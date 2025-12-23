@@ -55,6 +55,7 @@ public class SecurityConfig {
                         })
                 )
 
+                // Swagger
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers(
@@ -66,7 +67,7 @@ public class SecurityConfig {
                         .requestMatchers("/error").permitAll()
                         .anyRequest().authenticated()
                 )
-                .formLogin(AbstractHttpConfigurer::disable) //로그인 폼 없이
+                .formLogin(AbstractHttpConfigurer::disable) // no login for swagger , we need comfort
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .logout(logout -> logout
                         .logoutUrl("/api/auth/logout")
@@ -84,7 +85,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.setAllowedOrigins(List.of("http://localhost:0000","http://localhost:8080")); // 0000(미정) 프론트엔드 서버 주소로 바꿔야함
+        configuration.setAllowedOrigins(List.of("http://localhost:0000","http://localhost:8080")); // 0000 <- we have to convert this number from 0000 to frontend number
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
