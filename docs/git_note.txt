@@ -1,10 +1,10 @@
 # U-sto_BE Git Workflow (Team Rule)
 
 ## 0. 원칙
-- main은 “배포/기준선”이다. 직접 작업 금지.
-- 작업은 항상 브랜치에서 한다.
-- Push는 Terminal에서만 한다. (IntelliJ Push 버튼 사용 금지)
-- 환경설정/보안/빌드 관련 변경은 PR로 검증 후 merge.
+- main은 “배포/기준선”이다. 직접 작업하면 안된다.
+- 작업은 항상 브랜치에서 진행한다.
+- 박도현은 Push을 Terminal에서만 한다. (IntelliJ Push 버튼 사용 금지) - 인텔리제이 설정이 꼬임
+- 환경설정/보안/빌드 관련 변경은 PR로 검증 후 merge해야한다
 
 ---
 
@@ -44,6 +44,10 @@
 2) 커밋
 - `git add .`
 - `git commit -m "feat: ..."`
+
+커밋 내역 확인하기
+git log --oneline
+
 
 3) 원격에 브랜치 올리기 (최초 1회는 -u)
 - `git push -u origin <branch>`
