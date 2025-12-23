@@ -1,0 +1,91 @@
+# U-sto_BE Git Workflow (Team Rule)
+
+## 0. 원칙
+- main은 “배포/기준선”이다. 직접 작업 금지.
+- 작업은 항상 브랜치에서 한다.
+- Push는 Terminal에서만 한다. (IntelliJ Push 버튼 사용 금지)
+- 환경설정/보안/빌드 관련 변경은 PR로 검증 후 merge.
+
+---
+
+## 1. 개발 시작 전 (매일 시작 루틴)
+1) 최신 main 받기
+- `git switch main`
+- `git pull origin main`
+
+2) 새 작업 브랜치 만들기 (이슈/작업 단위)
+- `git switch -c feature/<topic>` 또는 `fix/<topic>` 또는 `chore/<topic>`
+
+3) 실행 확인(최소)
+- dev profile로 앱 기동
+- swagger 접속 확인
+
+---
+
+## 2. 개발 중 (작업 루틴)
+- 변경 단위를 작게 유지한다.
+- 의미 있는 단위로 commit 한다.
+- 커밋 메시지 규칙:
+  - feat: 기능
+  - fix: 버그
+  - chore: 설정/빌드
+  - docs: 문서
+  - refactor: 리팩토링
+
+권장:
+- 기능 1개 = 커밋 1~3개
+
+---
+
+## 3. 개발 후 (올리기 루틴)
+1) 상태 확인
+- `git status`
+
+2) 커밋
+- `git add .`
+- `git commit -m "feat: ..."`
+
+3) 원격에 브랜치 올리기 (최초 1회는 -u)
+- `git push -u origin <branch>`
+
+4) GitHub에서 PR 생성
+- base: main
+- 리뷰/검증: 팀원 실행 + swagger 확인
+
+5) PR merge 후
+- `git switch main`
+- `git pull origin main`
+- (선택) 브랜치 삭제:
+  - `git branch -d <branch>`
+
+---
+
+## 4. 문제 발생 시 행동강령 (Troubleshooting)
+### A) push가 403/denied 계정으로 뜸
+1) 에러 메시지에 찍힌 계정 확인
+2) Terminal에서 push로 재시도:
+- `git push -u origin <branch>`
+3) 그래도 안 되면 자격증명 초기화:
+- `git credential-manager erase`
+  - protocol=https
+  - host=github.com
+
+### B) "not a git repository"
+- 현재 폴더가 리포 루트인지 확인:
+  - `.git` 존재 확인
+- 맞는 폴더로 이동 후 재시도
+
+### C) 충돌(conflict)
+- main 최신화 후 rebase/merge
+- 충돌 해결 → 테스트 → 커밋 → push
+
+### D) 누가 작성자인지(Annotate) 이상함
+- `git log -1 --pretty=full`
+- push 전이면:
+  - `git commit --amend --reset-author`
+
+---
+
+## 5. 보안
+- 시크릿은 절대 커밋하지 않는다.
+- application-*.properties에는 환경변수 참조만 둔다.
