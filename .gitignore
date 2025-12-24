@@ -1,8 +1,8 @@
-# Compiled class file
+# java
 *.class
-
-# Log file
 *.log
+hs_err_pid*
+replay_pid*
 
 # BlueJ files
 *.ctxt
@@ -19,6 +19,37 @@
 *.tar.gz
 *.rar
 
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
-hs_err_pid*
-replay_pid*
+# Spring Initializr
+HELP.md
+
+# gradle
+.gradle
+build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# STS
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+
+# NetBeans
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+# VS Code
+.vscode/

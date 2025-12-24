@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project version="4">
-  <component name="com.obiscr.chatgpt.settings.EasyCodeState">
-    <option name="projectFiles" value="$PROJECT_DIR$/core/src/main/java/com/usto/api/common/config/SecurityConfig.java;C:/dev/U-sto/U-sto_BE/core/src/main/java/com/usto/api/common/config/SwaggerConfig.java;C:/dev/U-sto/U-sto_BE/core/src/main/java/com/usto/api/CoreApplication.java;C:/dev/U-sto/U-sto_BE/core/src/test/java/com/usto/api/CoreApplicationTests.java" />
-  </component>
-</project>
