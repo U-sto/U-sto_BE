@@ -3,12 +3,13 @@ use usto;
 1. 사용자는 반드시 하나의 조직에 속한다.
 2. 조직은 사용자/운용부서의 상위 개념이다.
 3. 조직의 조직코드는 <대학명>_<캠퍼스>
-4. 운용부서 코드가 같아도 조직코드가 다르면 다른 운용부서 취급이다. 그래서 운용부서는 복합키(기본키2개) 방식을 사용한다.
-5. 운용부서의 운용부서코드는 <유형>_<팀> 
+4. 운용부서 코드가 같아도 조직코드가 다르면 다른 운용부서 취급이다.
+5. 운용부서는 복합키(기본키2개) 방식을 사용한다.
+6. 운용부서의 운용부서코드는 <유형>_<팀>
 */
 
 -- TB_ORG001M
-
+DROP TABLE IF EXISTS TB_ORG001M;
 CREATE TABLE `TB_ORG001M` (
   `ORG_CD` VARCHAR(50)      NOT NULL COMMENT '조직코드(의미코드)',
   `ORG_NM` VARCHAR(100)  NOT NULL COMMENT '조직명',
@@ -41,6 +42,7 @@ FROM TB_ORG001M
 ORDER BY ORG_CD;
 
 -- TB_ORG002M
+DROP TABLE IF EXISTS TB_ORG002M;
 CREATE TABLE `TB_ORG002M` (
   `DEPT_CD` VARCHAR(50)      NOT NULL COMMENT '운용부서코드(의미코드, 조직 내 유일)',
   `ORG_CD`  VARCHAR(50)      NOT NULL COMMENT '조직코드(FK)',
@@ -81,14 +83,18 @@ WHERE ORG_CD = 'HYU_ERICA'
 ORDER BY DEPT_CD;
 
 -- TB_USER001M
+DROP TABLE IF EXISTS TB_USER001M;
 CREATE TABLE `TB_USER001M` (
-  `USR_ID`  VARCHAR(50)   NOT NULL COMMENT '사용자ID(로그인ID, 회원가입 시 사용자가 설정)',
+  `USR_ID`  VARCHAR(30)   NOT NULL COMMENT '사용자ID(로그인ID, 회원가입 시 사용자가 설정)',
   `USR_NM`  VARCHAR(50)   NOT NULL COMMENT '사용자명',
   `PW_HASH` VARCHAR(100)  NOT NULL COMMENT '비밀번호(해시)',
   `EMAIL`   VARCHAR(50)   NOT NULL COMMENT '이메일(UNIQUE)',
-  `MOB_NO`  CHAR(11)      NOT NULL COMMENT '전화번호',
-  `ROLE_ID` VARCHAR(20)   NOT NULL DEFAULT '' COMMENT '역할ID(ADMIN,MANAGER)',
-  `ORG_CD`  CHAR(10)      NOT NULL COMMENT '조직코드(FK)',
+  `PHONE`  CHAR(11)      NOT NULL COMMENT '전화번호',
+  `ROLE_ID` VARCHAR(20)   NOT NULL DEFAULT 'GUEST' COMMENT '역할ID(ADMIN,MANAGER,GUEST)',
+  `APPR_STS` VARCHAR(20) NOT NULL DEFAULT 'WAIT' COMMENT '승인여부(APPROVED,WAIT,REJECTED,SUSPENDED)',
+  `APPR_USR_ID` VARCHAR(30) NULL COMMENT '승인자ID',
+  `APPR_AT` DATETIME NULL COMMENT '승인일자',
+  `ORG_CD`  VARCHAR(50)      NOT NULL COMMENT '조직코드(FK)',
   `CRE_BY`  VARCHAR(30)   NOT NULL COMMENT '생성자ID',
   `CRE_AT`  DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '생성일자',
   `UPD_BY`  VARCHAR(30)   NULL COMMENT '수정자ID',
@@ -101,8 +107,11 @@ CREATE TABLE `TB_USER001M` (
     ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- 검증
 SELECT *
 FROM TB_USER001M;
 
--- 확인
+
+
+-- 최종 확인
 SHOW TABLES;
