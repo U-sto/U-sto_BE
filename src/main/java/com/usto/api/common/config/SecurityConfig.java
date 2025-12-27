@@ -5,11 +5,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -23,11 +25,6 @@ import java.util.List;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
 
     /**
      *
@@ -48,12 +45,12 @@ public class SecurityConfig {
                         .authenticationEntryPoint((request, response, authException) -> {
                             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-                            response.getWriter().write("{\"message\":\"로그인이 필요합니다\"}"); //로그인이 필요합니다(프론트)
+                            response.getWriter().write("{\"message\":\"로그인이 필요합니다.\"}"); //로그인이 필요합니다(프론트)
                         })
                         .accessDeniedHandler((request, response, accessDeniedException) -> {
                             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-                            response.getWriter().write("{\"message\":\"접근 권한이 없습니다\"}"); //접근 권한이 없습니다(프론트)
+                            response.getWriter().write("{\"message\":\"접근권한이 없습니다.\"}"); //접근 권한이 없습니다(프론트)
                         })
                 )
 
@@ -97,8 +94,39 @@ public class SecurityConfig {
         return source;
     }
 
+    /**
+     *
+     * @param config
+     * @return
+     * @throws Exception
+     */
     @Bean // 로그인에 필요함
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+    public AuthenticationManager authenticationManager(
+            AuthenticationConfiguration config
+    ) throws Exception {
         return config.getAuthenticationManager();
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    //아이디,비밀번호 로그인 실행기
+    /**
+     *\
+     * @param userDetailsService
+     * @param passwordEncoder
+     * @return
+     */
+    @Bean
+    public DaoAuthenticationProvider daoAuthenticationProvider(
+            UserDetailsService userDetailsService,
+            PasswordEncoder passwordEncoder
+    ) {
+        DaoAuthenticationProvider p = new DaoAuthenticationProvider();
+        p.setUserDetailsService(userDetailsService); // 사용자 조회 전략
+        p.setPasswordEncoder(passwordEncoder);       // 비밀번호 비교 전략(핵심)
+        return p;
     }
 }
