@@ -20,21 +20,21 @@ CREATE TABLE TB_G2B_RAW (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- 2) 적재
-LOAD DATA LOCAL INFILE 'D:/g2b_list.csv' -- 이거는 예영님에게 맞게 수정하셔야합니다
+LOAD DATA LOCAL INFILE './src/main/resources/data/g2b_list.csv'
 INTO TABLE TB_G2B_RAW
 CHARACTER SET utf8mb4
 FIELDS TERMINATED BY '\t'
 ENCLOSED BY '"'
-LINES TERMINATED BY '\r\n'
+LINES TERMINATED BY '\n'
 IGNORE 1 ROWS
 (G2B_M_CD, G2B_M_NM, G2B_D_CD, G2B_D_NM, @upr_raw)
 SET
-  G2B_UPR_RAW = @upr_raw,
+  G2B_UPR_RAW = REPLACE(@upr_raw, '\r', ''),
   G2B_UPR=
     CASE
-      WHEN @upr_raw IS NULL OR TRIM(@upr_raw) = '' THEN NULL
-      WHEN REPLACE(TRIM(@upr_raw), ',', '') REGEXP '^[0-9]+$'
-        THEN CAST(REPLACE(TRIM(@upr_raw), ',', '') AS DECIMAL(20,0))
+      WHEN REPLACE(@upr_raw, '\r', '') IS NULL OR TRIM(REPLACE(@upr_raw, '\r', '')) = '' THEN NULL
+      WHEN REPLACE(REPLACE(TRIM(@upr_raw), ',', ''), '\r', '') REGEXP '^[0-9]+$'
+        THEN CAST(REPLACE(REPLACE(TRIM(@upr_raw), ',', ''), '\r', '') AS DECIMAL(20,0))
       ELSE NULL
     END;
 
