@@ -1,5 +1,6 @@
 package com.usto.api;
 
+import jakarta.annotation.PostConstruct;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.core.env.Environment;
@@ -17,7 +18,7 @@ public class CoreApplication {
         SpringApplication.run(CoreApplication.class, args);
     }
 
-    @jakarta.annotation.PostConstruct
+    @PostConstruct
     void logProfile() {
         System.out.println("CoreApplication 실행 성공");
         System.out.println("profile 값(의도와 다르면 변경) : " + String.join(",", env.getActiveProfiles()));
