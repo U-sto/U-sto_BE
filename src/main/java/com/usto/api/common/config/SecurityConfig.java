@@ -112,7 +112,7 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    //아이디,비밀번호 로그인 실행기
+    //아이디,비밀번호 로그인 실행기 (로그인 구현시에 사용할 예정)
     /**
      *\
      * @param userDetailsService
@@ -124,9 +124,9 @@ public class SecurityConfig {
             UserDetailsService userDetailsService,
             PasswordEncoder passwordEncoder
     ) {
-        DaoAuthenticationProvider p = new DaoAuthenticationProvider();
-        p.setUserDetailsService(userDetailsService); // 사용자 조회 전략
-        p.setPasswordEncoder(passwordEncoder);       // 비밀번호 비교 전략(핵심)
-        return p;
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        provider.setUserDetailsService(userDetailsService); // 사용자 조회 전략
+        provider.setPasswordEncoder(passwordEncoder);       // 비밀번호 비교 전략(핵심)
+        return provider;
     }
 }
