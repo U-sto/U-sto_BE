@@ -1,0 +1,101 @@
+package com.usto.api.user.infrastructure.repository;
+
+import com.usto.api.user.domain.model.Verification;
+import com.usto.api.user.domain.model.VerificationPurpose;
+import com.usto.api.user.domain.model.VerificationType;
+import com.usto.api.user.domain.repository.VerificationRepository;
+import com.usto.api.user.infrastructure.entity.VerificationJpaEntity;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
+
+import java.time.LocalDateTime;
+import java.util.Optional;
+
+/*
+    Repository와 JpaRepository를 연결하는 어댑터
+    Application은 Repository만 사용하지만, 실제 DB 접근은 JpaRepository가 하나기때문에 필요함
+ */
+
+@Repository
+@RequiredArgsConstructor //@RequiredArgsConstructor는 final 필드만 생성자에 넣어줌
+public class VerificationRepositoryAdapter implements VerificationRepository {
+
+    private final VerificationJpaRepository verificationJpaRepository;
+
+    @Override
+    public Optional<Verification> find(
+            String target,
+            VerificationType type,
+            VerificationPurpose purpose)
+    {
+        return verificationJpaRepository.findByTypeAndPurposeAndTarget(
+                        type,
+                        purpose,
+                        target)
+                        .map(VerificationRepositoryAdapter::toDomain);
+    }
+
+    @Override
+    public Verification save(
+            Verification verification)
+    {
+        VerificationJpaEntity mapped = toEntity(verification);
+        VerificationJpaEntity saved = verificationJpaRepository.save(mapped);
+        return toDomain(saved);
+    }
+
+    @Override
+    public void delete(
+            String target,
+            VerificationType type,
+            VerificationPurpose purpose)
+    {
+        verificationJpaRepository.findByTypeAndPurposeAndTarget(
+                        type,
+                        purpose,
+                        target)
+                .ifPresent(verificationJpaRepository::delete);
+    }
+
+    @Override
+    public int deleteExpiredBefore(LocalDateTime now) {
+        return verificationJpaRepository.deleteByExpiresAtBefore(now);
+    }
+
+    // --- mapper ---
+    private static Verification toDomain(VerificationJpaEntity e) {
+        return Verification.builder()
+                .id(e.getId())
+                .type(e.getType())
+                .purpose(e.getPurpose())
+                .target(e.getTarget())
+                .code(e.getCode())
+                .expiresAt(e.getExpiresAt())
+                .isVerified(e.isVerified())
+                .verifiedAt(e.getVerifiedAt())
+                // base time
+                .creBy(e.getCreBy())
+                .creAt(e.getCreAt())
+                .updBy(e.getUpdBy())
+                .updAt(e.getUpdAt())
+                .build();
+    }
+
+    private static VerificationJpaEntity toEntity(Verification d) {
+        return VerificationJpaEntity.builder()
+                .id(d.getId())
+                .type(d.getType())
+                .purpose(d.getPurpose())
+                .target(d.getTarget())
+                .code(d.getCode())
+                .expiresAt(d.getExpiresAt())
+                .isVerified(d.isVerified())
+                .verifiedAt(d.getVerifiedAt())
+                // base time
+                .creBy(d.getCreBy())
+                .creAt(d.getCreAt())
+                .updBy(d.getUpdBy())
+                .updAt(d.getUpdAt())
+                .build();
+    }
+}
