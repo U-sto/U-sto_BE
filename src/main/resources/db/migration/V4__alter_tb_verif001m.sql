@@ -8,7 +8,7 @@ USE usto;
 
 
     + 예영님과 상의 후에 마이그레이션을 다시 짤거긴한데, 일단 메모용으로라도 남깁니다.
- */
+
 
 -- 1) PURPOSE 컬럼 추가
 ALTER TABLE TB_VERIF001M
@@ -52,3 +52,5 @@ ALTER TABLE TB_VERIF001M
 -- 4) 칼럼 삭제
 ALTER TABLE TB_VERIF001M
     DROP COLUMN ORG_CD;
+
+ */
