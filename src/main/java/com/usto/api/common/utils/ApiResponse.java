@@ -1,4 +1,4 @@
-package com.usto.api.common;
+package com.usto.api.common.utils;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

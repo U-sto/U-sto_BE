@@ -5,10 +5,12 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.AccessLevel;
+import lombok.experimental.SuperBuilder;
 
 @Entity
 @Table(name = "TB_ORG002M")
 @Getter
+@SuperBuilder(toBuilder = true)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class DepartmentJpaEntity extends BaseTimeEntity {
 
