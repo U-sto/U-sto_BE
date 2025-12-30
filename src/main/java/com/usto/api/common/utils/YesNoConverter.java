@@ -4,7 +4,7 @@ import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
 @Converter
-public class YseNoConverter implements AttributeConverter<Boolean, String> {
+public class YesNoConverter implements AttributeConverter<Boolean, String> {
     // Entity(boolean) -> DB(Char/String)
     @Override
     public String convertToDatabaseColumn(Boolean attribute) {
