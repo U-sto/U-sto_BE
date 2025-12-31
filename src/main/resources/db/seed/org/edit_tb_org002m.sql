@@ -1,0 +1,22 @@
+USE usto;
+
+INSERT INTO TB_ORG002M (
+    ORG_CD,
+    DEPT_CD,
+    DEPT_NM,
+    DEPT_TY,
+    CRE_BY
+) VALUES
+-- 총무관리처 계열
+('HANYANG_ERICA', 'ADM_HR',     '총무인사팀',                 '총무관리처', 'SYSTEM'),
+('HANYANG_ERICA', 'ADM_SAFE',   '캠퍼스안전팀',               '총무관리처', 'SYSTEM'),
+('HANYANG_ERICA', 'ADM_ASSET',  '관재팀',                     '총무관리처', 'SYSTEM'),
+('HANYANG_ERICA', 'ADM_FAC',    '시설팀',                     '총무관리처', 'SYSTEM'),
+
+-- 단과대학 계열
+('HANYANG_ERICA', 'COL_SW_RC',  '소프트웨어융합대학RC 행정팀', '단과대학',   'SYSTEM');
+
+-- 확인
+SELECT *
+FROM TB_ORG002M
+ORDER BY DEPT_CD;
