@@ -16,8 +16,6 @@ import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
 
-import static java.time.LocalDateTime.*;
-
 @Entity
 @Table(name = "TB_VERIF001M")
 @Getter

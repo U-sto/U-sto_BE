@@ -50,6 +50,7 @@ public class EmailVerificationController {
     private String resolveActor(HttpServletRequest http) {
         // 로그인 기반이면 여기서 SecurityContext에서 usrId 꺼냄
         // 아니면 IP+UA
+        // 일반적으로는 UsrID로 해야함.
         String ip = http.getRemoteAddr();
         String ua = http.getHeader("User-Agent");
         return "ANON ip=" + ip + " ua=" + (ua == null ? "-" : ua);

@@ -12,12 +12,13 @@ import com.usto.api.user.domain.model.VerificationType;
 import com.usto.api.user.domain.repository.VerificationRepository;
 import com.usto.api.user.presentation.dto.request.EmailVerifyRequestDto;
 import com.usto.api.user.presentation.dto.request.SmsVerifyRequestDto;
-import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.time.LocalDateTime;
 
 @Slf4j
@@ -28,7 +29,7 @@ public class EmailVerificationApplication {
     private final VerificationRepository verificationRepository; // 인증 이력 저장/조회용 JPA 리포지토리
 
 
-    @org.springframework.transaction.annotation.Transactional
+    @Transactional
     public void verifyCode(EmailVerifyRequestDto request) {
         LocalDateTime now = LocalDateTime.now();
         Verification verification = verificationRepository

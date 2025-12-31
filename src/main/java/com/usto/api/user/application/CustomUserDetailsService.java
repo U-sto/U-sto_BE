@@ -20,7 +20,7 @@ public class CustomUserDetailsService implements UserDetailsService {
             throws UsernameNotFoundException {
 
         UserJpaEntity user = userJpaRepository
-                .findByUsrId(usrNm)
+                .findByUsrId(usrNm) //시스템에서 ID가 username이라서,,
                 .orElseThrow(() ->
                         new UsernameNotFoundException("존재하지 않는 사용자입니다."));
 
