@@ -30,7 +30,7 @@ public abstract class BaseTimeEntity {
 
     //생성자ID
     @CreatedBy
-    @Column(name="cre_by", updatable = false, length = 30)
+    @Column(name="cre_by", updatable = false, length = 100)
     private String creBy;
 
     //생성일자
@@ -40,7 +40,7 @@ public abstract class BaseTimeEntity {
 
     //수정자ID
     @LastModifiedBy
-    @Column(name="upd_by" , length = 30)
+    @Column(name="upd_by" , length = 100)
     private String updBy;
 
     //수정일자
