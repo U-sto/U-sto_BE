@@ -30,7 +30,7 @@ public class VerificationJpaEntity extends BaseTimeEntity {
     private Long id;
 
     // 인증 대상 (이메일 주소 또는 전화번호)
-    @Column(name="TARGET",nullable = false)
+    @Column(name="TARGET",length = 255 ,nullable = false)
     private String target;
 
     // 인증 타입 (EMAIL, PHONE)
@@ -40,7 +40,7 @@ public class VerificationJpaEntity extends BaseTimeEntity {
 
     // 인증 목적
     @Enumerated(EnumType.STRING)
-    @Column(name="VERIF_PURPOSE",length = 100,nullable = false)
+    @Column(name="VERIF_PURPOSE",length = 30,nullable = false)
     private VerificationPurpose purpose;
 
     // 인증 코드 (예: "1234")

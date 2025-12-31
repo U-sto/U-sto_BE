@@ -16,7 +16,7 @@ public class UserJpaEntity extends BaseTimeEntity {
 
     // 로그인 아이디
     @Id //PK
-    @Column(name = "USR_ID", length = 30,nullable = false) //PK긴 하지만 가독성을 위해
+    @Column(name = "USR_ID", length = 50,nullable = false) //PK긴 하지만 가독성을 위해
     private String usrId;
 
     //유저이름
@@ -29,7 +29,7 @@ public class UserJpaEntity extends BaseTimeEntity {
     private String pwHash;
 
     // 이메일
-    @Column(name = "EMAIL", unique = true, nullable = false)
+    @Column(name = "EMAIL", length = 255 , unique = true, nullable = false)
     private String email;
 
     // 전화번호
@@ -51,7 +51,7 @@ public class UserJpaEntity extends BaseTimeEntity {
     private ApprovalStatus apprSts = ApprovalStatus.WAIT; //기본 값은 WAIT(승인 전)
 
     //승인자ID - 셀프 조인을 할까? 했는데 단순 이력이라서 그냥 컬럼으로 사용
-    @Column(name = "APPR_USR_ID", length = 30)
+    @Column(name = "APPR_USR_ID", length = 50)
     private String apprUsrId;
 
     //승인일자
