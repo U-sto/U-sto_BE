@@ -29,6 +29,7 @@ use usto;
 */
 
 -- TB_ORG001M
+-- VARCHAR(255)로 싹다 바꾸기 !
 CREATE TABLE `TB_ORG001M` (
   `ORG_CD` VARCHAR(50)      NOT NULL COMMENT '조직코드(의미코드)',
   `ORG_NM` VARCHAR(100)  NOT NULL COMMENT '조직명',
@@ -38,27 +39,6 @@ CREATE TABLE `TB_ORG001M` (
   `UPD_AT` DATETIME      NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일자',
   PRIMARY KEY (`ORG_CD`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
-INSERT INTO TB_ORG001M (
-    ORG_CD,
-    ORG_NM,
-    CRE_BY
-) VALUES
-(
-    'HYU_SEOUL',
-    '한양대학교 서울캠퍼스',
-    'SYSTEM'
-),
-(
-    'HYU_ERICA',
-    '한양대학교 ERICA캠퍼스',
-    'SYSTEM'
-);
-
--- 확인
-SELECT *
-FROM TB_ORG001M
-ORDER BY ORG_CD;
 
 -- TB_ORG002M
 CREATE TABLE `TB_ORG002M` (
