@@ -9,13 +9,8 @@ package com.usto.api.user.application;
 
 import com.usto.api.common.utils.SmsUtil;
 import com.usto.api.user.domain.model.Verification;
-import com.usto.api.user.domain.model.VerificationPurpose;
-import com.usto.api.user.domain.model.VerificationType;
 import com.usto.api.user.domain.repository.VerificationRepository;
-import com.usto.api.user.infrastructure.entity.VerificationJpaEntity;
-import com.usto.api.user.infrastructure.repository.VerificationJpaRepository;
 import com.usto.api.user.presentation.dto.request.SmsSendRequestDto;
-import com.usto.api.user.presentation.dto.request.SmsVerifyRequestDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +28,7 @@ public class SmsSendApplication {
     /**
      * 인증번호 발송
      * @param request
+     * @param actor
      */
     @Transactional
     public void sendCodeToSms(SmsSendRequestDto request,String actor) {
@@ -63,7 +59,6 @@ public class SmsSendApplication {
                     .expiresAt(timeLimit) // 5분 제한
                     .isVerified(false)
                     .build();
-            verificationRepository.save(verification);
         } else {
             // 기존 내역이 있으면 재전송
             verification.renew(code,timeLimit);
