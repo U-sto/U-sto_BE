@@ -1,4 +1,4 @@
-package com.usto.api.user.account.domain.model;
+package com.usto.api.user.domain.model;
 
 public enum Role {
     ADMIN, //관리자
