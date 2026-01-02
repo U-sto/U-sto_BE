@@ -4,14 +4,19 @@ import com.usto.api.common.BaseTimeEntity;
 import com.usto.api.organization.infrastructure.entity.OrganizationJpaEntity;
 import com.usto.api.user.domain.model.ApprovalStatus;
 import com.usto.api.user.domain.model.Role;
+import com.usto.api.user.domain.model.User;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
+
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "TB_USER001M")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED) // JPA가 사용할 기본 생성자 만들기
+@SuperBuilder
+@AllArgsConstructor //builder랑 슈퍼세트
 public class UserJpaEntity extends BaseTimeEntity {
 
     // 로그인 아이디
@@ -39,6 +44,7 @@ public class UserJpaEntity extends BaseTimeEntity {
     //역할E
     @Enumerated(EnumType.STRING)
     @Column(name = "ROLE_ID", length = 20, nullable = false)
+    @Builder.Default
     private Role roleId = Role.GUEST; //기본 값은 GUEST(승인 전)
 
     //조직코드
@@ -46,6 +52,7 @@ public class UserJpaEntity extends BaseTimeEntity {
     private String orgCd;
 
     //승인여부
+    @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(name = "APPR_STS" , length = 20 , nullable = false)
     private ApprovalStatus apprSts = ApprovalStatus.WAIT; //기본 값은 WAIT(승인 전)
@@ -63,4 +70,5 @@ public class UserJpaEntity extends BaseTimeEntity {
     @JoinColumn(name = "ORG_CD", referencedColumnName = "ORG_CD",
             insertable = false, updatable = false)
     private OrganizationJpaEntity organization; // <-조회용 “읽기 전용 뷰
+
 }
