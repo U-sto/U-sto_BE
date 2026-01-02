@@ -38,7 +38,7 @@ public class SmsVerificationController {
         return ResponseEntity.ok("인증번호가 문자로 발송되었습니다.");
     }
 
-    @PostMapping("/verify")
+    @PostMapping("/check")
     public ResponseEntity<String> verifyCode(
             @Valid
             @RequestBody

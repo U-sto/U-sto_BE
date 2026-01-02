@@ -37,7 +37,7 @@ public class EmailVerificationController {
     }
 
 
-    @PostMapping("/verify")
+    @PostMapping("/check")
     public ResponseEntity<String> verifyEmail(
             @Valid
             @RequestBody EmailVerifyRequestDto request
