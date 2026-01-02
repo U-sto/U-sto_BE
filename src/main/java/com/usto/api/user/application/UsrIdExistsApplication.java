@@ -1,5 +1,6 @@
 package com.usto.api.user.application;
 
+import com.usto.api.user.domain.repository.UserRepository;
 import com.usto.api.user.infrastructure.repository.UserJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -8,9 +9,9 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class UsrIdExistsApplication {
 
-    private final UserJpaRepository userJpaRepository;
+    private final UserRepository userRepository;
 
     public boolean existsByUsrId(String usrId) {
-        return userJpaRepository.existsByUsrId(usrId);
+        return userRepository.existsByUsrId(usrId);
     }
 }
