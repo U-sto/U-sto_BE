@@ -1,5 +1,6 @@
 package com.usto.api.user.infrastructure.repository;
 
+import com.usto.api.user.domain.model.User;
 import com.usto.api.user.infrastructure.entity.UserJpaEntity;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -9,12 +10,11 @@ import java.util.Optional;
 
 public interface UserJpaRepository extends JpaRepository<UserJpaEntity, String> {
 
-    // 회원조회
-    Optional<UserJpaEntity> findByUsrId(String usrId);
-    Optional<UserJpaEntity> findByEmail(String email);
-    Optional<UserJpaEntity> findBySms(String sms);
-
     boolean existsByUsrId(String usrId);
     boolean existsByEmail(String email);
     boolean existsBySms(String sms);
+
+    User save(User user);
+
+    Optional<Object> findByUsrId(String usrId);
 }
