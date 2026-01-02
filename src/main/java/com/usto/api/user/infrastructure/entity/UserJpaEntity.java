@@ -33,8 +33,8 @@ public class UserJpaEntity extends BaseTimeEntity {
     private String email;
 
     // 전화번호
-    @Column(name = "PHONE", length = 11, unique = true, nullable = false ,columnDefinition = "CHAR(11)")
-    private String phone;
+    @Column(name = "SMS", length = 11, unique = true, nullable = false ,columnDefinition = "CHAR(11)")
+    private String sms;
 
     //역할E
     @Enumerated(EnumType.STRING)

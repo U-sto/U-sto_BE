@@ -4,7 +4,7 @@ public interface UserRepository {
 
     boolean existsByUsrId(String usrId);
     boolean existsByEmail(String email);
-    boolean existsByPhone(String phone);
+    boolean existsBySms(String sms);
 
     /* 아직은 구현 X
     Optional<User> findByUsrId(String usrId); // 로그인/조회
