@@ -11,7 +11,8 @@ public interface UserJpaRepository extends JpaRepository<UserJpaEntity, String> 
 
     // 회원조회
     Optional<UserJpaEntity> findByUsrId(String usrId);
-
+    Optional<UserJpaEntity> findByEmail(String email);
+    Optional<UserJpaEntity> findBySms(String sms);
 
     boolean existsByUsrId(String usrId);
     boolean existsByEmail(String email);
