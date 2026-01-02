@@ -1,3 +1,5 @@
+USE usto;
+
 SHOW VARIABLES LIKE 'local_infile'; -- ON이여야합니다.
 SET GLOBAL local_infile = 1;
 

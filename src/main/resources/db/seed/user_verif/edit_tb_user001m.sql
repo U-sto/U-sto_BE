@@ -7,7 +7,13 @@ VALUES
      'user_rej@usto.com', '01000000004', 'GUEST', 'REJECTED',
      NULL, NULL, 'HANYANG_ERICA', 'SYSTEM');
 */
-
+USE usto;
 -- 검증
+INSERT INTO TB_USER001M
+(USR_ID, USR_NM, PW_HASH, EMAIL, SMS, ROLE_ID, APPR_STS, APPR_USR_ID, APPR_AT, ORG_CD, CRE_BY)
+VALUES
+    ('rejected01', '반려유저', '$2b$10$N9qo8uLOickgx2ZMRZo5i.ej3xGJdZQzQ0jrISFRCGDpa2BkLomf6',
+     'user_rej@usto.com', '01000000004', 'GUEST', 'REJECTED',
+     NULL, NULL, 'HANYANG_ERICA', 'SYSTEM');
 SELECT *
 FROM TB_USER001M;

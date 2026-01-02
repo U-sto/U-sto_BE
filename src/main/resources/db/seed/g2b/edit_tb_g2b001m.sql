@@ -1,3 +1,5 @@
+USE usto;
+
 INSERT INTO TB_G2B001M (
     G2B_M_CD,
     G2B_M_NM,
