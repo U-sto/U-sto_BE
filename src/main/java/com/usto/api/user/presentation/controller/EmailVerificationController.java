@@ -11,10 +11,13 @@ import com.usto.api.user.application.EmailVerificationApplication;
 import com.usto.api.user.presentation.dto.request.EmailSendRequestDto;
 import com.usto.api.user.presentation.dto.request.EmailVerifyRequestDto;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/api/auth/verif/email")
@@ -29,7 +32,8 @@ public class EmailVerificationController {
             @Valid
             @RequestBody EmailSendRequestDto request,
             HttpServletRequest http
-    ) {
+    )
+    {
         String actor = resolveActor(http);   // 아래 메서드
         emailSendApplication.sendCodeToEmail(request,actor);
 
@@ -40,11 +44,17 @@ public class EmailVerificationController {
     @PostMapping("/check")
     public ResponseEntity<String> verifyEmail(
             @Valid
-            @RequestBody EmailVerifyRequestDto request
+            @RequestBody EmailVerifyRequestDto request,
+            HttpSession session
+
     ) {
         emailVerifyApplication.verifyCode(request);
 
+        session.setAttribute("signup.preauth.email", request.getTarget());
+        session.setAttribute("signup.preauth.expiresAt", LocalDateTime.now().plusMinutes(15));
+
         return ResponseEntity.ok("이메일 인증이 완료되었습니다.");
+
     }
 
     private String resolveActor(HttpServletRequest http) {

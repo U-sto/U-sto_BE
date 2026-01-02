@@ -11,10 +11,13 @@ import com.usto.api.user.application.SmsVerificationApplication;
 import com.usto.api.user.presentation.dto.request.SmsSendRequestDto;
 import com.usto.api.user.presentation.dto.request.SmsVerifyRequestDto;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/api/auth/verif/sms")
@@ -42,10 +45,14 @@ public class SmsVerificationController {
     public ResponseEntity<String> verifyCode(
             @Valid
             @RequestBody
-            SmsVerifyRequestDto request
+            SmsVerifyRequestDto request,
+            HttpSession session
     )
     {
         smsVerifyApplication.verifyCode(request);
+
+        session.setAttribute("signup.preauth.sms", request.getTarget());
+        session.setAttribute("signup.preauth.expiresAt", LocalDateTime.now().plusMinutes(15));
 
         return ResponseEntity.ok("전화번호 인증이 완료되었습니다.");
     }
