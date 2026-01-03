@@ -1,7 +1,13 @@
 package com.usto.api.user.presentation.controller;
 
 import com.usto.api.common.utils.ApiResponse;
+import com.usto.api.user.application.PasswordFindApplication;
+import com.usto.api.user.application.PasswordUpdateApplication;
+import com.usto.api.user.application.UserIdFindApplication;
+import com.usto.api.user.presentation.dto.request.PasswordFindRequestDto;
+import com.usto.api.user.presentation.dto.request.PasswordResetRequestDto;
 import com.usto.api.user.presentation.dto.request.UserIdFindRequestDto;
+import com.usto.api.user.presentation.dto.response.UserIdFindResponseDto;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,49 +20,88 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/auth/find")
 public class FindController {
 
+    private final UserIdFindApplication userIdFindApplication;
+    private final PasswordFindApplication passwordFindApplication;
+    private final PasswordUpdateApplication passwordUpdateApplication;
+
     @PostMapping("/user-id")
     public ApiResponse<?> findUserId(
             @RequestBody
             UserIdFindRequestDto request,
             HttpSession session
     ) {
-        String verifiedEmail = (String) session.getAttribute("signup.preauth.email");
+
+        String verifiedEmail = (String) session.getAttribute("find.preauth.email");
+
         if (verifiedEmail == null) {
             return ApiResponse.fail("이메일 인증이 필요합니다");
         }
 
-        //찾기 기능
+        String userId = userIdFindApplication.findUserIdByEmail(verifiedEmail);
+        if (userId == null) {
+            return ApiResponse.fail("존재하지 않는 회원입니다.");
+        }
 
-        //세션 삭제
-        session.removeAttribute("signup.preauth.email");
-        session.removeAttribute("signup.preauth.emailVerifiedAt");
-        session.removeAttribute("signup.preauth.expiresAt");
+        String userName = userIdFindApplication.findUserNmByUserId(userId);
+        if (!userName.equals(request.getUsrNm())) {
+            return ApiResponse.fail("이름을 확인해주세요.");
+        }
 
-        return ApiResponse.ok("아이디 찾기 완료");
+        session.removeAttribute("find.preauth.usrId");
+        session.removeAttribute("find.preauth.emailVerifiedAt");
+        session.removeAttribute("find.preauth.expiresAt");
+
+        return ApiResponse.ok("아이디 찾기 완료", new UserIdFindResponseDto(userId)); // <- 이 부분을 Dto로 풀고 싶은데 어떻게 해야할지 모르겠음
 
     }
 
 
     @PostMapping("/password")
-    public ApiResponse<?> resetPassword(
+    public ApiResponse<?> findPassword(
             @RequestBody
-            UserIdFindRequestDto request,
+            PasswordFindRequestDto request,
             HttpSession session
     )
     {
-        String verifiedEmail = (String) session.getAttribute("signup.preauth.email");
+
+        String verifiedEmail = (String) session.getAttribute("find.preauth.email");
         if (verifiedEmail == null) {
             return ApiResponse.fail("이메일 인증이 필요합니다");
         }
 
-        //재설정 기능
+        String userId = passwordFindApplication.findUserIdByEmail(verifiedEmail);
+        if (!userId.equals(request.getUsrId())) {
+            return ApiResponse.fail("아이디를 확인해주세요.");
+        }
+        session.removeAttribute("find.preauth.password");
+        session.removeAttribute("find.preauth.emailVerifiedAt");
+        session.removeAttribute("find.preauth.expiresAt");
 
-        //세션 삭제
-        session.removeAttribute("signup.preauth.email");
-        session.removeAttribute("signup.preauth.emailVerifiedAt");
-        session.removeAttribute("signup.preauth.expiresAt");
+        session.setAttribute("find.preauth.usrId",userId); //재설정에서 사용하기 위해서 세션에 담아두기
 
         return ApiResponse.ok("비밀번호 찾기 완료");
+    }
+
+    @PostMapping("/password/update")
+    public ApiResponse<?> resetPassword(
+            @RequestBody
+            PasswordResetRequestDto request,
+            HttpSession session
+    )
+    {
+        String userId = (String) session.getAttribute("find.preauth.usrId");
+
+        if (userId == null) {
+            return ApiResponse.fail("존재하지 않는 회원입니다.");
+        }
+
+        if(!request.getPwd().equals(request.getPwdConfirm())){
+            return ApiResponse.fail("두 비밀번호가 일치하지 않습니다.");
+        }
+
+        passwordUpdateApplication.updatePwHashByUsrId(userId, request.getPwd());
+
+        return ApiResponse.ok("비밀번호 재설정 완료");
     }
 
 }
