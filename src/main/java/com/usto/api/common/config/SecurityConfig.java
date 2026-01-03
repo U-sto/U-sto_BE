@@ -59,7 +59,7 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/api/users",
                                 "/api/users/exists/**",
-                                "/api/auth/reccovery/**",
+                                "/api/auth/find/**",
                                 "/api/auth/verification/**"
                         ).permitAll()
 
