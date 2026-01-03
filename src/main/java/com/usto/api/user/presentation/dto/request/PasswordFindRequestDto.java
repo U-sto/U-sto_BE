@@ -7,5 +7,5 @@ import lombok.Getter;
 public class PasswordFindRequestDto {
 
     @NotBlank
-    String usrNm;
+    String usrId;
 }
