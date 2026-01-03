@@ -6,6 +6,7 @@ import com.usto.api.user.infrastructure.entity.UserJpaEntity;
 import com.usto.api.user.infrastructure.entity.UserJpaEntityMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -39,17 +40,28 @@ public class UserRepositoryAdapter implements UserRepository {
 
     @Override
     public Optional<String> findUsrIdByEmail(String email) {
-        return userJpaRepository.findByEmail(email).map(UserJpaEntity::getUsrId);
+        return userJpaRepository.findByEmail(email)
+                .map(UserJpaEntity::getUsrId);
     }
 
     @Override
     public Optional<String> findUsrNmByUsrId(String usrId) {
-        return userJpaRepository.findByUsrId(usrId).map(UserJpaEntity::getUsrNm);
+        return userJpaRepository.findByUsrId(usrId)
+                .map(UserJpaEntity::getUsrNm);
     }
 
     @Override
-    public void updatePasswordHash(String usrId, String pwHash) {
-        userJpaRepository.updatePwHashByUsrId(usrId, pwHash);
+    @Transactional
+    public void updatePwHashByUsrId(String usrId, String pwHash) {
+
+        int updated = userJpaRepository
+                .updatePwHashByUsrId(
+                        usrId,
+                        pwHash); //업데이트 된 행 수
+
+        if (updated == 0) {
+            throw new IllegalArgumentException("존재하지 않는 회원입니다.");
+        }
     }
 }
 

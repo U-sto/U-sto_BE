@@ -1,11 +1,5 @@
 package com.usto.api.user.presentation.dto.response;
 
-import jakarta.validation.constraints.NotBlank;
-import lombok.Getter;
 
-@Getter
-public class UserIdFindResponseDto {
+public record UserIdFindResponseDto (String usrId){}
 
-    @NotBlank
-    String usrId;
-}

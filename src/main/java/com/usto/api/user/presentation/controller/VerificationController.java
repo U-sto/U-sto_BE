@@ -4,6 +4,7 @@ import com.usto.api.user.application.EmailSendApplication;
 import com.usto.api.user.application.EmailVerificationApplication;
 import com.usto.api.user.application.SmsSendApplication;
 import com.usto.api.user.application.SmsVerificationApplication;
+import com.usto.api.user.domain.model.VerificationPurpose;
 import com.usto.api.user.presentation.dto.request.EmailSendRequestDto;
 import com.usto.api.user.presentation.dto.request.EmailVerifyRequestDto;
 import com.usto.api.user.presentation.dto.request.SmsSendRequestDto;
@@ -54,8 +55,17 @@ public class VerificationController {
     ) {
         emailVerifyApplication.verifyCode(request);
 
-        session.setAttribute("signup.preauth.email", request.getTarget());
-        session.setAttribute("signup.preauth.expiresAt", LocalDateTime.now().plusMinutes(15));
+        if (request.getPurpose().equals(VerificationPurpose.SIGNUP)) {
+            session.setAttribute("signup.preauth.email", request.getTarget());
+            session.setAttribute("signup.preauth.expiresAt", LocalDateTime.now().plusMinutes(15));
+        }else if(request.getPurpose().equals(VerificationPurpose.FIND_ID)) {
+            session.setAttribute("find.preauth.email", request.getTarget());
+            session.setAttribute("find.preauth.expiresAt", LocalDateTime.now().plusMinutes(15));
+        }else if(request.getPurpose().equals(VerificationPurpose.RESET_PASSWORD)){
+            session.setAttribute("find.preauth.email", request.getTarget());
+            session.setAttribute("find.preauth.expiresAt", LocalDateTime.now().plusMinutes(15));
+        }
+
 
         return ResponseEntity.ok("이메일 인증이 완료되었습니다.");
 
@@ -85,8 +95,16 @@ public class VerificationController {
     {
         smsVerifyApplication.verifyCode(request);
 
-        session.setAttribute("signup.preauth.sms", request.getTarget());
-        session.setAttribute("signup.preauth.expiresAt", LocalDateTime.now().plusMinutes(15));
+        if (request.getPurpose().equals("SIGNUP")) {
+            session.setAttribute("signup.preauth.sms", request.getTarget());
+            session.setAttribute("signup.preauth.expiresAt", LocalDateTime.now().plusMinutes(15));
+        }else if(request.getPurpose().equals("FIND_ID")) {
+            session.setAttribute("find-userid.preauth.sms", request.getTarget());
+            session.setAttribute("find-userid.preauth.expiresAt", LocalDateTime.now().plusMinutes(15));
+        }else if(request.getPurpose().equals("RESET_PASSWORD")){
+            session.setAttribute("reset-password.preauth.sms", request.getTarget());
+            session.setAttribute("reset-password.preauth.expiresAt", LocalDateTime.now().plusMinutes(15));
+        }
 
         return ResponseEntity.ok("전화번호 인증이 완료되었습니다.");
     }

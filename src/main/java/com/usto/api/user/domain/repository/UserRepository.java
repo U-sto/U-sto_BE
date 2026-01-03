@@ -13,7 +13,8 @@ public interface UserRepository{
 
     User save(User user);
 
+    //이메일 인증을 위한..
     Optional<String> findUsrIdByEmail(String email);
     Optional<String> findUsrNmByUsrId(String usrId);
-    void updatePasswordHash(String usrId, String pwHash);
+    void updatePwHashByUsrId(String usrId, String pwHash);
 }

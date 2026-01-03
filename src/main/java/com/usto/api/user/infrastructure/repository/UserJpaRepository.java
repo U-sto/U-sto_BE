@@ -17,11 +17,14 @@ public interface UserJpaRepository extends JpaRepository<UserJpaEntity, String> 
     boolean existsByEmail(String email);
     boolean existsBySms(String sms);
 
-    User save(User user);
+    //User save(User user);
 
-    Optional<Object> findByUsrId(String usrId);
+    Optional<UserJpaEntity> findByUsrId(String usrId);
 
     Optional<UserJpaEntity> findByEmail(String email);
+
+    boolean existsByUsrNmAndEmail(String usrNm, String email);
+    boolean existsByUsrIdAndEmail(String usrId, String email);
 
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("update UserJpaEntity u set u.pwHash = :pwHash where u.usrId = :usrId")
