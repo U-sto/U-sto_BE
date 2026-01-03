@@ -57,11 +57,10 @@ public class SecurityConfig {
                 // Swagger
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "/api/auth/**",
                                 "/api/users",
                                 "/api/users/exists/**",
-                                "/api/users/reccovery/**",
-                                "/api/users/verification/**"
+                                "/api/auth/reccovery/**",
+                                "/api/auth/verification/**"
                         ).permitAll()
 
                         .requestMatchers(
