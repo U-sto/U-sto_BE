@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/users")
+@RequestMapping("/api/users/exists")
 public class ExistsController {
 
     private final EmailExistsApplication emailExistsApplication;
@@ -23,7 +23,7 @@ public class ExistsController {
     private final UserIdExistsApplication userIdExistsApplication;
 
 
-    @GetMapping("/email/exists")
+    @GetMapping("/email")
     public ApiResponse<?> existsByEmail(
             @RequestParam(required = false)
             String email
@@ -41,7 +41,7 @@ public class ExistsController {
         return ApiResponse.ok("이용 가능한 이메일입니다", new EmailExistsResponseDto(false));
     }
 
-    @GetMapping("/sms/exists")
+    @GetMapping("/sms")
     public ApiResponse<?> existsBySms(
             @RequestParam(required = false)
             String sms
@@ -59,7 +59,7 @@ public class ExistsController {
         return ApiResponse.ok("이용 가능한 전화번호입니다", new SmsExistsResponseDto(false));
     }
 
-    @GetMapping("/user-id/exists")
+    @GetMapping("/user-id")
     public ApiResponse<?> existsByUsrId(
             @RequestParam(required = false)
             String usrId

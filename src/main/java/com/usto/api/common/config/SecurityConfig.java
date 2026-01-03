@@ -59,9 +59,9 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/api/auth/**",
                                 "/api/users",
-                                "/api/users/email/exists",
-                                "/api/users/sms/exists",
-                                "/api/users/user-id/exists"
+                                "/api/users/exists/**",
+                                "/api/users/reccovery/**",
+                                "/api/users/verification/**"
                         ).permitAll()
 
                         .requestMatchers(

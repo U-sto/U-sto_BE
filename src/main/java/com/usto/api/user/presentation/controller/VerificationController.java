@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.time.LocalDateTime;
 
 @RestController
-@RequestMapping("/api/auth/verif")
+@RequestMapping("/api/auth/verification")
 @RequiredArgsConstructor
 public class VerificationController {
 
