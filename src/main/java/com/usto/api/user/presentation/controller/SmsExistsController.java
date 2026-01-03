@@ -2,8 +2,6 @@ package com.usto.api.user.presentation.controller;
 
 import com.usto.api.common.utils.ApiResponse;
 import com.usto.api.user.application.SmsExistsApplication;
-import com.usto.api.user.application.UsrIdExistsApplication;
-import com.usto.api.user.presentation.dto.response.EmailExistsResponseDto;
 import com.usto.api.user.presentation.dto.response.SmsExistsResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;

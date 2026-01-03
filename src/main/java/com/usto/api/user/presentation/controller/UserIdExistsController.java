@@ -1,12 +1,9 @@
 package com.usto.api.user.presentation.controller;
 
 import com.usto.api.common.utils.ApiResponse;
-import com.usto.api.user.application.EmailExistsApplication;
-import com.usto.api.user.application.UsrIdExistsApplication;
-import com.usto.api.user.presentation.dto.response.EmailExistsResponseDto;
+import com.usto.api.user.application.UserIdExistsApplication;
 import com.usto.api.user.presentation.dto.response.UsrIdExistsResponseDto;
 import lombok.RequiredArgsConstructor;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -15,9 +12,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/users/user-id")
-public class UsrIdExistsController {
+public class UserIdExistsController {
 
-    private final UsrIdExistsApplication usrIdExistsApplication;
+    private final UserIdExistsApplication userIdExistsApplication;
 
     @GetMapping("/exists")
     public ApiResponse<?> existsByUsrId(
@@ -28,7 +25,7 @@ public class UsrIdExistsController {
             return ApiResponse.fail("아이디을 써주세요");
         }
 
-        boolean exists = usrIdExistsApplication.existsByUsrId(usrId.trim());
+        boolean exists = userIdExistsApplication.existsByUsrId(usrId.trim());
 
         if (exists) {
             return ApiResponse.fail("이미 가입된 아이디입니다", new UsrIdExistsResponseDto(true));

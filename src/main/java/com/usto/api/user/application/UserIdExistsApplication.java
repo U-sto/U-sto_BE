@@ -1,13 +1,12 @@
 package com.usto.api.user.application;
 
 import com.usto.api.user.domain.repository.UserRepository;
-import com.usto.api.user.infrastructure.repository.UserJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class UsrIdExistsApplication {
+public class UserIdExistsApplication {
 
     private final UserRepository userRepository;
 
