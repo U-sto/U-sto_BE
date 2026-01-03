@@ -11,13 +11,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/users/exists")
+@RequestMapping("/api/users/email")
 
 public class EmailExistsController {
 
     private final EmailExistsApplication emailExistsApplication;
 
-    @GetMapping("/email")
+    @GetMapping("/exists")
     public ApiResponse<?> existsByEmail(
             @RequestParam(required = false)
             String email

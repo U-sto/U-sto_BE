@@ -13,12 +13,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/users/exists")
+@RequestMapping("/api/users/sms")
 public class SmsExistsController {
 
     private final SmsExistsApplication smsExistsApplication;
 
-    @GetMapping("/sms")
+    @GetMapping("/exists")
     public ApiResponse<?> existsBySms(
             @RequestParam(required = false)
             String sms

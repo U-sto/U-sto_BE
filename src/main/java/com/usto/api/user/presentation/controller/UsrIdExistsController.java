@@ -14,12 +14,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/users/exists")
+@RequestMapping("/api/users/user-id")
 public class UsrIdExistsController {
 
     private final UsrIdExistsApplication usrIdExistsApplication;
 
-    @GetMapping("/usrId")
+    @GetMapping("/exists")
     public ApiResponse<?> existsByUsrId(
             @RequestParam(required = false)
             String usrId
