@@ -59,7 +59,7 @@ public class ExistsController {
         return ApiResponse.ok("이용 가능한 전화번호입니다", new SmsExistsResponseDto(false));
     }
 
-    @GetMapping("/user-id")
+    @GetMapping("/user-id   ")
     public ApiResponse<?> existsByUsrId(
             @RequestParam(required = false)
             String usrId
