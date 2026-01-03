@@ -7,6 +7,8 @@ import com.usto.api.user.infrastructure.entity.UserJpaEntityMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 @RequiredArgsConstructor
 public class UserRepositoryAdapter implements UserRepository {
@@ -33,6 +35,21 @@ public class UserRepositoryAdapter implements UserRepository {
         UserJpaEntity entity = UserJpaEntityMapper.toEntity(user);
         UserJpaEntity saved = userJpaRepository.save(entity);
         return UserJpaEntityMapper.toDomain(saved);
+    }
+
+    @Override
+    public Optional<String> findUsrIdByEmail(String email) {
+        return userJpaRepository.findByEmail(email).map(UserJpaEntity::getUsrId);
+    }
+
+    @Override
+    public Optional<String> findUsrNmByUsrId(String usrId) {
+        return userJpaRepository.findByUsrId(usrId).map(UserJpaEntity::getUsrNm);
+    }
+
+    @Override
+    public void updatePasswordHash(String usrId, String pwHash) {
+        userJpaRepository.updatePwHashByUsrId(usrId, pwHash);
     }
 }
 
