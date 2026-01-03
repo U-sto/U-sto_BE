@@ -2,5 +2,6 @@ package com.usto.api.user.domain.model;
 
 public enum VerificationPurpose {
     SIGNUP,
-    RECOVERY
+    FIND_ID,
+    RESET_PASSWORD //바꿔야할 수도
 }
