@@ -1,7 +1,7 @@
 /*
  * Verification 엔티티
  * - 역할: 이메일/전화번호 인증번호와 상태를 저장하는 테이블의 도메인 모델입니다.
- * - 주요 필드: target(이메일/전화), code(인증번호), type(EMAIL/PHONE), expiresAt(만료), isVerified(성공여부)
+ * - 주요 필드: target(이메일/전화), code(인증번호), type(EMAIL/SMS), expiresAt(만료), isVerified(성공여부)
  * - 메서드: renew(코드/만료 갱신 및 인증상태 초기화), verify(성공 표시)
  */
 package com.usto.api.user.infrastructure.entity;
@@ -33,7 +33,7 @@ public class VerificationJpaEntity extends BaseTimeEntity {
     @Column(name="TARGET",length = 255 ,nullable = false)
     private String target;
 
-    // 인증 타입 (EMAIL, PHONE)
+    // 인증 타입 (EMAIL, SMS)
     @Enumerated(EnumType.STRING)
     @Column(name="VERIF_TYPE",length = 20, nullable = false)
     private VerificationType type;

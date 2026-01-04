@@ -16,11 +16,11 @@ public class CustomUserDetailsService implements UserDetailsService {
     private final UserJpaRepository userJpaRepository;
 
     @Override
-    public UserDetails loadUserByUsername(String usrNm)
+    public UserDetails loadUserByUsername(String usrId)
             throws UsernameNotFoundException {
 
-        UserJpaEntity user = userJpaRepository
-                .findByUsrId(usrNm) //시스템에서 ID가 username이라서,,
+        UserJpaEntity user = (UserJpaEntity) userJpaRepository
+                .findByUsrId(usrId) //시스템에서 ID가 username이라서,,
                 .orElseThrow(() ->
                         new UsernameNotFoundException("존재하지 않는 사용자입니다."));
 

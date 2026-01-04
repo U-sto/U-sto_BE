@@ -1,14 +1,20 @@
 package com.usto.api.user.domain.repository;
 
-public interface UserRepository {
+
+import com.usto.api.user.domain.model.User;
+
+import java.util.Optional;
+
+public interface UserRepository{
 
     boolean existsByUsrId(String usrId);
     boolean existsByEmail(String email);
-    boolean existsByPhone(String phone);
+    boolean existsBySms(String sms);
 
-    /* 아직은 구현 X
-    Optional<User> findByUsrId(String usrId); // 로그인/조회
+    User save(User user);
 
-    User save(User user); // 회원가입 저장용 (선택)
-     */
+    //이메일 인증을 위한..
+    Optional<String> findUsrIdByEmail(String email);
+    Optional<String> findUsrNmByUsrId(String usrId);
+    void updatePwHashByUsrId(String usrId, String pwHash);
 }

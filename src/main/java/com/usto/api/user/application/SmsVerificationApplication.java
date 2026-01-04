@@ -2,7 +2,7 @@
  * SmsVerificationService
  * - 역할: 휴대폰(SMS) 인증번호 발송/검증을 담당하는 서비스입니다.
  * - 정책: 4자리 숫자 코드, 유효시간 5분. (이메일은 6자리 별도 정책)
- * - 저장: Verification 엔티티를 (target=전화번호, type=PHONE) 키로 관리합니다.
+ * - 저장: Verification 엔티티를 (target=전화번호, type=SMS) 키로 관리합니다.
  */
 package com.usto.api.user.application;
 
