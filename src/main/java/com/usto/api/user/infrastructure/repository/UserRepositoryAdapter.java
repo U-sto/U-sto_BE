@@ -1,5 +1,6 @@
 package com.usto.api.user.infrastructure.repository;
 
+import com.usto.api.user.domain.model.LoginUser;
 import com.usto.api.user.domain.model.User;
 import com.usto.api.user.domain.repository.UserRepository;
 import com.usto.api.user.infrastructure.entity.UserJpaEntity;
@@ -62,6 +63,16 @@ public class UserRepositoryAdapter implements UserRepository {
         if (updated == 0) {
             throw new IllegalArgumentException("존재하지 않는 회원입니다.");
         }
+    }
+
+    @Override
+    public Optional<LoginUser> loadByUsrId(String usrId) {
+        return userJpaRepository.findByUsrId(usrId)
+                .map(user -> LoginUser.forLogin(
+                        user.getUsrId(),
+                        user.getPwHash(),
+                        user.getUsrNm()
+                ));
     }
 }
 

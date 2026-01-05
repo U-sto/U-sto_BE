@@ -29,4 +29,5 @@ public interface UserJpaRepository extends JpaRepository<UserJpaEntity, String> 
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("update UserJpaEntity u set u.pwHash = :pwHash where u.usrId = :usrId")
     int updatePwHashByUsrId(@Param("usrId") String usrId, @Param("pwHash") String pwHash);
+
 }
