@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 
 /**
- * @class G2BItemJpaEntity
+ * @class G2bItemJpaEntity
  * @desc 조달청 세부 품목 엔티티 (TB_G2B001D)
  */
 @Entity
@@ -21,7 +21,7 @@ import java.math.BigDecimal;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class G2BItemJpaEntity {
+public class G2bItemJpaEntity {
     @Id
     // columnDefinition을 추가해서 DB의 CHAR 타입과 맞춤
     @Column(name = "G2B_D_CD", length = 8, columnDefinition = "char(8)")
