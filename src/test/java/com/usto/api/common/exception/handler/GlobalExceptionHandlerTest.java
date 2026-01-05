@@ -94,7 +94,7 @@ class GlobalExceptionHandlerTest {
     void testHandleHttpMessageNotReadableException() {
         // given
         HttpMessageNotReadableException exception = 
-            new HttpMessageNotReadableException("Invalid JSON", (org.springframework.http.HttpInputMessage) null);
+            new HttpMessageNotReadableException("Invalid JSON", null, null);
 
         // when
         ResponseEntity<ErrorResponse> response = handler.handleHttpMessageNotReadableException(exception);

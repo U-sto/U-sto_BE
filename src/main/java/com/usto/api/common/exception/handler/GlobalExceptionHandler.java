@@ -39,7 +39,9 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
         log.warn("Validation exception occurred: {}", e.getMessage());
-        String message = e.getBindingResult().getAllErrors().get(0).getDefaultMessage();
+        String message = e.getBindingResult().hasErrors() 
+            ? e.getBindingResult().getAllErrors().get(0).getDefaultMessage()
+            : "입력값 검증에 실패했습니다.";
         ErrorResponse errorResponse = ErrorResponse.of("VALIDATION_ERROR", message);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
@@ -50,7 +52,9 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BindException.class)
     public ResponseEntity<ErrorResponse> handleBindException(BindException e) {
         log.warn("Bind exception occurred: {}", e.getMessage());
-        String message = e.getBindingResult().getAllErrors().get(0).getDefaultMessage();
+        String message = e.getBindingResult().hasErrors()
+            ? e.getBindingResult().getAllErrors().get(0).getDefaultMessage()
+            : "입력값 바인딩에 실패했습니다.";
         ErrorResponse errorResponse = ErrorResponse.of("VALIDATION_ERROR", message);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
