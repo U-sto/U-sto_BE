@@ -38,10 +38,4 @@ public class LogController {
                 )
         );
     }
-
-    @PostMapping("/logout")
-    public ApiResponse<Void> logout(HttpServletRequest request) {
-        logoutApplication.logout(request);
-        return ApiResponse.success(null);
-    }
 }
