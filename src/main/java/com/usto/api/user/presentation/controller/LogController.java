@@ -5,6 +5,7 @@ import com.usto.api.user.application.LoginApplication;
 import com.usto.api.user.domain.model.LoginUser;
 import com.usto.api.user.presentation.dto.request.LoginRequestDto;
 import com.usto.api.user.presentation.dto.response.LoginResponseDto;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -36,5 +37,11 @@ public class LogController {
                         user.getUsrNm()
                 )
         );
+    }
+
+    @PostMapping("/logout")
+    public ApiResponse<Void> logout(HttpServletRequest request) {
+        logoutApplication.logout(request);
+        return ApiResponse.success(null);
     }
 }
