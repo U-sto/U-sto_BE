@@ -8,6 +8,8 @@ import com.usto.api.g2b.infrastructure.repository.G2bItemJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -33,12 +35,17 @@ public class G2bSearchServiceImpl implements G2bSearchService {
     @Override
     @Transactional(readOnly = true)
     public List<G2bItemJpaEntity> findItemList(String mCd, String dCd, String dNm) {
-        if (mCd == null || mCd.isEmpty()) {
-            throw new IllegalArgumentException("물품분류코드는 필수입니다.");
-        }
+        // null 체크 및 공백 제거 처리
+        String categoryCode = (mCd == null) ? "" : mCd.trim();
         String itemCode = (dCd == null) ? "" : dCd.trim();
         String itemName = (dNm == null) ? "" : dNm.trim();
-        return itemRepository.findByG2bMCdAndG2bDCdContainingAndG2bDNmContaining(
-                mCd, itemCode, itemName);
+
+        // [방어 코드] 아무런 조건도 입력되지 않았을 경우, 전체 조회를 막아 DB 부하 방지
+        if (categoryCode.isEmpty() && itemCode.isEmpty() && itemName.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        // 동적 쿼리 호출 (mCd가 비어있어도 dCd나 dNm이 있다면 조회 성공)
+        return itemRepository.findByFilters(categoryCode, itemCode, itemName);
     }
 }

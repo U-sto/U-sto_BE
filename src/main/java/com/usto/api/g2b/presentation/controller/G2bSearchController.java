@@ -37,7 +37,7 @@ public class G2bSearchController {
 
     @GetMapping("/items")
     public ApiResponse<List<G2bItemResponseDto>> getItemList(
-            @RequestParam String categoryCode,
+            @RequestParam(required = false) String categoryCode,
             @RequestParam(required = false) String itemCode,
             @RequestParam(required = false) String itemName) {
         List<G2bItemResponseDto> result = g2bSearchService.findItemList(
