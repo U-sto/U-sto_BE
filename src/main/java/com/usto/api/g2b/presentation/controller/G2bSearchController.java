@@ -28,11 +28,14 @@ public class G2bSearchController {
     public ApiResponse<List<G2bCategoryResponseDto>> getCategoryList(
             @RequestParam(required = false) String code,
             @RequestParam(required = false) String name) {
-        List<G2bCategoryResponseDto> result = g2bSearchService.findCategoryList(code, name)
+        List<G2bCategoryResponseDto> categories = g2bSearchService.findCategoryList(code, name)
                 .stream()
                 .map(e -> new G2bCategoryResponseDto(e.getG2bMCd(), e.getG2bMNm()))
                 .toList();
-        return ApiResponse.ok("분류 조회 성공", result);
+        if (categories.isEmpty()) {
+            return ApiResponse.ok("조회 결과가 없습니다.", categories);
+        }
+        return ApiResponse.ok("분류 조회 성공", categories);
     }
 
     @GetMapping("/items")
@@ -40,11 +43,14 @@ public class G2bSearchController {
             @RequestParam(required = false) String categoryCode,
             @RequestParam(required = false) String itemCode,
             @RequestParam(required = false) String itemName) {
-        List<G2bItemResponseDto> result = g2bSearchService.findItemList(
+        List<G2bItemResponseDto> items = g2bSearchService.findItemList(
                         categoryCode, itemCode, itemName)
                 .stream()
                 .map(e -> new G2bItemResponseDto(e.getG2bDCd(), e.getG2bDNm(), e.getG2bUpr()))
                 .toList();
-        return ApiResponse.ok("품목 조회 성공", result);
+        if (items.isEmpty()) {
+            return ApiResponse.ok("조회 결과가 없습니다.", items);
+        }
+        return ApiResponse.ok("품목 조회 성공", items);
     }
 }
