@@ -1,5 +1,6 @@
 package com.usto.api.g2b.infrastructure.entity;
 
+import com.usto.api.common.BaseTimeEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -9,6 +10,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
+
 import java.math.BigDecimal;
 
 /**
@@ -18,10 +21,10 @@ import java.math.BigDecimal;
 @Entity
 @Table(name = "TB_G2B001D")
 @Getter
-@Builder
+@SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class G2bItemJpaEntity {
+public class G2bItemJpaEntity extends BaseTimeEntity {
     @Id
     // columnDefinition을 추가해서 DB의 CHAR 타입과 맞춤
     @Column(name = "G2B_D_CD", length = 8, columnDefinition = "char(8)")

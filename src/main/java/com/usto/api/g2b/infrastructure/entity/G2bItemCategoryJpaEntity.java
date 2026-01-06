@@ -1,5 +1,6 @@
 package com.usto.api.g2b.infrastructure.entity;
 
+import com.usto.api.common.BaseTimeEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -9,6 +10,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 /**
  * @class G2bItemCategoryJpaEntity
@@ -17,10 +19,10 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "TB_G2B001M")
 @Getter
-@Builder
+@SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class G2bItemCategoryJpaEntity {
+public class G2bItemCategoryJpaEntity extends BaseTimeEntity {
     @Id
     // char(8)을 명시
     @Column(name = "G2B_M_CD", length = 8, columnDefinition = "char(8)")
