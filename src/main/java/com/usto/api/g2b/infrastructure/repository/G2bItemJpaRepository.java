@@ -16,8 +16,8 @@ public interface G2bItemJpaRepository extends JpaRepository<G2bItemJpaEntity, St
     // 분류코드, 식별코드, 품목명 중 입력된 값에 대해서만 AND 검색 수행
     @Query("SELECT i FROM G2bItemJpaEntity i " +
             "WHERE (:mCd IS NULL OR :mCd = '' OR i.g2bMCd = :mCd) " +
-            "AND (:dCd IS NULL OR :dCd = '' OR i.g2bDCd LIKE :dCd%) " + // 코드 검색은 전방 일치
-            "AND (:dNm IS NULL OR :dNm = '' OR i.g2bDNm LIKE %:dNm%)")
+            "AND (:dCd IS NULL OR :dCd = '' OR i.g2bDCd LIKE CONCAT(:dCd, '%')) " + // 코드 검색은 전방 일치
+            "AND (:dNm IS NULL OR :dNm = '' OR i.g2bDNm LIKE CONCAT('%', :dNm, '%'))")
     List<G2bItemJpaEntity> findByFilters(
             @Param("mCd") String mCd,
             @Param("dCd") String dCd,

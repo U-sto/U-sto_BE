@@ -14,8 +14,8 @@ import java.util.List;
 public interface G2bItemCategoryJpaRepository extends JpaRepository<G2bItemCategoryJpaEntity, String> {
 
     @Query("SELECT c FROM G2bItemCategoryJpaEntity c " +
-            "WHERE (:code IS NULL OR :code = '' OR c.g2bMCd LIKE :code%) " + // 코드 검색은 전방 일치
-            "AND (:name IS NULL OR :name = '' OR c.g2bMNm LIKE %:name%)")
+            "WHERE (:code IS NULL OR :code = '' OR c.g2bMCd LIKE CONCAT(:code, '%')) " + // 코드 검색은 전방 일치
+            "AND (:name IS NULL OR :name = '' OR c.g2bMNm LIKE CONCAT('%', :name, '%'))")
     List<G2bItemCategoryJpaEntity> findByFilters(
             @Param("code") String code,
             @Param("name") String name);
