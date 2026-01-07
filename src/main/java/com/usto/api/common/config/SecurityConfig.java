@@ -2,8 +2,10 @@ package com.usto.api.common.config;
 
 import com.usto.api.user.application.CustomUserDetailsService;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -24,7 +26,7 @@ import java.util.List;
 
 @Configuration
 @EnableWebSecurity
-@lombok.RequiredArgsConstructor // 생성자 주입용
+@RequiredArgsConstructor // 생성자 주입용
 public class SecurityConfig {
 
     /**
@@ -33,7 +35,7 @@ public class SecurityConfig {
      * @return
      * @throws Exception
      */
-    private final org.springframework.core.env.Environment env; // 환경 변수 접근용
+    private final Environment env; // 환경 변수 접근용
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         // 현재 활성화된 프로필이 dev인지 확인

@@ -29,9 +29,10 @@ public class G2bSearchServiceImpl implements G2bSearchService {
         String searchCode = (code == null) ? "" : code.trim();
         String searchName = (name == null) ? "" : name.trim();
 
-        // 검색어 길이 검증 (명칭 검색 시 2글자 미만 제한)
-        if (!searchName.isEmpty() && searchName.length() < 2) {
-            throw new G2bBusinessException("최소 2글자 이상 입력해 주세요.");
+        // 검색어 길이 검증 (코드 및 명칭 검색 시 2글자 미만 제한)
+        if ((!searchCode.isEmpty() && searchCode.length() < 2) ||
+                (!searchName.isEmpty() && searchName.length() < 2)) {
+            throw new G2bBusinessException("최소 2자 이상 입력해 주세요.");
         }
 
         return categoryRepository.findByFilters(searchCode, searchName);
@@ -45,9 +46,10 @@ public class G2bSearchServiceImpl implements G2bSearchService {
         String itemCode = (dCd == null) ? "" : dCd.trim();
         String itemName = (dNm == null) ? "" : dNm.trim();
 
-        // 검색어 길이 검증 (명칭 검색 시 2글자 미만 제한)
-        if (!itemName.isEmpty() && itemName.length() < 2) {
-            throw new G2bBusinessException("최소 2글자 이상 입력해 주세요.");
+        // 검색어 길이 검증 (코드 및 명칭 검색 시 2글자 미만 제한)
+        if ((!itemCode.isEmpty() && itemCode.length() < 2) ||
+                (!itemName.isEmpty() && itemName.length() < 2)) {
+            throw new G2bBusinessException("최소 2자 이상 입력해 주세요.");
         }
 
         // [방어 코드] 아무런 조건도 입력되지 않았을 경우, 전체 조회를 막아 DB 부하 방지
