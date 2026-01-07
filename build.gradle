@@ -44,7 +44,7 @@ dependencies {
     //전화번호 인증을 위한
     implementation 'net.nurigo:sdk:4.3.0'
     //Swagger UI
-    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.3'
 }
 
 tasks.named('test') {
