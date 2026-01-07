@@ -11,8 +11,19 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.util.HashMap;
 import java.util.Map;
 
-@RestControllerAdvice
+/**
+ * @class GlobalExceptionHandler
+ * @desc 프로젝트 전역 예외 처리기 - 모든 도메인의 예외를 ApiResponse 포맷으로 통일
+ */
+@RestControllerAdvice(basePackages = "com.usto.api")
 public class GlobalExceptionHandler {
+    /**
+     * BusinessException 클래스를 상속받은 모든 비즈니스 예외 처리
+     */
+    @ExceptionHandler(BusinessException.class)
+    public ApiResponse<Void> handleBusinessException(BusinessException e) {
+        return ApiResponse.fail(e.getMessage());
+    }
 
     /**
      * 로그인 실패 예외 처리

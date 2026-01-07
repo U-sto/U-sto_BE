@@ -2,8 +2,10 @@ package com.usto.api.common.config;
 
 import com.usto.api.user.application.CustomUserDetailsService;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -24,6 +26,7 @@ import java.util.List;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor // 생성자 주입용
 public class SecurityConfig {
 
     /**
@@ -32,8 +35,12 @@ public class SecurityConfig {
      * @return
      * @throws Exception
      */
+    private final Environment env; // 환경 변수 접근용
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        // 현재 활성화된 프로필이 dev인지 확인
+        boolean isDev = Arrays.asList(env.getActiveProfiles()).contains("dev");
+
         http
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
@@ -45,34 +52,44 @@ public class SecurityConfig {
                         .authenticationEntryPoint((request, response, authException) -> {
                             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+                            response.setCharacterEncoding("UTF-8"); // 한글 깨짐 방지 추가
                             response.getWriter().write("{\"message\":\"로그인이 필요합니다.\"}"); //로그인이 필요합니다(프론트)
                         })
                         .accessDeniedHandler((request, response, accessDeniedException) -> {
                             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+                            response.setCharacterEncoding("UTF-8"); // 한글 깨짐 방지 추가
                             response.getWriter().write("{\"message\":\"접근권한이 없습니다.\"}"); //접근 권한이 없습니다(프론트)
                         })
                 )
 
                 // Swagger
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                "/api/users",
-                                "/api/users/exists/**",
-                                "/api/auth/find/**",
-                                "/api/auth/verification/**",
-                                "/api/auth/login"
-                        ).permitAll()
+                .authorizeHttpRequests(auth -> {
+                    // 기본 허용 경로
+                    auth.requestMatchers(
+                            "/api/users",
+                            "/api/users/exists/**",
+                            "/api/auth/find/**",
+                            "/api/auth/verification/**",
+                            "/api/auth/login"
+                    ).permitAll();
 
-                        .requestMatchers(
-                                "/v3/api-docs/**",
-                                "/swagger-ui/**",
-                                "/swagger-ui.html",
-                                "/swagger-resources/**"
-                        ).permitAll()
-                        .requestMatchers("/error").permitAll()
-                        .anyRequest().authenticated()
-                )
+                    // 개발 환경(dev)일 때만 G2B API를 로그인 없이 허용
+                    if (isDev) {
+                        auth.requestMatchers("/api/g2b/**").permitAll();
+                    }
+
+                    auth.requestMatchers(
+                            "/v3/api-docs/**",
+                            "/swagger-ui/**",
+                            "/swagger-ui.html",
+                            "/swagger-resources/**"
+                    ).permitAll();
+
+                    auth.requestMatchers("/error").permitAll();
+                    auth.anyRequest().authenticated();
+                })
+
                 .formLogin(AbstractHttpConfigurer::disable) // no login for swagger , we need comfort
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .logout(logout -> logout
