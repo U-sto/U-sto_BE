@@ -1,0 +1,29 @@
+# Gemini Code Assist 기본 설정
+reviews:
+  enabled:  true
+  auto_review: true
+
+  # 리뷰 심각도 수준 (critical, high, medium, low)
+  severity_threshold: medium
+
+  # 리뷰할 파일 형식
+  file_extensions:
+    - .js
+    - .ts
+    - .py
+    - .java
+    - .go
+    - .rb
+    - .php
+    - . cpp
+    - .c
+    - .cs
+
+  # 제외할 파일/폴더
+  exclude_patterns:
+    - "node_modules/**"
+    - "dist/**"
+    - "build/**"
+    - "*.min.js"
+    - "package-lock.json"
+    - "yarn.lock"
