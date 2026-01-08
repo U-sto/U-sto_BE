@@ -1,5 +1,6 @@
 package com.usto.api.user.presentation.dto.request;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 
@@ -8,4 +9,7 @@ public class PasswordFindRequestDto {
 
     @NotBlank
     String usrId;
+
+    @Email
+    String email;
 }
