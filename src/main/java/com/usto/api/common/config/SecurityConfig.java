@@ -71,18 +71,15 @@ public class SecurityConfig {
                             "/api/users/exists/**", //중복조회 when 회원가입
                             "/api/auth/find/**", //아이디/비밀번호 찾기
                             "/api/auth/verification/**", //이메일/전화번호 인증 when 회원가입,아이디/비번찾기
-                            "/api/auth/login" //로그인
+                            "/api/auth/login", //로그인
+                            "/api/auth/logout"
                     ).permitAll();
 
                     // 개발 환경(dev)일 때만 G2B API를 로그인 없이 허용
                     if (isDev) {
-                        auth.requestMatchers(
-                                "/api/g2b/**",
-                                "/api/auth/logout"
-                        ).permitAll();
+                        auth.requestMatchers("/api/g2b/**").permitAll();
                     }
 
-                    //Swagger는 전부 허용한다 (봐야하니까)
                     auth.requestMatchers(
                             "/v3/api-docs/**",
                             "/swagger-ui/**",
