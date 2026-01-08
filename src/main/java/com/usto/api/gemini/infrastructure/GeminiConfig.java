@@ -2,7 +2,9 @@ package com.usto.api.gemini.infrastructure;
 
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.client.RestTemplate;
 
 /**
  * @class GeminiConfig
@@ -17,4 +19,9 @@ public class GeminiConfig {
     
     @Value("${gemini.api.model}")
     private String model;
+    
+    @Bean(name = "geminiRestTemplate")
+    public RestTemplate geminiRestTemplate() {
+        return new RestTemplate();
+    }
 }

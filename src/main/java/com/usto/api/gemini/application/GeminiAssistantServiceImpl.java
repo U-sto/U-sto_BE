@@ -5,8 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.usto.api.common.exception.GeminiException;
 import com.usto.api.gemini.domain.service.GeminiAssistantService;
 import com.usto.api.gemini.infrastructure.GeminiConfig;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -20,15 +20,23 @@ import java.util.Map;
  * @desc Gemini AI 어시스턴트 서비스 구현체
  */
 @Service
-@RequiredArgsConstructor
 @Slf4j
 public class GeminiAssistantServiceImpl implements GeminiAssistantService {
     
     private final GeminiConfig geminiConfig;
-    private final RestTemplate restTemplate = new RestTemplate();
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final RestTemplate restTemplate;
+    private final ObjectMapper objectMapper;
     
     private static final String GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/%s:generateContent?key=%s";
+    
+    public GeminiAssistantServiceImpl(
+            GeminiConfig geminiConfig,
+            @Qualifier("geminiRestTemplate") RestTemplate restTemplate,
+            ObjectMapper objectMapper) {
+        this.geminiConfig = geminiConfig;
+        this.restTemplate = restTemplate;
+        this.objectMapper = objectMapper;
+    }
     
     @Override
     public String generateResponse(String prompt) {
