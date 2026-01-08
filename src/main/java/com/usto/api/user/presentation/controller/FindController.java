@@ -31,20 +31,23 @@ public class FindController {
             HttpSession session
     ) {
 
-        String verifiedEmail = (String) session.getAttribute("find.preauth.email");
-
-        if (verifiedEmail == null) {
-            return ApiResponse.fail("이메일 인증이 필요합니다");
+            String userName = userIdFindApplication.findUserNmByUserId(request.getEmail());
+        if (!userName.equals(request.getUsrNm())) {
+            return ApiResponse.fail("회원 정보가 일치하지 않습니다.."); //인증번호 전송 불가
         }
 
+        //전송 (purpose를 FIND_ID로 해서 구현하기)
+
+        String verifiedEmail = (String) session.getAttribute("find.preauth.email");
+
         String userId = userIdFindApplication.findUserIdByEmail(verifiedEmail);
+
         if (userId == null) {
             return ApiResponse.fail("존재하지 않는 회원입니다.");
         }
 
-        String userName = userIdFindApplication.findUserNmByUserId(userId);
-        if (!userName.equals(request.getUsrNm())) {
-            return ApiResponse.fail("이름을 확인해주세요.");
+        if (verifiedEmail == null) {
+            return ApiResponse.fail("이메일 인증이 필요합니다");
         }
 
         session.removeAttribute("find.preauth.usrId");
@@ -63,16 +66,21 @@ public class FindController {
             HttpSession session
     )
     {
+        String userId = userIdFindApplication.findUserIdByEmail(request.getEmail());
+        if (!userId.equals(request.getUsrId())) {
+            return ApiResponse.fail("회원 정보가 일치하지 않습니다..");
+        }
 
         String verifiedEmail = (String) session.getAttribute("find.preauth.email");
+
+        if (!userId.equals(request.getUsrId())) {
+            return ApiResponse.fail("아이디를 확인해주세요.");
+        }
+
         if (verifiedEmail == null) {
             return ApiResponse.fail("이메일 인증이 필요합니다");
         }
 
-        String userId = passwordFindApplication.findUserIdByEmail(verifiedEmail);
-        if (!userId.equals(request.getUsrId())) {
-            return ApiResponse.fail("아이디를 확인해주세요.");
-        }
         session.removeAttribute("find.preauth.password");
         session.removeAttribute("find.preauth.emailVerifiedAt");
         session.removeAttribute("find.preauth.expiresAt");
