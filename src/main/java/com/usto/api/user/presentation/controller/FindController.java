@@ -8,6 +8,8 @@ import com.usto.api.user.presentation.dto.request.PasswordFindRequestDto;
 import com.usto.api.user.presentation.dto.request.PasswordResetRequestDto;
 import com.usto.api.user.presentation.dto.request.UserIdFindRequestDto;
 import com.usto.api.user.presentation.dto.response.UserIdFindResponseDto;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@Tag(name = "find-controller", description = "찾기 관련 API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/auth/find")
@@ -25,6 +28,7 @@ public class FindController {
     private final PasswordUpdateApplication passwordUpdateApplication;
 
     @PostMapping("/user-id")
+    @Operation(summary = "아이디 찾기")
     public ApiResponse<?> findUserId(
             @RequestBody
             UserIdFindRequestDto request,
@@ -60,6 +64,7 @@ public class FindController {
 
 
     @PostMapping("/password")
+    @Operation(summary = "비밀번호 찾기")
     public ApiResponse<?> findPassword(
             @RequestBody
             PasswordFindRequestDto request,
@@ -91,6 +96,7 @@ public class FindController {
     }
 
     @PostMapping("/password/update")
+    @Operation(summary = "비밀번호 재설정")
     public ApiResponse<?> resetPassword(
             @RequestBody
             PasswordResetRequestDto request,

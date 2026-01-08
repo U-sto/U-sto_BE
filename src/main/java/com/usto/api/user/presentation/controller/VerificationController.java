@@ -9,6 +9,8 @@ import com.usto.api.user.presentation.dto.request.EmailSendRequestDto;
 import com.usto.api.user.presentation.dto.request.EmailVerifyRequestDto;
 import com.usto.api.user.presentation.dto.request.SmsSendRequestDto;
 import com.usto.api.user.presentation.dto.request.SmsVerifyRequestDto;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -21,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
 
+@Tag(name = "verification-controller", description = "인증 관련 API")
 @RestController
 @RequestMapping("/api/auth/verification")
 @RequiredArgsConstructor
@@ -33,6 +36,7 @@ public class VerificationController {
     private final SmsSendApplication smsSendApplication;
 
     @PostMapping("/email/send")
+    @Operation(summary = "이메일 인증번호 전송")
     public ResponseEntity<String> sendEmail(
             @Valid
             @RequestBody EmailSendRequestDto request,
@@ -47,6 +51,7 @@ public class VerificationController {
 
 
     @PostMapping("/email/check")
+    @Operation(summary = "이메일 인증번호 확인")
     public ResponseEntity<String> verifyEmail(
             @Valid
             @RequestBody EmailVerifyRequestDto request,
@@ -72,6 +77,7 @@ public class VerificationController {
     }
 
     @PostMapping("/sms/send")
+    @Operation(summary = "휴대폰 인증번호 전송")
     public ResponseEntity<String> sendSms(
             @Valid
             @RequestBody SmsSendRequestDto request,
@@ -86,6 +92,7 @@ public class VerificationController {
     }
 
     @PostMapping("/sms/check")
+    @Operation(summary = "휴대폰 인증번호 확인")
     public ResponseEntity<String> verifyCode(
             @Valid
             @RequestBody
