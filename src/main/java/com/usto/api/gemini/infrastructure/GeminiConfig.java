@@ -1,0 +1,20 @@
+package com.usto.api.gemini.infrastructure;
+
+import lombok.Getter;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Configuration;
+
+/**
+ * @class GeminiConfig
+ * @desc Gemini AI API 설정 클래스
+ */
+@Configuration
+@Getter
+public class GeminiConfig {
+    
+    @Value("${gemini.api.key}")
+    private String apiKey;
+    
+    @Value("${gemini.api.model}")
+    private String model;
+}

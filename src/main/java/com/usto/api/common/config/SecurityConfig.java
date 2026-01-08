@@ -77,6 +77,7 @@ public class SecurityConfig {
                     // 개발 환경(dev)일 때만 G2B API를 로그인 없이 허용
                     if (isDev) {
                         auth.requestMatchers("/api/g2b/**").permitAll();
+                        auth.requestMatchers("/api/gemini/**").permitAll();
                     }
 
                     auth.requestMatchers(

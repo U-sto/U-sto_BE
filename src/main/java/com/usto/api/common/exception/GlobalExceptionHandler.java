@@ -35,6 +35,15 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * Gemini AI 예외 처리
+     */
+    @ExceptionHandler(GeminiException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ApiResponse<?> handleGeminiException(GeminiException e) {
+        return ApiResponse.fail(e.getMessage());
+    }
+
+    /**
      * Bean Validation 예외 처리
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
