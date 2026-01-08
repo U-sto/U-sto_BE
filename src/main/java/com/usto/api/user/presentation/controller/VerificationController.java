@@ -95,19 +95,23 @@ public class VerificationController {
     {
         smsVerifyApplication.verifyCode(request);
 
-        if (request.getPurpose().equals("SIGNUP")) {
+        if (request.getPurpose().equals(VerificationPurpose.SIGNUP)) {
             session.setAttribute("signup.preauth.sms", request.getTarget());
             session.setAttribute("signup.preauth.expiresAt", LocalDateTime.now().plusMinutes(15));
-        }else if(request.getPurpose().equals("FIND_ID")) {
+        }else if(request.getPurpose().equals(VerificationPurpose.FIND_ID)) {
             session.setAttribute("find-userid.preauth.sms", request.getTarget());
             session.setAttribute("find-userid.preauth.expiresAt", LocalDateTime.now().plusMinutes(15));
-        }else if(request.getPurpose().equals("RESET_PASSWORD")){
+        }else if(request.getPurpose().equals(VerificationPurpose.RESET_PASSWORD)){
             session.setAttribute("reset-password.preauth.sms", request.getTarget());
             session.setAttribute("reset-password.preauth.expiresAt", LocalDateTime.now().plusMinutes(15));
         }
 
         return ResponseEntity.ok("전화번호 인증이 완료되었습니다.");
     }
+
+
+
+
 
     private String resolveActor(HttpServletRequest http) {
         // 로그인 기반이면 여기서 SecurityContext에서 usrId 꺼냄
