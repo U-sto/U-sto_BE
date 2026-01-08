@@ -5,7 +5,6 @@ import com.usto.api.user.application.LoginApplication;
 import com.usto.api.user.domain.model.LoginUser;
 import com.usto.api.user.presentation.dto.request.LoginRequestDto;
 import com.usto.api.user.presentation.dto.response.LoginResponseDto;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,10 +15,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/auth")
-public class LogController {
+public class LoginController {
 
     private final LoginApplication loginApplication;
-    //private final LogoutApplication logoutApplication;
 
     @PostMapping("/login")
     public ApiResponse<?> login(
