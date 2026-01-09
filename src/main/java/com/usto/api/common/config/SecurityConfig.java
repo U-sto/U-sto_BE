@@ -72,7 +72,7 @@ public class SecurityConfig {
                             "/api/auth/find/**", //아이디/비밀번호 찾기
                             "/api/auth/verification/**", //이메일/전화번호 인증 when 회원가입,아이디/비번찾기
                             "/api/auth/login", //로그인
-                            "/api/auth/logout"
+                            "/api/auth/logout" //로그아웃
                     ).permitAll();
 
                     // 개발 환경(dev)일 때만 G2B API를 로그인 없이 허용
