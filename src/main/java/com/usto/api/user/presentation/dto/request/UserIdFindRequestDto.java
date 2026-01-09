@@ -10,6 +10,7 @@ public class UserIdFindRequestDto {
     @NotBlank
     String usrNm;
 
+    @NotBlank
     @Email
     String email;
 

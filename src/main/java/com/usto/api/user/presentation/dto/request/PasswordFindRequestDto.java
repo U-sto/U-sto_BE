@@ -10,6 +10,7 @@ public class PasswordFindRequestDto {
     @NotBlank
     String usrId;
 
+    @NotBlank
     @Email
     String email;
 }
