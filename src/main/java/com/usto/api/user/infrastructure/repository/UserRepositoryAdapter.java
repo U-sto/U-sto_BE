@@ -1,11 +1,13 @@
 package com.usto.api.user.infrastructure.repository;
 
+import com.usto.api.common.exception.BusinessException;
 import com.usto.api.user.domain.model.LoginUser;
 import com.usto.api.user.domain.model.User;
 import com.usto.api.user.domain.repository.UserRepository;
 import com.usto.api.user.infrastructure.entity.UserJpaEntity;
 import com.usto.api.user.infrastructure.entity.UserJpaEntityMapper;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -75,5 +77,26 @@ public class UserRepositoryAdapter implements UserRepository {
                         user.getRoleId()
                 ));
     }
+
+    @Override
+    public User getByUsrId(String pathUserId) {
+        return userJpaRepository.findByUsrId(pathUserId)
+                .map(this::toDomain)
+                .orElseThrow(() -> new BusinessException(pathUserId)); //임시
+    }
+
+    private User toDomain(UserJpaEntity e) {
+        return User.builder()
+                .usrId(e.getUsrId())
+                .usrNm(e.getUsrNm())
+                .pwHash(e.getPwHash())
+                .email(e.getEmail())
+                .sms(e.getSms())
+                .orgCd(e.getOrgCd())
+                .roleId(e.getRoleId())
+                .apprSts(e.getApprSts())
+                .build();
+    }
+
 }
 

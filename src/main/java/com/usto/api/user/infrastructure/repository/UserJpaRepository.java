@@ -30,4 +30,5 @@ public interface UserJpaRepository extends JpaRepository<UserJpaEntity, String> 
     @Query("update UserJpaEntity u set u.pwHash = :pwHash where u.usrId = :usrId")
     int updatePwHashByUsrId(@Param("usrId") String usrId, @Param("pwHash") String pwHash);
 
+    public User getByUsrId(String pathUserId);
 }
