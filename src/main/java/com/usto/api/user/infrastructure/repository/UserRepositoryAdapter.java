@@ -82,7 +82,7 @@ public class UserRepositoryAdapter implements UserRepository {
     public User getByUsrId(String pathUserId) {
         return userJpaRepository.findByUsrId(pathUserId)
                 .map(this::toDomain)
-                .orElseThrow(() -> new BusinessException(pathUserId)); //임시
+                .orElseThrow(() -> new BusinessException(pathUserId)); //임시 - 예외처리 따로 싹 할 에정
     }
 
     private User toDomain(UserJpaEntity e) {
