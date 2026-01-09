@@ -21,4 +21,5 @@ public interface UserRepository{
     //로그인을 위한
     Optional<LoginUser> loadByUsrId(String usrId);
 
+    User getByUsrId(String pathUserId);
 }
