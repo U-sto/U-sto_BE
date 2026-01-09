@@ -71,7 +71,8 @@ public class UserRepositoryAdapter implements UserRepository {
                 .map(user -> LoginUser.forLogin(
                         user.getUsrId(),
                         user.getPwHash(),
-                        user.getUsrNm()
+                        user.getUsrNm(),
+                        user.getRoleId()
                 ));
     }
 }
