@@ -64,11 +64,11 @@ public class VerificationController {
             session.setAttribute("signup.preauth.email", request.getTarget());
             session.setAttribute("signup.preauth.expiresAt", LocalDateTime.now().plusMinutes(15));
         }else if(request.getPurpose().equals(VerificationPurpose.FIND_ID)) {
-            session.setAttribute("find.preauth.email", request.getTarget());
-            session.setAttribute("find.preauth.expiresAt", LocalDateTime.now().plusMinutes(15));
+            session.setAttribute("findId.preauth.email", request.getTarget());
+            session.setAttribute("findId.preauth.expiresAt", LocalDateTime.now().plusMinutes(15));
         }else if(request.getPurpose().equals(VerificationPurpose.RESET_PASSWORD)){
-            session.setAttribute("find.preauth.email", request.getTarget());
-            session.setAttribute("find.preauth.expiresAt", LocalDateTime.now().plusMinutes(15));
+            session.setAttribute("findPw.preauth.email", request.getTarget());
+            session.setAttribute("findPw.preauth.expiresAt", LocalDateTime.now().plusMinutes(15));
         }
 
 
@@ -106,11 +106,11 @@ public class VerificationController {
             session.setAttribute("signup.preauth.sms", request.getTarget());
             session.setAttribute("signup.preauth.expiresAt", LocalDateTime.now().plusMinutes(15));
         }else if(request.getPurpose().equals(VerificationPurpose.FIND_ID)) {
-            session.setAttribute("find-userid.preauth.sms", request.getTarget());
-            session.setAttribute("find-userid.preauth.expiresAt", LocalDateTime.now().plusMinutes(15));
+            session.setAttribute("findId.preauth.sms", request.getTarget());
+            session.setAttribute("findId.preauth.expiresAt", LocalDateTime.now().plusMinutes(15));
         }else if(request.getPurpose().equals(VerificationPurpose.RESET_PASSWORD)){
-            session.setAttribute("reset-password.preauth.sms", request.getTarget());
-            session.setAttribute("reset-password.preauth.expiresAt", LocalDateTime.now().plusMinutes(15));
+            session.setAttribute("findPw.preauth.sms", request.getTarget());
+            session.setAttribute("findPw.preauth.expiresAt", LocalDateTime.now().plusMinutes(15));
         }
 
         return ResponseEntity.ok("전화번호 인증이 완료되었습니다.");
