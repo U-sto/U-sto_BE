@@ -29,13 +29,8 @@ import java.util.List;
 @RequiredArgsConstructor // 생성자 주입용
 public class SecurityConfig {
 
-    /**
-     *
-     * @param http
-     * @return
-     * @throws Exception
-     */
     private final Environment env; // 환경 변수 접근용
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         // 현재 활성화된 프로필이 dev인지 확인
@@ -88,6 +83,11 @@ public class SecurityConfig {
                     ).permitAll();
 
                     auth.requestMatchers("/error").permitAll();
+
+                    //역할별 접근 제한
+                    auth.requestMatchers("/api/admin/**").hasRole("ADMIN");
+                    auth.requestMatchers("/api/**").hasAnyRole("MANAGER", "ADMIN");
+
                     auth.anyRequest().authenticated();
                 })
 
