@@ -21,4 +21,9 @@ public class User extends BaseTime {
     private String orgCd;
     private ApprovalStatus apprSts;
 
+    public void changeName(String name) { this.usrNm = name; }
+    public void changeEmail(String email) { this.email = email; }
+    public void changePhone(String phone) { this.sms = phone; }
+    public void changePwHash(String pwHash) { this.pwHash = pwHash; }
+
 }
