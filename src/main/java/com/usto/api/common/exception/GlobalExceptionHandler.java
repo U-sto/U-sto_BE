@@ -41,7 +41,7 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiResponse<?> handleValidationException(MethodArgumentNotValidException e) {
         Map<String, String> errors = new HashMap<>();
-        
+
         e.getBindingResult().getAllErrors().forEach(error -> {
             String fieldName = ((FieldError) error).getField();
             String errorMessage = error.getDefaultMessage();

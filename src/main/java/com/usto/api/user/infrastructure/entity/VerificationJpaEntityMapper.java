@@ -6,7 +6,7 @@ import com.usto.api.user.domain.model.Verification;
 public final class VerificationJpaEntityMapper {
     private VerificationJpaEntityMapper() {}
 
-    private static Verification toDomain(VerificationJpaEntity e) {
+    public static Verification toDomain(VerificationJpaEntity e) {
         return Verification.builder()
                 .id(e.getId())
                 .type(e.getType())
@@ -24,7 +24,7 @@ public final class VerificationJpaEntityMapper {
                 .build();
     }
 
-    private static VerificationJpaEntity toEntity(Verification d) {
+    public static VerificationJpaEntity toEntity(Verification d) {
         return VerificationJpaEntity.builder()
                 .id(d.getId())
                 .type(d.getType())

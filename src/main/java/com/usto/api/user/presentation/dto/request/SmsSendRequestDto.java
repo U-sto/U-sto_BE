@@ -17,6 +17,5 @@ public class SmsSendRequestDto {
     @Pattern(regexp = "^[0-9]{11}$", message = "전화번호는 숫자 11자리여야 합니다.")
     private String target; //01012345678
 
-    @NotBlank
     private VerificationType type = VerificationType.SMS;
 }

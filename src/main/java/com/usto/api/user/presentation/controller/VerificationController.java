@@ -9,6 +9,8 @@ import com.usto.api.user.presentation.dto.request.EmailSendRequestDto;
 import com.usto.api.user.presentation.dto.request.EmailVerifyRequestDto;
 import com.usto.api.user.presentation.dto.request.SmsSendRequestDto;
 import com.usto.api.user.presentation.dto.request.SmsVerifyRequestDto;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -21,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
 
+@Tag(name = "verification-controller", description = "인증 관련 API")
 @RestController
 @RequestMapping("/api/auth/verification")
 @RequiredArgsConstructor
@@ -33,6 +36,7 @@ public class VerificationController {
     private final SmsSendApplication smsSendApplication;
 
     @PostMapping("/email/send")
+    @Operation(summary = "이메일 인증번호 전송")
     public ResponseEntity<String> sendEmail(
             @Valid
             @RequestBody EmailSendRequestDto request,
@@ -47,6 +51,7 @@ public class VerificationController {
 
 
     @PostMapping("/email/check")
+    @Operation(summary = "이메일 인증번호 확인")
     public ResponseEntity<String> verifyEmail(
             @Valid
             @RequestBody EmailVerifyRequestDto request,
@@ -59,11 +64,11 @@ public class VerificationController {
             session.setAttribute("signup.preauth.email", request.getTarget());
             session.setAttribute("signup.preauth.expiresAt", LocalDateTime.now().plusMinutes(15));
         }else if(request.getPurpose().equals(VerificationPurpose.FIND_ID)) {
-            session.setAttribute("find.preauth.email", request.getTarget());
-            session.setAttribute("find.preauth.expiresAt", LocalDateTime.now().plusMinutes(15));
+            session.setAttribute("findId.preauth.email", request.getTarget());
+            session.setAttribute("findId.preauth.expiresAt", LocalDateTime.now().plusMinutes(15));
         }else if(request.getPurpose().equals(VerificationPurpose.RESET_PASSWORD)){
-            session.setAttribute("find.preauth.email", request.getTarget());
-            session.setAttribute("find.preauth.expiresAt", LocalDateTime.now().plusMinutes(15));
+            session.setAttribute("findPw.preauth.email", request.getTarget());
+            session.setAttribute("findPw.preauth.expiresAt", LocalDateTime.now().plusMinutes(15));
         }
 
 
@@ -72,6 +77,7 @@ public class VerificationController {
     }
 
     @PostMapping("/sms/send")
+    @Operation(summary = "휴대폰 인증번호 전송")
     public ResponseEntity<String> sendSms(
             @Valid
             @RequestBody SmsSendRequestDto request,
@@ -86,6 +92,7 @@ public class VerificationController {
     }
 
     @PostMapping("/sms/check")
+    @Operation(summary = "휴대폰 인증번호 확인")
     public ResponseEntity<String> verifyCode(
             @Valid
             @RequestBody
@@ -95,19 +102,23 @@ public class VerificationController {
     {
         smsVerifyApplication.verifyCode(request);
 
-        if (request.getPurpose().equals("SIGNUP")) {
+        if (request.getPurpose().equals(VerificationPurpose.SIGNUP)) {
             session.setAttribute("signup.preauth.sms", request.getTarget());
             session.setAttribute("signup.preauth.expiresAt", LocalDateTime.now().plusMinutes(15));
-        }else if(request.getPurpose().equals("FIND_ID")) {
-            session.setAttribute("find-userid.preauth.sms", request.getTarget());
-            session.setAttribute("find-userid.preauth.expiresAt", LocalDateTime.now().plusMinutes(15));
-        }else if(request.getPurpose().equals("RESET_PASSWORD")){
-            session.setAttribute("reset-password.preauth.sms", request.getTarget());
-            session.setAttribute("reset-password.preauth.expiresAt", LocalDateTime.now().plusMinutes(15));
+        }else if(request.getPurpose().equals(VerificationPurpose.FIND_ID)) {
+            session.setAttribute("findId.preauth.sms", request.getTarget());
+            session.setAttribute("findId.preauth.expiresAt", LocalDateTime.now().plusMinutes(15));
+        }else if(request.getPurpose().equals(VerificationPurpose.RESET_PASSWORD)){
+            session.setAttribute("findPw.preauth.sms", request.getTarget());
+            session.setAttribute("findPw.preauth.expiresAt", LocalDateTime.now().plusMinutes(15));
         }
 
         return ResponseEntity.ok("전화번호 인증이 완료되었습니다.");
     }
+
+
+
+
 
     private String resolveActor(HttpServletRequest http) {
         // 로그인 기반이면 여기서 SecurityContext에서 usrId 꺼냄

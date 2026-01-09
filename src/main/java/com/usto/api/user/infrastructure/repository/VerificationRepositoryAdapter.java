@@ -5,6 +5,7 @@ import com.usto.api.user.domain.model.VerificationPurpose;
 import com.usto.api.user.domain.model.VerificationType;
 import com.usto.api.user.domain.repository.VerificationRepository;
 import com.usto.api.user.infrastructure.entity.VerificationJpaEntity;
+import com.usto.api.user.infrastructure.entity.VerificationJpaEntityMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -26,30 +27,27 @@ public class VerificationRepositoryAdapter implements VerificationRepository {
     public Optional<Verification> find(
             String target,
             VerificationType type,
-            VerificationPurpose purpose)
-    {
+            VerificationPurpose purpose) {
         return verificationJpaRepository.findByTypeAndPurposeAndTarget(
                         type,
                         purpose,
                         target)
-                        .map(VerificationRepositoryAdapter::toDomain);
+                .map(VerificationJpaEntityMapper::toDomain);
     }
 
     @Override
     public Verification save(
-            Verification verification)
-    {
-        VerificationJpaEntity mapped = toEntity(verification);
+            Verification verification) {
+        VerificationJpaEntity mapped = VerificationJpaEntityMapper.toEntity(verification);
         VerificationJpaEntity saved = verificationJpaRepository.save(mapped);
-        return toDomain(saved);
+        return VerificationJpaEntityMapper.toDomain(saved);
     }
 
     @Override
     public void delete(
             String target,
             VerificationType type,
-            VerificationPurpose purpose)
-    {
+            VerificationPurpose purpose) {
         verificationJpaRepository.findByTypeAndPurposeAndTarget(
                         type,
                         purpose,
@@ -60,42 +58,5 @@ public class VerificationRepositoryAdapter implements VerificationRepository {
     @Override
     public int deleteExpiredBefore(LocalDateTime now) {
         return verificationJpaRepository.deleteByExpiresAtBefore(now);
-    }
-
-    // --- mapper ---
-    private static Verification toDomain(VerificationJpaEntity e) {
-        return Verification.builder()
-                .id(e.getId())
-                .type(e.getType())
-                .purpose(e.getPurpose())
-                .target(e.getTarget())
-                .code(e.getCode())
-                .expiresAt(e.getExpiresAt())
-                .isVerified(e.isVerified())
-                .verifiedAt(e.getVerifiedAt())
-                // base time
-                .creBy(e.getCreBy())
-                .creAt(e.getCreAt())
-                .updBy(e.getUpdBy())
-                .updAt(e.getUpdAt())
-                .build();
-    }
-
-    private static VerificationJpaEntity toEntity(Verification d) {
-        return VerificationJpaEntity.builder()
-                .id(d.getId())
-                .type(d.getType())
-                .purpose(d.getPurpose())
-                .target(d.getTarget())
-                .code(d.getCode())
-                .expiresAt(d.getExpiresAt())
-                .isVerified(d.isVerified())
-                .verifiedAt(d.getVerifiedAt())
-                // base time
-                .creBy(d.getCreBy())
-                .creAt(d.getCreAt())
-                .updBy(d.getUpdBy())
-                .updAt(d.getUpdAt())
-                .build();
     }
 }

@@ -7,12 +7,15 @@ import com.usto.api.user.application.UserIdExistsApplication;
 import com.usto.api.user.presentation.dto.response.EmailExistsResponseDto;
 import com.usto.api.user.presentation.dto.response.SmsExistsResponseDto;
 import com.usto.api.user.presentation.dto.response.UsrIdExistsResponseDto;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+@Tag(name = "exists-controller", description = "중복 확인 관련 API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/users/exists")
@@ -24,6 +27,7 @@ public class ExistsController {
 
 
     @GetMapping("/email")
+    @Operation(summary = "이메일 중복 확인")
     public ApiResponse<?> existsByEmail(
             @RequestParam(required = false)
             String email
@@ -42,6 +46,7 @@ public class ExistsController {
     }
 
     @GetMapping("/sms")
+    @Operation(summary = "전화번호 중복 확인")
     public ApiResponse<?> existsBySms(
             @RequestParam(required = false)
             String sms
@@ -60,6 +65,7 @@ public class ExistsController {
     }
 
     @GetMapping("/user-id   ")
+    @Operation(summary = "아이디 중복 확인")
     public ApiResponse<?> existsByUsrId(
             @RequestParam(required = false)
             String usrId
