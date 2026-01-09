@@ -8,15 +8,14 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 
 @Getter
-public class EmailSendRequestDto {
+public class   EmailSendRequestDto {
 
     @NotNull
     private VerificationPurpose purpose;
 
     @NotBlank
     @Email
-    private String target;
+    private String target;//example@naver.com
 
-    @NotBlank
-    private VerificationType type = VerificationType.EMAIL;//example@naver.com
+    private VerificationType type = VerificationType.EMAIL;
 }

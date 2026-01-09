@@ -63,13 +63,80 @@ public class EmailSendApplication {
             helper.setSubject("[U-sto] 이메일 인증 번호 : " + authCode);
 
             // 본문 내용 (HTML 태그 사용 for 크기 조절)
-            String body =
-                    """
-                            <h1>대학물품관리시스템의 표준 U-sto</h1>
-                            <h3>요청하신 인증번호입니다.</h3>
-                            <h1>%s</h1>
-                            <p>5분 안에 입력해주세요.</p>
-                            """.formatted(authCode);
+            String body = """
+            <table width="100%%" cellpadding="0" cellspacing="0"
+                   style="background:#0F2A44;padding:40px 0;">
+              <tr>
+                <td align="center">
+                  <table width="560" cellpadding="0" cellspacing="0"
+                         style="background:#ffffff;border-radius:14px;
+                                overflow:hidden;
+                                box-shadow:0 10px 30px rgba(0,0,0,0.25);
+                                font-family:'Apple SD Gothic Neo',Arial,sans-serif;">
+                    
+                    <!-- Header -->
+                    <tr>
+                      <td style="
+                          background:linear-gradient(135deg,#003876,#0B5ED7);
+                          padding:28px 32px;
+                          color:#ffffff;">
+                        <div style="font-size:14px;letter-spacing:2px;opacity:0.9;">
+                          대학물품관리시스템
+                        </div>
+                        <h1 style="margin:8px 0 0 0;font-size:26px;font-weight:700;">
+                          U-sto 인증 안내
+                        </h1>
+                      </td>
+                    </tr>
+            
+                    <!-- Body -->
+                    <tr>
+                      <td style="padding:36px 32px;color:#1F2A44;">
+                        <p style="margin:0 0 20px 0;font-size:15px;line-height:1.6;">
+                          요청하신 <strong>인증번호</strong>를 아래에 안내드립니다.
+                        </p>
+            
+                        <!-- Code Box -->
+                        <div style="
+                            margin:24px 0;
+                            padding:28px 0;
+                            text-align:center;
+                            border-radius:10px;
+                            background:#F4F8FD;
+                            border:1px solid #D9E5F3;">
+                          <div style="
+                              font-size:34px;
+                              font-weight:800;
+                              letter-spacing:6px;
+                              color:#003876;">
+                            %s
+                          </div>
+                        </div>
+            
+                        <p style="margin:16px 0 0 0;font-size:14px;">
+                          인증번호는 <strong style="color:#0B5ED7;">5분 이내</strong>에 입력해주세요.
+                        </p>
+            
+                        <p style="margin:24px 0 0 0;font-size:12px;color:#6B7280;">
+                          본 메일은 대학물품관리시스템(U-sto)에서 발송된 메일입니다.<br/>
+                          문의사항은 시스템 관리자에게 연락해주세요.
+                        </p>
+                      </td>
+                    </tr>
+            
+                    <!-- Footer -->
+                    <tr>
+                      <td style="background:#F8FAFC;padding:16px 32px;
+                                 font-size:11px;color:#9CA3AF;text-align:center;">
+                        © U-sto · 대학물품관리시스템
+                      </td>
+                    </tr>
+            
+                  </table>
+                </td>
+              </tr>
+            </table>
+            """.formatted(authCode);
 
             helper.setText(body, true); // HTML을 쓰겠다는 뜻
             emailSender.send(message);

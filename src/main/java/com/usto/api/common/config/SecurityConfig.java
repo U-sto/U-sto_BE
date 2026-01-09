@@ -65,13 +65,14 @@ public class SecurityConfig {
 
                 // Swagger
                 .authorizeHttpRequests(auth -> {
-                    // 기본 허용 경로
+                    // 기본 허용 경로 (언제든 접근 가능)
                     auth.requestMatchers(
-                            "/api/users",
-                            "/api/users/exists/**",
-                            "/api/auth/find/**",
-                            "/api/auth/verification/**",
-                            "/api/auth/login"
+                            "/api/users", //회원가입
+                            "/api/users/exists/**", //중복조회 when 회원가입
+                            "/api/auth/find/**", //아이디/비밀번호 찾기
+                            "/api/auth/verification/**", //이메일/전화번호 인증 when 회원가입,아이디/비번찾기
+                            "/api/auth/login", //로그인
+                            "/api/auth/logout"
                     ).permitAll();
 
                     // 개발 환경(dev)일 때만 G2B API를 로그인 없이 허용
@@ -92,10 +93,13 @@ public class SecurityConfig {
 
                 .formLogin(AbstractHttpConfigurer::disable) // no login for swagger , we need comfort
                 .httpBasic(AbstractHttpConfigurer::disable)
+                //로그아웃
                 .logout(logout -> logout
                         .logoutUrl("/api/auth/logout")
                         .logoutSuccessHandler((request, response, authentication) -> {
                             response.setStatus(HttpServletResponse.SC_OK);
+                            response.setContentType("application/json;charset=UTF-8");
+                            response.getWriter().write("{\"success\":true,\"message\":\"로그아웃 성공\",\"data\":null}");
                         })
                         .invalidateHttpSession(true)
                         .deleteCookies("JSESSIONID")

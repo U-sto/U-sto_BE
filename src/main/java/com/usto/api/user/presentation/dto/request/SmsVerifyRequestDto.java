@@ -22,6 +22,5 @@ public class SmsVerifyRequestDto {
     @Pattern(regexp = "^[0-9]{4}$", message = "인증코드는 4자리 숫자여야 합니다.")
     private String code;
 
-    @NotBlank
     private VerificationType type = VerificationType.SMS;
 }
