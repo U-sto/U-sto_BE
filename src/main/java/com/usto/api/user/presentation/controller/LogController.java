@@ -38,8 +38,7 @@ public class LogController {
     private final AuthenticationManager authenticationManager; //세션 토큰 관리자님
     private final LoginApplication loginApplication;
 
-    private final SecurityContextRepository securityContextRepository =
-            new HttpSessionSecurityContextRepository();
+    private final SecurityContextRepository securityContextRepository;
 
     @PostMapping("/login")
     @Operation(summary = "로그인")
