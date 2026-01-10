@@ -29,9 +29,18 @@ public class G2bSearchServiceImpl implements G2bSearchService {
         String searchCode = (code == null) ? "" : code.trim();
         String searchName = (name == null) ? "" : name.trim();
 
-        // 검색어 길이 검증 (코드 및 명칭 검색 시 2글자 미만 제한)
-        if ((!searchCode.isEmpty() && searchCode.length() < 2) ||
-                (!searchName.isEmpty() && searchName.length() < 2)) {
+        // 분류코드 검증: 입력했다면 숫자여야 함
+        if (!searchCode.isEmpty()) {
+            if (!searchCode.matches("\\d+")) {
+                throw new G2bBusinessException("코드는 숫자만 입력 가능합니다.");
+            }
+            if (searchCode.length() < 2) {
+                throw new G2bBusinessException("코드는 최소 2자 이상 입력해 주세요.");
+            }
+        }
+
+        // 분류명 검증: 입력했다면 최소 2자 이상
+        if (!searchName.isEmpty() && searchName.length() < 2) {
             throw new G2bBusinessException("최소 2자 이상 입력해 주세요.");
         }
 
@@ -51,9 +60,18 @@ public class G2bSearchServiceImpl implements G2bSearchService {
             throw new G2bBusinessException("물품분류코드 또는 식별코드를 입력해 주세요.");
         }
 
-        // 검색어 길이 검증 (코드 및 명칭 검색 시 2글자 미만 제한)
-        if ((!itemCode.isEmpty() && itemCode.length() < 2) ||
-                (!itemName.isEmpty() && itemName.length() < 2)) {
+        // 물품분류코드: 입력했다면 숫자 8자리여야 함
+        if (!categoryCode.isEmpty() && !categoryCode.matches("\\d{8}")) {
+            throw new G2bBusinessException("코드는 8자리 숫자만 입력 가능합니다.");
+        }
+
+        // 물품식별코드: 입력했다면 숫자 8자리여야 함
+        if (!itemCode.isEmpty() && !itemCode.matches("\\d{8}")) {
+            throw new G2bBusinessException("코드는 8자리 숫자만 입력 가능합니다.");
+        }
+
+        // 품목명 길이 검증: 입력했다면 최소 2자 이상
+        if (!itemName.isEmpty() && itemName.length() < 2) {
             throw new G2bBusinessException("최소 2자 이상 입력해 주세요.");
         }
 
