@@ -16,7 +16,7 @@ INSERT INTO TB_ORG002M (
 -- 단과대학 계열
 ('HANYANG_ERICA', 'COL_SW_RC',  '소프트웨어융합대학RC 행정팀', '단과대학',   'SYSTEM');
 
--- 타 조직의 운용부서 (운용부서 api 테스트용으로 추가함)
+-- 타 조직의 운용부서
 INSERT INTO TB_ORG002M (
     ORG_CD,
     DEPT_CD,

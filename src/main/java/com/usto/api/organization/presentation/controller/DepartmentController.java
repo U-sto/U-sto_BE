@@ -19,7 +19,7 @@ import java.util.List;
 @RequestMapping("/api/organization")
 @RequiredArgsConstructor
 public class DepartmentController {
-    private final DepartmentService deptService;
+    private final DepartmentService departmentService;
 
     @Operation(summary = "운용부서 목록 조회", description = "현재 로그인한 사용자가 속한 조직의 부서 목록을 조회합니다.")
     @GetMapping("/departments")
@@ -27,11 +27,7 @@ public class DepartmentController {
 
         // 로그인한 유저의 조직코드 가져오기
         String myOrgCd = principal.getOrgCd();
-        List<DepartmentResponse> list = deptService.getDepartmentList(myOrgCd);
-
-        if (list == null || list.isEmpty()) {
-            return ApiResponse.ok("해당 조직의 운용부서 정보가 존재하지 않습니다.", list);
-        }
+        List<DepartmentResponse> list = departmentService.getDepartmentList(myOrgCd);
 
         return ApiResponse.ok("부서 목록 조회 성공", list);
     }
