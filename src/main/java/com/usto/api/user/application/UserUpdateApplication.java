@@ -1,5 +1,6 @@
 package com.usto.api.user.application;
 
+import com.usto.api.common.exception.BusinessException;
 import com.usto.api.common.exception.LoginFailedException;
 import com.usto.api.common.utils.CurrentUser;
 import com.usto.api.user.domain.model.User;
@@ -19,7 +20,7 @@ public class UserUpdateApplication {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final HttpSession session; // 로그인 userId 얻기
+    //private final HttpSession session; // 로그인 userId 얻기
 
     @Transactional
     public UserUpdateResponseDto update(String pathUserId, UserUpdateRequestDto request) {
@@ -27,7 +28,7 @@ public class UserUpdateApplication {
         String loginUsrId = CurrentUser.usrId();
 
         if (loginUsrId == null) {
-            throw new LoginFailedException(); //로그인이 안된거임
+            throw new BusinessException("로그인이 필요합니다."); //로그인이 안된거임
         }
 
         if (!loginUsrId.equals(pathUserId)) {
@@ -36,9 +37,8 @@ public class UserUpdateApplication {
 
         User user = userRepository
                 .getByUsrId(pathUserId);
-               // .orElseThrow(UserNotFoundException::new); //예외처리 정리할 떄에 NOT_FOUND 넣어야함
 
-        // 들어온 것들만 수정한다, 나머지는 그대로
+        // 들어온 것들(기존과 다른거)만 수정한다, 나머지는 그대로
         if (request.getNewUsrNm() != null && !request.getNewUsrNm().equals(user.getUsrNm())) {
             user.changeName(request.getNewUsrNm());
         }
@@ -46,13 +46,12 @@ public class UserUpdateApplication {
             user.changeEmail(request.getNewEmail());
         }
         if (request.getNewSms() != null && !request.getNewSms().equals(user.getSms())) {
-            user.changePhone(request.getNewSms());
+            user.changeSms(request.getNewSms());
         }
-
         if (request.getNewPw() != null && !request.getNewPw().equals(user.getPwHash())){
             passwordEncoder.encode(request.getNewPw());
             user.changePwHash(passwordEncoder.encode(request.getNewPw()));
-        }// 비밀번호 일치 여부를 확인하는 과정이 추가되면 보강되어야할 부분
+        }
 
 
         // 4) 저장
@@ -63,8 +62,6 @@ public class UserUpdateApplication {
                 .usrNm(user.getUsrNm())
                 .email(user.getEmail())
                 .sms(user.getSms())
-//                .orgNm(user.getOrgNm()) org관련 정보를 전부 다 채우면 활용이 가능함
-//                .roleId(user.getRoleId())
                 .build();
     }
 }

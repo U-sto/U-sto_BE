@@ -52,12 +52,15 @@ public class UserController {
         return ApiResponse.ok("회원가입 완료");
     }
 
-    @PutMapping("/{userId}")
+    @PutMapping("api/users")
     @Operation(summary = "회원 수정")
     public ApiResponse<UserUpdateResponseDto> updateUser(
             @PathVariable String userId,
             @RequestBody UserUpdateRequestDto request
     ) {
+
+        userUpdateApplication.update(userId,request);
+
         return ApiResponse.ok(
                 "회원정보가 정상적으로 수정되었습니다.",
                 userUpdateApplication.update(userId, request)

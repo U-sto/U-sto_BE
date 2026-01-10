@@ -23,7 +23,7 @@ public class User extends BaseTime {
 
     public void changeName(String name) { this.usrNm = name; }
     public void changeEmail(String email) { this.email = email; }
-    public void changePhone(String phone) { this.sms = phone; }
+    public void changeSms(String Sms) { this.sms = sms; }
     public void changePwHash(String pwHash) { this.pwHash = pwHash; }
 
 }
