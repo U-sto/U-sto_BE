@@ -17,6 +17,8 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -29,13 +31,8 @@ import java.util.List;
 @RequiredArgsConstructor // 생성자 주입용
 public class SecurityConfig {
 
-    /**
-     *
-     * @param http
-     * @return
-     * @throws Exception
-     */
     private final Environment env; // 환경 변수 접근용
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         // 현재 활성화된 프로필이 dev인지 확인
@@ -88,6 +85,11 @@ public class SecurityConfig {
                     ).permitAll();
 
                     auth.requestMatchers("/error").permitAll();
+
+                    //역할별 접근 제한
+                    auth.requestMatchers("/api/admin/**").hasRole("ADMIN");
+                    auth.requestMatchers("/api/**").hasAnyRole("MANAGER", "ADMIN");
+
                     auth.anyRequest().authenticated();
                 })
 
@@ -116,10 +118,17 @@ public class SecurityConfig {
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
+        //세션 생성여부 확인
+        configuration.setExposedHeaders(List.of("X-Session-Exists"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
+    }
+
+    @Bean
+    public SecurityContextRepository securityContextRepository() {
+        return new HttpSessionSecurityContextRepository();
     }
 
     /**

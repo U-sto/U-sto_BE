@@ -50,13 +50,4 @@ public class GlobalExceptionHandler {
 
         return ApiResponse.fail("입력값 검증에 실패했습니다.", errors);
     }
-
-    /**
-     * 일반 예외 처리
-     */
-    @ExceptionHandler(Exception.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ApiResponse<?> handleGeneralException(Exception e) {
-        return ApiResponse.fail("서버 오류가 발생했습니다.");
-    }
 }
