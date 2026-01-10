@@ -3,6 +3,7 @@ package com.usto.api.organization.infrastructure.entity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
@@ -10,6 +11,7 @@ import java.util.Objects;
 
 @Embeddable //복합키 (ORG_CD+DEPT_CD)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
 public class DeptId implements Serializable {
 
     @Column(name = "ORG_CD", length = 50, nullable = false)

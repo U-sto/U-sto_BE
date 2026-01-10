@@ -72,9 +72,8 @@ public class SecurityConfig {
                             "/api/auth/logout"
                     ).permitAll();
 
-                    // 개발 환경(dev)일 때만 G2B API를 로그인 없이 허용
                     if (isDev) {
-                        auth.requestMatchers("/api/g2b/**").permitAll();
+                        // 개발 환경(dev)일 때만 로그인 없이 스웨거 테스트하고 싶은 API 작성 가능
                     }
 
                     auth.requestMatchers(

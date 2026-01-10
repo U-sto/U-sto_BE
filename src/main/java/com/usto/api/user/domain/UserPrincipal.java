@@ -32,6 +32,8 @@ public class UserPrincipal implements UserDetails {
         return user.getUsrId();
     }
 
+    public String getOrgCd() { return user.getOrgCd(); }
+
     @Override public boolean isAccountNonExpired() { return true; }
     @Override public boolean isAccountNonLocked() { return true; }
     @Override public boolean isCredentialsNonExpired() { return true; }
