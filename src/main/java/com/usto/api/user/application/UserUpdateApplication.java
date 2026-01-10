@@ -53,7 +53,9 @@ public class UserUpdateApplication {
                 .usrNm(updated.getUsrNm())
                 .email(updated.getEmail())
                 .sms(updated.getSms())
-                .build();
+         //       .orgNm(user.getOrgCd())
+         //       .role(user.getRoleId())  구현해야할 수도 있어 미래의 도현아 !
+                 .build();
     }
 }
 
