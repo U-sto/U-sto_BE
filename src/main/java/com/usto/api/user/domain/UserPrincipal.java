@@ -1,5 +1,7 @@
 package com.usto.api.user.domain;
 
+import com.usto.api.user.domain.model.ApprovalStatus;
+import com.usto.api.user.domain.model.Role;
 import com.usto.api.user.infrastructure.entity.UserJpaEntity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -35,7 +37,11 @@ public class UserPrincipal implements UserDetails {
     @Override public boolean isAccountNonExpired() { return true; }
     @Override public boolean isAccountNonLocked() { return true; }
     @Override public boolean isCredentialsNonExpired() { return true; }
-    @Override public boolean isEnabled() {
-        return user.getApprSts().isApproved();
+
+    //로그인 가능 조건
+    @Override
+    public boolean isEnabled() {
+        return user.getRoleId() != Role.GUEST
+                && user.getApprSts() == ApprovalStatus.APPROVED;
     }
 }

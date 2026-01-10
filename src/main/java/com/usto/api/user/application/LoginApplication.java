@@ -18,26 +18,9 @@ public class LoginApplication {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public LoginUser login(String usrId, String rawPassword) {
-        LoginUser user = userRepository.loadByUsrId(usrId)
+
+    public LoginUser login(String usrId) {
+        return userRepository.loadByUsrId(usrId)
                 .orElseThrow(LoginFailedException::new);
-
-
-        if (!passwordEncoder.matches(rawPassword, user.getPwHash())) {
-            throw new LoginFailedException();
-        }
-
-        //세션 토큰 발급
-        UsernamePasswordAuthenticationToken authentication =
-                new UsernamePasswordAuthenticationToken(
-                        user.getUsrId(),
-                        null,
-                        List.of()
-                );
-
-        SecurityContextHolder.getContext()
-                .setAuthentication(authentication);
-
-        return user;
     }
 }
