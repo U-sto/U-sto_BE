@@ -12,8 +12,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UserUpdateRequestDto {
 
-    User user;
-
     @Schema(nullable = true , example = "")
     private String newUsrNm;
 
