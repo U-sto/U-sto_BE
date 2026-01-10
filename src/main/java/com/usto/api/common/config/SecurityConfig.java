@@ -115,7 +115,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.setAllowedOrigins(List.of("http://localhost:0000","http://localhost:8080")); // 0000 <- we have to convert this number from 0000 to frontend number
+        configuration.setAllowedOrigins(List.of("http://localhost:3000","http://localhost:8080")); // 프론트엔드 포트에 맞게 수정 (예: 3000)
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
