@@ -88,6 +88,8 @@ public class SecurityConfig {
                     //역할별 접근 제한
                     auth.requestMatchers("/api/admin/**").hasRole("ADMIN");
                     auth.requestMatchers("/api/**").hasAnyRole("MANAGER", "ADMIN");
+                    auth.requestMatchers("/api/users/update/me").hasAnyRole("MANAGER", "ADMIN");
+
 
                     auth.anyRequest().authenticated();
                 })
