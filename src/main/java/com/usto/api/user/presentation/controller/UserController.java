@@ -61,7 +61,7 @@ public class UserController {
     @PutMapping("/api/users/update")
         @Operation(summary = "회원 수정")
         public ApiResponse<UserUpdateResponseDto> updateUser(
-            @RequestBody UserUpdateRequestDto request,
+                @RequestBody UserUpdateRequestDto request,
             @AuthenticationPrincipal UserPrincipal userPrincipal
             ) {
 
