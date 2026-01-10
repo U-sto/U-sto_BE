@@ -26,25 +26,25 @@ public class G2bSearchServiceImpl implements G2bSearchService {
     @Transactional(readOnly = true)
     public List<G2bItemCategoryJpaEntity> findCategoryList(String code, String name) {
         // null 체크 후 빈 문자열로 치환하여 LIKE '%%'가 모든 값을 포함하도록 유도
-        String searchCode = (code == null) ? "" : code.trim();
-        String searchName = (name == null) ? "" : name.trim();
+        String categoryCode = (code == null) ? "" : code.trim();
+        String categoryName = (name == null) ? "" : name.trim();
 
         // 분류코드 검증: 입력했다면 숫자여야 함
-        if (!searchCode.isEmpty()) {
-            if (!searchCode.matches("\\d+")) {
+        if (!categoryCode.isEmpty()) {
+            if (!categoryCode.matches("\\d+")) {
                 throw new G2bBusinessException("코드는 숫자만 입력 가능합니다.");
             }
-            if (searchCode.length() < 2) {
+            if (categoryCode.length() < 2) {
                 throw new G2bBusinessException("코드는 최소 2자 이상 입력해 주세요.");
             }
         }
 
         // 분류명 검증: 입력했다면 최소 2자 이상
-        if (!searchName.isEmpty() && searchName.length() < 2) {
+        if (!categoryName.isEmpty() && categoryName.length() < 2) {
             throw new G2bBusinessException("최소 2자 이상 입력해 주세요.");
         }
 
-        return categoryRepository.findByFilters(searchCode, searchName);
+        return categoryRepository.findByFilters(categoryCode, categoryName);
     }
 
     @Override
