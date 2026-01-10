@@ -67,6 +67,20 @@ public class UserRepositoryAdapter implements UserRepository {
         }
     }
 
+    @Transactional
+    @Override
+    public User updateProfile(String usrId, String usrNm, String email, String sms, String pwHash) {
+        UserJpaEntity e = userJpaRepository.findByUsrId(usrId).orElseThrow();
+
+        // Swagger 기본 설정때문에 string으로는 변경할 수 없게 막았습니다.
+        if (usrNm != null && !usrNm.equals("string")) e.setUsrNm(usrNm);
+        if (email != null && !email.equals("string")) e.setEmail(email);
+        if (sms != null && !sms.equals("01000000000")) e.setSms(sms);
+        if (pwHash != null && !pwHash.equals("string")) e.setPwHash(pwHash);
+
+        return UserJpaEntityMapper.toDomain(e);
+    }
+
     @Override
     public Optional<LoginUser> loadByUsrId(String usrId) {
         return userJpaRepository.findByUsrId(usrId)
@@ -97,6 +111,5 @@ public class UserRepositoryAdapter implements UserRepository {
                 .apprSts(e.getApprSts())
                 .build();
     }
-
 }
 

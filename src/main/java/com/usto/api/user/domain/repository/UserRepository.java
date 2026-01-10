@@ -21,5 +21,8 @@ public interface UserRepository{
     //로그인을 위한
     Optional<LoginUser> loadByUsrId(String usrId);
 
+    //User getByUsrId(String pathUserId);
+
     User getByUsrId(String pathUserId);
+    User updateProfile(String usrId, String usrNm, String email, String sms, String pwHash);
 }

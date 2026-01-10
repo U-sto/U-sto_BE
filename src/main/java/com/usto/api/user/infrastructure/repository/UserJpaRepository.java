@@ -1,5 +1,6 @@
 package com.usto.api.user.infrastructure.repository;
 
+import com.usto.api.user.domain.model.LoginUser;
 import com.usto.api.user.domain.model.User;
 import com.usto.api.user.infrastructure.entity.UserJpaEntity;
 import jakarta.validation.constraints.Email;
@@ -20,6 +21,7 @@ public interface UserJpaRepository extends JpaRepository<UserJpaEntity, String> 
     //User save(User user);
 
     Optional<UserJpaEntity> findByUsrId(String usrId);
+    Optional<UserJpaEntity> findByUsrId(LoginUser usrId);
 
     Optional<UserJpaEntity> findByEmail(String email);
 
@@ -29,5 +31,7 @@ public interface UserJpaRepository extends JpaRepository<UserJpaEntity, String> 
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("update UserJpaEntity u set u.pwHash = :pwHash where u.usrId = :usrId")
     int updatePwHashByUsrId(@Param("usrId") String usrId, @Param("pwHash") String pwHash);
+
+    //User getByUsrId(LoginUser pathUserId);
 
 }

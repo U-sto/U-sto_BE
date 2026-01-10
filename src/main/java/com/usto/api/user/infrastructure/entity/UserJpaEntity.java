@@ -11,6 +11,7 @@ import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
 
+@Setter
 @Entity
 @Table(name = "TB_USER001M")
 @Getter
