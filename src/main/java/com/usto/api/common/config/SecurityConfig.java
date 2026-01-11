@@ -69,7 +69,7 @@ public class SecurityConfig {
                             "/api/auth/find/**", //아이디/비밀번호 찾기
                             "/api/auth/verification/**", //이메일/전화번호 인증 when 회원가입,아이디/비번찾기
                             "/api/auth/login", //로그인
-                            "/api/auth/logout"
+                            "/api/auth/logout" //로그아웃
                     ).permitAll();
 
                     if (isDev) {
@@ -88,6 +88,8 @@ public class SecurityConfig {
                     //역할별 접근 제한
                     auth.requestMatchers("/api/admin/**").hasRole("ADMIN");
                     auth.requestMatchers("/api/**").hasAnyRole("MANAGER", "ADMIN");
+                    auth.requestMatchers("/api/users/update").hasAnyRole("MANAGER", "ADMIN");
+
 
                     auth.anyRequest().authenticated();
                 })
@@ -113,7 +115,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.setAllowedOrigins(List.of("http://localhost:0000","http://localhost:8080")); // 0000 <- we have to convert this number from 0000 to frontend number
+        configuration.setAllowedOrigins(List.of("http://localhost:3000","http://localhost:8080")); // 프론트엔드 포트에 맞게 수정 (예: 3000)
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);

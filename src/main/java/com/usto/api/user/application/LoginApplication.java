@@ -2,6 +2,7 @@ package com.usto.api.user.application;
 
 import com.usto.api.common.exception.LoginFailedException;
 import com.usto.api.user.domain.model.LoginUser;
+import com.usto.api.user.domain.model.User;
 import com.usto.api.user.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -16,11 +17,18 @@ import java.util.List;
 public class LoginApplication {
 
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
-
 
     public LoginUser login(String usrId) {
-        return userRepository.loadByUsrId(usrId)
-                .orElseThrow(LoginFailedException::new);
+
+        // 1. 아이디 조회
+        User user = userRepository.findByUsrId(usrId)
+                .orElseThrow(LoginFailedException::invalidCredentials);
+
+        // 2. 승인 상태 조회
+        if (!user.getApprSts().isApproved()) {
+            throw LoginFailedException.notApproved();
+        }
+
+        return LoginUser.from(user);
     }
 }
