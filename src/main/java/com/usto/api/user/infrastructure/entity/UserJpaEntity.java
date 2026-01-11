@@ -74,16 +74,16 @@ public class UserJpaEntity extends BaseTimeEntity {
 
     //회원 수정
     public void updateProfile(String usrNm, String email, String sms, String pwHash) {
-        if (usrNm != null || !usrNm.equals("사용자이름")) {
+        if (usrNm != null && !usrNm.equals("사용자이름")) {
             this.usrNm = usrNm;
         }
-        if (email != null || !email.equals("usto@example.com")) {
+        if (email != null && !email.equals("usto@example.com")) {
             this.email = email;
         }
-        if (sms != null || !sms.equals("01000000000")) {
+        if (sms != null && !sms.equals("01000000000")) {
             this.sms = sms;
         }
-        if (pwHash != null || !pwHash.equals("newPw1234!")) {
+        if (pwHash != null && !pwHash.equals("newPw1234!")) {
             this.pwHash = pwHash;
         }
     }
