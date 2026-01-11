@@ -1,6 +1,7 @@
 package com.usto.api.user.infrastructure.repository;
 
 import com.usto.api.common.exception.BusinessException;
+import com.usto.api.common.exception.UserNotFoundException;
 import com.usto.api.user.domain.model.LoginUser;
 import com.usto.api.user.domain.model.User;
 import com.usto.api.user.domain.repository.UserRepository;
@@ -88,7 +89,6 @@ public class UserRepositoryAdapter implements UserRepository {
     public User getByUsrId(String pathUserId) {
         return userJpaRepository.findByUsrId(pathUserId)
                 .map(UserJpaEntityMapper::toDomain)
-                .orElseThrow(() -> new BusinessException(pathUserId)); //임시 - 예외처리 따로 싹 할 에정
+                .orElseThrow(UserNotFoundException::new);
     }
 }
-
