@@ -22,5 +22,5 @@ public class UserUpdateResponseDto {
 
     private String orgNm; //표시
 
-    private Role role;// 역할
+    private String roleNm;// 역할이름
 }

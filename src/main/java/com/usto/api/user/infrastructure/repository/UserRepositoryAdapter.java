@@ -71,12 +71,8 @@ public class UserRepositoryAdapter implements UserRepository {
     @Override
     public User updateProfile(String usrId, String usrNm, String email, String sms, String pwHash) {
         UserJpaEntity e = userJpaRepository.findByUsrId(usrId).orElseThrow();
-
-        // Swagger 기본 설정때문에 string으로는 변경할 수 없게 막았습니다.
-        if (usrNm != null && !usrNm.equals("string")) e.setUsrNm(usrNm);
-        if (email != null && !email.equals("string")) e.setEmail(email);
-        if (sms != null && !sms.equals("01000000000")) e.setSms(sms);
-        if (pwHash != null && !pwHash.equals("string")) e.setPwHash(pwHash);
+        
+        e.updateProfile(usrNm,email,sms,pwHash);
 
         return UserJpaEntityMapper.toDomain(e);
     }
@@ -95,21 +91,8 @@ public class UserRepositoryAdapter implements UserRepository {
     @Override
     public User getByUsrId(String pathUserId) {
         return userJpaRepository.findByUsrId(pathUserId)
-                .map(this::toDomain)
+                .map(UserJpaEntityMapper::toDomain)
                 .orElseThrow(() -> new BusinessException(pathUserId)); //임시 - 예외처리 따로 싹 할 에정
-    }
-
-    private User toDomain(UserJpaEntity e) {
-        return User.builder()
-                .usrId(e.getUsrId())
-                .usrNm(e.getUsrNm())
-                .pwHash(e.getPwHash())
-                .email(e.getEmail())
-                .sms(e.getSms())
-                .orgCd(e.getOrgCd())
-                .roleId(e.getRoleId())
-                .apprSts(e.getApprSts())
-                .build();
     }
 }
 
