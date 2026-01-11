@@ -2,6 +2,8 @@ package com.usto.api.common.exception;
 
 import com.usto.api.common.utils.ApiResponse;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -30,8 +32,30 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(LoginFailedException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    public ApiResponse<?> handleLoginFailedException(LoginFailedException e) {
-        return ApiResponse.fail(e.getMessage());
+    public ApiResponse<?> handleLoginFailed(LoginFailedException e) {
+        return switch (e.getReason()) {
+            case INVALID_CREDENTIALS -> ApiResponse.fail("아이디 또는 비밀번호가 올바르지 않습니다.");
+            case NOT_APPROVED -> ApiResponse.fail("승인 대기 중입니다.");
+            };
+    }
+
+    /**
+     *  Spring Security 기본 로그인 실패(아이디/비번 틀림)
+     * - authenticate()에서 BadCredentialsException이 올라옴
+     */
+    @ExceptionHandler(BadCredentialsException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ApiResponse<?> handleBadCredentials(BadCredentialsException e) {
+        return ApiResponse.fail("아이디 또는 비밀번호가 올바르지 않습니다.");
+    }
+
+    /**
+     * 기타 인증 예외(필요 시 메시지 통일)
+     */
+    @ExceptionHandler(AuthenticationException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ApiResponse<?> handleAuth(AuthenticationException e) {
+        return ApiResponse.fail("로그인에 실패했습니다."); //서버 문제
     }
 
     /**

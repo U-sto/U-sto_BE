@@ -1,7 +1,9 @@
 package com.usto.api.user.presentation.controller;
 
+import com.usto.api.common.exception.LoginFailedException;
 import com.usto.api.common.utils.ApiResponse;
 import com.usto.api.user.application.LoginApplication;
+import com.usto.api.user.domain.UserPrincipal;
 import com.usto.api.user.domain.model.LoginUser;
 import com.usto.api.user.presentation.dto.request.LoginRequestDto;
 import com.usto.api.user.presentation.dto.response.LoginResponseDto;
@@ -37,7 +39,6 @@ public class LogController {
 
     private final AuthenticationManager authenticationManager; //세션 토큰 관리자님
     private final LoginApplication loginApplication;
-
     private final SecurityContextRepository securityContextRepository;
 
     @PostMapping("/login")
@@ -47,22 +48,20 @@ public class LogController {
             HttpServletRequest httpRequest,
             HttpServletResponse httpResponse
     ) {
-
-        // 비밀번호 검증 + 상태체크
+        // 1) 스프링 시큐리티 표준 인증(비번 틀리면 BadCredentialsException 발생)
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getUsrId(), request.getPwd())
         );
 
+        // 2) 인증 성공 시 SecurityContext 생성 + 세션 저장
         SecurityContext context = SecurityContextHolder.createEmptyContext();
         context.setAuthentication(authentication);
         SecurityContextHolder.setContext(context);
 
-        // 세션에 저장
         securityContextRepository.saveContext(context, httpRequest, httpResponse);
 
-        LoginUser loginUser = loginApplication.login(
-                request.getUsrId()
-        );
+        // 3) 응답용 사용자 정보 로딩 -> 승인 상태 확인
+        LoginUser loginUser = loginApplication.login(request.getUsrId());
 
         return ApiResponse.ok(
                 "로그인 성공",
@@ -71,6 +70,29 @@ public class LogController {
                         loginUser.getUsrNm()
                 )
         );
+
+        //로그인 실패는 Controller에서 먹어버리는게 나을거같음
+        /*
+            [다른  API에서 로그인 사용자 정보 가져오는 방법]
+            UserPrincipal me = (UserPrincipal) SecurityContextHolder.getContext()
+            .getAuthentication()
+            .getPrincipal();
+         */
+
+        /*
+                [최신 로그인 로직]
+
+                POST /api/auth/login
+                   ↓
+                AuthenticationManager.authenticate()      // 아이디·비번 검증
+                   ↓ (성공)
+                SecurityContextRepository.saveContext()   // 세션 저장
+                   ↓
+                LoginApplication.loadLoginUser()           // 승인/계정상태 검증
+                   ↓
+                LoginResponse 반환
+         */
+
     }
 
     @PostMapping("/logout")

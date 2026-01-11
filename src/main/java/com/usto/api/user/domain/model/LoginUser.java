@@ -16,17 +16,12 @@ public class LoginUser extends BaseTime {
     private final String usrNm;
     private final Role roleId;
 
-    public static LoginUser forLogin(
-            String usrId,
-            String pwHash,
-            String usrNm,
-            Role roleId
-    ) {
+    public static LoginUser from(User user) {
         return LoginUser.builder()
-                .usrId(usrId)
-                .pwHash(pwHash)
-                .usrNm(usrNm)
-                .roleId(roleId)
+                .usrId(user.getUsrId())
+                .pwHash(user.getPwHash())
+                .usrNm(user.getUsrNm())
+                .roleId(user.getRoleId())
                 .build();
     }
 }

@@ -19,9 +19,7 @@ public interface UserRepository{
     void updatePwHashByUsrId(String usrId, String pwHash);
 
     //로그인을 위한
-    Optional<LoginUser> loadByUsrId(String usrId);
-
-    //User getByUsrId(String pathUserId);
+    Optional<User> findByUsrId(String usrId);
 
     User getByUsrId(String pathUserId);
     User updateProfile(String usrId, String usrNm, String email, String sms, String pwHash);

@@ -78,15 +78,11 @@ public class UserRepositoryAdapter implements UserRepository {
     }
 
     @Override
-    public Optional<LoginUser> loadByUsrId(String usrId) {
+    public Optional<User> findByUsrId(String usrId) {
         return userJpaRepository.findByUsrId(usrId)
-                .map(user -> LoginUser.forLogin(
-                        user.getUsrId(),
-                        user.getPwHash(),
-                        user.getUsrNm(),
-                        user.getRoleId()
-                ));
+                .map(UserJpaEntityMapper::toDomain);
     }
+
 
     @Override
     public User getByUsrId(String pathUserId) {
