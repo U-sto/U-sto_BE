@@ -36,7 +36,7 @@ public class GlobalExceptionHandler {
         return switch (e.getReason()) {
             case INVALID_CREDENTIALS -> ApiResponse.fail("아이디 또는 비밀번호가 올바르지 않습니다.");
             case NOT_APPROVED -> ApiResponse.fail("승인 대기 중입니다.");
-            case DELETE -> ApiResponse.fail("탈퇴한 회원입니다.");
+            case DELETED -> ApiResponse.fail("탈퇴한 회원입니다.");
             };
     }
 

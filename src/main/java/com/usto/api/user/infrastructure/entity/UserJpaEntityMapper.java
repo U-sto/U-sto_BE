@@ -18,8 +18,8 @@ public final class UserJpaEntityMapper {
                 .orgCd(u.getOrgCd())
                 .apprSts(u.getApprSts())
                 .roleId(u.getRoleId())
-                .delYn(false)
-                .delAt(null)
+                .delYn(u.isDelYn())
+                .delAt(u.getDelAt())
                 // base time
                 .creBy(u.getCreBy())
                 .creAt(u.getCreAt())
@@ -38,8 +38,8 @@ public final class UserJpaEntityMapper {
                 .orgCd(e.getOrgCd())
                 .apprSts(e.getApprSts())
                 .roleId(e.getRoleId())
-                .delYn(false)
-                .delAt(null)
+                .delYn(e.isDelYn())
+                .delAt(e.getDelAt())
                 // base time
                 .creBy(e.getCreBy())
                 .creAt(e.getCreAt())

@@ -75,7 +75,6 @@ public class SecurityConfig {
                     //역할별 접근 제한
                     auth.requestMatchers("/api/admin/**").hasRole("ADMIN");
                     auth.requestMatchers("/api/**").hasAnyRole("MANAGER", "ADMIN");
-                    auth.requestMatchers("/api/users/update").hasAnyRole("MANAGER", "ADMIN");
 
                     if (isDev) {
                         // 개발 환경(dev)일 때만 로그인 없이 스웨거 테스트하고 싶은 API 작성 가능

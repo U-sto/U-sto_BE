@@ -4,7 +4,7 @@ package com.usto.api.common.exception;
 public class LoginFailedException extends RuntimeException {
 
 
-    public enum Reason { INVALID_CREDENTIALS, NOT_APPROVED , DELETE }
+    public enum Reason { INVALID_CREDENTIALS, NOT_APPROVED , DELETED }
 
     private final Reason reason;
 
@@ -21,7 +21,7 @@ public class LoginFailedException extends RuntimeException {
     }
 
     public static LoginFailedException deleted() {
-        return new LoginFailedException(Reason.DELETE);
+        return new LoginFailedException(Reason.DELETED);
     }
 
     public Reason getReason() {

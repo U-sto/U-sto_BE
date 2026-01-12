@@ -1,5 +1,6 @@
 package com.usto.api.user.application;
 
+import com.usto.api.common.exception.BusinessException;
 import com.usto.api.user.domain.model.ApprovalStatus;
 import com.usto.api.user.domain.model.Role;
 import com.usto.api.user.domain.model.User;
@@ -23,6 +24,8 @@ public class SignupApplication {
             String verifiedEmail,
             String verifiedSms) {
         String pwHash = passwordEncoder.encode(request.getPwd());
+
+        //회원 탈퇴한 회원과 같은 이메일과 전화번호를 쓰려고 하면 막아야한다? 조금 이상한 정책으로 보임,, 어떻게 풀어나가야할지 고민
 
         User user = User.builder()
                 .usrId(request.getUsrId())

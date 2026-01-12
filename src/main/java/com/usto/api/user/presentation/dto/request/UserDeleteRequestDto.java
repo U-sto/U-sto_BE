@@ -7,5 +7,5 @@ import lombok.Getter;
 public class UserDeleteRequestDto {
 
     @NotBlank
-    String crrentPw;
+    String currentPw;
 }
