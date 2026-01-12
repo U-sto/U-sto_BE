@@ -30,7 +30,7 @@ public class LoginApplication {
         }
 
         // 3. 탈퇴 회원 여부 확인
-        if(!user.getDelAt().isEqual(null)){
+        if(user.getDelAt() != null){
             throw LoginFailedException.deleted();
         }
 
