@@ -34,4 +34,16 @@ public interface UserJpaRepository extends JpaRepository<UserJpaEntity, String> 
 
     //User getByUsrId(LoginUser pathUserId);
 
+    Optional<UserJpaEntity> findByUsrIdAndDelYnFalse(String usrId);
+
+    @Modifying
+    @Query("""
+        update UserJpaEntity u
+           set u.delYn = true,
+               u.delAt = CURRENT_TIMESTAMP
+         where u.usrId = :usrId
+           and u.delYn = false
+    """)
+    int softDeleteByUsrId(@Param("usrId") String usrId);
+
 }

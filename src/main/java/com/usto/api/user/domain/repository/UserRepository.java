@@ -23,4 +23,6 @@ public interface UserRepository{
 
     User getByUsrId(String pathUserId);
     User updateProfile(String usrId, String usrNm, String email, String sms, String pwHash);
+    void softDeleteByUsrId(String usrId);
+
 }
