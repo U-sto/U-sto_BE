@@ -30,7 +30,7 @@ CREATE TABLE `TB_ITEM002M` (
   `ACQ_ID`        BIGINT          NOT NULL COMMENT '취득ID',
   `G2B_M_CD`      CHAR(8)         NOT NULL COMMENT '물품분류코드',
   `G2B_D_CD`      CHAR(8)         NOT NULL COMMENT '물품식별코드',
-  `QTY`           INT             NOT NULL COMMENT '수량',  -- 일부 물품이 처분될 시 수량이 변경됨 / 초기값: TB_ITEM001M의 '취득수량'
+  `QTY`           INT             NOT NULL COMMENT '수량',  -- 일부 물품이 처분될 시 수량이 감소함 / 초기값: TB_ITEM001M의 '취득수량'
   `ACQ_AT`        DATETIME        NOT NULL COMMENT '취득일자',
   `ACQ_UPR`       DECIMAL(20,0)   NOT NULL COMMENT '취득단가',
   `APPR_AT`       DATETIME        NOT NULL COMMENT '확정일자(정리일자)',
@@ -46,7 +46,7 @@ CREATE TABLE `TB_ITEM002M` (
   PRIMARY KEY (`ACQ_ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='물품대장기본';
 
--- TB_ITEM002D 물품대장상세
+-- TB_ITEM002D 물품대장상세 (개별 물품 단위)
 CREATE TABLE `TB_ITEM002D` (
   `ITM_NO`        BIGINT          NOT NULL AUTO_INCREMENT COMMENT '물품고유번호',
   `ACQ_ID`        BIGINT          NOT NULL COMMENT '취득ID',
@@ -65,7 +65,7 @@ CREATE TABLE `TB_ITEM002D` (
 
   PRIMARY KEY (`ITM_NO`),
   CONSTRAINT
-    FOREIGN KEY (`ACQ_ID`) REFERENCES TB_ITEM001M (`ACQ_ID`)
+    FOREIGN KEY (`ACQ_ID`) REFERENCES TB_ITEM002M (`ACQ_ID`)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='물품대장상세';
