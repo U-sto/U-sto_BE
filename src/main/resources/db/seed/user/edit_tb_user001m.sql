@@ -23,3 +23,17 @@ UPDATE TB_USER001M
 SET ROLE_ID = 'ADMIN',
     APPR_STS = 'APPROVED'
 WHERE USR_ID = 'badbergjr';
+
+-- 충돌나면 이걸 먼저 하고나서 돌려주세요
+USE usto;
+-- 1. 인덱스 삭제
+DROP INDEX idx_user_del_yn ON tb_user001m;
+
+-- 2. 컬럼 삭제
+ALTER TABLE tb_user001m
+    DROP COLUMN DEL_YN,
+    DROP COLUMN DEL_AT;
+-- 실패한 V5 기록 삭제 (로컬에서만!)
+DELETE
+FROM flyway_schema_history
+WHERE version = '5';
