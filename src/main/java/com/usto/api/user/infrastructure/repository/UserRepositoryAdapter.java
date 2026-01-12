@@ -91,4 +91,10 @@ public class UserRepositoryAdapter implements UserRepository {
                 .map(UserJpaEntityMapper::toDomain)
                 .orElseThrow(UserNotFoundException::new);
     }
+
+    @Override
+    public void softDeleteByUsrId(String usrId) {
+        int updated = userJpaRepository.softDeleteByUsrId(usrId);
+        if (updated == 0) throw new UserNotFoundException(); // 이미 삭제 포함
+    }
 }

@@ -3,10 +3,12 @@ package com.usto.api.user.presentation.controller;
 import com.usto.api.common.exception.BusinessException;
 import com.usto.api.common.utils.ApiResponse;
 import com.usto.api.user.application.SignupApplication;
+import com.usto.api.user.application.UserDeleteApplication;
 import com.usto.api.user.application.UserUpdateApplication;
 import com.usto.api.user.domain.UserPrincipal;
 import com.usto.api.user.domain.model.LoginUser;
 import com.usto.api.user.presentation.dto.request.SignupRequestDto;
+import com.usto.api.user.presentation.dto.request.UserDeleteRequestDto;
 import com.usto.api.user.presentation.dto.request.UserUpdateRequestDto;
 import com.usto.api.user.presentation.dto.response.LoginResponseDto;
 import com.usto.api.user.presentation.dto.response.UserUpdateResponseDto;
@@ -28,6 +30,7 @@ public class UserController {
 
     private final SignupApplication signupApplication;
     private final UserUpdateApplication userUpdateApplication;
+    private final UserDeleteApplication userDeleteApplication;
 
     @PostMapping("/api/users/sign-up")
     @Operation(summary = "회원 가입")
@@ -72,5 +75,15 @@ public class UserController {
                     "회원정보가 정상적으로 수정되었습니다.",
                     result
             );
+    }
+
+    @DeleteMapping("/api/users/delete")
+    @Operation(summary = "회원 탈퇴")
+    public ApiResponse<?> deleteMe(
+            @AuthenticationPrincipal UserPrincipal me,
+            @RequestBody UserDeleteRequestDto request
+    ) {
+        userDeleteApplication.deleteMe(me, request);
+        return ApiResponse.ok("회원 탈퇴 완료");
     }
 }

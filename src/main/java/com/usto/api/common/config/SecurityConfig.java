@@ -64,13 +64,17 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> {
                     // 기본 허용 경로 (언제든 접근 가능)
                     auth.requestMatchers(
-                            "/api/users", //회원가입
+                            "/api/users/sign-up", //회원가입
                             "/api/users/exists/**", //중복조회 when 회원가입
                             "/api/auth/find/**", //아이디/비밀번호 찾기
                             "/api/auth/verification/**", //이메일/전화번호 인증 when 회원가입,아이디/비번찾기
                             "/api/auth/login", //로그인
                             "/api/auth/logout" //로그아웃
                     ).permitAll();
+
+                    //역할별 접근 제한
+                    auth.requestMatchers("/api/admin/**").hasRole("ADMIN");
+                    auth.requestMatchers("/api/**").hasAnyRole("MANAGER", "ADMIN");
 
                     if (isDev) {
                         // 개발 환경(dev)일 때만 로그인 없이 스웨거 테스트하고 싶은 API 작성 가능
@@ -84,12 +88,6 @@ public class SecurityConfig {
                     ).permitAll();
 
                     auth.requestMatchers("/error").permitAll();
-
-                    //역할별 접근 제한
-                    auth.requestMatchers("/api/admin/**").hasRole("ADMIN");
-                    auth.requestMatchers("/api/**").hasAnyRole("MANAGER", "ADMIN");
-                    auth.requestMatchers("/api/users/update").hasAnyRole("MANAGER", "ADMIN");
-
 
                     auth.anyRequest().authenticated();
                 })
