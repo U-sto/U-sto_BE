@@ -29,6 +29,11 @@ public class LoginApplication {
             throw LoginFailedException.notApproved();
         }
 
+        // 3. 탈퇴 회원 여부 확인
+        if(!user.getDelAt().isEqual(null)){
+            throw LoginFailedException.deleted();
+        }
+
         return LoginUser.from(user);
     }
 }
