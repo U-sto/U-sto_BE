@@ -22,13 +22,14 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/api/users")
 public class UserController {
 
     private final SignupApplication signupApplication;
     private final UserUpdateApplication userUpdateApplication;
     private final UserDeleteApplication userDeleteApplication;
 
-    @PostMapping("/api/users/sign-up")
+    @PostMapping("sign-up")
     @Operation(summary = "회원 가입")
     public ApiResponse<?> signup(
             @RequestBody SignupRequestDto request,
@@ -58,7 +59,7 @@ public class UserController {
         return ApiResponse.ok("회원가입 완료");
     }
 
-    @PutMapping("/api/users/update")
+    @PutMapping("/update")
         @Operation(summary = "회원 수정")
         public ApiResponse<UserUpdateResponseDto> updateUser(
                 @Valid @RequestBody UserUpdateRequestDto request,
@@ -73,7 +74,7 @@ public class UserController {
             );
     }
 
-    @DeleteMapping("/api/users/delete")
+    @DeleteMapping("/delete")
     @Operation(summary = "회원 탈퇴")
     public ApiResponse<?> deleteMe(
             @AuthenticationPrincipal UserPrincipal me,

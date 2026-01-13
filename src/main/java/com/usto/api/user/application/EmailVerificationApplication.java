@@ -20,6 +20,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.xml.crypto.KeySelector;
 import java.time.LocalDateTime;
 
 @Slf4j
@@ -31,7 +32,9 @@ public class EmailVerificationApplication {
 
 
     @Transactional
-    public void verifyCode(EmailVerifyRequestDto request) {
+    public void verifyCode(
+            EmailVerifyRequestDto request,
+            VerificationPurpose purpose) {
         LocalDateTime now = LocalDateTime.now();
 
         //인증정보 조회
@@ -39,7 +42,7 @@ public class EmailVerificationApplication {
                 .find(
                         request.getTarget(),
                         VerificationType.EMAIL,
-                        request.getPurpose())
+                        purpose)
 
                 .orElseThrow(() -> new IllegalArgumentException("인증요청이 없습니다."));
 

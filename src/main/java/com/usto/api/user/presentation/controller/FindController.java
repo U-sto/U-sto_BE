@@ -1,9 +1,7 @@
 package com.usto.api.user.presentation.controller;
 
 import com.usto.api.common.utils.ApiResponse;
-import com.usto.api.user.application.PasswordFindApplication;
-import com.usto.api.user.application.PasswordUpdateApplication;
-import com.usto.api.user.application.UserIdFindApplication;
+import com.usto.api.user.application.*;
 import com.usto.api.user.presentation.dto.request.PasswordFindRequestDto;
 import com.usto.api.user.presentation.dto.request.PasswordResetRequestDto;
 import com.usto.api.user.presentation.dto.request.UserIdFindRequestDto;
@@ -26,6 +24,9 @@ public class FindController {
     private final UserIdFindApplication userIdFindApplication;
     private final PasswordFindApplication passwordFindApplication;
     private final PasswordUpdateApplication passwordUpdateApplication;
+
+    private final EmailVerificationApplication emailVerifyApplication;
+    private final EmailSendApplication emailSendApplication;
 
     @PostMapping("/user-id")
     @Operation(summary = "아이디 찾기")
@@ -69,7 +70,7 @@ public class FindController {
             HttpSession session
     )
     {
-        String userId = userIdFindApplication.findUserIdByEmail(request.getEmail());
+        String userId = passwordFindApplication.findUserIdByEmail(request.getEmail());
         if (!userId.equals(request.getUsrId())) {
             return ApiResponse.fail("회원 정보가 일치하지 않습니다..");
         }

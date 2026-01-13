@@ -9,6 +9,7 @@ package com.usto.api.user.application;
 
 import com.usto.api.common.utils.SmsUtil;
 import com.usto.api.user.domain.model.Verification;
+import com.usto.api.user.domain.model.VerificationPurpose;
 import com.usto.api.user.domain.model.VerificationType;
 import com.usto.api.user.domain.repository.VerificationRepository;
 import com.usto.api.user.presentation.dto.request.SmsSendRequestDto;
@@ -30,7 +31,9 @@ public class SmsSendApplication {
 
     @Transactional
     public void sendCodeToSms(
-            SmsSendRequestDto request,String actor
+            SmsSendRequestDto request,
+            VerificationPurpose purpose,  // ← 추가
+            String actor
     )
     {
         LocalDateTime timeLimit = LocalDateTime.now().plusMinutes(5);
@@ -42,7 +45,7 @@ public class SmsSendApplication {
                 .find(
                         request.getTarget(),
                         VerificationType.SMS,
-                        request.getPurpose()
+                        purpose
                         )
                 .orElse(null); //없으면? Null 처리
 
@@ -52,7 +55,7 @@ public class SmsSendApplication {
             // 새로 생성
             verificationToSave  = Verification.builder()
                     .creBy(actor)
-                    .purpose(request.getPurpose())
+                    .purpose(purpose)
                     .target(request.getTarget())
                     .type(VerificationType.SMS)
                     .code(code)
@@ -60,7 +63,7 @@ public class SmsSendApplication {
                     .isVerified(false)
                     .build();
             log.info("[SMS-SEND] 새 인증 생성 - target: {}, purpose: {}",
-                    request.getTarget(), request.getPurpose());
+                    request.getTarget(), purpose);
         } else {
             //재발송하는 경우
             Verification renewed = existingVerification.renew(code, timeLimit);
@@ -70,7 +73,7 @@ public class SmsSendApplication {
                     .build();
 
             log.info("[SMS-SEND] 인증 재발송 - target:  {}, purpose: {}",
-                    request.getTarget(), request.getPurpose());
+                    request.getTarget(), purpose);
         }
         verificationRepository.save(verificationToSave);
 

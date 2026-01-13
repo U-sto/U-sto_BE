@@ -43,6 +43,7 @@ public class EmailSendApplication {
     @Transactional
     public void sendCodeToEmail(
             EmailSendRequestDto request,
+            VerificationPurpose purpose,
             String actor)
     {
         LocalDateTime timeLimit = LocalDateTime.now().plusMinutes(5);
@@ -54,8 +55,7 @@ public class EmailSendApplication {
                 .find(
                         request.getTarget(),
                         VerificationType.EMAIL,
-                        request.getPurpose()
-                )
+                        purpose                )
                 .orElse(null);
 
         Verification verificationToSave;
@@ -64,7 +64,7 @@ public class EmailSendApplication {
             // 기존 내역없어? -> 생성
             verificationToSave = Verification.builder()
                     .creBy(actor)
-                    .purpose(request.getPurpose())
+                    .purpose(purpose)
                     .target(request.getTarget())
                     .type(VerificationType.EMAIL)
                     .code(code)
@@ -73,7 +73,7 @@ public class EmailSendApplication {
                     .build();
 
             log.info("[EMAIL-SEND] 새 인증 생성 - target: {}, purpose: {}",
-                    request.getTarget(), request.getPurpose());
+                    request.getTarget(), purpose);
         } else {
             //재발송
             Verification renewed = existingVerification.renew(code, timeLimit);
@@ -83,7 +83,7 @@ public class EmailSendApplication {
                     .build();
 
             log.info("[EMAIL-SEND] 인증 재발송 - target: {}, purpose: {}",
-                    request.getTarget(), request.getPurpose());
+                    request.getTarget(), purpose);
         }
 
         verificationRepository.save(verificationToSave);

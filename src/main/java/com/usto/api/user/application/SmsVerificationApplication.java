@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.xml.crypto.KeySelector;
 import java.time.LocalDateTime;
 
 @Service
@@ -31,14 +32,18 @@ public class SmsVerificationApplication {
      * - 저장된 Verification을 조회 → 만료시간 확인 → 코드 일치 확인 → 성공 시 verify() 호출
      */
     @Transactional
-    public void verifyCode(SmsVerifyRequestDto request) {
+    public void verifyCode(
+            SmsVerifyRequestDto request,
+            VerificationPurpose purpose
+    ) {
         LocalDateTime now = LocalDateTime.now();
+
         Verification verification = verificationRepository
                 .find(
                         request.getTarget(),
                         VerificationType.SMS,
-                        request.getPurpose())
-
+                        purpose
+                )
                 .orElseThrow(() -> new IllegalArgumentException("인증요청이 없습니다."));
 
 

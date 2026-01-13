@@ -25,7 +25,7 @@ import java.time.LocalDateTime;
 
 @Tag(name = "verification-controller", description = "인증 관련 API")
 @RestController
-@RequestMapping("/api/auth/verification")
+@RequestMapping("/api/auth/verification/sign-up")
 @RequiredArgsConstructor
 public class VerificationController {
 
@@ -35,6 +35,7 @@ public class VerificationController {
     private final SmsVerificationApplication smsVerifyApplication;
     private final SmsSendApplication smsSendApplication;
 
+    //회원가입
     @PostMapping("/email/send")
     @Operation(summary = "이메일 인증번호 전송")
     public ResponseEntity<String> sendEmail(
@@ -44,7 +45,10 @@ public class VerificationController {
     )
     {
         String actor = resolveActor(http);   // 아래 메서드
-        emailSendApplication.sendCodeToEmail(request,actor);
+        emailSendApplication.sendCodeToEmail(
+                request,
+                VerificationPurpose.SIGNUP,
+                actor);
 
         return ResponseEntity.ok("인증번호가 발송되었습니다.");
     }
@@ -58,18 +62,11 @@ public class VerificationController {
             HttpSession session
 
     ) {
-        emailVerifyApplication.verifyCode(request);
+        emailVerifyApplication.verifyCode(request,VerificationPurpose.SIGNUP);
 
-        if (request.getPurpose().equals(VerificationPurpose.SIGNUP)) {
-            session.setAttribute("signup.preauth.email", request.getTarget());
-            session.setAttribute("signup.preauth.expiresAt", LocalDateTime.now().plusMinutes(15));
-        }else if(request.getPurpose().equals(VerificationPurpose.FIND_ID)) {
-            session.setAttribute("findId.preauth.email", request.getTarget());
-            session.setAttribute("findId.preauth.expiresAt", LocalDateTime.now().plusMinutes(15));
-        }else if(request.getPurpose().equals(VerificationPurpose.RESET_PASSWORD)){
-            session.setAttribute("findPw.preauth.email", request.getTarget());
-            session.setAttribute("findPw.preauth.expiresAt", LocalDateTime.now().plusMinutes(15));
-        }
+
+        session.setAttribute("signup.preauth.email", request.getTarget());
+        session.setAttribute("signup.preauth.expiresAt", LocalDateTime.now().plusMinutes(15));
 
 
         return ResponseEntity.ok("이메일 인증이 완료되었습니다.");
@@ -86,7 +83,10 @@ public class VerificationController {
     ) {
         String actor = resolveActor(http);   // 아래 메서드
 
-        smsSendApplication.sendCodeToSms(request,actor);
+        smsSendApplication.sendCodeToSms(
+                request,
+                VerificationPurpose.SIGNUP,
+                actor);
 
         return ResponseEntity.ok("인증번호가 문자로 발송되었습니다.");
     }
@@ -100,25 +100,15 @@ public class VerificationController {
             HttpSession session
     )
     {
-        smsVerifyApplication.verifyCode(request);
+        smsVerifyApplication.verifyCode(request,VerificationPurpose.SIGNUP);
 
-        if (request.getPurpose().equals(VerificationPurpose.SIGNUP)) {
-            session.setAttribute("signup.preauth.sms", request.getTarget());
-            session.setAttribute("signup.preauth.expiresAt", LocalDateTime.now().plusMinutes(15));
-        }else if(request.getPurpose().equals(VerificationPurpose.FIND_ID)) {
-            session.setAttribute("findId.preauth.sms", request.getTarget());
-            session.setAttribute("findId.preauth.expiresAt", LocalDateTime.now().plusMinutes(15));
-        }else if(request.getPurpose().equals(VerificationPurpose.RESET_PASSWORD)){
-            session.setAttribute("findPw.preauth.sms", request.getTarget());
-            session.setAttribute("findPw.preauth.expiresAt", LocalDateTime.now().plusMinutes(15));
-        }
+
+        session.setAttribute("signup.preauth.sms", request.getTarget());
+        session.setAttribute("signup.preauth.expiresAt", LocalDateTime.now().plusMinutes(15));
+
 
         return ResponseEntity.ok("전화번호 인증이 완료되었습니다.");
     }
-
-
-
-
 
     private String resolveActor(HttpServletRequest http) {
         // 로그인 기반이면 여기서 SecurityContext에서 usrId 꺼냄
