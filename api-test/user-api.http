@@ -1,11 +1,10 @@
-### 1. 회원가입 - 이메일 인증번호 발송
+### 1. 이메일 인증번호 발송
 POST http://localhost:8080/api/auth/verification/email/send
 Content-Type: application/json
 
 {
   "target": "badbergjrr@naver.com",
-  "purpose": "SIGNUP",
-  "type": "EMAIL"
+  "purpose": "SIGNUP"
 }
 
 ### 2. 이메일 인증번호 확인
@@ -15,8 +14,7 @@ Content-Type: application/json
 {
   "target": "badbergjrr@naver.com",
   "code": "330979",
-  "purpose": "SIGNUP",
-  "type": "EMAIL"
+  "purpose": "SIGNUP"
 }
 
 ### 3. SMS 인증번호 발송
@@ -25,8 +23,7 @@ Content-Type:  application/json
 
 {
   "target": "01012345678",
-  "purpose": "SIGNUP",
-  "type": "SMS"
+  "purpose": "SIGNUP"
 }
 
 ### 4. SMS 인증번호 확인
@@ -36,8 +33,7 @@ Content-Type:  application/json
 {
   "target": "01012345678",
   "code": "1234",
-  "purpose": "SIGNUP",
-  "type": "SMS"
+  "purpose": "SIGNUP"
 }
 
 ### 5. 회원가입
@@ -56,8 +52,8 @@ POST http://localhost:8080/api/auth/login
 Content-Type: application/json
 
 {
-  "usrId": "testuser",
-  "pwd": "password123!"
+  "usrId": "badbergjr",
+  "pwd": "1111"
 }
 
 ### 7. 회원 정보 수정 (로그인 필요)
@@ -72,10 +68,28 @@ Content-Type: application/json
 }
 
 ### 8. 아이디 중복 확인
-GET http://localhost:8080/api/users/exists/user-id?usrId=testuser
+GET http://localhost:8080/api/users/exists/user-id
+Content-Type: application/json
+
+{
+  "usrId" : "badbergjr"
+}
 
 ### 9. 이메일 중복 확인
-GET http://localhost:8080/api/users/exists/email?email=test@example.com
+GET http://localhost:8080/api/users/exists/email
+Content-Type: application/json
+
+{
+  "email" : "badbergjrr@naver.com"
+}
+
+### 전화번호 중복 확인
+GET http://localhost:8080/api/users/exists/sms
+Content-Type: application/json
+
+{
+  "sms" : "01099569414"
+}
 
 ### 10. 아이디 찾기
 POST http://localhost:8080/api/auth/find/user-id

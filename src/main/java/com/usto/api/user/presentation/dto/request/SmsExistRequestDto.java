@@ -1,7 +1,6 @@
 package com.usto.api.user.presentation.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
@@ -9,19 +8,10 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class UserUpdateRequestDto {
+public class SmsExistRequestDto {
 
-    @Schema(example = "사용자 이름")
-    private String newUsrNm;
-
-    @Email
-    @Schema(example = "user@example.com")
-    private String newEmail;
-
+    @NotBlank(message = "전화번호를 입력해주세요.")
+    @Schema(example = "01012345678")
     @Pattern(regexp = "^[0-9]{11}$", message = "전화번호는 숫자 11자리여야 합니다.")
-    @Schema(example = "01000000000")
-    private String newSms;
-
-    @Schema(example = "newPw1234!")
-    private String newPw;
+    private String sms;
 }
