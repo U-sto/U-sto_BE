@@ -19,9 +19,6 @@ public interface UserJpaRepository extends JpaRepository<UserJpaEntity, String> 
     Optional<UserJpaEntity> findByUsrId(String usrId);
     Optional<UserJpaEntity> findByEmail(String email);
 
-    boolean existsByUsrNmAndEmail(String usrNm, String email);
-    boolean existsByUsrIdAndEmail(String usrId, String email);
-
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("update UserJpaEntity u set u.pwHash = :pwHash where u.usrId = :usrId")
     int updatePwHashByUsrId(@Param("usrId") String usrId, @Param("pwHash") String pwHash);
@@ -40,4 +37,6 @@ public interface UserJpaRepository extends JpaRepository<UserJpaEntity, String> 
     """)
     int softDeleteByUsrId(@Param("usrId") String usrId);
 
+    boolean existsByUsrNmAndEmail(String usrNm, String email);
+    boolean existsByUsrIdAndEmail(String usrId, String email);
 }

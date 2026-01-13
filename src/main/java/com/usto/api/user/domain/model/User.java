@@ -24,11 +24,6 @@ public class User extends BaseTime {
     private boolean delYn;
     private LocalDateTime delAt;
 
-    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    // 비즈니스 규칙 (도메인 로직)
-    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-
     public boolean canLogin() {
         return this.roleId != Role.GUEST
                 && this.apprSts == ApprovalStatus.APPROVED;

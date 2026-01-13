@@ -1,10 +1,9 @@
 package com.usto.api.user.presentation.controller;
 
-import com.usto.api.user.application.EmailSendApplication;
-import com.usto.api.user.application.EmailVerificationApplication;
-import com.usto.api.user.application.SmsSendApplication;
-import com.usto.api.user.application.SmsVerificationApplication;
+import com.usto.api.common.exception.BusinessException;
+import com.usto.api.user.application.*;
 import com.usto.api.user.domain.model.VerificationPurpose;
+import com.usto.api.user.domain.repository.UserRepository;
 import com.usto.api.user.presentation.dto.request.EmailSendRequestDto;
 import com.usto.api.user.presentation.dto.request.EmailVerifyRequestDto;
 import com.usto.api.user.presentation.dto.request.SmsSendRequestDto;
@@ -15,6 +14,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,6 +24,7 @@ import java.time.LocalDateTime;
 @RestController
 @RequestMapping("/api/auth/verification")
 @RequiredArgsConstructor
+@Slf4j
 public class VerificationController {
 
     private final EmailVerificationApplication emailVerifyApplication;
@@ -32,15 +33,40 @@ public class VerificationController {
     private final SmsVerificationApplication smsVerifyApplication;
     private final SmsSendApplication smsSendApplication;
 
+    private final EmailExistsApplication emailExistsApplication;
+    private final SmsExistsApplication smsExistsApplication;
+
+
     //회원가입
     @PostMapping("/email/send")
     @Operation(summary = "이메일 인증번호 전송")
     public ResponseEntity<String> sendEmail(
             @Valid @RequestBody EmailSendRequestDto request,
-            @RequestParam VerificationPurpose purpose,
-            HttpServletRequest http
+            HttpServletRequest http,
+            HttpSession session
+
     )
     {
+        VerificationPurpose purpose = determinePurpose(
+                request.getUsrId(),
+                request.getUsrNm()
+        );
+
+        validateUserInfo(request, purpose);
+
+        if(purpose.equals(VerificationPurpose.FIND_ID)){
+            session.setAttribute("email.pending.usrNm", request.getUsrNm());
+
+        }
+        if(purpose.equals(VerificationPurpose.RESET_PASSWORD)){
+            session.setAttribute("email.pending.usrId", request.getUsrId());
+
+        }
+
+        session.setAttribute("email.pending.purpose", purpose);
+        session.setAttribute("email.pending.target", request.getTarget());
+        session.setAttribute("email.pending.sentAt", LocalDateTime.now());
+
         String actor = resolveActor(http);
         emailSendApplication.sendCodeToEmail(
                 request,
@@ -55,15 +81,46 @@ public class VerificationController {
     @Operation(summary = "이메일 인증번호 확인")
     public ResponseEntity<String> verifyEmail(
             @Valid @RequestBody EmailVerifyRequestDto request,
-            @RequestParam VerificationPurpose purpose,
             HttpSession session
 
     ) {
-        emailVerifyApplication.verifyCode(request,purpose);
+
+        VerificationPurpose purpose = (VerificationPurpose) session.getAttribute("email.pending.purpose");
+        if (purpose == null) {
+            throw new BusinessException("인증번호 발송 내역이 없습니다. no_purpose");
+        }
+
+        String target = (String) session.getAttribute("email.pending.target");
+        if (target == null) {
+            throw new BusinessException("인증번호 발송 내역이 없습니다. no_target");
+        }
+
+        emailVerifyApplication.verifyCode(request.getCode(),target,purpose);
 
         String sessionPrefix = getSessionPrefix(purpose);
-        session.setAttribute( sessionPrefix +"preauth.email", request.getTarget());
-        session.setAttribute(sessionPrefix +"preauth.expiresAt", LocalDateTime.now().plusMinutes(15));
+
+        session.removeAttribute("email.pending.purpose");
+        session.removeAttribute("email.pending.target");
+        session.removeAttribute("email.pending. sentAt");
+
+        switch (purpose){
+            case FIND_ID -> {
+                String usrNm = (String) session.getAttribute("email.pending.usrNm");
+                session.setAttribute(sessionPrefix + ".auth.usrNm", usrNm);
+                session.removeAttribute("email.pending.usrNm");
+                break;
+            }
+            case RESET_PASSWORD -> {
+                String usrId = (String) session.getAttribute("email.pending.usrId");
+                session.setAttribute(sessionPrefix + ".auth.usrId", usrId);
+                session.removeAttribute("email.pending.usrId");
+                break;
+            }
+            case SIGNUP -> {break;}
+        }
+
+        session.setAttribute( sessionPrefix +".auth.email", target);
+        session.setAttribute(sessionPrefix +".auth.expiresAt", LocalDateTime.now().plusMinutes(15));
 
         return ResponseEntity.ok("이메일 인증이 완료되었습니다.");
 
@@ -73,10 +130,21 @@ public class VerificationController {
     @Operation(summary = "휴대폰 인증번호 전송")
     public ResponseEntity<String> sendSms(
             @Valid @RequestBody SmsSendRequestDto request,
-            @RequestParam VerificationPurpose purpose,
-            HttpServletRequest http
+            HttpServletRequest http,
+            HttpSession session
 
     ) {
+        VerificationPurpose purpose = VerificationPurpose.SIGNUP; // 전화번호 인증은 회원가입에서만 쓰임
+
+        if (smsExistsApplication.existsBySms(request.getTarget())) {
+            throw new BusinessException("이미 가입된 전화번호입니다.");
+        }
+
+        log.debug("[SIGNUP] 전화번호 중복 확인 완료:   {}", request.getTarget());
+
+        session.setAttribute("sms.pending.target", request.getTarget());
+        session.setAttribute("sms.pending.sentAt", LocalDateTime.now());
+
         String actor = resolveActor(http);
 
         smsSendApplication.sendCodeToSms(
@@ -92,22 +160,86 @@ public class VerificationController {
     public ResponseEntity<String> verifyCode(
             @Valid @RequestBody
             SmsVerifyRequestDto request,
-            @RequestParam VerificationPurpose purpose,
             HttpSession session
     )
     {
-        smsVerifyApplication.verifyCode(request,purpose);
 
+        VerificationPurpose purpose = VerificationPurpose.SIGNUP; // 전화번호 인증은 회원가입에서만 쓰임
+
+        String target = (String) session.getAttribute("sms.pending.target");
+        if (target == null) {
+            throw new BusinessException("인증번호 발송 내역이 없습니다.");
+        }
+
+        smsVerifyApplication.verifyCode(request.getCode(),target,purpose);
+
+        session.removeAttribute("sms.pending.target");
+        session.removeAttribute("sms.pending. sentAt");
 
         String sessionPrefix = getSessionPrefix(purpose);
-        session.setAttribute( sessionPrefix +"preauth.email", request.getTarget());
-        session.setAttribute(sessionPrefix +"preauth.expiresAt", LocalDateTime.now().plusMinutes(15));
+
+        session.setAttribute( sessionPrefix +".auth.sms", target);
+        session.setAttribute(sessionPrefix +".auth.expiresAt", LocalDateTime.now().plusMinutes(15));
 
 
         return ResponseEntity.ok("전화번호 인증이 완료되었습니다.");
     }
 
     //메서드들
+
+    private void validateUserInfo(EmailSendRequestDto request, VerificationPurpose purpose) {
+        switch (purpose) {
+            case SIGNUP -> {
+                // 회원가입:  이메일 중복 확인
+                if (emailExistsApplication.existsByEmail(request.getTarget())) {
+                    throw new BusinessException("이미 가입된 이메일입니다.");
+                }
+                log.debug("[SIGNUP] 이메일 중복 확인 완료:   {}", request.getTarget());
+            }
+            case FIND_ID -> {
+                // 아이디 찾기:  이름 + 이메일 매칭 확인
+                if (! emailExistsApplication.existsByUsrNmAndEmail(request.getUsrNm(), request.getTarget())) {
+                    throw new BusinessException("입력하신 정보와 일치하는 회원이 없습니다.");
+                }
+                log.debug("[FIND_ID] 회원 정보 확인 완료:  usrNm={}, email={}",
+                        request.getUsrNm(), request.getTarget());
+            }
+            case RESET_PASSWORD -> {
+                // 비밀번호 찾기: 아이디 + 이메일 매칭 확인
+                if (! emailExistsApplication.existsByUsrIdAndEmail(request.getUsrId(), request.getTarget())) {
+                    throw new BusinessException("입력하신 정보와 일치하는 회원이 없습니다.");
+                }
+                log.debug("[RESET_PASSWORD] 회원 정보 확인 완료: usrId={}, email={}",
+                        request.getUsrId(), request.getTarget());
+            }
+        }
+    }
+
+    private VerificationPurpose determinePurpose(String usrId, String usrNm) {
+        boolean hasUsrId = usrId != null && !usrId.trim().isEmpty();
+        boolean hasUsrNm = usrNm != null && !usrNm.trim().isEmpty();
+
+        // 둘 다 없음 → 회원가입
+        if (!hasUsrId && !hasUsrNm) {
+            return VerificationPurpose.SIGNUP;
+        }
+
+        // usrNm만 있음 → 아이디 찾기
+        if (! hasUsrId && hasUsrNm) {
+            return VerificationPurpose.FIND_ID;
+        }
+
+        // usrId만 있음 → 비밀번호 찾기
+        if (hasUsrId && !hasUsrNm) {
+            return VerificationPurpose.RESET_PASSWORD;
+        }
+
+        // 둘 다 있음 → 잘못된 요청
+        throw new IllegalArgumentException(
+                "usrId와 usrNm 중 하나만 입력해주세요.  " +
+                        "(아이디 찾기:  usrNm만, 비밀번호 찾기: usrId만, 회원가입: 둘 다 없음)"
+        );
+    }
     private String resolveActor(HttpServletRequest http) {
         // 로그인 기반이면 여기서 SecurityContext에서 usrId 꺼냄
         // 아니면 IP+UA
@@ -123,4 +255,5 @@ public class VerificationController {
             case RESET_PASSWORD -> "findPassword";
         };
     }
+
 }

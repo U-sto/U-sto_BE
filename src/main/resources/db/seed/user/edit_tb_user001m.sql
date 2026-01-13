@@ -24,6 +24,12 @@ SET ROLE_ID = 'ADMIN',
     APPR_STS = 'APPROVED'
 WHERE USR_ID = 'badbergjr';
 
+UPDATE TB_USER001M
+SET EMAIL = 'badbergjrr@naver.com',
+    SMS = '01099569414'
+WHERE USR_ID = 'badbergjr';
+
+
 -- 테스트를 위한 삭제 취소(이건 어거지)
 UPDATE TB_USER001M
 SET DEL_YN = 'N',

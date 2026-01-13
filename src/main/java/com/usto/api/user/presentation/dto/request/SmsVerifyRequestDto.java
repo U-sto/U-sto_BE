@@ -12,11 +12,6 @@ import lombok.Getter;
 @Getter
 public class SmsVerifyRequestDto {
 
-    @NotBlank(message = "전화번호를 입력해주세요.")
-    @Schema(example = "01012345678")
-    @Pattern(regexp = "^[0-9]{11}$", message = "전화번호는 숫자 11자리여야 합니다.")
-    private String target; //01012345678
-
     @NotBlank(message = "인증번호를 입력해주세요.")
     @Schema(example = "1234")
     @Pattern(regexp = "^[0-9]{4}$", message = "인증코드는 4자리 숫자여야 합니다.")

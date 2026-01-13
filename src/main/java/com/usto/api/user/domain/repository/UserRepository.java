@@ -21,4 +21,6 @@ public interface UserRepository{
 
     void softDeleteByUsrId(String usrId);
 
+    boolean existsByUsrNmAndEmail(String usrNm, String email);
+    boolean existsByUsrIdAndEmail(String usrId, String email);
 }

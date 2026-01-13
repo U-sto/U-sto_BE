@@ -83,4 +83,14 @@ public class UserRepositoryAdapter implements UserRepository {
         int updated = userJpaRepository.softDeleteByUsrId(usrId);
         if (updated == 0) throw new UserNotFoundException(); // 이미 삭제 포함
     }
+
+    @Override
+    public boolean existsByUsrNmAndEmail(String usrNm, String email) {
+        return userJpaRepository.existsByUsrNmAndEmail(usrNm, email);
+    }
+
+    @Override
+    public boolean existsByUsrIdAndEmail(String usrId, String email) {
+        return userJpaRepository.existsByUsrIdAndEmail(usrId, email);
+    }
 }

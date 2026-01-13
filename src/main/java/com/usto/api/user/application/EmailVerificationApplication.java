@@ -33,14 +33,15 @@ public class EmailVerificationApplication {
 
     @Transactional
     public void verifyCode(
-            EmailVerifyRequestDto request,
+            String code,
+            String target,
             VerificationPurpose purpose) {
         LocalDateTime now = LocalDateTime.now();
 
         //인증정보 조회
         Verification verification = verificationRepository
                 .find(
-                        request.getTarget(),
+                        target,
                         VerificationType.EMAIL,
                         purpose)
 
@@ -57,7 +58,7 @@ public class EmailVerificationApplication {
         }
 
         //코드 일치 체크
-        if (!verification.isCodeMatching(request.getCode())) {
+        if (!verification.isCodeMatching(code)) {
             throw new BusinessException("인증번호가 일치하지 않습니다");
         }
 

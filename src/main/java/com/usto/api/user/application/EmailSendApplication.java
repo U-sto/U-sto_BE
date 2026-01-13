@@ -88,17 +88,17 @@ public class EmailSendApplication {
 
         verificationRepository.save(verificationToSave);
 
-        // 5. 이메일 발송
+        //이메일 발송
         try {
-            sendEmail(request. getTarget(), code);
+            sendEmail(request.getTarget(), code ,purpose);
         } catch (MessagingException | UnsupportedEncodingException e) {
             log.error("[EMAIL-SEND] 이메일 발송 실패 - target: {}", request.getTarget(), e);
             throw new RuntimeException("이메일 발송 실패", e);
         }
     }
 
-    //이메일 발송 함수
-    private void sendEmail(String to, String code)
+    //메서드
+    private void sendEmail(String to, String code ,VerificationPurpose purpose)
             throws MessagingException, UnsupportedEncodingException {
 
         MimeMessage message = emailSender.createMimeMessage();
@@ -106,7 +106,7 @@ public class EmailSendApplication {
 
         helper.setFrom(new InternetAddress(emailName, "U-sto", "UTF-8"));
         helper.setTo(to);
-        helper.setSubject("[U-sto] 이메일 인증 번호 : " + code);
+        helper.setSubject(getEmailSubject(purpose, code));
 
         // HTML 본문
         String body = buildEmailBody(code);
@@ -114,9 +114,16 @@ public class EmailSendApplication {
 
         emailSender.send(message);
 
-        log.info("[EMAIL-SEND] 발송 완료 - to:  {}", to);
+        log.info("[EMAIL-SEND] 발송 완료 - to:  {}, purpose: {}", to, purpose);
     }
 
+    private String getEmailSubject(VerificationPurpose purpose, String code) {
+        return switch (purpose) {
+            case SIGNUP -> "[U-sto] 회원가입 인증번호 :  " + code;
+            case FIND_ID -> "[U-sto] 아이디 찾기 인증번호 : " + code;
+            case RESET_PASSWORD -> "[U-sto] 비밀번호 재설정 인증번호 : " + code;
+        };
+    }
 
     private String createVerificationCode(int length) {
         SecureRandom random = new SecureRandom();

@@ -3,8 +3,9 @@ POST http://localhost:8080/api/auth/verification/email/send
 Content-Type: application/json
 
 {
-  "target": "badbergjrr@naver.com",
-  "purpose": "SIGNUP"
+  "usrId": "badbergjr",
+  "usrNm": "",
+  "target": "badbergjrr@naver.com"
 }
 
 ### 2. 이메일 인증번호 확인
@@ -12,9 +13,7 @@ POST http://localhost:8080/api/auth/verification/email/check
 Content-Type: application/json
 
 {
-  "target": "badbergjrr@naver.com",
-  "code": "330979",
-  "purpose": "SIGNUP"
+  "code": "431918"
 }
 
 ### 3. SMS 인증번호 발송
@@ -22,8 +21,7 @@ POST http://localhost:8080/api/auth/verification/sms/send
 Content-Type:  application/json
 
 {
-  "target": "01012345678",
-  "purpose": "SIGNUP"
+  "target": "01099569414"
 }
 
 ### 4. SMS 인증번호 확인
@@ -31,9 +29,7 @@ POST http://localhost:8080/api/auth/verification/sms/check
 Content-Type:  application/json
 
 {
-  "target": "01012345678",
-  "code": "1234",
-  "purpose": "SIGNUP"
+  "code": "1857"
 }
 
 ### 5. 회원가입
@@ -41,9 +37,9 @@ POST http://localhost:8080/api/users/sign-up
 Content-Type: application/json
 
 {
-  "usrId": "testuser",
-  "usrNm": "테스트사용자",
-  "pwd": "password123! ",
+  "usrId": "badberg2002",
+  "usrNm": "박도현2",
+  "pwd": "1111",
   "orgCd": "SEOUL_N_GWANAK"
 }
 
@@ -56,15 +52,15 @@ Content-Type: application/json
   "pwd": "1111"
 }
 
-### 7. 회원 정보 수정 (로그인 필요)
+### 7. 회원 정보 수정 (로그인 필요) - 같은 값이 들어가면 막아야한다. by 중복확인 + 전화번호,이메일은 인증을 해야 변경할 수 있어야한다.
 PUT http://localhost:8080/api/users/update
 Content-Type: application/json
 
 {
-  "newUsrNm": "변경된이름",
-  "newEmail": "newemail@example.com",
-  "newSms": "01087654321",
-  "newPw": "newpassword123!"
+  "newUsrNm": "박도현",
+  "newEmail": "badbergjrr@naver.com",
+  "newSms": "01011111111",
+  "newPw": "1111"
 }
 
 ### 8. 아이디 중복 확인
@@ -93,28 +89,15 @@ Content-Type: application/json
 
 ### 10. 아이디 찾기
 POST http://localhost:8080/api/auth/find/user-id
-Content-Type: application/json
 
-{
-  "usrNm": "테스트사용자",
-  "email": "test@example.com"
-}
-
-### 11. 비밀번호 찾기
+### 12. 비밀번호 재설정
 POST http://localhost:8080/api/auth/find/password
 Content-Type: application/json
 
 {
-  "usrId": "testuser",
-  "email": "test@example.com"
-}
+  "pwd": "1111",
+  "pwdConfirm" : "1111"
 
-### 12. 비밀번호 재설정
-POST http://localhost:8080/api/auth/find/password/update
-Content-Type: application/json
-
-{
-  "pwd": "newpassword456!"
 }
 
 ### 13. 로그아웃

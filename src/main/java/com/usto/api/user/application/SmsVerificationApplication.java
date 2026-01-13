@@ -33,14 +33,15 @@ public class SmsVerificationApplication {
      */
     @Transactional
     public void verifyCode(
-            SmsVerifyRequestDto request,
+            String code,
+            String target,
             VerificationPurpose purpose
     ) {
         LocalDateTime now = LocalDateTime.now();
 
         Verification verification = verificationRepository
                 .find(
-                        request.getTarget(),
+                        target,
                         VerificationType.SMS,
                         purpose
                 )
@@ -53,7 +54,7 @@ public class SmsVerificationApplication {
         }
 
         // 2. 코드 일치 체크
-        if (!verification.getCode().equals(request.getCode())) {
+        if (!verification.getCode().equals(code)) {
             throw new IllegalArgumentException("인증번호가 일치하지 않습니다.");
         }
 

@@ -11,6 +11,12 @@ import lombok.Getter;
 @Getter
 public class EmailSendRequestDto {
 
+    @Schema(description = "아이디 찾기 시 필요" , example = "김철수")
+    private String usrNm;
+
+    @Schema(description = "비밀번호 찾기 시 필요" , example = "ustoId")
+    private String usrId;
+
     @NotBlank(message = "이메일을 입력해주세요")
     @Schema(example = "example@usto.com")
     @Email(message = "올바른 이메일 형식이 아닙니다.")

@@ -12,11 +12,6 @@ import lombok.Getter;
 @Getter
 public class EmailVerifyRequestDto {
 
-    @NotBlank(message = "이메일을 입력해주세요")
-    @Schema(example = "example@usto.com")
-    @Email(message = "올바른 이메일 형식이 아닙니다.")
-    private String target; //example@naver.com
-
     @NotBlank(message = "인증번호를 입력해주세요")
     @Schema(example = "123456")
     @Pattern(regexp = "^[0-9]{6}$", message = "인증코드는 6자리 숫자여야 합니다.")
