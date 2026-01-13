@@ -1,16 +1,13 @@
 package com.usto.api.user.presentation.controller;
 
-import com.usto.api.common.exception.BusinessException;
 import com.usto.api.common.utils.ApiResponse;
 import com.usto.api.user.application.SignupApplication;
 import com.usto.api.user.application.UserDeleteApplication;
 import com.usto.api.user.application.UserUpdateApplication;
-import com.usto.api.user.domain.UserPrincipal;
-import com.usto.api.user.domain.model.LoginUser;
+import com.usto.api.common.UserPrincipal;
 import com.usto.api.user.presentation.dto.request.SignupRequestDto;
 import com.usto.api.user.presentation.dto.request.UserDeleteRequestDto;
 import com.usto.api.user.presentation.dto.request.UserUpdateRequestDto;
-import com.usto.api.user.presentation.dto.response.LoginResponseDto;
 import com.usto.api.user.presentation.dto.response.UserUpdateResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -19,7 +16,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "user-controller", description = "회원 정보 관련 API")

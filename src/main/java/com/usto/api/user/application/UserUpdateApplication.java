@@ -1,17 +1,13 @@
 package com.usto.api.user.application;
 
 import com.usto.api.common.exception.BusinessException;
-import com.usto.api.common.exception.LoginFailedException;
 import com.usto.api.common.utils.CurrentUser;
 import com.usto.api.organization.infrastructure.entity.OrganizationJpaEntity;
 import com.usto.api.organization.infrastructure.repository.OrganizationJpaRepository;
-import com.usto.api.user.domain.model.LoginUser;
-import com.usto.api.user.domain.model.Role;
 import com.usto.api.user.domain.model.User;
 import com.usto.api.user.domain.repository.UserRepository;
 import com.usto.api.user.presentation.dto.request.UserUpdateRequestDto;
 import com.usto.api.user.presentation.dto.response.UserUpdateResponseDto;
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.crypto.password.PasswordEncoder;

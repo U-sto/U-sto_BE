@@ -1,5 +1,4 @@
 package com.usto.api.user.domain.repository;
-import com.usto.api.user.domain.model.LoginUser;
 import com.usto.api.user.domain.model.User;
 
 import java.util.Optional;

@@ -1,10 +1,6 @@
 package com.usto.api.user.infrastructure.repository;
 
-import com.usto.api.user.domain.model.LoginUser;
-import com.usto.api.user.domain.model.User;
 import com.usto.api.user.infrastructure.entity.UserJpaEntity;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -21,8 +17,6 @@ public interface UserJpaRepository extends JpaRepository<UserJpaEntity, String> 
     //User save(User user);
 
     Optional<UserJpaEntity> findByUsrId(String usrId);
-    Optional<UserJpaEntity> findByUsrId(LoginUser usrId);
-
     Optional<UserJpaEntity> findByEmail(String email);
 
     boolean existsByUsrNmAndEmail(String usrNm, String email);
