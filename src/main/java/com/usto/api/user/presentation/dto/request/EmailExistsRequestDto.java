@@ -12,7 +12,7 @@ public class EmailExistsRequestDto {
 
     @NotBlank(message = "이메일을 입력해주세요")
     @Schema(example = "example@usto.com")
-    @Email
+    @Email(message = "올바른 이메일 형식이 아닙니다.")
     private String email;
 
 

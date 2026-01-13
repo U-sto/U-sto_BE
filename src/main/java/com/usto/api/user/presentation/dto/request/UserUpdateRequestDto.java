@@ -14,7 +14,7 @@ public class UserUpdateRequestDto {
     @Schema(example = "사용자 이름")
     private String newUsrNm;
 
-    @Email
+    @Email(message = "올바른 이메일 형식이 아닙니다.")
     @Schema(example = "user@example.com")
     private String newEmail;
 
