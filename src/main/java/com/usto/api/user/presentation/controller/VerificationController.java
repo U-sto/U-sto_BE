@@ -16,16 +16,13 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 
 @Tag(name = "verification-controller", description = "인증 관련 API")
 @RestController
-@RequestMapping("/api/auth/verification/sign-up")
+@RequestMapping("/api/auth/verification")
 @RequiredArgsConstructor
 public class VerificationController {
 
@@ -39,15 +36,15 @@ public class VerificationController {
     @PostMapping("/email/send")
     @Operation(summary = "이메일 인증번호 전송")
     public ResponseEntity<String> sendEmail(
-            @Valid
-            @RequestBody EmailSendRequestDto request,
+            @Valid @RequestBody EmailSendRequestDto request,
+            @RequestParam VerificationPurpose purpose,
             HttpServletRequest http
     )
     {
-        String actor = resolveActor(http);   // 아래 메서드
+        String actor = resolveActor(http);
         emailSendApplication.sendCodeToEmail(
                 request,
-                VerificationPurpose.SIGNUP,
+                purpose,
                 actor);
 
         return ResponseEntity.ok("인증번호가 발송되었습니다.");
@@ -57,17 +54,16 @@ public class VerificationController {
     @PostMapping("/email/check")
     @Operation(summary = "이메일 인증번호 확인")
     public ResponseEntity<String> verifyEmail(
-            @Valid
-            @RequestBody EmailVerifyRequestDto request,
+            @Valid @RequestBody EmailVerifyRequestDto request,
+            @RequestParam VerificationPurpose purpose,
             HttpSession session
 
     ) {
-        emailVerifyApplication.verifyCode(request,VerificationPurpose.SIGNUP);
+        emailVerifyApplication.verifyCode(request,purpose);
 
-
-        session.setAttribute("signup.preauth.email", request.getTarget());
-        session.setAttribute("signup.preauth.expiresAt", LocalDateTime.now().plusMinutes(15));
-
+        String sessionPrefix = getSessionPrefix(purpose);
+        session.setAttribute( sessionPrefix +"preauth.email", request.getTarget());
+        session.setAttribute(sessionPrefix +"preauth.expiresAt", LocalDateTime.now().plusMinutes(15));
 
         return ResponseEntity.ok("이메일 인증이 완료되었습니다.");
 
@@ -76,16 +72,16 @@ public class VerificationController {
     @PostMapping("/sms/send")
     @Operation(summary = "휴대폰 인증번호 전송")
     public ResponseEntity<String> sendSms(
-            @Valid
-            @RequestBody SmsSendRequestDto request,
+            @Valid @RequestBody SmsSendRequestDto request,
+            @RequestParam VerificationPurpose purpose,
             HttpServletRequest http
 
     ) {
-        String actor = resolveActor(http);   // 아래 메서드
+        String actor = resolveActor(http);
 
         smsSendApplication.sendCodeToSms(
                 request,
-                VerificationPurpose.SIGNUP,
+                purpose,
                 actor);
 
         return ResponseEntity.ok("인증번호가 문자로 발송되었습니다.");
@@ -94,27 +90,37 @@ public class VerificationController {
     @PostMapping("/sms/check")
     @Operation(summary = "휴대폰 인증번호 확인")
     public ResponseEntity<String> verifyCode(
-            @Valid
-            @RequestBody
+            @Valid @RequestBody
             SmsVerifyRequestDto request,
+            @RequestParam VerificationPurpose purpose,
             HttpSession session
     )
     {
-        smsVerifyApplication.verifyCode(request,VerificationPurpose.SIGNUP);
+        smsVerifyApplication.verifyCode(request,purpose);
 
 
-        session.setAttribute("signup.preauth.sms", request.getTarget());
-        session.setAttribute("signup.preauth.expiresAt", LocalDateTime.now().plusMinutes(15));
+        String sessionPrefix = getSessionPrefix(purpose);
+        session.setAttribute( sessionPrefix +"preauth.email", request.getTarget());
+        session.setAttribute(sessionPrefix +"preauth.expiresAt", LocalDateTime.now().plusMinutes(15));
 
 
         return ResponseEntity.ok("전화번호 인증이 완료되었습니다.");
     }
 
+    //메서드들
     private String resolveActor(HttpServletRequest http) {
         // 로그인 기반이면 여기서 SecurityContext에서 usrId 꺼냄
         // 아니면 IP+UA
         String ip = http.getRemoteAddr();
         String ua = http.getHeader("User-Agent");
         return "ANON ip=" + ip + " ua=" + (ua == null ? "-" : ua);
+    }
+
+    private String getSessionPrefix(VerificationPurpose purpose) {
+        return switch (purpose) {
+            case SIGNUP -> "signup";
+            case FIND_ID -> "findId";
+            case RESET_PASSWORD -> "findPassword";
+        };
     }
 }
