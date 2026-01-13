@@ -19,6 +19,7 @@ replay_pid*
 *.tar.gz
 *.rar
 *.csv
+*.http
 
 # Spring Initializr
 HELP.md
