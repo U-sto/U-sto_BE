@@ -9,7 +9,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 
 @Getter
-public class   EmailSendRequestDto {
+public class EmailSendRequestDto {
 
     @NotBlank(message = "이메일을 입력해주세요")
     @Schema(example = "example@usto.com")
