@@ -13,11 +13,11 @@ import java.time.LocalDateTime;
 public class Verification extends BaseTime {
 
     private Long id;
-    private VerificationType type;
     private VerificationPurpose purpose;
     private String target;
     private String code;
     private LocalDateTime expiresAt;
+    private VerificationType type;
     private boolean isVerified;
     private LocalDateTime verifiedAt;
 

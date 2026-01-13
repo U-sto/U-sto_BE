@@ -9,15 +9,18 @@ package com.usto.api.user.application;
 
 import com.usto.api.common.utils.SmsUtil;
 import com.usto.api.user.domain.model.Verification;
+import com.usto.api.user.domain.model.VerificationType;
 import com.usto.api.user.domain.repository.VerificationRepository;
 import com.usto.api.user.presentation.dto.request.SmsSendRequestDto;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class SmsSendApplication {
@@ -25,59 +28,64 @@ public class SmsSendApplication {
     private final SmsUtil smsUtil; // 추가: SmsUtil 스프링 빈 주입 - 이렇게 해야 생성자 주입을 할 수가 있게 된다.
     private final VerificationRepository verificationRepository; // 인증 이력 저장/조회용 JPA 리포지토리
 
-    /**
-     * 인증번호 발송
-     * @param request
-     * @param actor
-     */
     @Transactional
-    public void sendCodeToSms(SmsSendRequestDto request,String actor) {
-
-        // 0. 시간 제한 생성
+    public void sendCodeToSms(
+            SmsSendRequestDto request,String actor
+    )
+    {
         LocalDateTime timeLimit = LocalDateTime.now().plusMinutes(5);
 
-        // 1. 인증번호 생성 (1000 ~ 9999)
-        String code = generateRandomCode();
+        String code = generateRandomCode(4);
 
-        // 2. 기존 내역 확인 (있으면 갱신, 없으면 생성)
-        Verification verification = verificationRepository
+        //기존내역 확인
+        Verification existingVerification  = verificationRepository
                 .find(
                         request.getTarget(),
-                        request.getType(),
+                        VerificationType.SMS,
                         request.getPurpose()
                         )
                 .orElse(null); //없으면? Null 처리
 
-        if (verification == null) { //null처리? -> 없구나
+        Verification verificationToSave;
+
+        if (existingVerification  == null) { //null처리? -> 없구나 ㅇㅋ ㄱㄱ
             // 새로 생성
-            verification = Verification.builder()
+            verificationToSave  = Verification.builder()
                     .creBy(actor)
                     .purpose(request.getPurpose())
                     .target(request.getTarget())
-                    .type(request.getType())
+                    .type(VerificationType.SMS)
                     .code(code)
-                    .expiresAt(timeLimit) // 5분 제한
+                    .expiresAt(timeLimit)
                     .isVerified(false)
                     .build();
+            log.info("[SMS-SEND] 새 인증 생성 - target: {}, purpose: {}",
+                    request.getTarget(), request.getPurpose());
         } else {
-            // 기존 내역이 있으면 재전송
-            verification.renew(code,timeLimit);
-            verification.setUpdBy(actor); // 갱신자 남기기
-        }
-        verificationRepository.save(verification); // ← 두 분기 공통 저장
+            //재발송하는 경우
+            Verification renewed = existingVerification.renew(code, timeLimit);
 
-        // 3. SMS 발송 (숫자만 남기도록 정규화)
+            verificationToSave = renewed.toBuilder()
+                    .updBy(actor)
+                    .build();
+
+            log.info("[SMS-SEND] 인증 재발송 - target:  {}, purpose: {}",
+                    request.getTarget(), request.getPurpose());
+        }
+        verificationRepository.save(verificationToSave);
+
+        // SMS 발송 (숫자만 남기도록 정규화)
         String to = request.getTarget().replaceAll("[^0-9]", "");
         smsUtil.sendVerificationCode(to, code);
+
+        log.info("[SMS-SEND] 발송 완료 - to: {}", to);
     }
 
-    /**
-     * 4자리 랜덤 숫자 코드를 생성
-     */
-    private String generateRandomCode() {
+
+    private String generateRandomCode(int Length) {
         SecureRandom random = new SecureRandom();
         StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < Length; i++) {
             builder.append(random.nextInt(10));
         }
         return builder.toString();

@@ -36,7 +36,7 @@ public class SmsVerificationApplication {
         Verification verification = verificationRepository
                 .find(
                         request.getTarget(),
-                        request.getType(),
+                        VerificationType.SMS,
                         request.getPurpose())
 
                 .orElseThrow(() -> new IllegalArgumentException("인증요청이 없습니다."));

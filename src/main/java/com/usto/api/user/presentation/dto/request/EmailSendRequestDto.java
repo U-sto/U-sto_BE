@@ -16,6 +16,4 @@ public class   EmailSendRequestDto {
     @NotBlank
     @Email
     private String target;//example@naver.com
-
-    private VerificationType type = VerificationType.EMAIL;
 }

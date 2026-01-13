@@ -21,6 +21,4 @@ public class EmailVerifyRequestDto {
     @NotBlank
     @Pattern(regexp = "^[0-9]{6}$", message = "인증코드는 6자리 숫자여야 합니다.")
     private String code;
-
-    private VerificationType type = VerificationType.EMAIL;
 }
