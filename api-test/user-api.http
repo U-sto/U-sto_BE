@@ -3,7 +3,7 @@ POST http://localhost:8080/api/auth/verification/email/send
 Content-Type: application/json
 
 {
-  "usrId": "badbergjr",
+  "usrId": "usrID",
   "usrNm": "",
   "target": "badbergjrr@naver.com"
 }
