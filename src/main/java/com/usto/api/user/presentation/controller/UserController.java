@@ -4,7 +4,7 @@ import com.usto.api.common.utils.ApiResponse;
 import com.usto.api.user.application.SignupApplication;
 import com.usto.api.user.application.UserDeleteApplication;
 import com.usto.api.user.application.UserUpdateApplication;
-import com.usto.api.common.UserPrincipal;
+import com.usto.api.user.domain.UserPrincipal;
 import com.usto.api.user.presentation.dto.request.SignupRequestDto;
 import com.usto.api.user.presentation.dto.request.UserDeleteRequestDto;
 import com.usto.api.user.presentation.dto.request.UserUpdateRequestDto;

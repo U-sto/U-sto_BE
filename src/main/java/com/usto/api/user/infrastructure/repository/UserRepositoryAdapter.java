@@ -53,26 +53,15 @@ public class UserRepositoryAdapter implements UserRepository {
 
     @Override
     @Transactional
+    @Deprecated
     public void updatePwHashByUsrId(String usrId, String pwHash) {
 
         int updated = userJpaRepository
-                .updatePwHashByUsrId(
-                        usrId,
-                        pwHash); //업데이트 된 행 수
+                .updatePwHashByUsrId(usrId, pwHash);
 
         if (updated == 0) {
             throw new IllegalArgumentException("존재하지 않는 회원입니다.");
         }
-    }
-
-    @Transactional
-    @Override
-    public User updateProfile(String usrId, String usrNm, String email, String sms, String pwHash) {
-        UserJpaEntity e = userJpaRepository.findByUsrId(usrId).orElseThrow();
-        
-        e.updateProfile(usrNm,email,sms,pwHash);
-
-        return UserMapper.toDomain(e);
     }
 
     @Override

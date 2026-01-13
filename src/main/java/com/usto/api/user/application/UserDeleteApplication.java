@@ -1,7 +1,7 @@
 package com.usto.api.user.application;
 
 import com.usto.api.common.exception.BusinessException;
-import com.usto.api.common.UserPrincipal;
+import com.usto.api.user.domain.UserPrincipal;
 import com.usto.api.user.domain.repository.UserRepository;
 import com.usto.api.user.presentation.dto.request.UserDeleteRequestDto;
 import lombok.RequiredArgsConstructor;

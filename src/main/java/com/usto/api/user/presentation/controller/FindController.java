@@ -107,7 +107,7 @@ public class FindController {
             return ApiResponse.fail("두 비밀번호가 일치하지 않습니다.");
         }
 
-        passwordUpdateApplication.updatePwHashByUsrId(userId, request.getPwd());
+        passwordUpdateApplication.updatePassword(userId, request.getPwd());
 
         return ApiResponse.ok("비밀번호 재설정 완료");
     }
