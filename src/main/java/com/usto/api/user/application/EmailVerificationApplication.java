@@ -6,6 +6,7 @@
  */
 package com.usto.api.user.application;
 
+import com.usto.api.common.exception.BusinessException;
 import com.usto.api.user.domain.model.Verification;
 import com.usto.api.user.domain.model.VerificationPurpose;
 import com.usto.api.user.domain.model.VerificationType;
@@ -19,6 +20,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.xml.crypto.KeySelector;
 import java.time.LocalDateTime;
 
 @Slf4j
@@ -30,33 +32,43 @@ public class EmailVerificationApplication {
 
 
     @Transactional
-    public void verifyCode(EmailVerifyRequestDto request) {
+    public void verifyCode(
+            String code,
+            String target,
+            VerificationPurpose purpose) {
         LocalDateTime now = LocalDateTime.now();
+
+        //인증정보 조회
         Verification verification = verificationRepository
                 .find(
-                        request.getTarget(),
-                        request.getType(),
-                        request.getPurpose())
+                        target,
+                        VerificationType.EMAIL,
+                        purpose)
 
                 .orElseThrow(() -> new IllegalArgumentException("인증요청이 없습니다."));
 
-
-        // 1. 시간 만료 체크
-        if (verification.getExpiresAt().isBefore(now)) {
-            throw new IllegalArgumentException("인증 시간이 만료되었습니다. 다시 요청해주세요.");
+        //만료 체크
+        if (verification.isExpired(now)) {
+            throw new BusinessException("인증 시간이 만료되었습니다");
         }
 
-        // 2. 코드 일치 체크
-        if (!verification.getCode().equals(request.getCode())) {
-            throw new IllegalArgumentException("인증번호가 일치하지 않습니다.");
+        //중복 검증 체크
+        if (verification.isVerified()) {
+            throw new BusinessException("이미 인증되었습니다");
         }
 
-        // 3. 인증 완료 처리
-        verification.verify(now);
+        //코드 일치 체크
+        if (!verification.isCodeMatching(code)) {
+            throw new BusinessException("인증번호가 일치하지 않습니다");
+        }
 
-        // 4. 저장
-        verificationRepository.save(verification);
+        //인증 완료 처리
+        Verification verified = verification.verify(now);
+
+        //저장
+        verificationRepository.save(verified);
     }
+
 
     /**
      * 매일 자정에 만료된 인증 데이터를 정리 (용량 감안) - 선택

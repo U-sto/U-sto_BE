@@ -1,16 +1,11 @@
 package com.usto.api.user.application;
 
 import com.usto.api.common.exception.LoginFailedException;
-import com.usto.api.user.domain.model.LoginUser;
 import com.usto.api.user.domain.model.User;
 import com.usto.api.user.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -18,7 +13,7 @@ public class LoginApplication {
 
     private final UserRepository userRepository;
 
-    public LoginUser login(String usrId) {
+    public User login(String usrId) {
 
         // 1. 아이디 조회
         User user = userRepository.findByUsrId(usrId)
@@ -34,6 +29,6 @@ public class LoginApplication {
             throw LoginFailedException.deleted();
         }
 
-        return LoginUser.from(user);
+        return user;
     }
 }

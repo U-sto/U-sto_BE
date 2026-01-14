@@ -4,21 +4,24 @@ import com.usto.api.common.utils.ApiResponse;
 import com.usto.api.user.application.EmailExistsApplication;
 import com.usto.api.user.application.SmsExistsApplication;
 import com.usto.api.user.application.UserIdExistsApplication;
+import com.usto.api.user.presentation.dto.request.EmailExistsRequestDto;
+import com.usto.api.user.presentation.dto.request.SmsExistRequestDto;
+import com.usto.api.user.presentation.dto.request.UserIdExistsRequestDto;
 import com.usto.api.user.presentation.dto.response.EmailExistsResponseDto;
 import com.usto.api.user.presentation.dto.response.SmsExistsResponseDto;
 import com.usto.api.user.presentation.dto.response.UsrIdExistsResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "exists-controller", description = "중복 확인 관련 API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/users/exists")
+@Validated
 public class ExistsController {
 
     private final EmailExistsApplication emailExistsApplication;
@@ -29,58 +32,67 @@ public class ExistsController {
     @GetMapping("/email")
     @Operation(summary = "이메일 중복 확인")
     public ApiResponse<?> existsByEmail(
-            @RequestParam(required = false)
-            String email
+            @ModelAttribute
+            @Valid
+            EmailExistsRequestDto request
     ) {
-        if (email == null || email.trim().isEmpty()) {
+        if (request.getEmail() == null || request.getEmail().trim().isEmpty()) {
             return ApiResponse.fail("이메일을 써주세요");
         }
 
-        boolean exists = emailExistsApplication.existsByEmail(email.trim());
+        boolean exists = emailExistsApplication.existsByEmail(request.getEmail().trim());
 
         if (exists) {
-            return ApiResponse.fail("이미 가입된 이메일입니다", new EmailExistsResponseDto(true));
+            return ApiResponse.fail("이미 가입된 이메일입니다",
+                    new EmailExistsResponseDto(true));
         }
 
-        return ApiResponse.ok("이용 가능한 이메일입니다", new EmailExistsResponseDto(false));
+        return ApiResponse.ok("이용 가능한 이메일입니다",
+                new EmailExistsResponseDto(false));
     }
 
     @GetMapping("/sms")
     @Operation(summary = "전화번호 중복 확인")
     public ApiResponse<?> existsBySms(
-            @RequestParam(required = false)
-            String sms
+            @ModelAttribute
+            @Valid
+            SmsExistRequestDto request
     ) {
-        if (sms == null || sms.trim().isEmpty()) {
+        if (request.getSms() == null || request.getSms().trim().isEmpty()) {
             return ApiResponse.fail("전화번호를 써주세요");
         }
 
-        boolean exists = smsExistsApplication.existsBySms(sms.trim());
+        boolean exists = smsExistsApplication.existsBySms(request.getSms().trim());
 
         if (exists) {
-            return ApiResponse.fail("이미 가입된 전화번호입니다", new SmsExistsResponseDto(true));
+            return ApiResponse.fail("이미 가입된 전화번호입니다",
+                    new SmsExistsResponseDto(true));
         }
 
-        return ApiResponse.ok("이용 가능한 전화번호입니다", new SmsExistsResponseDto(false));
+        return ApiResponse.ok("이용 가능한 전화번호입니다",
+                new SmsExistsResponseDto(false));
     }
 
-    @GetMapping("/user-id   ")
+    @GetMapping("/user-id")
     @Operation(summary = "아이디 중복 확인")
     public ApiResponse<?> existsByUsrId(
-            @RequestParam(required = false)
-            String usrId
+            @ModelAttribute
+            @Valid
+            UserIdExistsRequestDto request
     ) {
-        if (usrId == null || usrId.trim().isEmpty()) {
+        if (request.getUsrId() == null || request.getUsrId().trim().isEmpty()) {
             return ApiResponse.fail("아이디을 써주세요");
         }
 
-        boolean exists = userIdExistsApplication.existsByUsrId(usrId.trim());
+        boolean exists = userIdExistsApplication.existsByUsrId(request.getUsrId().trim());
 
         if (exists) {
-            return ApiResponse.fail("이미 가입된 아이디입니다", new UsrIdExistsResponseDto(true));
+            return ApiResponse.fail("이미 가입된 아이디입니다",
+                    new UsrIdExistsResponseDto(true));
         }
 
-        return ApiResponse.ok("이용 가능한 아이디입니다", new UsrIdExistsResponseDto(false));
+        return ApiResponse.ok("이용 가능한 아이디입니다",
+                new UsrIdExistsResponseDto(false));
     }
 
 }

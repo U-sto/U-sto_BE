@@ -1,10 +1,11 @@
-package com.usto.api.user.infrastructure.entity;
+package com.usto.api.user.infrastructure.mapper;
 
 import com.usto.api.user.domain.model.Verification;
+import com.usto.api.user.infrastructure.entity.VerificationJpaEntity;
 
 //이상하게 에러나는데 이유를 못 찾아서 나중에 연결하겠습니다.
-public final class VerificationJpaEntityMapper {
-    private VerificationJpaEntityMapper() {}
+public final class VerificationMapper {
+    private VerificationMapper() {}
 
     public static Verification toDomain(VerificationJpaEntity e) {
         return Verification.builder()

@@ -78,26 +78,9 @@ public class UserJpaEntity extends BaseTimeEntity {
     @Column(name = "DEL_AT")
     private LocalDateTime delAt;
 
-    // 조직 엔티티 연관관계 - 조직명 등 필요할 때만 조인
+    // 연관관게 매핑
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ORG_CD", referencedColumnName = "ORG_CD",
             insertable = false, updatable = false)
-    private OrganizationJpaEntity organization; // <-조회용 “읽기 전용 뷰
-
-    //회원 수정
-    public void updateProfile(String usrNm, String email, String sms, String pwHash) {
-        if (usrNm != null && !usrNm.equals("사용자이름")) {
-            this.usrNm = usrNm;
-        }
-        if (email != null && !email.equals("usto@example.com")) {
-            this.email = email;
-        }
-        if (sms != null && !sms.equals("01000000000")) {
-            this.sms = sms;
-        }
-        if (pwHash != null && !pwHash.equals("newPw1234!")) {
-            this.pwHash = pwHash;
-        }
-    }
-
+    private OrganizationJpaEntity organization;
 }
