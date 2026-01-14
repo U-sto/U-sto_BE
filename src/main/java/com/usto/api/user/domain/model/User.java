@@ -1,6 +1,7 @@
 package com.usto.api.user.domain.model;
 
 import com.usto.api.common.BaseTime;
+import com.usto.api.common.exception.BusinessException;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,7 +21,9 @@ public class User extends BaseTime {
     private String sms;
     private Role roleId;
     private String orgCd;
+    private String apprUsrId;
     private ApprovalStatus apprSts;
+    private LocalDateTime apprAt;
     private boolean delYn;
     private LocalDateTime delAt;
 
@@ -45,17 +48,30 @@ public class User extends BaseTime {
         return this.apprSts == ApprovalStatus. APPROVED;
     }
 
-    public User approve(String approverUsrId, Role newRole) {
+    public User approve(Role assignedRole,String apprUsrId) {
         if (this.apprSts == ApprovalStatus.APPROVED) {
             throw new IllegalStateException("이미 승인된 사용자입니다");
         }
-        if (newRole == Role.GUEST) {
+        if (assignedRole == Role.GUEST) {
             throw new IllegalArgumentException("GUEST 역할로는 승인할 수 없습니다");
         }
 
         return this.toBuilder()
+                .apprUsrId(apprUsrId)
                 .apprSts(ApprovalStatus.APPROVED)
-                .roleId(newRole)
+                .roleId(assignedRole)
+                .build();
+    }
+
+    public User reject(String apprUsrId) {
+        if (this.getApprSts() == ApprovalStatus.REJECTED) {
+            throw new BusinessException("이미 반려된 회원입니다.");
+        }
+
+        return this.toBuilder()
+                .apprUsrId(apprUsrId)
+                .apprSts(ApprovalStatus.REJECTED)
+                .apprAt(LocalDateTime.now())
                 .build();
     }
 
