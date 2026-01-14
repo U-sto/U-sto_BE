@@ -72,7 +72,7 @@ public class SmsSendApplication {
                     .updBy(actor)
                     .build();
 
-            log.info("[SMS-SEND] 인증 재발송 - target:  {}, purpose: {}",
+            log.info("[SMS-SEND] 인증 재발송 - target: {}, purpose: {}",
                     request.getTarget(), purpose);
         }
         verificationRepository.save(verificationToSave);

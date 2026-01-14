@@ -28,7 +28,7 @@ public class Verification extends BaseTime {
 
     //인증 코드 일치 여부
     public boolean isCodeMatching(String inputCode) {
-        return this. code. equals(inputCode);
+        return this.code.equals(inputCode);
     }
 
     //인증 가능 여부(만료 안됨 + 아직 검증 안됨)

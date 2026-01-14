@@ -47,7 +47,7 @@ public class VerificationController {
 
     )
     {
-        VerificationPurpose purpose = determinePurpose(
+        VerificationPurpose purpose = VerificationPurpose.determinePurpose(
                 request.getUsrId(),
                 request.getUsrNm()
         );
@@ -101,7 +101,7 @@ public class VerificationController {
 
         session.removeAttribute("email.pending.purpose");
         session.removeAttribute("email.pending.target");
-        session.removeAttribute("email.pending. sentAt");
+        session.removeAttribute("email.pending.sentAt");
 
         switch (purpose){
             case FIND_ID -> {
@@ -140,7 +140,7 @@ public class VerificationController {
             throw new BusinessException("이미 가입된 전화번호입니다.");
         }
 
-        log.debug("[SIGNUP] 전화번호 중복 확인 완료:   {}", request.getTarget());
+        log.debug("[SIGNUP] 전화번호 중복 확인 완료: {}", request.getTarget());
 
         session.setAttribute("sms.pending.target", request.getTarget());
         session.setAttribute("sms.pending.sentAt", LocalDateTime.now());
@@ -174,7 +174,7 @@ public class VerificationController {
         smsVerifyApplication.verifyCode(request.getCode(),target,purpose);
 
         session.removeAttribute("sms.pending.target");
-        session.removeAttribute("sms.pending. sentAt");
+        session.removeAttribute("sms.pending.sentAt");
 
         String sessionPrefix = getSessionPrefix(purpose);
 
@@ -194,14 +194,14 @@ public class VerificationController {
                 if (emailExistsApplication.existsByEmail(request.getTarget())) {
                     throw new BusinessException("이미 가입된 이메일입니다.");
                 }
-                log.debug("[SIGNUP] 이메일 중복 확인 완료:   {}", request.getTarget());
+                log.debug("[SIGNUP] 이메일 중복 확인 완료: {}", request.getTarget());
             }
             case FIND_ID -> {
                 // 아이디 찾기:  이름 + 이메일 매칭 확인
                 if (! emailExistsApplication.existsByUsrNmAndEmail(request.getUsrNm(), request.getTarget())) {
                     throw new BusinessException("입력하신 정보와 일치하는 회원이 없습니다.");
                 }
-                log.debug("[FIND_ID] 회원 정보 확인 완료:  usrNm={}, email={}",
+                log.debug("[FIND_ID] 회원 정보 확인 완료: usrNm={}, email={}",
                         request.getUsrNm(), request.getTarget());
             }
             case RESET_PASSWORD -> {
@@ -215,31 +215,6 @@ public class VerificationController {
         }
     }
 
-    private VerificationPurpose determinePurpose(String usrId, String usrNm) {
-        boolean hasUsrId = usrId != null && !usrId.trim().isEmpty();
-        boolean hasUsrNm = usrNm != null && !usrNm.trim().isEmpty();
-
-        // 둘 다 없음 → 회원가입
-        if (!hasUsrId && !hasUsrNm) {
-            return VerificationPurpose.SIGNUP;
-        }
-
-        // usrNm만 있음 → 아이디 찾기
-        if (! hasUsrId && hasUsrNm) {
-            return VerificationPurpose.FIND_ID;
-        }
-
-        // usrId만 있음 → 비밀번호 찾기
-        if (hasUsrId && !hasUsrNm) {
-            return VerificationPurpose.RESET_PASSWORD;
-        }
-
-        // 둘 다 있음 → 잘못된 요청
-        throw new IllegalArgumentException(
-                "usrId와 usrNm 중 하나만 입력해주세요.  " +
-                        "(아이디 찾기:  usrNm만, 비밀번호 찾기: usrId만, 회원가입: 둘 다 없음)"
-        );
-    }
     private String resolveActor(HttpServletRequest http) {
         // 로그인 기반이면 여기서 SecurityContext에서 usrId 꺼냄
         // 아니면 IP+UA

@@ -114,12 +114,12 @@ public class EmailSendApplication {
 
         emailSender.send(message);
 
-        log.info("[EMAIL-SEND] 발송 완료 - to:  {}, purpose: {}", to, purpose);
+        log.info("[EMAIL-SEND] 발송 완료 - to: {}, purpose: {}", to, purpose);
     }
 
     private String getEmailSubject(VerificationPurpose purpose, String code) {
         return switch (purpose) {
-            case SIGNUP -> "[U-sto] 회원가입 인증번호 :  " + code;
+            case SIGNUP -> "[U-sto] 회원가입 인증번호 : " + code;
             case FIND_ID -> "[U-sto] 아이디 찾기 인증번호 : " + code;
             case RESET_PASSWORD -> "[U-sto] 비밀번호 재설정 인증번호 : " + code;
         };
@@ -201,6 +201,6 @@ public class EmailSendApplication {
                 </td>
               </tr>
             </table>
-            """. formatted(code);
+            """.formatted(code);
     }
 }
