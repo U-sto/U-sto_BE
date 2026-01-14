@@ -35,20 +35,26 @@ public class UserController {
             @RequestBody SignupRequestDto request,
             HttpSession session
     ){
-        String verifiedEmail = (String)session.getAttribute("signup.preauth.email");
+
+        String verifiedEmail = (String) session.getAttribute("signup.auth.email");
         if (verifiedEmail == null) {
             return ApiResponse.fail("이메일 인증이 필요합니다");
         }
 
-        String verifiedSms = (String) session.getAttribute("signup.preauth.sms");
+        String verifiedSms = (String) session.getAttribute("signup.auth.sms");
         if (verifiedSms == null) {
             return ApiResponse.fail("휴대폰 인증이 필요합니다");
         }
 
         log.info("[SIGNUP] orgCd={}", request.getOrgCd());
 
-
-        signupApplication.signup(request,verifiedEmail,verifiedSms);
+        signupApplication.signup(
+                request.getUsrId(),
+                request.getUsrNm(),
+                request.getPwd(),
+                request.getOrgCd(),
+                verifiedEmail,
+                verifiedSms);
 
         //세션 삭제
         session.removeAttribute("signup.preauth.email");
