@@ -1,6 +1,7 @@
 package com.usto.api.user.infrastructure.repository;
 
 import com.usto.api.common.exception.UserNotFoundException;
+import com.usto.api.user.domain.model.Role;
 import com.usto.api.user.domain.model.User;
 import com.usto.api.user.domain.repository.UserRepository;
 import com.usto.api.user.infrastructure.entity.UserJpaEntity;
@@ -92,5 +93,11 @@ public class UserRepositoryAdapter implements UserRepository {
     @Override
     public boolean existsByUsrIdAndEmail(String usrId, String email) {
         return userJpaRepository.existsByUsrIdAndEmail(usrId, email);
+    }
+
+    @Override
+    public Optional<User> findAdminByOrgCd(String orgCd) {
+        return userJpaRepository.findByOrgCdAndRoleId(orgCd, Role.ADMIN)
+                .map(UserMapper::toDomain);
     }
 }

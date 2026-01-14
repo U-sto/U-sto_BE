@@ -1,11 +1,13 @@
 package com.usto.api.user.infrastructure.repository;
 
+import com.usto.api.user.domain.model.Role;
 import com.usto.api.user.infrastructure.entity.UserJpaEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface UserJpaRepository extends JpaRepository<UserJpaEntity, String> {
@@ -39,4 +41,6 @@ public interface UserJpaRepository extends JpaRepository<UserJpaEntity, String> 
 
     boolean existsByUsrNmAndEmail(String usrNm, String email);
     boolean existsByUsrIdAndEmail(String usrId, String email);
+
+    Optional<UserJpaEntity> findByOrgCdAndRoleId(String orgCd, Role roleId);
 }

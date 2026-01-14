@@ -1,5 +1,7 @@
 package com.usto.api.user.domain.repository;
+import com.usto.api.user.domain.model.Role;
 import com.usto.api.user.domain.model.User;
+import com.usto.api.user.infrastructure.entity.UserJpaEntity;
 
 import java.util.Optional;
 
@@ -17,6 +19,7 @@ public interface UserRepository{
     Optional<String> findUsrIdByEmail(String email);
     Optional<String> findUsrNmByUsrId(String usrId);
     Optional<User> findByUsrId(String usrId);
+    Optional<User> findAdminByOrgCd(String orgCd);
     User getByUsrId(String pathUserId);
 
     void softDeleteByUsrId(String usrId);

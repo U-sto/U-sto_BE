@@ -86,6 +86,7 @@ public class VerificationController {
     ) {
 
         VerificationPurpose purpose = (VerificationPurpose) session.getAttribute("email.pending.purpose");
+
         if (purpose == null) {
             throw new BusinessException("인증번호 발송 내역이 없습니다. no_purpose");
         }
@@ -116,7 +117,9 @@ public class VerificationController {
                 session.removeAttribute("email.pending.usrId");
                 break;
             }
-            case SIGNUP -> {break;}
+            case SIGNUP -> {
+                session.setAttribute(sessionPrefix + ".auth.email", target);
+                break;}
         }
 
         session.setAttribute( sessionPrefix +".auth.email", target);
