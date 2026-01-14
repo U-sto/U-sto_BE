@@ -1,17 +1,13 @@
 package com.usto.api.user.application;
 
 import com.usto.api.common.exception.BusinessException;
-import com.usto.api.common.exception.LoginFailedException;
 import com.usto.api.common.utils.CurrentUser;
 import com.usto.api.organization.infrastructure.entity.OrganizationJpaEntity;
 import com.usto.api.organization.infrastructure.repository.OrganizationJpaRepository;
-import com.usto.api.user.domain.model.LoginUser;
-import com.usto.api.user.domain.model.Role;
 import com.usto.api.user.domain.model.User;
 import com.usto.api.user.domain.repository.UserRepository;
 import com.usto.api.user.presentation.dto.request.UserUpdateRequestDto;
 import com.usto.api.user.presentation.dto.response.UserUpdateResponseDto;
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -32,42 +28,39 @@ public class UserUpdateApplication {
         String loginUsrId = CurrentUser.usrId();
 
         if (loginUsrId == null) {
-            throw new BusinessException("로그인이 필요합니다"); //세션 만료
+            throw new BusinessException("로그인이 필요합니다");
         }
-
         if (!loginUsrId.equals(usrId)) {
-            throw new AccessDeniedException("본인만 수정 가능합니다."); //사실 불가능한 상황이긴 함
+            throw new AccessDeniedException("본인만 수정 가능합니다.");
         }
 
-        String newPwHash = null;
-        if (request.getNewPw() != null) {
-            newPwHash = passwordEncoder.encode(request.getNewPw()); //비밀번호 재확인 절차
-        }
+        User user = userRepository.getByUsrId(usrId);
 
-
-
-        User updated = userRepository.updateProfile(
-                usrId, //고정으로 따라가는 놈(식별자 역할)
+        User updated = user.updateProfile(
                 request.getNewUsrNm(),
                 request.getNewEmail(),
-                request.getNewSms(),
-                newPwHash
+                request.getNewSms()
         );
 
-        //역할이름 가져오기
-        User user = userRepository.getByUsrId(usrId);
-        String roleNm = user.getRoleId().displayName();
+        //비밀번호 변경이 있다면 (로직 분리)
+        if (request.getNewPw() != null && ! request.getNewPw().isBlank()) {
+            String encodedPw = passwordEncoder.encode(request.getNewPw());
+            updated = updated.changePassword(encodedPw);
+        }
 
-        //조직 이름 가져오기
+        User saved = userRepository.save(updated);
+
+        //다른 애들도 가져오기(수정은 안되지만 보여주긴 해야하는 것들)
+        String roleNm = user.getRoleId().displayName();
         String orgNm = organizationJpaRepository.findByOrgCd(user.getOrgCd())
                 .map(OrganizationJpaEntity::getOrgNm)
                 .orElse(null);
 
         return UserUpdateResponseDto.builder()
-                .usrId(updated.getUsrId())
-                .usrNm(updated.getUsrNm())
-                .email(updated.getEmail())
-                .sms(updated.getSms())
+                .usrId(saved.getUsrId())
+                .usrNm(saved.getUsrNm())
+                .email(saved.getEmail())
+                .sms(saved.getSms()) //있다면
                 .orgNm(orgNm)
                 .roleNm(roleNm)
                 .build();

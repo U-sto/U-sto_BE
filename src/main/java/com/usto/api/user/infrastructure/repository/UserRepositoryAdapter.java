@@ -1,14 +1,11 @@
 package com.usto.api.user.infrastructure.repository;
 
-import com.usto.api.common.exception.BusinessException;
 import com.usto.api.common.exception.UserNotFoundException;
-import com.usto.api.user.domain.model.LoginUser;
 import com.usto.api.user.domain.model.User;
 import com.usto.api.user.domain.repository.UserRepository;
 import com.usto.api.user.infrastructure.entity.UserJpaEntity;
-import com.usto.api.user.infrastructure.entity.UserJpaEntityMapper;
+import com.usto.api.user.infrastructure.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,9 +34,9 @@ public class UserRepositoryAdapter implements UserRepository {
 
     @Override
     public User save(User user) {
-        UserJpaEntity entity = UserJpaEntityMapper.toEntity(user);
+        UserJpaEntity entity = UserMapper.toEntity(user);
         UserJpaEntity saved = userJpaRepository.save(entity);
-        return UserJpaEntityMapper.toDomain(saved);
+        return UserMapper.toDomain(saved);
     }
 
     @Override
@@ -56,39 +53,28 @@ public class UserRepositoryAdapter implements UserRepository {
 
     @Override
     @Transactional
+    @Deprecated
     public void updatePwHashByUsrId(String usrId, String pwHash) {
 
         int updated = userJpaRepository
-                .updatePwHashByUsrId(
-                        usrId,
-                        pwHash); //업데이트 된 행 수
+                .updatePwHashByUsrId(usrId, pwHash);
 
         if (updated == 0) {
             throw new IllegalArgumentException("존재하지 않는 회원입니다.");
         }
     }
 
-    @Transactional
-    @Override
-    public User updateProfile(String usrId, String usrNm, String email, String sms, String pwHash) {
-        UserJpaEntity e = userJpaRepository.findByUsrId(usrId).orElseThrow();
-        
-        e.updateProfile(usrNm,email,sms,pwHash);
-
-        return UserJpaEntityMapper.toDomain(e);
-    }
-
     @Override
     public Optional<User> findByUsrId(String usrId) {
         return userJpaRepository.findByUsrId(usrId)
-                .map(UserJpaEntityMapper::toDomain);
+                .map(UserMapper::toDomain);
     }
 
 
     @Override
     public User getByUsrId(String pathUserId) {
         return userJpaRepository.findByUsrId(pathUserId)
-                .map(UserJpaEntityMapper::toDomain)
+                .map(UserMapper::toDomain)
                 .orElseThrow(UserNotFoundException::new);
     }
 
@@ -96,5 +82,15 @@ public class UserRepositoryAdapter implements UserRepository {
     public void softDeleteByUsrId(String usrId) {
         int updated = userJpaRepository.softDeleteByUsrId(usrId);
         if (updated == 0) throw new UserNotFoundException(); // 이미 삭제 포함
+    }
+
+    @Override
+    public boolean existsByUsrNmAndEmail(String usrNm, String email) {
+        return userJpaRepository.existsByUsrNmAndEmail(usrNm, email);
+    }
+
+    @Override
+    public boolean existsByUsrIdAndEmail(String usrId, String email) {
+        return userJpaRepository.existsByUsrIdAndEmail(usrId, email);
     }
 }

@@ -1,0 +1,104 @@
+### 1. 이메일 인증번호 발송
+POST http://localhost:8080/api/auth/verification/email/send
+Content-Type: application/json
+
+{
+  "usrId": "badbergjr",
+  "usrNm": "",
+  "target": "badbergjrr@naver.com"
+}
+
+### 2. 이메일 인증번호 확인
+POST http://localhost:8080/api/auth/verification/email/check
+Content-Type: application/json
+
+{
+  "code": "765322"
+}
+
+### 3. SMS 인증번호 발송
+POST http://localhost:8080/api/auth/verification/sms/send
+Content-Type:  application/json
+
+{
+  "target": "01099569414"
+}
+
+### 4. SMS 인증번호 확인
+POST http://localhost:8080/api/auth/verification/sms/check
+Content-Type:  application/json
+
+{
+  "code": "1857"
+}
+
+### 5. 회원가입
+POST http://localhost:8080/api/users/sign-up
+Content-Type: application/json
+
+{
+  "usrId": "badberg2002",
+  "usrNm": "박도현2",
+  "pwd": "1111",
+  "orgCd": "SEOUL_N_GWANAK"
+}
+
+### 6. 로그인
+POST http://localhost:8080/api/auth/login
+Content-Type: application/json
+
+{
+  "usrId": "badbergjr",
+  "pwd": "1111"
+}
+
+### 7. 회원 정보 수정 (로그인 필요) - 같은 값이 들어가면 막아야한다. by 중복확인 + 전화번호,이메일은 인증을 해야 변경할 수 있어야한다.
+PUT http://localhost:8080/api/users/update
+Content-Type: application/json
+
+{
+  "newUsrNm": "박도현",
+  "newEmail": "badbergjrr@naver.com",
+  "newSms": "01011111111",
+  "newPw": "1111"
+}
+
+### 8. 아이디 중복 확인
+GET http://localhost:8080/api/users/exists/user-id
+Content-Type: application/json
+
+{
+  "usrId" : "badbergjr"
+}
+
+### 9. 이메일 중복 확인
+GET http://localhost:8080/api/users/exists/email
+Content-Type: application/json
+
+{
+  "email" : "badbergjrr@naver.com"
+}
+
+### 전화번호 중복 확인
+GET http://localhost:8080/api/users/exists/sms
+Content-Type: application/json
+
+{
+  "sms" : "01099569414"
+}
+
+### 10. 아이디 찾기
+POST http://localhost:8080/api/auth/find/user-id
+
+### 12. 비밀번호 재설정
+POST http://localhost:8080/api/auth/find/password
+Content-Type: application/json
+
+{
+  "pwd": "1111",
+  "pwdConfirm" : "1111"
+
+}
+
+### 13. 로그아웃
+POST http://localhost:8080/api/auth/logout

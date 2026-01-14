@@ -1,34 +1,27 @@
 package com.usto.api.user.presentation.controller;
 
-import com.usto.api.common.exception.LoginFailedException;
 import com.usto.api.common.utils.ApiResponse;
 import com.usto.api.user.application.LoginApplication;
-import com.usto.api.user.domain.UserPrincipal;
-import com.usto.api.user.domain.model.LoginUser;
+import com.usto.api.user.domain.model.User;
 import com.usto.api.user.presentation.dto.request.LoginRequestDto;
 import com.usto.api.user.presentation.dto.response.LoginResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @Tag(name = "log-controller", description = "로그인/아웃 관련 API")
 @Slf4j
@@ -61,13 +54,13 @@ public class LogController {
         securityContextRepository.saveContext(context, httpRequest, httpResponse);
 
         // 3) 응답용 사용자 정보 로딩 -> 승인 상태 확인
-        LoginUser loginUser = loginApplication.login(request.getUsrId());
+        User user = loginApplication.login(request.getUsrId());
 
         return ApiResponse.ok(
                 "로그인 성공",
                 new LoginResponseDto(
-                        loginUser.getUsrId(),
-                        loginUser.getUsrNm()
+                        user.getUsrId(),
+                        user.getUsrNm()
                 )
         );
 

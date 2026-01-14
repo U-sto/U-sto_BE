@@ -1,5 +1,6 @@
 package com.usto.api.user.application;
 
+import com.usto.api.user.domain.model.User;
 import com.usto.api.user.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -14,12 +15,15 @@ public class PasswordUpdateApplication {
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
-    public void updatePwHashByUsrId(
-            String userId,
-            String rawPassword)
+    public void updatePassword(String usrId, String newPassword)
     {
-        String pwHash = passwordEncoder.encode(rawPassword);
-         userRepository.updatePwHashByUsrId(userId, pwHash);
+        //사용자 조회
+        User user = userRepository.getByUsrId(usrId);
+        //비밀번호 암호화
+        String encodedPassword = passwordEncoder.encode(newPassword);
+        //Domain메서드로 변경
+        User updated = user.changePassword(encodedPassword);
+        //저장
+        userRepository.save(updated);
     }
-
 }

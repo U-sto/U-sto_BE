@@ -5,7 +5,7 @@ import com.usto.api.user.domain.model.VerificationPurpose;
 import com.usto.api.user.domain.model.VerificationType;
 import com.usto.api.user.domain.repository.VerificationRepository;
 import com.usto.api.user.infrastructure.entity.VerificationJpaEntity;
-import com.usto.api.user.infrastructure.entity.VerificationJpaEntityMapper;
+import com.usto.api.user.infrastructure.mapper.VerificationMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -32,15 +32,15 @@ public class VerificationRepositoryAdapter implements VerificationRepository {
                         type,
                         purpose,
                         target)
-                .map(VerificationJpaEntityMapper::toDomain);
+                .map(VerificationMapper::toDomain);
     }
 
     @Override
     public Verification save(
             Verification verification) {
-        VerificationJpaEntity mapped = VerificationJpaEntityMapper.toEntity(verification);
+        VerificationJpaEntity mapped = VerificationMapper.toEntity(verification);
         VerificationJpaEntity saved = verificationJpaRepository.save(mapped);
-        return VerificationJpaEntityMapper.toDomain(saved);
+        return VerificationMapper.toDomain(saved);
     }
 
     @Override

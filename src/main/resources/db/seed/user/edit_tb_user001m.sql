@@ -24,6 +24,18 @@ SET ROLE_ID = 'ADMIN',
     APPR_STS = 'APPROVED'
 WHERE USR_ID = 'badbergjr';
 
+UPDATE TB_USER001M
+SET EMAIL = 'badbergjrr@naver.com',
+    SMS = '01099569414'
+WHERE USR_ID = 'badbergjr';
+
+
+-- 테스트를 위한 삭제 취소(이건 어거지)
+UPDATE TB_USER001M
+SET DEL_YN = 'N',
+    DEL_AT = null
+WHERE USR_ID = 'badbergjr';
+
 -- 충돌나면 이걸 먼저 하고나서 돌려주세요
 USE usto;
 -- 1. 인덱스 삭제

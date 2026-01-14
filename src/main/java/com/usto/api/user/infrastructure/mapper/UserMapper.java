@@ -1,12 +1,11 @@
-package com.usto.api.user.infrastructure.entity;
+package com.usto.api.user.infrastructure.mapper;
 
-import com.usto.api.user.domain.model.ApprovalStatus;
-import com.usto.api.user.domain.model.Role;
 import com.usto.api.user.domain.model.User;
+import com.usto.api.user.infrastructure.entity.UserJpaEntity;
 
 // 다시 생각해보니 verification도 이렇게 하는게 나아보이네요. 나중에 리팩토링 하겠습니다.
-public final class UserJpaEntityMapper {
-    private UserJpaEntityMapper() {}
+public final class UserMapper {
+    private UserMapper() {}
 
     public static UserJpaEntity toEntity(User u) {
         return UserJpaEntity.builder()
