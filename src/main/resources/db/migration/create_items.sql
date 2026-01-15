@@ -85,10 +85,10 @@ CREATE TABLE `TB_ITEM002D` (
 -- TB_ITEM003M/D 물품 반납 (M:신청서, D:상세 물품)
 CREATE TABLE `TB_ITEM003M` (
   `RTRN_M_ID`     BIGINT          NOT NULL AUTO_INCREMENT COMMENT '반납ID',
-  `APLY_USR_ID`   VARCHAR(30)     NOT NULL COMMENT '신청자ID',
-  `APLY_AT`       DATETIME        NOT NULL COMMENT '반납(신청)일자',
+  `APLY_USR_ID`   VARCHAR(30)     NOT NULL COMMENT '등록자ID',
+  `APLY_AT`       DATETIME        NOT NULL COMMENT '반납(등록)일자',
   `ITEM_STS`      VARCHAR(30)     NOT NULL COMMENT '물품상태',
-  `CHG_RSN`       VARCHAR(200)    NULL     COMMENT '사유',
+  `CHG_RSN`       VARCHAR(200)    NOT NULL COMMENT '사유',
   `APPR_USR_ID`   VARCHAR(30)     NULL     COMMENT '확정자ID',
   `RTRN_APPR_AT`  DATETIME        NULL     COMMENT '반납확정일자',
   `APPR_STS`      VARCHAR(30)     NOT NULL DEFAULT 'WAIT' COMMENT '승인상태',
@@ -111,10 +111,10 @@ CREATE TABLE `TB_ITEM003D` (
 -- TB_ITEM004M/D 물품 불용 (M:신청서, D:상세 물품)
 CREATE TABLE `TB_ITEM004M` (
   `DSU_M_ID`      BIGINT          NOT NULL AUTO_INCREMENT COMMENT '불용ID',
-  `APLY_USR_ID`   VARCHAR(30)     NOT NULL COMMENT '신청자ID',
-  `APLY_AT`       DATETIME        NOT NULL COMMENT '불용(신청)일자',
+  `APLY_USR_ID`   VARCHAR(30)     NOT NULL COMMENT '등록자ID',
+  `APLY_AT`       DATETIME        NOT NULL COMMENT '불용(등록)일자',
   `ITEM_STS`      VARCHAR(30)     NOT NULL COMMENT '물품상태',
-  `CHG_RSN`       VARCHAR(200)    NULL     COMMENT '사유',
+  `CHG_RSN`       VARCHAR(200)    NOT NULL COMMENT '사유',
   `APPR_USR_ID`   VARCHAR(30)     NULL     COMMENT '확정자ID',
   `DSU_APPR_AT`   DATETIME        NULL     COMMENT '불용확정일자',
   `APPR_STS`      VARCHAR(30)     NOT NULL DEFAULT 'WAIT' COMMENT '승인상태',
@@ -144,7 +144,7 @@ CREATE TABLE `TB_ITEM005M` (
   `REQ_USR_ID`    VARCHAR(30)     NOT NULL COMMENT '등록자ID',
   `REQ_AT`        DATETIME        NOT NULL COMMENT '등록일자',
   `APPR_USR_ID`   VARCHAR(30)     NULL     COMMENT '확정자ID',
-  `APPR_AT`       DATETIME        NULL     COMMENT '확정일자',
+  `APPR_AT`       DATETIME        NULL     COMMENT '확정일자(변경일자)',
   `ORG_CD`        VARCHAR(50)     NOT NULL COMMENT '조직코드',
 
   PRIMARY KEY (`ITEM_HIS_ID`)
@@ -154,7 +154,7 @@ CREATE TABLE `TB_ITEM005M` (
 -- TB_ITEM006M/D 물품 처분 (M:신청서, D:상세 물품)
 CREATE TABLE `TB_ITEM006M` (
   `DISP_M_ID`     BIGINT          NOT NULL AUTO_INCREMENT COMMENT '처분ID',
-  `APLY_USR_ID`   VARCHAR(30)     NOT NULL COMMENT '신청자ID',
+  `APLY_USR_ID`   VARCHAR(30)     NOT NULL COMMENT '등록자ID',
   `DISP_TYPE`     VARCHAR(30)     NOT NULL COMMENT '처분방식',
   `DISP_AT`       DATETIME        NOT NULL COMMENT '처분일자',
   `APPR_USR_ID`   VARCHAR(30)     NULL     COMMENT '확정자ID',
@@ -168,7 +168,8 @@ CREATE TABLE `TB_ITEM004D` (
   `DISP_D_ID`     BIGINT          NOT NULL AUTO_INCREMENT COMMENT '처분상세ID',
   `DISP_M_ID`     BIGINT          NOT NULL COMMENT '처분ID',
   `ITM_NO`        BIGINT          NOT NULL COMMENT '물품고유번호',
-  `DEPT_CD`       VARCHAR(50)     NOT NULL COMMENT '운용부서코드',  -- 신청 당시의 값이 스냅샷으로 남음
+  `ITEM_STS`      VARCHAR(30)     NOT NULL COMMENT '물품상태', -- 처분 신청 시 해당 물품의 불용기본 테이블의 물품상태 값을 받아옴
+  `CHG_RSN`       VARCHAR(200)    NOT NULL COMMENT '사유',    -- 처분 신청 시 해당 물품의 불용기본 테이블의 사유 값을 받아옴
   `ORG_CD`        VARCHAR(50)     NOT NULL COMMENT '조직코드',
 
   PRIMARY KEY (`DISP_D_ID`)
