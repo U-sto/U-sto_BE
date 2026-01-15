@@ -2,10 +2,7 @@ package com.usto.api.user.domain.model;
 
 import com.usto.api.common.BaseTime;
 import com.usto.api.common.exception.BusinessException;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
@@ -30,22 +27,6 @@ public class User extends BaseTime {
     public boolean canLogin() {
         return this.roleId != Role.GUEST
                 && this.apprSts == ApprovalStatus.APPROVED;
-    }
-
-    public boolean isAdmin() {
-        return this.roleId == Role.ADMIN;
-    }
-
-    public boolean isManager() {
-        return this.roleId == Role.MANAGER;
-    }
-
-    public boolean isWaitingApproval() {
-        return this.apprSts == ApprovalStatus.WAIT;
-    }
-
-    public boolean isApproved() {
-        return this.apprSts == ApprovalStatus. APPROVED;
     }
 
     public User approve(Role assignedRole,String apprUsrId) {
