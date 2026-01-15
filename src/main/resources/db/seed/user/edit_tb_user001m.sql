@@ -20,8 +20,11 @@ FROM TB_USER001M;
 
 -- 로그인 확인을 위한 박도현 계정 강제 승인처리
 UPDATE TB_USER001M
-SET ROLE_ID = 'ADMIN',
-    APPR_STS = 'APPROVED'
+SET ROLE_ID = 'GUEST',
+    APPR_STS = 'WAIT'
+WHERE USR_ID = 'badbergjr';
+
+DELETE FROM tb_user001m
 WHERE USR_ID = 'badbergjr';
 
 UPDATE TB_USER001M
