@@ -52,6 +52,9 @@ public class User extends BaseTime {
         if (this.apprSts == ApprovalStatus.APPROVED) {
             throw new IllegalStateException("이미 승인된 사용자입니다");
         }
+        if(this.apprSts == ApprovalStatus.REJECTED){
+            throw new IllegalStateException("이미 반려된 사용자입니다");
+        }
         if (assignedRole == Role.GUEST) {
             throw new IllegalArgumentException("GUEST 역할로는 승인할 수 없습니다");
         }

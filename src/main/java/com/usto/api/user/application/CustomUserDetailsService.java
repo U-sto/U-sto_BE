@@ -29,10 +29,10 @@ public class CustomUserDetailsService implements UserDetailsService {
                         new UsernameNotFoundException("존재하지 않는 사용자입니다."));
 
         if(user.getApprSts() == ApprovalStatus.REJECTED){
-            throw new BusinessException("삭제된 계정입니다.");
+            throw new BusinessException("탈퇴된 계정입니다.");
         }
         if(user.getRoleId() == Role.GUEST){
-            throw new BusinessException("승인되지 않은 계정입니다. 조직 관리자에게 문의하세요");
+            throw new BusinessException("승인되지 않은 계정입니다.");
         }
 
         // UserDetails 구현체로 감싸서 반환

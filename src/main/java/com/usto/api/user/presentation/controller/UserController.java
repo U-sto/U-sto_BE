@@ -1,5 +1,6 @@
 package com.usto.api.user.presentation.controller;
 
+import com.usto.api.common.exception.BusinessException;
 import com.usto.api.common.utils.ApiResponse;
 import com.usto.api.user.application.SignupApplication;
 import com.usto.api.user.application.UserDeleteApplication;
@@ -37,16 +38,13 @@ public class UserController {
     ){
 
         String verifiedEmail = (String) session.getAttribute("signup.auth.email");
-        if (verifiedEmail == null) {
-            return ApiResponse.fail("이메일 인증이 필요합니다");
-        }
-
         String verifiedSms = (String) session.getAttribute("signup.auth.sms");
-        if (verifiedSms == null) {
-            return ApiResponse.fail("휴대폰 인증이 필요합니다");
-        }
 
-        log.info("[SIGNUP] orgCd={}", request.getOrgCd());
+        Boolean isExistsUsrID = (Boolean) session.getAttribute("exists.auth.usrId.exists");
+        String checkedUsrId = (String) session.getAttribute(("exists.auth.usrId.target"));
+        if(isExistsUsrID == null || !checkedUsrId.equals(request.getUsrId())){
+            throw new BusinessException("아이디 중복확인이 필요합니다.");
+        }
 
         signupApplication.signup(
                 request.getUsrId(),
@@ -57,6 +55,7 @@ public class UserController {
                 verifiedSms);
 
         //세션 삭제
+        session.removeAttribute("exists.auth.usrId");
         session.removeAttribute("signup.preauth.email");
         session.removeAttribute("signup.preauth.sms");
         session.removeAttribute("signup.preauth.emailVerifiedAt");
