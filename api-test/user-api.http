@@ -3,8 +3,8 @@ POST http://localhost:8080/api/auth/verification/email/send
 Content-Type: application/json
 
 {
-  "usrId": "",
-  "usrNm": "박도현",
+  "usrId": "badbergjr",
+  "usrNm": "",
   "emailId": "badbergjr"
 }
 
@@ -13,7 +13,7 @@ POST http://localhost:8080/api/auth/verification/email/check
 Content-Type: application/json
 
 {
-  "code": "829314"
+  "code": "398838"
 }
 
 ### 3. SMS 인증번호 발송
@@ -98,7 +98,6 @@ Content-Type: application/json
 {
   "pwd": "1111",
   "pwdConfirm" : "1111"
-
 }
 
 ### 13. 로그아웃

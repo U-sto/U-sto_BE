@@ -34,10 +34,6 @@ public class VerificationController {
     private final SmsVerificationApplication smsVerifyApplication;
     private final SmsSendApplication smsSendApplication;
 
-    private final EmailExistsApplication emailExistsApplication;
-    private final SmsExistsApplication smsExistsApplication;
-
-
     //회원가입
     @PostMapping("/email/send")
     @Operation(summary = "이메일 인증번호 전송")
@@ -48,17 +44,19 @@ public class VerificationController {
 
     )
     {
-        Boolean isExistsEmail = (Boolean) session.getAttribute("exists.auth.email.exists");
-        String checkedEmail = (String) session.getAttribute(("exists.auth.email.target"));
-        if(isExistsEmail == null || !checkedEmail.equals(request.getEmail())){
-            throw new BusinessException("이메일 중복확인이 필요합니다.");
-        }
 
         VerificationPurpose purpose = VerificationPurpose.determinePurpose(
                 request.getUsrId(),
                 request.getUsrNm()
         );
 
+        if(purpose.equals(VerificationPurpose.SIGNUP)){
+            Boolean isExistsEmail = (Boolean) session.getAttribute("exists.auth.email.exists");
+            String checkedEmail = (String) session.getAttribute(("exists.auth.email.target"));
+            if(isExistsEmail == null || !checkedEmail.equals(request.getEmail())){
+                throw new BusinessException("이메일 중복확인이 필요합니다.");
+            }
+        }
 
         if(purpose.equals(VerificationPurpose.FIND_ID)){
             session.setAttribute("email.pending.usrNm", request.getUsrNm());
