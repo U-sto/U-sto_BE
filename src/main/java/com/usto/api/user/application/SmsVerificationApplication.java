@@ -7,6 +7,7 @@
 package com.usto.api.user.application;
 
 
+import com.usto.api.common.exception.BusinessException;
 import com.usto.api.user.domain.model.Verification;
 import com.usto.api.user.domain.model.VerificationPurpose;
 import com.usto.api.user.domain.model.VerificationType;
@@ -37,6 +38,11 @@ public class SmsVerificationApplication {
             String target,
             VerificationPurpose purpose
     ) {
+
+        if (target == null) {
+            throw new BusinessException("인증번호 발송 내역이 없습니다.");
+        }
+
         LocalDateTime now = LocalDateTime.now();
 
         Verification verification = verificationRepository

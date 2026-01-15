@@ -52,6 +52,9 @@ public class User extends BaseTime {
         if (this.apprSts == ApprovalStatus.APPROVED) {
             throw new IllegalStateException("이미 승인된 사용자입니다");
         }
+        if(this.apprSts == ApprovalStatus.REJECTED){
+            throw new IllegalStateException("이미 반려된 사용자입니다");
+        }
         if (assignedRole == Role.GUEST) {
             throw new IllegalArgumentException("GUEST 역할로는 승인할 수 없습니다");
         }
@@ -59,11 +62,15 @@ public class User extends BaseTime {
         return this.toBuilder()
                 .apprUsrId(apprUsrId)
                 .apprSts(ApprovalStatus.APPROVED)
+                .apprAt(LocalDateTime.now())
                 .roleId(assignedRole)
                 .build();
     }
 
     public User reject(String apprUsrId) {
+        if (this.apprSts == ApprovalStatus.APPROVED) {
+            throw new IllegalStateException("이미 승인된 사용자입니다");
+        }
         if (this.getApprSts() == ApprovalStatus.REJECTED) {
             throw new BusinessException("이미 반려된 회원입니다.");
         }

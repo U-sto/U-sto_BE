@@ -12,6 +12,7 @@ import com.usto.api.user.presentation.dto.response.SmsExistsResponseDto;
 import com.usto.api.user.presentation.dto.response.UsrIdExistsResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
@@ -32,9 +33,9 @@ public class ExistsController {
     @GetMapping("/email")
     @Operation(summary = "이메일 중복 확인")
     public ApiResponse<?> existsByEmail(
-            @ModelAttribute
-            @Valid
-            EmailExistsRequestDto request
+            @Valid @RequestBody
+            EmailExistsRequestDto request,
+            HttpSession session
     ) {
         if (request.getEmail() == null || request.getEmail().trim().isEmpty()) {
             return ApiResponse.fail("이메일을 써주세요");
@@ -47,6 +48,9 @@ public class ExistsController {
                     new EmailExistsResponseDto(true));
         }
 
+        session.setAttribute("exists.auth.email.exists",exists);
+        session.setAttribute("exists.auth.email.target",request.getEmail());
+
         return ApiResponse.ok("이용 가능한 이메일입니다",
                 new EmailExistsResponseDto(false));
     }
@@ -54,9 +58,9 @@ public class ExistsController {
     @GetMapping("/sms")
     @Operation(summary = "전화번호 중복 확인")
     public ApiResponse<?> existsBySms(
-            @ModelAttribute
-            @Valid
-            SmsExistRequestDto request
+            @Valid @RequestBody
+            SmsExistRequestDto request,
+            HttpSession session
     ) {
         if (request.getSms() == null || request.getSms().trim().isEmpty()) {
             return ApiResponse.fail("전화번호를 써주세요");
@@ -69,6 +73,9 @@ public class ExistsController {
                     new SmsExistsResponseDto(true));
         }
 
+        session.setAttribute("exists.auth.sms.exists",exists);
+        session.setAttribute("exists.auth.sms.target",request.getSms());
+
         return ApiResponse.ok("이용 가능한 전화번호입니다",
                 new SmsExistsResponseDto(false));
     }
@@ -76,9 +83,9 @@ public class ExistsController {
     @GetMapping("/user-id")
     @Operation(summary = "아이디 중복 확인")
     public ApiResponse<?> existsByUsrId(
-            @ModelAttribute
-            @Valid
-            UserIdExistsRequestDto request
+            @Valid @RequestBody
+            UserIdExistsRequestDto request,
+            HttpSession session
     ) {
         if (request.getUsrId() == null || request.getUsrId().trim().isEmpty()) {
             return ApiResponse.fail("아이디을 써주세요");
@@ -90,6 +97,9 @@ public class ExistsController {
             return ApiResponse.fail("이미 가입된 아이디입니다",
                     new UsrIdExistsResponseDto(true));
         }
+
+        session.setAttribute("exists.auth.usrId.exists",exists);
+        session.setAttribute("exists.auth.usrId.target",request.getUsrId());
 
         return ApiResponse.ok("이용 가능한 아이디입니다",
                 new UsrIdExistsResponseDto(false));
