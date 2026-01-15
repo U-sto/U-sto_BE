@@ -70,7 +70,7 @@ public class SecurityConfig {
                             "/api/auth/verification/**", //이메일/전화번호 인증 when 회원가입,아이디/비번찾기
                             "/api/auth/login", //로그인
                             "/api/auth/logout", //로그아웃
-                            "/api/approval/**"
+                            "/api/approval/**" //일단은 열어두는데 추후에 막아야한다.
                     ).permitAll();
 
                     //역할별 접근 제한

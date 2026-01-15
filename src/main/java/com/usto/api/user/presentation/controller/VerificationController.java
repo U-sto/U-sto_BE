@@ -122,7 +122,6 @@ public class VerificationController {
                 break;}
         }
 
-        session.setAttribute( sessionPrefix +".auth.email", target);
         session.setAttribute(sessionPrefix +".auth.expiresAt", LocalDateTime.now().plusMinutes(15));
 
         return ResponseEntity.ok("이메일 인증이 완료되었습니다.");

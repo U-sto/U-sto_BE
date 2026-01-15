@@ -42,7 +42,7 @@ public class ApprovalController {
             return ApiResponse.ok("승인이 완료되었습니다.  (역할: " + assignedRole + ")", null);
 
 
-        } else if ("reject". equals(action)) {
+        } else if ("reject".equals(action)) {
             approvalApplication.rejectUser(userId, approverUsrId);
             return ApiResponse.ok("반려가 완료되었습니다.", null);
 
