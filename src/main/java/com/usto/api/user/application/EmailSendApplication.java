@@ -54,7 +54,7 @@ public class EmailSendApplication {
         //기존 내역 확인
         Verification existingVerification = verificationRepository
                 .find(
-                        request.getTarget(),
+                        request.getEmail(),
                         VerificationType.EMAIL,
                         purpose                )
                 .orElse(null);
@@ -66,7 +66,7 @@ public class EmailSendApplication {
             verificationToSave = Verification.builder()
                     .creBy(actor)
                     .purpose(purpose)
-                    .target(request.getTarget())
+                    .target(request.getEmail())
                     .type(VerificationType.EMAIL)
                     .code(code)
                     .expiresAt(timeLimit)
@@ -74,7 +74,7 @@ public class EmailSendApplication {
                     .build();
 
             log.info("[EMAIL-SEND] 새 인증 생성 - target: {}, purpose: {}",
-                    request.getTarget(), purpose);
+                    request.getEmail(), purpose);
         } else {
             //재발송
             Verification renewed = existingVerification.renew(code, timeLimit);
@@ -84,16 +84,16 @@ public class EmailSendApplication {
                     .build();
 
             log.info("[EMAIL-SEND] 인증 재발송 - target: {}, purpose: {}",
-                    request.getTarget(), purpose);
+                    request.getEmail(), purpose);
         }
 
         verificationRepository.save(verificationToSave);
 
         //이메일 발송
         try {
-            sendEmail(request.getTarget(), code ,purpose);
+            sendEmail(request.getEmail(), code ,purpose);
         } catch (MessagingException | UnsupportedEncodingException e) {
-            log.error("[EMAIL-SEND] 이메일 발송 실패 - target: {}", request.getTarget(), e);
+            log.error("[EMAIL-SEND] 이메일 발송 실패 - target: {}", request.getEmail(), e);
             throw new RuntimeException("이메일 발송 실패", e);
         }
     }

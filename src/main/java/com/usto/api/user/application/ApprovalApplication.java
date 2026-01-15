@@ -32,6 +32,8 @@ public class ApprovalApplication {
     /**
      * 회원 반려
      */
+
+    //이미 승인된 사용자는 반려하면 안됌 -> 회의때 협의 예정
     @Transactional
     public void rejectUser(String usrId,String apprUsrId) {
         User user = userRepository.getByUsrId(usrId);

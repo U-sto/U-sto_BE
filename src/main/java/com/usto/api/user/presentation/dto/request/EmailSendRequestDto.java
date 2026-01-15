@@ -1,11 +1,13 @@
 package com.usto.api.user.presentation.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.usto.api.user.domain.model.VerificationPurpose;
 import com.usto.api.user.domain.model.VerificationType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 
 @Getter
@@ -17,8 +19,14 @@ public class EmailSendRequestDto {
     @Schema(description = "비밀번호 찾기 시 필요" , example = "ustoId")
     private String usrId;
 
+    private static final String FIXED_DOMAIN = "hanyang.ac.kr";
+
     @NotBlank(message = "이메일을 입력해주세요")
-    @Schema(example = "example@usto.com")
-    @Email(message = "올바른 이메일 형식이 아닙니다.")
-    private String target;
+    @Pattern(regexp = "^[A-Za-z0-9._%+-]{1,64}$")
+    private String emailId;
+
+    @JsonIgnore // 응답에 노출 방지 (필요 시)
+    public String getEmail() {
+        return emailId.trim() + "@" + FIXED_DOMAIN;
+    }
 }

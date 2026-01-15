@@ -64,7 +64,7 @@ public class VerificationController {
         }
 
         session.setAttribute("email.pending.purpose", purpose);
-        session.setAttribute("email.pending.target", request.getTarget());
+        session.setAttribute("email.pending.target", request.getEmail());
         session.setAttribute("email.pending.sentAt", LocalDateTime.now());
 
         String actor = resolveActor(http);
@@ -108,12 +108,14 @@ public class VerificationController {
             case FIND_ID -> {
                 String usrNm = (String) session.getAttribute("email.pending.usrNm");
                 session.setAttribute(sessionPrefix + ".auth.usrNm", usrNm);
+                session.setAttribute(sessionPrefix + ".auth.email", target);
                 session.removeAttribute("email.pending.usrNm");
                 break;
             }
             case RESET_PASSWORD -> {
                 String usrId = (String) session.getAttribute("email.pending.usrId");
                 session.setAttribute(sessionPrefix + ".auth.usrId", usrId);
+                session.setAttribute(sessionPrefix + ".auth.email", target);
                 session.removeAttribute("email.pending.usrId");
                 break;
             }
@@ -193,26 +195,26 @@ public class VerificationController {
         switch (purpose) {
             case SIGNUP -> {
                 // 회원가입:  이메일 중복 확인
-                if (emailExistsApplication.existsByEmail(request.getTarget())) {
+                if (emailExistsApplication.existsByEmail(request.getEmail())) {
                     throw new BusinessException("이미 가입된 이메일입니다.");
                 }
-                log.debug("[SIGNUP] 이메일 중복 확인 완료: {}", request.getTarget());
+                log.debug("[SIGNUP] 이메일 중복 확인 완료: {}", request.getEmail());
             }
             case FIND_ID -> {
                 // 아이디 찾기:  이름 + 이메일 매칭 확인
-                if (! emailExistsApplication.existsByUsrNmAndEmail(request.getUsrNm(), request.getTarget())) {
+                if (! emailExistsApplication.existsByUsrNmAndEmail(request.getUsrNm(), request.getEmail())) {
                     throw new BusinessException("입력하신 정보와 일치하는 회원이 없습니다.");
                 }
                 log.debug("[FIND_ID] 회원 정보 확인 완료: usrNm={}, email={}",
-                        request.getUsrNm(), request.getTarget());
+                        request.getUsrNm(), request.getEmail());
             }
             case RESET_PASSWORD -> {
                 // 비밀번호 찾기: 아이디 + 이메일 매칭 확인
-                if (! emailExistsApplication.existsByUsrIdAndEmail(request.getUsrId(), request.getTarget())) {
+                if (! emailExistsApplication.existsByUsrIdAndEmail(request.getUsrId(), request.getEmail())) {
                     throw new BusinessException("입력하신 정보와 일치하는 회원이 없습니다.");
                 }
                 log.debug("[RESET_PASSWORD] 회원 정보 확인 완료: usrId={}, email={}",
-                        request.getUsrId(), request.getTarget());
+                        request.getUsrId(), request.getEmail());
             }
         }
     }

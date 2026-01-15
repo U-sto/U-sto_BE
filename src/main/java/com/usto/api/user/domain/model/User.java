@@ -75,12 +75,10 @@ public class User extends BaseTime {
                 .build();
     }
 
-    public User updateProfile(String usrNm, String email, String sms ) {
+    public User updateProfile(String usrNm, String sms ) {
         return this.toBuilder()
                 .usrNm(usrNm != null && !usrNm.equals("사용자이름") ?
                         usrNm : this.usrNm)
-                .email(email != null && !email.equals("usto@example.com") ?
-                                email : this.email)
                 .sms(sms != null && !sms.equals("01000000000") ?
                         sms : this.sms)
                 .build();
