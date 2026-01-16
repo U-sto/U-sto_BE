@@ -16,7 +16,6 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -78,6 +77,7 @@ public class VerificationController {
                 actor);
 
         session.removeAttribute("exists.auth.email.exists");
+        session.removeAttribute("exists.auth.email.target");
 
         return ApiResponse.ok("인증번호가 발송되었습니다.");
     }
@@ -165,12 +165,15 @@ public class VerificationController {
                 purpose,
                 actor);
 
+        session.removeAttribute("exists.auth.sms.exists");
+        session.removeAttribute("exists.auth.sms.target");
+
         return ApiResponse.ok("인증번호가 문자로 발송되었습니다.");
     }
 
     @PostMapping("/sms/check")
     @Operation(summary = "휴대폰 인증번호 확인")
-    public ResponseEntity<String> verifyCode(
+    public ApiResponse<?> verifyCode(
             @Valid @RequestBody
             SmsVerifyRequestDto request,
             HttpSession session
@@ -195,7 +198,7 @@ public class VerificationController {
         session.removeAttribute("exists.auth.sms.exists");
         session.removeAttribute("exists.auth.sms.target");
 
-        return ResponseEntity.ok("전화번호 인증이 완료되었습니다.");
+        return ApiResponse.ok("전화번호 인증이 완료되었습니다.");
     }
 
 

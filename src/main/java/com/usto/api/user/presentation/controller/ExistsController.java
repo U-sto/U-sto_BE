@@ -88,7 +88,7 @@ public class ExistsController {
             HttpSession session
     ) {
         if (request.getUsrId() == null || request.getUsrId().trim().isEmpty()) {
-            return ApiResponse.fail("아이디을 써주세요");
+            return ApiResponse.fail("아이디를 써주세요");
         }
 
         boolean exists = userIdExistsApplication.existsByUsrId(request.getUsrId().trim());
