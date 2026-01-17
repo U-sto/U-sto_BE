@@ -9,10 +9,10 @@ CREATE TABLE `TB_ITEM001M` (
   `ACQ_UPR`       DECIMAL(20,0)   NOT NULL COMMENT '취득단가(기본)',
   `DEPT_CD`       VARCHAR(50)     NOT NULL COMMENT '운용부서코드',
   `OPER_STS`      VARCHAR(30)     NOT NULL COMMENT '운용상태',       -- 사용자가 ACQ or OPER 입력
-  `DRB_YR`        VARCHAR(20)     NOT NULL COMMENT '내용연수(기본)',  -- 디폴트로 '자산분류별 표준 내용연수' => 어디서 갖고 와야되는???
+  `DRB_YR`        VARCHAR(20)     NOT NULL COMMENT '내용연수(기본)',  -- 디폴트로 '자산분류별 표준 내용연수' => 어디서 갖고 와야되는?
   `ACQ_QTY`       INT             NOT NULL COMMENT '취득수량',
   `ARRG_TY`       VARCHAR(20)     NOT NULL COMMENT '정리구분',                 -- BUY/DONATE/MAKE (자체구입/기증/자체제작)
-  `APPR_STS`      VARCHAR(20)     NOT NULL DEFAULT 'WAIT' COMMENT '승인상태',  -- WAIT/REJECTED/APPROVED (대기/반려/확정)
+  `APPR_STS`      VARCHAR(20)     NOT NULL DEFAULT 'WAIT' COMMENT '승인상태',
   `RMK`           VARCHAR(500)    NULL     COMMENT '비고',
   `APLY_USR_ID`   VARCHAR(30)     NOT NULL COMMENT '등록자ID',
   `APPR_USR_ID`   VARCHAR(30)     NULL     COMMENT '확정자ID',
