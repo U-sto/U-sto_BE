@@ -55,3 +55,6 @@ build/
 
 # VS Code
 .vscode/
+
+# API test
+/api-test

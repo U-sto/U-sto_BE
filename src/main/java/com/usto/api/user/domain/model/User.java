@@ -2,10 +2,7 @@ package com.usto.api.user.domain.model;
 
 import com.usto.api.common.BaseTime;
 import com.usto.api.common.exception.BusinessException;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
@@ -32,25 +29,12 @@ public class User extends BaseTime {
                 && this.apprSts == ApprovalStatus.APPROVED;
     }
 
-    public boolean isAdmin() {
-        return this.roleId == Role.ADMIN;
-    }
-
-    public boolean isManager() {
-        return this.roleId == Role.MANAGER;
-    }
-
-    public boolean isWaitingApproval() {
-        return this.apprSts == ApprovalStatus.WAIT;
-    }
-
-    public boolean isApproved() {
-        return this.apprSts == ApprovalStatus. APPROVED;
-    }
-
     public User approve(Role assignedRole,String apprUsrId) {
         if (this.apprSts == ApprovalStatus.APPROVED) {
             throw new IllegalStateException("이미 승인된 사용자입니다");
+        }
+        if(this.apprSts == ApprovalStatus.REJECTED){
+            throw new IllegalStateException("이미 반려된 사용자입니다");
         }
         if (assignedRole == Role.GUEST) {
             throw new IllegalArgumentException("GUEST 역할로는 승인할 수 없습니다");
@@ -59,11 +43,15 @@ public class User extends BaseTime {
         return this.toBuilder()
                 .apprUsrId(apprUsrId)
                 .apprSts(ApprovalStatus.APPROVED)
+                .apprAt(LocalDateTime.now())
                 .roleId(assignedRole)
                 .build();
     }
 
     public User reject(String apprUsrId) {
+        if (this.apprSts == ApprovalStatus.APPROVED) {
+            throw new IllegalStateException("이미 승인된 사용자입니다");
+        }
         if (this.getApprSts() == ApprovalStatus.REJECTED) {
             throw new BusinessException("이미 반려된 회원입니다.");
         }
