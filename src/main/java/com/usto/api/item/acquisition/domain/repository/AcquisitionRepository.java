@@ -11,4 +11,5 @@ public interface AcquisitionRepository {
     ItemAcquisitionEntity save(ItemAcquisitionEntity entity);
     Optional<ItemAcquisitionEntity> findById(Long id);
     List<AcqListResponse> findAllByFilter(AcqSearchRequest cond, String orgCd);
+    void delete(ItemAcquisitionEntity entity);
 }

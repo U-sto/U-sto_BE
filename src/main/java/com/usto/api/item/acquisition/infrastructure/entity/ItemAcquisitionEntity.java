@@ -4,6 +4,7 @@ import com.usto.api.common.BaseTimeEntity;
 import com.usto.api.item.acquisition.domain.model.AcqArrangementType;
 import com.usto.api.item.common.model.ApprStatus;
 import com.usto.api.item.common.model.OperStatus;
+import com.usto.api.item.acquisition.presentation.dto.request.AcqRegisterRequest;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
@@ -78,4 +79,18 @@ public class ItemAcquisitionEntity extends BaseTimeEntity {
 
     @Column(name = "DEL_AT")
     private LocalDateTime delAt;  // 삭제일시
+
+    public void updateInfo(AcqRegisterRequest request, BigDecimal acqUpr) {
+        this.g2bDCd = request.getG2bDCd();
+        this.acqAt = request.getAcqAt();
+        this.acqQty = request.getAcqQty();
+        this.acqUpr = acqUpr;
+        this.deptCd = request.getDeptCd();
+        this.operSts = request.getOperSts();
+        this.rmk = request.getRmk();
+    }
+
+    public void changeStatus(ApprStatus status) {
+        this.apprSts = status;
+    }
 }

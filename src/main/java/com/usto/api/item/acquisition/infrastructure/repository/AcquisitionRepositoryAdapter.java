@@ -94,6 +94,14 @@ public class AcquisitionRepositoryAdapter implements AcquisitionRepository {
                 .fetch();
     }
 
+    /**
+     * 물품 취득 정보 삭제 (Soft Delete)
+     * - 엔티티의 @SQLDelete 설정에 의해 내부적으로 UPDATE 쿼리가 실행됩니다.
+     */
+    @Override
+    public void delete(ItemAcquisitionEntity entity) {
+        jpaRepository.delete(entity);
+    }
 
     /**
      * 동적 쿼리를 위한 헬퍼 메서드들 (값이 null이면 조건이 무시됨)
