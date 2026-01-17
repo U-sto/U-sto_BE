@@ -28,17 +28,13 @@ CREATE TABLE `TB_ITEM001M` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='물품취득기본';
 
 
--- TB_ITEM002M 물품대장기본 (취득 묶음 단위로 관리하는 대장 헤더, 속성 중 수량을 제외하고 전부 취득 시점과 동일)
+-- TB_ITEM002M 물품대장기본 (취득 묶음 단위로 관리하는 대장 헤더, 속성 중 수량/단가/내용연수를 제외하고 취득 시점과 동일)
 CREATE TABLE `TB_ITEM002M` (
   `ACQ_ID`        BIGINT          NOT NULL COMMENT '취득ID',
-  `G2B_M_CD`      CHAR(8)         NOT NULL COMMENT '물품분류코드',
   `G2B_D_CD`      CHAR(8)         NOT NULL COMMENT '물품식별코드',
   `QTY`           INT             NOT NULL COMMENT '수량',  -- 일부 물품이 처분될 시 수량이 감소함 (초기값: TB_ITEM001M의 '취득수량')
-  `ACQ_AT`        DATETIME        NOT NULL COMMENT '취득일자',
-  `ACQ_UPR`       DECIMAL(20,0)   NOT NULL COMMENT '취득단가',
-  `APPR_AT`       DATETIME        NOT NULL COMMENT '확정일자(정리일자)',
-  `DRB_YR`        VARCHAR(20)     NOT NULL COMMENT '내용연수',
-  `ARRG_TY`       VARCHAR(20)     NOT NULL COMMENT '정리구분',
+  `ACQ_UPR`       DECIMAL(20,0)   NOT NULL COMMENT '취득단가',  -- 수정 가능
+  `DRB_YR`        VARCHAR(20)     NOT NULL COMMENT '내용연수',  -- 수정 가능
   `ORG_CD`        VARCHAR(50)     NOT NULL COMMENT '조직코드',
     --
   `CRE_BY`  VARCHAR(100)   NOT NULL COMMENT '생성자ID',
@@ -47,7 +43,7 @@ CREATE TABLE `TB_ITEM002M` (
   `UPD_AT`  DATETIME       NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일자',
 
   PRIMARY KEY (`ACQ_ID`)
-  -- FK: 취득ID, 물품분류코드, 물품식별코드, 조직코드
+  -- FK: 취득ID, 물품식별코드, 조직코드
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='물품대장기본';
 
