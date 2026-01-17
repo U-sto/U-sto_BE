@@ -38,7 +38,7 @@ public class SmsSendApplication {
     {
         LocalDateTime timeLimit = LocalDateTime.now().plusMinutes(5);
 
-        String code = generateRandomCode(4);
+        String code = generateRandomCode(6);
 
         //기존내역 확인
         Verification existingVerification  = verificationRepository

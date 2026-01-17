@@ -51,15 +51,6 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * 기타 인증 예외(필요 시 메시지 통일)
-     */
-    @ExceptionHandler(AuthenticationException.class)
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    public ApiResponse<?> handleAuth(AuthenticationException e) {
-        return ApiResponse.fail("로그인에 실패했습니다."); //서버 문제
-    }
-
-    /**
      * Bean Validation 예외 처리
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)

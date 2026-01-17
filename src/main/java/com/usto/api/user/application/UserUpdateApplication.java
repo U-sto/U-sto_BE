@@ -38,7 +38,6 @@ public class UserUpdateApplication {
 
         User updated = user.updateProfile(
                 request.getNewUsrNm(),
-                request.getNewEmail(),
                 request.getNewSms()
         );
 

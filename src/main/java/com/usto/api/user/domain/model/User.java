@@ -1,10 +1,8 @@
 package com.usto.api.user.domain.model;
 
 import com.usto.api.common.BaseTime;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
+import com.usto.api.common.exception.BusinessException;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
@@ -20,7 +18,9 @@ public class User extends BaseTime {
     private String sms;
     private Role roleId;
     private String orgCd;
+    private String apprUsrId;
     private ApprovalStatus apprSts;
+    private LocalDateTime apprAt;
     private boolean delYn;
     private LocalDateTime delAt;
 
@@ -29,42 +29,44 @@ public class User extends BaseTime {
                 && this.apprSts == ApprovalStatus.APPROVED;
     }
 
-    public boolean isAdmin() {
-        return this.roleId == Role.ADMIN;
-    }
-
-    public boolean isManager() {
-        return this.roleId == Role.MANAGER;
-    }
-
-    public boolean isWaitingApproval() {
-        return this.apprSts == ApprovalStatus.WAIT;
-    }
-
-    public boolean isApproved() {
-        return this.apprSts == ApprovalStatus. APPROVED;
-    }
-
-    public User approve(String approverUsrId, Role newRole) {
+    public User approve(Role assignedRole,String apprUsrId) {
         if (this.apprSts == ApprovalStatus.APPROVED) {
             throw new IllegalStateException("이미 승인된 사용자입니다");
         }
-        if (newRole == Role.GUEST) {
+        if(this.apprSts == ApprovalStatus.REJECTED){
+            throw new IllegalStateException("이미 반려된 사용자입니다");
+        }
+        if (assignedRole == Role.GUEST) {
             throw new IllegalArgumentException("GUEST 역할로는 승인할 수 없습니다");
         }
 
         return this.toBuilder()
+                .apprUsrId(apprUsrId)
                 .apprSts(ApprovalStatus.APPROVED)
-                .roleId(newRole)
+                .apprAt(LocalDateTime.now())
+                .roleId(assignedRole)
                 .build();
     }
 
-    public User updateProfile(String usrNm, String email, String sms ) {
+    public User reject(String apprUsrId) {
+        if (this.apprSts == ApprovalStatus.APPROVED) {
+            throw new IllegalStateException("이미 승인된 사용자입니다");
+        }
+        if (this.getApprSts() == ApprovalStatus.REJECTED) {
+            throw new BusinessException("이미 반려된 회원입니다.");
+        }
+
+        return this.toBuilder()
+                .apprUsrId(apprUsrId)
+                .apprSts(ApprovalStatus.REJECTED)
+                .apprAt(LocalDateTime.now())
+                .build();
+    }
+
+    public User updateProfile(String usrNm, String sms ) {
         return this.toBuilder()
                 .usrNm(usrNm != null && !usrNm.equals("사용자이름") ?
                         usrNm : this.usrNm)
-                .email(email != null && !email.equals("usto@example.com") ?
-                                email : this.email)
                 .sms(sms != null && !sms.equals("01000000000") ?
                         sms : this.sms)
                 .build();

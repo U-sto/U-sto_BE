@@ -6,6 +6,7 @@
  */
 package com.usto.api.user.application;
 
+import com.usto.api.user.domain.model.User;
 import com.usto.api.user.domain.model.Verification;
 import com.usto.api.user.domain.model.VerificationPurpose;
 import com.usto.api.user.domain.model.VerificationType;
@@ -53,7 +54,7 @@ public class EmailSendApplication {
         //기존 내역 확인
         Verification existingVerification = verificationRepository
                 .find(
-                        request.getTarget(),
+                        request.getEmail(),
                         VerificationType.EMAIL,
                         purpose                )
                 .orElse(null);
@@ -65,7 +66,7 @@ public class EmailSendApplication {
             verificationToSave = Verification.builder()
                     .creBy(actor)
                     .purpose(purpose)
-                    .target(request.getTarget())
+                    .target(request.getEmail())
                     .type(VerificationType.EMAIL)
                     .code(code)
                     .expiresAt(timeLimit)
@@ -73,7 +74,7 @@ public class EmailSendApplication {
                     .build();
 
             log.info("[EMAIL-SEND] 새 인증 생성 - target: {}, purpose: {}",
-                    request.getTarget(), purpose);
+                    request.getEmail(), purpose);
         } else {
             //재발송
             Verification renewed = existingVerification.renew(code, timeLimit);
@@ -83,21 +84,45 @@ public class EmailSendApplication {
                     .build();
 
             log.info("[EMAIL-SEND] 인증 재발송 - target: {}, purpose: {}",
-                    request.getTarget(), purpose);
+                    request.getEmail(), purpose);
         }
 
         verificationRepository.save(verificationToSave);
 
         //이메일 발송
         try {
-            sendEmail(request.getTarget(), code ,purpose);
+            sendEmail(request.getEmail(), code ,purpose);
         } catch (MessagingException | UnsupportedEncodingException e) {
-            log.error("[EMAIL-SEND] 이메일 발송 실패 - target: {}", request.getTarget(), e);
+            log.error("[EMAIL-SEND] 이메일 발송 실패 - target: {}", request.getEmail(), e);
             throw new RuntimeException("이메일 발송 실패", e);
         }
     }
 
-    //메서드
+    @Transactional
+    public void sendApprovalRequestEmail(User newUser) {
+        try {
+            MimeMessage message = emailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+            helper.setFrom(new InternetAddress(emailName, "U-sto", "UTF-8"));
+            helper.setTo(emailName);
+            helper.setSubject("[U-sto] 새로운 회원 승인 요청");
+
+            String body = buildApprovalEmailBody(newUser);
+            helper.setText(body, true);
+
+            emailSender.send(message);
+
+            log.info("[APPROVAL-REQUEST] 승인 요청 메일 발송 완료 - to: {}, newUser: {}",
+                    emailName, newUser.getUsrId());
+
+        } catch (MessagingException | UnsupportedEncodingException e) {
+            log.error("[APPROVAL-REQUEST] 메일 발송 실패 - to: {}", emailName, e);
+            throw new RuntimeException("승인 요청 메일 발송 실패", e);
+        }
+    }
+
+        //메서드
     private void sendEmail(String to, String code ,VerificationPurpose purpose)
             throws MessagingException, UnsupportedEncodingException {
 
@@ -135,24 +160,25 @@ public class EmailSendApplication {
     }
 
     //이메일 본문 HTML
+    //이메일 인증 부분
     private String buildEmailBody(String code) {
         return """
             <table width="100%%" cellpadding="0" cellspacing="0"
-                   style="background:#0F2A44;padding:40px 0;">
+                   style="background:#DBE6E7;padding:40px 0;">
               <tr>
                 <td align="center">
                   <table width="560" cellpadding="0" cellspacing="0"
-                         style="background:#ffffff;border-radius:14px;
+                         style="background:#FAFBFB;border-radius:14px;
                                 overflow:hidden;
                                 box-shadow:0 10px 30px rgba(0,0,0,0.25);
-                                font-family:'Apple SD Gothic Neo',Arial,sans-serif;">
+                                font-family:'Noto Sans KR','Apple SD Gothic Neo',Arial,sans-serif;">
                     
                     <!-- Header -->
                     <tr>
-                      <td style="background: linear-gradient(135deg, #667eea 0%%, #764ba2 100%%);
+                      <td style="background:linear-gradient(135deg,#18434F 0%%,#58828E 100%%);
                                  padding:32px 40px;text-align:center;">
-                        <h1 style="color:#ffffff;font-size:28px;font-weight:700;
-                                   margin: 0;letter-spacing:-0.5px;">
+                        <h1 style="color:#FAFBFB;font-size:28px;font-weight:700;
+                                   margin:0;letter-spacing:-0.5px;">
                           U-sto 이메일 인증
                         </h1>
                       </td>
@@ -160,39 +186,38 @@ public class EmailSendApplication {
                     
                     <!-- Body -->
                     <tr>
-                      <td style="padding: 48px 40px;">
-                        <p style="color:#2d3748;font-size:16px;line-height:1.6;margin: 0 0 24px;">
+                      <td style="padding:48px 40px;">
+                        <p style="color:#191919;font-size:16px;line-height:1.6;margin:0 0 24px;">
                           안녕하세요! <br>
-                          요청하신 인증번호를 안내해 드립니다. 
+                          요청하신 인증번호를 안내해 드립니다.
                         </p>
                         
                         <!-- Code Box -->
-                        <div style="background:#f7fafc;border: 2px dashed #cbd5e0;
+                        <div style="background:#C1D8DC;border:2px dashed #58828E;
                                     border-radius:8px;padding:24px;text-align:center;
                                     margin:32px 0;">
-                          <p style="color:#718096;font-size:14px;margin:0 0 12px;">
+                          <p style="color:#18434F;font-size:14px;margin:0 0 12px;font-weight:600;">
                             인증번호
                           </p>
-                          <p style="color:#667eea;font-size:36px;font-weight:700;
-                                    margin:0;letter-spacing: 8px;font-family: monospace;">
+                          <p style="color:#18434F;font-size:36px;font-weight:700;
+                                    margin:0;letter-spacing:8px;font-family:monospace;">
                             %s
                           </p>
                         </div>
                         
-                        <p style="color:#718096;font-size:14px;line-height:1.6;
-                                  margin:24px 0 0;">
-                          ⏰ 이 인증번호는 <strong style="color:#e53e3e;">5분간 유효</strong>합니다. <br>
-                          🔒 본인이 요청하지 않았다면 이 메일을 무시하세요. 
+                        <p style="color:#888C8D;font-size:14px;line-height:1.6;margin:24px 0 0;">
+                          ⏰ 이 인증번호는 <strong style="color:#D52E2E;">5분간 유효</strong>합니다. <br>
+                          🔒 본인이 요청하지 않았다면 이 메일을 무시하세요.
                         </p>
                       </td>
                     </tr>
                     
                     <!-- Footer -->
                     <tr>
-                      <td style="background:#f7fafc;padding:24px 40px;
-                                 border-top:1px solid #e2e8f0;text-align:center;">
-                        <p style="color:#a0aec0;font-size:12px;margin:0;">
-                          © 2024 U-sto. 대학물품관리시스템
+                      <td style="background:#DBE6E7;padding:24px 40px;
+                                 border-top:1px solid #BEC3C3;text-align:center;">
+                        <p style="color:#888C8D;font-size:12px;margin:0;">
+                          © 2026 U-sto. 대학물품관리시스템
                         </p>
                       </td>
                     </tr>
@@ -202,5 +227,124 @@ public class EmailSendApplication {
               </tr>
             </table>
             """.formatted(code);
+
     }
+
+    private String buildApprovalEmailBody(User newUser) {
+        String baseUrl = "http://localhost:8080/api/approval"; //배포 시 서버 url로 변경해야한다.
+
+        String approveAdminUrl = baseUrl + "?action=approve&role=ADMIN&userId=" + newUser.getUsrId();
+        String approveManagerUrl = baseUrl + "?action=approve&role=MANAGER&userId=" + newUser. getUsrId();
+        String rejectUrl = baseUrl + "?action=reject&userId=" + newUser.getUsrId();
+
+        return """
+            <table width="100%%" cellpadding="0" cellspacing="0"
+                   style="background:#DBE6E7;padding:40px 0;">
+              <tr>
+                <td align="center">
+                  <table width="560" cellpadding="0" cellspacing="0"
+                         style="background:#FAFBFB;border-radius:14px;
+                                overflow:hidden;
+                                box-shadow:0 10px 30px rgba(0,0,0,0.25);
+                                font-family:'Noto Sans KR','Apple SD Gothic Neo',Arial,sans-serif;">
+        
+                    <!-- Header -->
+                    <tr>
+                      <td style="background:linear-gradient(135deg,#18434F 0%%,#58828E 100%%);
+                                 padding:32px 40px;text-align:center;">
+                        <h1 style="color:#FAFBFB;font-size:28px;font-weight:700;
+                                   margin:0;letter-spacing:-0.5px;">
+                          새로운 회원 가입 승인 요청
+                        </h1>
+                      </td>
+                    </tr>
+        
+                    <!-- Body -->
+                    <tr>
+                      <td style="padding:48px 40px;">
+                        <p style="color:#191919;font-size:16px;line-height:1.6;margin:0 0 24px;">
+                          안녕하세요, DBA님!<br>
+                          새로운 회원이 가입을 요청했습니다.
+                        </p>
+        
+                        <!-- 가입자 정보 -->
+                        <div style="background:#C1D8DC;border-left:4px solid #18434F;
+                                    border-radius:8px;padding:20px;margin:24px 0;">
+                          <p style="margin:0 0 8px;color:#191919;font-size:14px;">
+                            <strong>아이디:</strong> %s
+                          </p>
+                          <p style="margin:0 0 8px;color:#191919;font-size:14px;">
+                            <strong>이름:</strong> %s
+                          </p>
+                          <p style="margin:0 0 8px;color:#191919;font-size:14px;">
+                            <strong>이메일:</strong> %s
+                          </p>
+                          <p style="margin:0 0 8px;color:#191919;font-size:14px;">
+                            <strong>조직:</strong> %s
+                          </p>
+                          <p style="margin:0;color:#191919;font-size:14px;">
+                            <strong>가입일시:</strong> %s
+                          </p>
+                        </div>
+        
+                        <p style="color:#191919;font-size:15px;font-weight:700;margin:24px 0 12px;">
+                          역할을 선택하여 승인해주세요:
+                        </p>
+        
+                        <!-- 버튼 영역 -->
+                        <div style="text-align:center;margin:32px 0;">
+                          <a href="%s"
+                             style="display:inline-block;background:#18434F;color:#FAFBFB;
+                                    padding:14px 28px;text-decoration:none;border-radius:8px;
+                                    font-weight:700;margin:0 4px 8px;font-size:15px;">
+                            조직 관리자로 승인
+                          </a>
+                          <a href="%s"
+                             style="display:inline-block;background:#58828E;color:#FAFBFB;
+                                    padding:14px 28px;text-decoration:none;border-radius:8px;
+                                    font-weight:700;margin:0 4px 8px;font-size:15px;">
+                            물품 운용관으로 승인
+                          </a>
+                          <br>
+                          <a href="%s"
+                             style="display:inline-block;background:#D52E2E;color:#FAFBFB;
+                                    padding:14px 28px;text-decoration:none;border-radius:8px;
+                                    font-weight:700;margin:8px 4px 0;font-size:15px;">
+                            반려하기
+                          </a>
+                        </div>
+        
+                        <p style="color:#888C8D;font-size:14px;line-height:1.6;margin:24px 0 0;">
+                          버튼을 클릭하면 자동으로 승인/반려 처리됩니다.
+                        </p>
+                      </td>
+                    </tr>
+        
+                    <!-- Footer -->
+                    <tr>
+                      <td style="background:#DBE6E7;padding:24px 40px;
+                                 border-top:1px solid #BEC3C3;text-align:center;">
+                        <p style="color:#888C8D;font-size:12px;margin:0;">
+                          © 2026 U-sto. 대학물품관리시스템
+                        </p>
+                      </td>
+                    </tr>
+        
+                  </table>
+                </td>
+              </tr>
+            </table>
+            """.formatted(
+                        newUser.getUsrId(),
+                        newUser.getUsrNm(),
+                        newUser.getEmail(),
+                        newUser.getOrgCd(),
+                        LocalDateTime.now(),
+                        approveAdminUrl,
+                        approveManagerUrl,
+                        rejectUrl
+                );
+
+            }
+
 }
