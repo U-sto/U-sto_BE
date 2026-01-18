@@ -37,6 +37,7 @@ public class AcqRegisterRequest {
     private OperStatus operSts;
 
     @Schema(description = "운용부서코드", example = "ADM_FAC")
+    @NotBlank(message = "운용부서코드는 필수입니다.")
     private String deptCd;
 
     @Schema(description = "비고")

@@ -19,8 +19,8 @@ import java.time.LocalDateTime;
 @Getter @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@SQLDelete(sql = "UPDATE tb_item001m SET del_yn = 'Y', del_at = NOW() WHERE acq_id = ?")
-@Where(clause = "del_yn = 'N'") // 조회 시 삭제 안 된 데이터만 기본으로 가져옴
+@SQLDelete(sql = "UPDATE TB_ITEM001M SET del_yn = 'Y', del_at = NOW() WHERE acq_id = ?")
+@Where(clause = "DEL_YN = 'N'") // 조회 시 삭제 안 된 데이터만 기본으로 가져옴
 public class ItemAcquisitionEntity extends BaseTimeEntity {
 
     @Id
@@ -85,6 +85,8 @@ public class ItemAcquisitionEntity extends BaseTimeEntity {
         this.acqAt = request.getAcqAt();
         this.acqQty = request.getAcqQty();
         this.acqUpr = acqUpr;
+        this.arrgTy = request.getArrgTy();
+        this.drbYr = drbYr;
         this.deptCd = request.getDeptCd();
         this.operSts = request.getOperSts();
         this.rmk = request.getRmk();

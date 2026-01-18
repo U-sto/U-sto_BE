@@ -80,7 +80,6 @@ public class AcquisitionRepositoryAdapter implements AcquisitionRepository {
                 )
                 .where(
                         itemAcquisitionEntity.orgCd.eq(orgCd), // 로그인한 사용자의 조직 데이터만 조회 (보안)
-                        itemAcquisitionEntity.delYn.eq("N"), // 삭제 안 된 것만
                         g2bDCdEq(cond.getG2bDCd()), // 식별코드 검색
                         deptCdEq(cond.getDeptCd()), // 부서 검색
                         acqAtBetween(cond.getStartAcqAt(), cond.getEndAcqAt()), // 취득일자 범위
