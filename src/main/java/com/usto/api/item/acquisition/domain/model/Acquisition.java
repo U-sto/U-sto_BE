@@ -10,6 +10,7 @@ import lombok.Getter;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.UUID;
 
 @Getter
@@ -46,6 +47,9 @@ public class Acquisition {
     private LocalDateTime creAt;
     private String updBy;
     private LocalDateTime updAt;
+
+    // 한국 표준시 (서울)
+    private static final ZoneId KOREA_ZONE = ZoneId.of("Asia/Seoul");
 
     // ===== 비즈니스 로직 메서드 =====
 
@@ -118,7 +122,7 @@ public class Acquisition {
 
         // 확정 시 확정일자 자동 설정
         if (newStatus == ApprStatus.APPROVED) {
-            this.apprAt = LocalDate.now();
+            this.apprAt = LocalDate.now(KOREA_ZONE);
         }
     }
 
@@ -147,6 +151,15 @@ public class Acquisition {
     public void validateModifiable() {
         if (this.apprSts == ApprStatus.REQUEST || this.apprSts == ApprStatus.APPROVED) {
             throw new BusinessException("승인 요청 중이거나 확정된 데이터는 수정/삭제할 수 없습니다.");
+        }
+    }
+
+    /**
+     * 조직 소유권 검증: 다른 조직의 데이터 접근 방지
+     */
+    public void validateOwnership(String requestOrgCd) {
+        if (!this.orgCd.equals(requestOrgCd)) {
+            throw new BusinessException("해당 조직의 데이터가 아닙니다.");
         }
     }
 

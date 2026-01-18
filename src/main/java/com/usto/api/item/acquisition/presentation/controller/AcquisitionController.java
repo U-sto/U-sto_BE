@@ -74,8 +74,10 @@ public class AcquisitionController {
     )
     @DeleteMapping("/{acqId}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ApiResponse<Void> delete(@PathVariable String acqId) {
-        acquisitionService.deleteAcquisition(acqId);
+    public ApiResponse<Void> delete(
+            @PathVariable String acqId,
+            @AuthenticationPrincipal UserPrincipal principal) {
+        acquisitionService.deleteAcquisition(acqId, principal.getOrgCd());
         return ApiResponse.ok("삭제 성공");
     }
 
@@ -86,8 +88,10 @@ public class AcquisitionController {
     )
     @PostMapping("/{acqId}/request")
     @PreAuthorize("hasRole('ADMIN')")
-    public ApiResponse<Void> requestApproval(@PathVariable String acqId) {
-        acquisitionService.requestApproval(acqId);
+    public ApiResponse<Void> requestApproval(
+            @PathVariable String acqId,
+            @AuthenticationPrincipal UserPrincipal principal) {
+        acquisitionService.requestApproval(acqId, principal.getOrgCd());
         return ApiResponse.ok("승인 요청 완료");
     }
 
@@ -98,8 +102,10 @@ public class AcquisitionController {
     )
     @PostMapping("/{acqId}/cancel")
     @PreAuthorize("hasRole('ADMIN')")
-    public ApiResponse<Void> cancelRequest(@PathVariable String acqId) {
-        acquisitionService.cancelRequest(acqId);
+    public ApiResponse<Void> cancelRequest(
+            @PathVariable String acqId,
+            @AuthenticationPrincipal UserPrincipal principal) {
+        acquisitionService.cancelRequest(acqId, principal.getOrgCd());
         return ApiResponse.ok("승인 요청 취소 완료");
     }
 }

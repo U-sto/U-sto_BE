@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 
 @Service
@@ -26,6 +27,8 @@ public class AcquisitionService {
     private final AcquisitionRepository acquisitionRepository;
     private final G2bItemJpaRepository g2bItemJpaRepository;
     private final DepartmentJpaRepository departmentJpaRepository;
+
+    private static final ZoneId KOREA_ZONE = ZoneId.of("Asia/Seoul");
 
     /**
      * 1. 등록 (Domain Model 사용)
@@ -64,6 +67,8 @@ public class AcquisitionService {
         Acquisition acquisition = acquisitionRepository.findById(acqId)
                 .orElseThrow(() -> new BusinessException("존재하지 않는 취득 정보입니다."));
 
+        acquisition.validateOwnership(orgCd);
+
         // 검증
         G2bItemJpaEntity g2bItem = validateRequest(request, orgCd);
 
@@ -88,9 +93,11 @@ public class AcquisitionService {
      * 3. 삭제
      */
     @Transactional
-    public void deleteAcquisition(String acqId) {
+    public void deleteAcquisition(String acqId, String orgCd) {
         Acquisition acquisition = acquisitionRepository.findById(acqId)
                 .orElseThrow(() -> new BusinessException("존재하지 않는 취득 정보입니다."));
+
+        acquisition.validateOwnership(orgCd);
 
         // 수정 가능 여부 체크 (Domain 메서드 사용)
         acquisition.validateModifiable();
@@ -103,9 +110,11 @@ public class AcquisitionService {
      * 4. 승인 요청
      */
     @Transactional
-    public void requestApproval(String acqId) {
+    public void requestApproval(String acqId, String orgCd) {
         Acquisition acquisition = acquisitionRepository.findById(acqId)
                 .orElseThrow(() -> new BusinessException("존재하지 않는 취득 건입니다."));
+
+        acquisition.validateOwnership(orgCd);
 
         // Domain 메서드 호출 (비즈니스 로직)
         acquisition.requestApproval();
@@ -118,9 +127,11 @@ public class AcquisitionService {
      * 5. 승인 요청 취소 → 소프트 삭제
      */
     @Transactional
-    public void cancelRequest(String acqId) {
+    public void cancelRequest(String acqId, String orgCd) {
         Acquisition acquisition = acquisitionRepository.findById(acqId)
                 .orElseThrow(() -> new BusinessException("존재하지 않는 취득 건입니다."));
+
+        acquisition.validateOwnership(orgCd);
 
         // 취소 가능 여부 체크 (Domain 메서드)
         acquisition.validateCancellable();
@@ -148,7 +159,7 @@ public class AcquisitionService {
             throw new BusinessException("해당 조직에 존재하지 않는 부서코드입니다.");
         }
 
-        if (request.getAcqAt().isAfter(LocalDate.now())) {
+        if (request.getAcqAt().isAfter(LocalDate.now(KOREA_ZONE))) {
             throw new BusinessException("취득일자는 현재 날짜 이후일 수 없습니다.");
         }
 
