@@ -24,9 +24,8 @@ import java.time.LocalDateTime;
 public class ItemAcquisitionEntity extends BaseTimeEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ACQ_ID")
-    private Long acqId;           // 취득 ID
+    @Column(name = "ACQ_ID", columnDefinition = "BINARY(16)")
+    private String acqId;         // 취득 ID
 
     @Column(name = "G2B_D_CD", nullable = false, length = 8, columnDefinition = "char(8)")
     private String g2bDCd;        // G2B 식별코드
@@ -79,20 +78,4 @@ public class ItemAcquisitionEntity extends BaseTimeEntity {
 
     @Column(name = "DEL_AT")
     private LocalDateTime delAt;  // 삭제일시
-
-    public void updateInfo(AcqRegisterRequest request, BigDecimal acqUpr) {
-        this.g2bDCd = request.getG2bDCd();
-        this.acqAt = request.getAcqAt();
-        this.acqQty = request.getAcqQty();
-        this.acqUpr = acqUpr;
-        this.arrgTy = request.getArrgTy();
-        this.drbYr = drbYr;
-        this.deptCd = request.getDeptCd();
-        this.operSts = request.getOperSts();
-        this.rmk = request.getRmk();
-    }
-
-    public void changeStatus(ApprStatus status) {
-        this.apprSts = status;
-    }
 }

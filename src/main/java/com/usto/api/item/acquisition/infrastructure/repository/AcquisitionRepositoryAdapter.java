@@ -4,6 +4,9 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.usto.api.common.exception.BusinessException;
+import com.usto.api.item.acquisition.domain.model.Acquisition;
+import com.usto.api.item.acquisition.infrastructure.mapper.AcquisitionMapper;
 import com.usto.api.item.common.model.ApprStatus;
 import com.usto.api.item.acquisition.domain.repository.AcquisitionRepository;
 import com.usto.api.item.acquisition.infrastructure.entity.ItemAcquisitionEntity;
@@ -29,20 +32,24 @@ public class AcquisitionRepositoryAdapter implements AcquisitionRepository {
     private final AcquisitionJpaRepository jpaRepository;
     private final JPAQueryFactory queryFactory;
 
-    /**
-     * 물품 취득 정보 저장
-     */
     @Override
-    public ItemAcquisitionEntity save(ItemAcquisitionEntity entity) {
-        return jpaRepository.save(entity);
+    public Acquisition save(Acquisition acquisition) {
+        ItemAcquisitionEntity entity = AcquisitionMapper.toEntity(acquisition);
+        ItemAcquisitionEntity saved = jpaRepository.save(entity);
+        return AcquisitionMapper.toDomain(saved);
     }
 
-    /**
-     * 취득ID로 단건 조회
-     */
     @Override
-    public Optional<ItemAcquisitionEntity> findById(Long id) {
-        return jpaRepository.findById(id);
+    public Optional<Acquisition> findById(String id) {
+        return jpaRepository.findById(id)
+                .map(AcquisitionMapper::toDomain);
+    }
+
+    @Override
+    public void delete(String acqId) {
+        ItemAcquisitionEntity entity = jpaRepository.findById(acqId)
+                .orElseThrow(() -> new BusinessException("존재하지 않는 취득 정보입니다."));
+        jpaRepository.delete(entity);  // Soft Delete 실행
     }
 
     /**
@@ -89,18 +96,10 @@ public class AcquisitionRepositoryAdapter implements AcquisitionRepository {
                         approvedOnlyIfApprDate(cond.getStartApprAt(), cond.getEndApprAt()),
                         apprStsEq(cond.getApprSts())
                 )
-                .orderBy(itemAcquisitionEntity.acqId.desc())  // 최근 등록 순 정렬
+                .orderBy(itemAcquisitionEntity.creAt.desc())  // 생성일시 기준 정렬
                 .fetch();
     }
 
-    /**
-     * 물품 취득 정보 삭제 (Soft Delete)
-     * - 엔티티의 @SQLDelete 설정에 의해 내부적으로 UPDATE 쿼리가 실행됩니다.
-     */
-    @Override
-    public void delete(ItemAcquisitionEntity entity) {
-        jpaRepository.delete(entity);
-    }
 
     /**
      * 동적 쿼리를 위한 헬퍼 메서드들 (값이 null이면 조건이 무시됨)

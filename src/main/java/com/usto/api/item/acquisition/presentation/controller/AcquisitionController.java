@@ -47,7 +47,8 @@ public class AcquisitionController {
     public ApiResponse<AcqRegisterResponse> register(
             @Valid @RequestBody AcqRegisterRequest request,
             @AuthenticationPrincipal UserPrincipal principal) {
-        Long acqId = acquisitionService.registerAcquisition(request, principal.getUsername(), principal.getOrgCd());
+        String acqId = acquisitionService.registerAcquisition(
+                request, principal.getUsername(), principal.getOrgCd());
         return ApiResponse.ok("취득 등록 성공", new AcqRegisterResponse(acqId));
     }
 
@@ -59,7 +60,7 @@ public class AcquisitionController {
     @PutMapping("/{acqId}")
     @PreAuthorize("hasRole('ADMIN')")
     public ApiResponse<Void> update(
-            @PathVariable Long acqId,
+            @PathVariable String acqId,
             @Valid @RequestBody AcqRegisterRequest request,
             @AuthenticationPrincipal UserPrincipal principal) {
         acquisitionService.updateAcquisition(acqId, request, principal.getOrgCd());
@@ -73,7 +74,7 @@ public class AcquisitionController {
     )
     @DeleteMapping("/{acqId}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ApiResponse<Void> delete(@PathVariable Long acqId) {
+    public ApiResponse<Void> delete(@PathVariable String acqId) {
         acquisitionService.deleteAcquisition(acqId);
         return ApiResponse.ok("삭제 성공");
     }
@@ -85,7 +86,7 @@ public class AcquisitionController {
     )
     @PostMapping("/{acqId}/request")
     @PreAuthorize("hasRole('ADMIN')")
-    public ApiResponse<Void> requestApproval(@PathVariable Long acqId) {
+    public ApiResponse<Void> requestApproval(@PathVariable String acqId) {
         acquisitionService.requestApproval(acqId);
         return ApiResponse.ok("승인 요청 완료");
     }
@@ -97,7 +98,7 @@ public class AcquisitionController {
     )
     @PostMapping("/{acqId}/cancel")
     @PreAuthorize("hasRole('ADMIN')")
-    public ApiResponse<Void> cancelRequest(@PathVariable Long acqId) {
+    public ApiResponse<Void> cancelRequest(@PathVariable String acqId) {
         acquisitionService.cancelRequest(acqId);
         return ApiResponse.ok("승인 요청 취소 완료");
     }

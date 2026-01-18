@@ -3,6 +3,7 @@ package com.usto.api.item.acquisition.application;
 import com.usto.api.common.exception.BusinessException;
 import com.usto.api.g2b.infrastructure.entity.G2bItemJpaEntity;
 import com.usto.api.g2b.infrastructure.repository.G2bItemJpaRepository;
+import com.usto.api.item.acquisition.domain.model.Acquisition;
 import com.usto.api.item.common.model.OperStatus;
 import com.usto.api.organization.infrastructure.repository.DepartmentJpaRepository;
 import com.usto.api.item.common.model.ApprStatus;
@@ -27,92 +28,118 @@ public class AcquisitionService {
     private final DepartmentJpaRepository departmentJpaRepository;
 
     /**
-     * 1. 등록 (기존 로직 유지 + 검증 분리)
+     * 1. 등록 (Domain Model 사용)
      */
     @Transactional
-    public Long registerAcquisition(AcqRegisterRequest request, String userId, String orgCd) {
+    public String registerAcquisition(AcqRegisterRequest request, String userId, String orgCd) {
+        // 검증
         G2bItemJpaEntity g2bItem = validateRequest(request, orgCd);
 
-        ItemAcquisitionEntity entity = ItemAcquisitionEntity.builder()
-                .g2bDCd(request.getG2bDCd())
-                .acqAt(request.getAcqAt())
-                .acqUpr(g2bItem.getG2bUpr())
-                .drbYr("5") // TODO: 내용연수 로직
-                .deptCd(request.getDeptCd())
-                .operSts(request.getOperSts())
-                .acqQty(request.getAcqQty())
-                .arrgTy(request.getArrgTy())
-                .apprSts(ApprStatus.WAIT)
-                .aplyUsrId(userId)
-                .orgCd(orgCd)
-                .delYn("N")
-                .build();
+        // Domain Model 생성 (UUID 자동 생성)
+        Acquisition acquisition = Acquisition.create(
+                request.getG2bDCd(),
+                request.getAcqAt(),
+                g2bItem.getG2bUpr(),
+                request.getDeptCd(),
+                request.getOperSts(),
+                "5",  // TODO: 내용연수 로직
+                request.getAcqQty(),
+                request.getArrgTy(),
+                request.getRmk(),
+                userId,
+                orgCd
+        );
 
-        return acquisitionRepository.save(entity).getAcqId();
+        // 저장
+        Acquisition saved = acquisitionRepository.save(acquisition);
+        return saved.getAcqId();
     }
 
     /**
-     * 2. 수정 (추가)
+     * 2. 수정
      */
     @Transactional
-    public void updateAcquisition(Long acqId, AcqRegisterRequest request, String orgCd) {
-        ItemAcquisitionEntity entity = acquisitionRepository.findById(acqId)
+    public void updateAcquisition(String acqId, AcqRegisterRequest request, String orgCd) {
+        // Domain 조회
+        Acquisition acquisition = acquisitionRepository.findById(acqId)
                 .orElseThrow(() -> new BusinessException("존재하지 않는 취득 정보입니다."));
 
-        // 상태 체크: 대기(WAIT) 또는 반려(REJECTED) 상태일 때만 수정 가능
-        if (entity.getApprSts() == ApprStatus.REQUEST || entity.getApprSts() == ApprStatus.APPROVED) {
-            throw new BusinessException("승인 요청 중이거나 확정된 데이터는 수정할 수 없습니다.");
-        }
-
+        // 검증
         G2bItemJpaEntity g2bItem = validateRequest(request, orgCd);
-        entity.updateInfo(request, g2bItem.getG2bUpr());
+
+        // Domain 메서드 호출 (비즈니스 로직은 Domain에서)
+        acquisition.updateInfo(
+                request.getG2bDCd(),
+                request.getAcqAt(),
+                g2bItem.getG2bUpr(),
+                request.getDeptCd(),
+                request.getOperSts(),
+                "5",
+                request.getAcqQty(),
+                request.getArrgTy(),
+                request.getRmk()
+        );
+
+        // 저장
+        acquisitionRepository.save(acquisition);
     }
 
     /**
-     * 3. 삭제 (추가)
+     * 3. 삭제
      */
     @Transactional
-    public void deleteAcquisition(Long acqId) {
-        ItemAcquisitionEntity entity = acquisitionRepository.findById(acqId)
+    public void deleteAcquisition(String acqId) {
+        Acquisition acquisition = acquisitionRepository.findById(acqId)
                 .orElseThrow(() -> new BusinessException("존재하지 않는 취득 정보입니다."));
 
-        // 상태 체크: 수정과 동일
-        if (entity.getApprSts() == ApprStatus.REQUEST || entity.getApprSts() == ApprStatus.APPROVED) {
-            throw new BusinessException("승인 요청 중이거나 확정된 데이터는 삭제할 수 없습니다.");
-        }
+        // 수정 가능 여부 체크 (Domain 메서드 사용)
+        acquisition.validateModifiable();
 
-        acquisitionRepository.delete(entity); // Soft Delete
+        // 소프트 삭제
+        acquisitionRepository.delete(acqId);
     }
 
     /**
-     * 4. 승인 요청 / 취소 (기존 사용자님 코드 유지)
+     * 4. 승인 요청
      */
     @Transactional
-    public void requestApproval(Long acqId) {
-        ItemAcquisitionEntity acq = acquisitionRepository.findById(acqId)
+    public void requestApproval(String acqId) {
+        Acquisition acquisition = acquisitionRepository.findById(acqId)
                 .orElseThrow(() -> new BusinessException("존재하지 않는 취득 건입니다."));
-        if (acq.getApprSts() != ApprStatus.WAIT && acq.getApprSts() != ApprStatus.REJECTED) {
-            throw new BusinessException("승인요청이 가능한 상태가 아닙니다.");
-        }
-        acq.changeStatus(ApprStatus.REQUEST);
+
+        // Domain 메서드 호출 (비즈니스 로직)
+        acquisition.requestApproval();
+
+        // 저장
+        acquisitionRepository.save(acquisition);
     }
 
+    /**
+     * 5. 승인 요청 취소 → 소프트 삭제
+     */
     @Transactional
-    public void cancelRequest(Long acqId) {
-        ItemAcquisitionEntity acq = acquisitionRepository.findById(acqId)
+    public void cancelRequest(String acqId) {
+        Acquisition acquisition = acquisitionRepository.findById(acqId)
                 .orElseThrow(() -> new BusinessException("존재하지 않는 취득 건입니다."));
-        if (acq.getApprSts() != ApprStatus.REQUEST) {
-            throw new BusinessException("승인요청 중인 상태만 취소할 수 있습니다.");
-        }
-        acq.changeStatus(ApprStatus.WAIT);
+
+        // 취소 가능 여부 체크 (Domain 메서드)
+        acquisition.validateCancellable();
+
+        // 상태 변경이 아닌 소프트 삭제
+        acquisitionRepository.delete(acqId);
     }
 
+    /**
+     * 6. 목록 조회 (변경 없음)
+     */
     @Transactional(readOnly = true)
     public List<AcqListResponse> getAcquisitionList(AcqSearchRequest searchRequest, String orgCd) {
         return acquisitionRepository.findAllByFilter(searchRequest, orgCd);
     }
 
-    // 공통 검증 로직 (안정성 확보)
+    /**
+     * 공통 검증 로직 (변경 없음)
+     */
     private G2bItemJpaEntity validateRequest(AcqRegisterRequest request, String orgCd) {
         G2bItemJpaEntity g2bItem = g2bItemJpaRepository.findById(request.getG2bDCd())
                 .orElseThrow(() -> new BusinessException("존재하지 않는 G2B 식별코드입니다."));
@@ -128,6 +155,7 @@ public class AcquisitionService {
         if (request.getOperSts() != OperStatus.ACQ && request.getOperSts() != OperStatus.OPER) {
             throw new BusinessException("취득 등록 시 운용상태는 '취득' 또는 '운용'만 가능합니다.");
         }
+
         return g2bItem;
     }
 }

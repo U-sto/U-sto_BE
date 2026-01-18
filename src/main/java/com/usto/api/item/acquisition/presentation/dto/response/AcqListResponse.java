@@ -11,7 +11,7 @@ import java.time.LocalDate;
 @Schema(description = "물품 취득 목록 응답")
 public class AcqListResponse {
     @Schema(description = "취득ID")
-    private Long acqId;
+    private String acqId;
 
     @Schema(description = "물품번호 (분류-식별)", example = "12345678-12345678")
     private String g2bItemNo;

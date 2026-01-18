@@ -9,5 +9,5 @@ import lombok.Getter;
 @Schema(description = "물품 취득 등록 결과")
 public class AcqRegisterResponse {
     @Schema(description = "생성된 취득 ID")
-    private Long acqId;
+    private String acqId;
 }
