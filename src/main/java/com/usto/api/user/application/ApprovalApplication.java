@@ -21,7 +21,7 @@ public class ApprovalApplication {
     private final OrganizationJpaRepository organizationJpaRepository;
 
     @Transactional
-    public void approveUserWithRole(String usrId, Role assignedRole ,String apprUsrId) {
+    public void approveUserWithRole(String usrId, Role assignedRole, String apprUsrId) {
         User user = userRepository. getByUsrId(usrId);
 
         // 승인 + 역할 지정
@@ -33,7 +33,7 @@ public class ApprovalApplication {
                 .map(OrganizationJpaEntity::getOrgNm) // 여기서 이름을 꺼냄
                 .orElse("알 수 없는 조직");
 
-        emailSendApplication.sendApprovalCompleteEmail(approved, orgName,assignedRole);
+        emailSendApplication.sendApprovalCompleteEmail(approved, orgName, assignedRole);
 
         log.info("[APPROVAL] 회원 승인 완료 - usrId: {}, role: {}, approver: {}",
                 usrId, assignedRole);

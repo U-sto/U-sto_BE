@@ -158,7 +158,7 @@ public class EmailSendApplication {
 
             emailSender.send(message);
 
-            log.info("[APPROVAL-REQUEST] 승인 요췅 반려 메일 발송 완료 - to: {}, newUser: {}",
+            log.info("[APPROVAL-REQUEST] 승인 요청 반려 메일 발송 완료 - to: {}, newUser: {}",
                     emailName, newUser.getUsrId());
 
         } catch (MessagingException | UnsupportedEncodingException e) {
