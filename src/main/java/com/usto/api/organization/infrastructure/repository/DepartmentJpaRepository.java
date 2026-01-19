@@ -11,4 +11,7 @@ import java.util.List;
 public interface DepartmentJpaRepository extends JpaRepository<DepartmentJpaEntity, DeptId> {
     // 특정 조직코드(orgCd)에 해당하는 부서만 가나다순으로 조회
     List<DepartmentJpaEntity> findAllById_OrgCdOrderByDeptNmAsc(String orgCd);
+
+    // 운용부서 존재 여부 확인
+    boolean existsById_OrgCdAndId_DeptCd(String orgCd, String deptCd);
 }

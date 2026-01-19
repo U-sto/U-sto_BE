@@ -1,0 +1,172 @@
+package com.usto.api.item.acquisition.application;
+
+import com.usto.api.common.exception.BusinessException;
+import com.usto.api.g2b.infrastructure.entity.G2bItemJpaEntity;
+import com.usto.api.g2b.infrastructure.repository.G2bItemJpaRepository;
+import com.usto.api.item.acquisition.domain.model.Acquisition;
+import com.usto.api.item.common.model.OperStatus;
+import com.usto.api.organization.infrastructure.repository.DepartmentJpaRepository;
+import com.usto.api.item.common.model.ApprStatus;
+import com.usto.api.item.acquisition.domain.repository.AcquisitionRepository;
+import com.usto.api.item.acquisition.infrastructure.entity.ItemAcquisitionEntity;
+import com.usto.api.item.acquisition.presentation.dto.request.AcqRegisterRequest;
+import com.usto.api.item.acquisition.presentation.dto.request.AcqSearchRequest;
+import com.usto.api.item.acquisition.presentation.dto.response.AcqListResponse;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+public class AcquisitionService {
+
+    private final AcquisitionRepository acquisitionRepository;
+    private final G2bItemJpaRepository g2bItemJpaRepository;
+    private final DepartmentJpaRepository departmentJpaRepository;
+
+    private static final ZoneId KOREA_ZONE = ZoneId.of("Asia/Seoul");
+
+    /**
+     * 1. 등록 (Domain Model 사용)
+     */
+    @Transactional
+    public String registerAcquisition(AcqRegisterRequest request, String userId, String orgCd) {
+        // 검증
+        G2bItemJpaEntity g2bItem = validateRequest(request, orgCd);
+
+        // Domain Model 생성 (UUID 자동 생성)
+        Acquisition acquisition = Acquisition.create(
+                request.getG2bDCd(),
+                request.getAcqAt(),
+                g2bItem.getG2bUpr(),
+                request.getDeptCd(),
+                request.getOperSts(),
+                "5",  // TODO: 내용연수 로직
+                request.getAcqQty(),
+                request.getArrgTy(),
+                request.getRmk(),
+                userId,
+                orgCd
+        );
+
+        // 저장
+        Acquisition saved = acquisitionRepository.save(acquisition);
+        return saved.getAcqId();
+    }
+
+    /**
+     * 2. 수정
+     */
+    @Transactional
+    public void updateAcquisition(String acqId, AcqRegisterRequest request, String orgCd) {
+        // Domain 조회
+        Acquisition acquisition = acquisitionRepository.findById(acqId)
+                .orElseThrow(() -> new BusinessException("존재하지 않는 취득 정보입니다."));
+
+        acquisition.validateOwnership(orgCd);
+
+        // 검증
+        G2bItemJpaEntity g2bItem = validateRequest(request, orgCd);
+
+        // Domain 메서드 호출 (비즈니스 로직은 Domain에서)
+        acquisition.updateInfo(
+                request.getG2bDCd(),
+                request.getAcqAt(),
+                g2bItem.getG2bUpr(),
+                request.getDeptCd(),
+                request.getOperSts(),
+                "5",
+                request.getAcqQty(),
+                request.getArrgTy(),
+                request.getRmk()
+        );
+
+        // 저장
+        acquisitionRepository.save(acquisition);
+    }
+
+    /**
+     * 3. 삭제
+     */
+    @Transactional
+    public void deleteAcquisition(String acqId, String orgCd) {
+        Acquisition acquisition = acquisitionRepository.findById(acqId)
+                .orElseThrow(() -> new BusinessException("존재하지 않는 취득 정보입니다."));
+
+        acquisition.validateOwnership(orgCd);
+
+        // 수정 가능 여부 체크 (Domain 메서드 사용)
+        acquisition.validateModifiable();
+
+        // 소프트 삭제
+        acquisitionRepository.delete(acqId);
+    }
+
+    /**
+     * 4. 승인 요청
+     */
+    @Transactional
+    public void requestApproval(String acqId, String orgCd) {
+        Acquisition acquisition = acquisitionRepository.findById(acqId)
+                .orElseThrow(() -> new BusinessException("존재하지 않는 취득 건입니다."));
+
+        acquisition.validateOwnership(orgCd);
+
+        // Domain 메서드 호출 (비즈니스 로직)
+        acquisition.requestApproval();
+
+        // 저장
+        acquisitionRepository.save(acquisition);
+    }
+
+    /**
+     * 5. 승인 요청 취소 → 소프트 삭제
+     */
+    @Transactional
+    public void cancelRequest(String acqId, String orgCd) {
+        Acquisition acquisition = acquisitionRepository.findById(acqId)
+                .orElseThrow(() -> new BusinessException("존재하지 않는 취득 건입니다."));
+
+        acquisition.validateOwnership(orgCd);
+
+        // 취소 가능 여부 체크 (Domain 메서드)
+        acquisition.validateCancellable();
+
+        // 상태 변경이 아닌 소프트 삭제
+        acquisitionRepository.delete(acqId);
+    }
+
+    /**
+     * 6. 목록 조회 (변경 없음)
+     */
+    @Transactional(readOnly = true)
+    public List<AcqListResponse> getAcquisitionList(AcqSearchRequest searchRequest, String orgCd) {
+        return acquisitionRepository.findAllByFilter(searchRequest, orgCd);
+    }
+
+    /**
+     * 공통 검증 로직 (변경 없음)
+     */
+    private G2bItemJpaEntity validateRequest(AcqRegisterRequest request, String orgCd) {
+        G2bItemJpaEntity g2bItem = g2bItemJpaRepository.findById(request.getG2bDCd())
+                .orElseThrow(() -> new BusinessException("존재하지 않는 G2B 식별코드입니다."));
+
+        if (!departmentJpaRepository.existsById_OrgCdAndId_DeptCd(orgCd, request.getDeptCd())) {
+            throw new BusinessException("해당 조직에 존재하지 않는 부서코드입니다.");
+        }
+
+        if (request.getAcqAt().isAfter(LocalDate.now(KOREA_ZONE))) {
+            throw new BusinessException("취득일자는 현재 날짜 이후일 수 없습니다.");
+        }
+
+        if (request.getOperSts() != OperStatus.ACQ && request.getOperSts() != OperStatus.OPER) {
+            throw new BusinessException("취득 등록 시 운용상태는 '취득' 또는 '운용'만 가능합니다.");
+        }
+
+        return g2bItem;
+    }
+}

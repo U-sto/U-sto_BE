@@ -2,6 +2,7 @@ package com.usto.api.common.exception;
 
 import com.usto.api.common.utils.ApiResponse;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.FieldError;
@@ -65,5 +66,14 @@ public class GlobalExceptionHandler {
         });
 
         return ApiResponse.fail("입력값 검증에 실패했습니다.", errors);
+    }
+
+    /**
+     * JSON 파싱 에러 및 Enum 바인딩 에러 처리
+     */
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiResponse<?> handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
+        return ApiResponse.fail("요청 데이터 형식이 잘못되었거나 허용되지 않는 상태값이 포함되어 있습니다.");
     }
 }

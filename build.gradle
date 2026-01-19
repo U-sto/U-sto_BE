@@ -39,6 +39,12 @@ dependencies {
     testImplementation 'org.springframework.security:spring-security-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
+    // QueryDSL 설정 (Spring Boot 3.x 용)
+    implementation 'com.querydsl:querydsl-jpa:5.1.0:jakarta'
+    annotationProcessor "com.querydsl:querydsl-apt:5.1.0:jakarta"
+    annotationProcessor "jakarta.persistence:jakarta.persistence-api"
+    annotationProcessor "jakarta.annotation:jakarta.annotation-api"
+
     // 이메일 전송을 위한 스타터.
     implementation 'org.springframework.boot:spring-boot-starter-mail'
     //전화번호 인증을 위한
@@ -50,3 +56,9 @@ dependencies {
 tasks.named('test') {
     useJUnitPlatform()
 }
+
+// QueryDSL QClass 생성 위치 설정
+def querydslDir = layout.buildDirectory.dir("generated/querydsl").get().asFile
+sourceSets { main.java.srcDirs += [ querydslDir ] }
+tasks.withType(JavaCompile).configureEach { options.getGeneratedSourceOutputDirectory().set(querydslDir) }
+clean { delete querydslDir }
