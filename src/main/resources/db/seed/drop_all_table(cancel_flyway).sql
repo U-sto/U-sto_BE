@@ -33,5 +33,3 @@
  */
 
 -- Flyway에게 "V5 실행한 적 없다"고 거짓말을 해서 기억을 지웁니다.
-DELETE FROM flyway_schema_history
-WHERE version = '5';
