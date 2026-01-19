@@ -33,7 +33,7 @@ public class ExistsController {
     @GetMapping("/email")
     @Operation(summary = "이메일 중복 확인")
     public ApiResponse<?> existsByEmail(
-            @Valid @RequestBody
+            @Valid @ModelAttribute
             EmailExistsRequestDto request,
             HttpSession session
     ) {
@@ -58,7 +58,7 @@ public class ExistsController {
     @GetMapping("/sms")
     @Operation(summary = "전화번호 중복 확인")
     public ApiResponse<?> existsBySms(
-            @Valid @RequestBody
+            @Valid @ModelAttribute
             SmsExistRequestDto request,
             HttpSession session
     ) {
@@ -83,7 +83,7 @@ public class ExistsController {
     @GetMapping("/user-id")
     @Operation(summary = "아이디 중복 확인")
     public ApiResponse<?> existsByUsrId(
-            @Valid @RequestBody
+            @Valid @ModelAttribute
             UserIdExistsRequestDto request,
             HttpSession session
     ) {
