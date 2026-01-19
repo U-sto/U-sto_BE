@@ -14,6 +14,8 @@
  DROP TABLE IF EXISTS TB_G2B001M;
 DROP DATABASE usto;
 CREATE DATABASE usto;
+USE usto;
+DROP TABLE IF EXISTS flyway_schema_history; -- 개발환경에서만 가능한....(V1부터 다시 실행시키는 방법)
  SET FOREIGN_KEY_CHECKS = 1;
 /*
  를 별도로 진행하시고 프로그램을 실행하셔야합니다. (그냥 커서 두고 실행하면 실행 됩니다)

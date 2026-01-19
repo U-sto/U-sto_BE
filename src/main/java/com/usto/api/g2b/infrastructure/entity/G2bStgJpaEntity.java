@@ -17,7 +17,7 @@ import java.math.BigDecimal;
 public class G2bStgJpaEntity {
 
     @Id
-    @Column(name = "G2B_D_CD", length = 8, nullable = false)
+    @Column(name = "G2B_D_CD", length = 8, columnDefinition = "char(8)")
     private String g2bDCd;
 
     @Column(name = "G2B_UPR", precision = 20, scale = 0)
