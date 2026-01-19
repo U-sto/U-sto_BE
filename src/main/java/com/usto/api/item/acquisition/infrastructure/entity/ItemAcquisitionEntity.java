@@ -4,7 +4,7 @@ import com.usto.api.common.BaseTimeEntity;
 import com.usto.api.item.acquisition.domain.model.AcqArrangementType;
 import com.usto.api.item.common.model.ApprStatus;
 import com.usto.api.item.common.model.OperStatus;
-import com.usto.api.item.acquisition.presentation.dto.request.AcqRegisterRequest;
+import com.usto.api.common.utils.UuidConverter;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
@@ -24,6 +24,7 @@ import java.time.LocalDateTime;
 public class ItemAcquisitionEntity extends BaseTimeEntity {
 
     @Id
+    @Convert(converter = UuidConverter.class)
     @Column(name = "ACQ_ID", columnDefinition = "BINARY(16)")
     private String acqId;         // 취득 ID
 
