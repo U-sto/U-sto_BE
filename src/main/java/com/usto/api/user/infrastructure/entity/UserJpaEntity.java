@@ -81,6 +81,6 @@ public class UserJpaEntity extends BaseTimeEntity {
     // 연관관게 매핑
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ORG_CD", referencedColumnName = "ORG_CD",
-            insertable = false, updatable = false)
+            insertable = false, updatable = false, columnDefinition = "char(7)")
     private OrganizationJpaEntity organization;
 }

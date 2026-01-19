@@ -19,7 +19,7 @@ public class DepartmentJpaEntity extends BaseTimeEntity {
 
     @MapsId("orgCd")
     @ManyToOne(fetch = FetchType.LAZY) //운용부서 N : 조직 1
-    @JoinColumn(name = "ORG_CD", nullable = false)
+    @JoinColumn(name = "ORG_CD", nullable = false,columnDefinition = "char(7)")
     private OrganizationJpaEntity organization;
 
     @Column(name = "DEPT_NM", length = 100, nullable = false)
