@@ -395,6 +395,9 @@ public class EmailSendApplication {
         // 실제 서비스의 로그인 페이지 URL로 변경해주세요.
         String loginUrl = "http://localhost:8080/login";
 
+        String roleNm = approvedRoleName.displayName();
+
+
         return """
         <table width="100%%" cellpadding="0" cellspacing="0"
                style="background:#DBE6E7;padding:40px 0;">
@@ -478,7 +481,7 @@ public class EmailSendApplication {
                 user.getUsrId(),      // %s: 아이디
                 user.getEmail(),      // %s: 이메일
                 orgName,      // %s: 조직
-                approvedRoleName,     // %s: 파라미터로 받은 역할 명칭 (예: "조직 관리자")
+                roleNm,     // %s: 파라미터로 받은 역할 명칭 (예: "조직 관리자")
                 loginUrl              // %s: 로그인 URL
         );
     }
