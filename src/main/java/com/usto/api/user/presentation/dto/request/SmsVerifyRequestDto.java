@@ -13,7 +13,7 @@ import lombok.Getter;
 public class SmsVerifyRequestDto {
 
     @NotBlank(message = "인증번호를 입력해주세요.")
-    @Schema(example = "1234")
+    @Schema(example = "123456")
     @Pattern(regexp = "^[0-9]{6}$", message = "인증코드는 6자리 숫자여야 합니다.")
     private String code;
 }
