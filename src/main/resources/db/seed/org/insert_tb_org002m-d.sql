@@ -1,3 +1,6 @@
+USE usto;
+
+
 INSERT INTO TB_ORG002M (
     ORG_CD,
     DEPT_CD,
