@@ -11,11 +11,16 @@ USE usto;
 -- 조회
 SELECT *
 FROM TB_USER001M;
+-- 강제 승인 취소 for 테스트
+UPDATE TB_USER001M
+SET ROLE_ID = 'GUEST',
+    APPR_STS = 'WAIT'
+WHERE USR_ID = 'badbergjr';
+
 -- 강제 삭제
 DELETE FROM tb_user001m
 WHERE USR_ID = 'badbergjr';
--- 삭제 취소
--- 테스트를 위한 삭제 취소(이건 어거지)
+-- 소프트 삭제 취소
 UPDATE TB_USER001M
 SET DEL_YN = 'N',
     DEL_AT = null

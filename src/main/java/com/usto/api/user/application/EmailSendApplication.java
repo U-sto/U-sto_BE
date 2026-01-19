@@ -6,10 +6,7 @@
  */
 package com.usto.api.user.application;
 
-import com.usto.api.user.domain.model.User;
-import com.usto.api.user.domain.model.Verification;
-import com.usto.api.user.domain.model.VerificationPurpose;
-import com.usto.api.user.domain.model.VerificationType;
+import com.usto.api.user.domain.model.*;
 import com.usto.api.user.domain.repository.VerificationRepository;
 import com.usto.api.user.presentation.dto.request.EmailSendRequestDto;
 import com.usto.api.user.presentation.dto.request.SmsSendRequestDto;
@@ -99,7 +96,7 @@ public class EmailSendApplication {
     }
 
     @Transactional
-    public void sendApprovalRequestEmail(User newUser) {
+    public void sendApprovalRequestEmail(User newUser ,String orgName) {
         try {
             MimeMessage message = emailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
@@ -108,7 +105,7 @@ public class EmailSendApplication {
             helper.setTo(emailName);
             helper.setSubject("[U-sto] 새로운 회원 승인 요청");
 
-            String body = buildApprovalEmailBody(newUser);
+            String body = buildApprovalEmailBody(newUser,orgName);
             helper.setText(body, true);
 
             emailSender.send(message);
@@ -122,7 +119,55 @@ public class EmailSendApplication {
         }
     }
 
-        //메서드
+    @Transactional
+    public void sendApprovalCompleteEmail(User newUser,String orgName ,Role approvedRoleName) {
+        try {
+            MimeMessage message = emailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+            helper.setFrom(new InternetAddress(emailName, "U-sto", "UTF-8"));
+            helper.setTo(emailName);
+            helper.setSubject("[U-sto] 승인 완료");
+
+            String body = buildApprovalCompletedEmailBody(newUser,orgName,approvedRoleName);
+            helper.setText(body, true);
+
+            emailSender.send(message);
+
+            log.info("[APPROVAL-REQUEST] 승인 완료 메일 발송 완료 - to: {}, newUser: {}",
+                    emailName, newUser.getUsrId());
+
+        } catch (MessagingException | UnsupportedEncodingException e) {
+            log.error("[APPROVAL-REQUEST] 메일 발송 실패 - to: {}", emailName, e);
+            throw new RuntimeException("승인 완료 메일 발송 실패", e);
+        }
+    }
+
+    @Transactional
+    public void sendApprovalRejectedEmail(User newUser,String orgName) {
+        try {
+            MimeMessage message = emailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+            helper.setFrom(new InternetAddress(emailName, "U-sto", "UTF-8"));
+            helper.setTo(emailName);
+            helper.setSubject("[U-sto] 승인 요청 반려");
+
+            String body = buildApprovalRejectedEmailBody(newUser,orgName);
+            helper.setText(body, true);
+
+            emailSender.send(message);
+
+            log.info("[APPROVAL-REQUEST] 승인 요췅 반려 메일 발송 완료 - to: {}, newUser: {}",
+                    emailName, newUser.getUsrId());
+
+        } catch (MessagingException | UnsupportedEncodingException e) {
+            log.error("[APPROVAL-REQUEST] 메일 발송 실패 - to: {}", emailName, e);
+            throw new RuntimeException("승인 요청 반려 메일 발송 실패", e);
+        }
+    }
+
+    //메서드
     private void sendEmail(String to, String code ,VerificationPurpose purpose)
             throws MessagingException, UnsupportedEncodingException {
 
@@ -159,8 +204,7 @@ public class EmailSendApplication {
         return builder.toString();
     }
 
-    //이메일 본문 HTML
-    //이메일 인증 부분
+    //이메일 본문 HTML Body들
     private String buildEmailBody(String code) {
         return """
             <table width="100%%" cellpadding="0" cellspacing="0"
@@ -230,7 +274,7 @@ public class EmailSendApplication {
 
     }
 
-    private String buildApprovalEmailBody(User newUser) {
+    private String buildApprovalEmailBody(User newUser,String orgName) {
         String baseUrl = "http://localhost:8080/api/approval"; //배포 시 서버 url로 변경해야한다.
 
         String approveAdminUrl = baseUrl + "?action=approve&role=ADMIN&userId=" + newUser.getUsrId();
@@ -338,7 +382,7 @@ public class EmailSendApplication {
                         newUser.getUsrId(),
                         newUser.getUsrNm(),
                         newUser.getEmail(),
-                        newUser.getOrgCd(),
+                        orgName,
                         LocalDateTime.now(),
                         approveAdminUrl,
                         approveManagerUrl,
@@ -347,4 +391,185 @@ public class EmailSendApplication {
 
             }
 
+    private String buildApprovalCompletedEmailBody(User user,String orgName, Role approvedRoleName) {
+        // 실제 서비스의 로그인 페이지 URL로 변경해주세요.
+        String loginUrl = "http://localhost:8080/login";
+
+        return """
+        <table width="100%%" cellpadding="0" cellspacing="0"
+               style="background:#DBE6E7;padding:40px 0;">
+          <tr>
+            <td align="center">
+              <table width="560" cellpadding="0" cellspacing="0"
+                     style="background:#FAFBFB;border-radius:14px;
+                            overflow:hidden;
+                            box-shadow:0 10px 30px rgba(0,0,0,0.25);
+                            font-family:'Noto Sans KR','Apple SD Gothic Neo',Arial,sans-serif;">
+    
+                <tr>
+                  <td style="background:linear-gradient(135deg,#18434F 0%%,#58828E 100%%);
+                             padding:32px 40px;text-align:center;">
+                    <h1 style="color:#FAFBFB;font-size:28px;font-weight:700;
+                               margin:0;letter-spacing:-0.5px;">
+                      회원가입 승인 완료
+                    </h1>
+                  </td>
+                </tr>
+    
+                <tr>
+                  <td style="padding:48px 40px;">
+                    <p style="color:#191919;font-size:16px;line-height:1.6;margin:0 0 24px;">
+                      안녕하세요, <strong>%s</strong>님!<br>
+                      요청하신 회원가입이 최종 <strong>승인</strong>되었습니다.<br>
+                      지금 바로 U-sto 서비스를 이용해보세요.
+                    </p>
+    
+                    <div style="background:#C1D8DC;border-left:4px solid #18434F;
+                                border-radius:8px;padding:20px;margin:24px 0;">
+                      <p style="margin:0 0 8px;color:#191919;font-size:14px;">
+                        <strong>아이디:</strong> %s
+                      </p>
+                      <p style="margin:0 0 8px;color:#191919;font-size:14px;">
+                        <strong>이메일:</strong> %s
+                      </p>
+                      <p style="margin:0 0 8px;color:#191919;font-size:14px;">
+                        <strong>소속 조직:</strong> %s
+                      </p>
+                      <p style="margin:0;color:#191919;font-size:14px;">
+                        <strong>부여된 권한:</strong> <span style="color:#18434F;font-weight:700;">%s</span>
+                      </p>
+                    </div>
+    
+                    <p style="color:#191919;font-size:15px;margin:24px 0 12px;">
+                      아래 버튼을 클릭하여 로그인 페이지로 이동합니다.
+                    </p>
+    
+                    <div style="text-align:center;margin:32px 0;">
+                      <a href="%s"
+                         style="display:inline-block;background:#18434F;color:#FAFBFB;
+                                padding:16px 40px;text-decoration:none;border-radius:8px;
+                                font-weight:700;font-size:16px;">
+                        서비스 바로가기
+                      </a>
+                    </div>
+    
+                    <p style="color:#888C8D;font-size:14px;line-height:1.6;margin:24px 0 0;">
+                      혹시 본인이 요청하지 않았거나 문의사항이 있으시면<br>
+                      관리자에게 문의해주세요.
+                    </p>
+                  </td>
+                </tr>
+    
+                <tr>
+                  <td style="background:#DBE6E7;padding:24px 40px;
+                             border-top:1px solid #BEC3C3;text-align:center;">
+                    <p style="color:#888C8D;font-size:12px;margin:0;">
+                      © 2026 U-sto. 대학물품관리시스템
+                    </p>
+                  </td>
+                </tr>
+    
+              </table>
+            </td>
+          </tr>
+        </table>
+        """.formatted(
+                user.getUsrNm(),      // %s: 이름
+                user.getUsrId(),      // %s: 아이디
+                user.getEmail(),      // %s: 이메일
+                orgName,      // %s: 조직
+                approvedRoleName,     // %s: 파라미터로 받은 역할 명칭 (예: "조직 관리자")
+                loginUrl              // %s: 로그인 URL
+        );
+    }
+
+    private String buildApprovalRejectedEmailBody(User user,String orgName) {
+        // 서비스 URL (재가입 또는 문의를 위해)
+        String serviceUrl = "http://localhost:8080";
+
+        return """
+        <table width="100%%" cellpadding="0" cellspacing="0"
+               style="background:#DBE6E7;padding:40px 0;">
+          <tr>
+            <td align="center">
+              <table width="560" cellpadding="0" cellspacing="0"
+                     style="background:#FAFBFB;border-radius:14px;
+                            overflow:hidden;
+                            box-shadow:0 10px 30px rgba(0,0,0,0.25);
+                            font-family:'Noto Sans KR','Apple SD Gothic Neo',Arial,sans-serif;">
+    
+                <tr>
+                  <td style="background:linear-gradient(135deg,#18434F 0%%,#58828E 100%%);
+                             padding:32px 40px;text-align:center;">
+                    <h1 style="color:#FAFBFB;font-size:28px;font-weight:700;
+                               margin:0;letter-spacing:-0.5px;">
+                      회원가입 반려 알림
+                    </h1>
+                  </td>
+                </tr>
+    
+                <tr>
+                  <td style="padding:48px 40px;">
+                    <p style="color:#191919;font-size:16px;line-height:1.6;margin:0 0 24px;">
+                      안녕하세요, <strong>%s</strong>님.<br>
+                      아쉽게도 요청하신 회원가입이 <strong style="color:#D52E2E;">반려</strong>되었습니다.<br>
+                      자세한 사항은 개발자에게 문의해주세요 010-9956-9414.
+                    </p>
+
+                    <div style="background:#F4F6F6;border-radius:8px;padding:20px;margin:0 0 24px;">
+                      <p style="margin:0 0 8px;color:#595959;font-size:13px;">
+                        신청 정보 확인
+                      </p>
+                      <p style="margin:0 0 4px;color:#191919;font-size:14px;">
+                        <strong>아이디:</strong> %s
+                      </p>
+                      <p style="margin:0 0 4px;color:#191919;font-size:14px;">
+                        <strong>이름:</strong> %s
+                      </p>
+                      <p style="margin:0;color:#191919;font-size:14px;">
+                        <strong>조직:</strong> %s
+                      </p>
+                    </div>
+    
+                    <p style="color:#191919;font-size:15px;margin:24px 0 12px;">
+                      내용을 수정하여 다시 가입하시거나,<br>
+                      관리자에게 문의해 주시기 바랍니다.
+                    </p>
+    
+                    <div style="text-align:center;margin:32px 0;">
+                      <a href="%s"
+                         style="display:inline-block;background:#58828E;color:#FAFBFB;
+                                padding:14px 32px;text-decoration:none;border-radius:8px;
+                                font-weight:700;font-size:15px;">
+                        서비스 바로가기
+                      </a>
+                    </div>
+    
+                    <p style="color:#888C8D;font-size:14px;line-height:1.6;margin:24px 0 0;">
+                      본 메일은 발신 전용입니다.
+                    </p>
+                  </td>
+                </tr>
+    
+                <tr>
+                  <td style="background:#DBE6E7;padding:24px 40px;
+                             border-top:1px solid #BEC3C3;text-align:center;">
+                    <p style="color:#888C8D;font-size:12px;margin:0;">
+                      © 2026 U-sto. 대학물품관리시스템
+                    </p>
+                  </td>
+                </tr>
+    
+              </table>
+            </td>
+          </tr>
+        </table>
+        """.formatted(
+                user.getUsrNm(),       // %s: 사용자 이름
+                user.getUsrId(),       // %s: 아이디
+                user.getUsrNm(),       // %s: 이름 (정보 확인용)
+                orgName,       // %s: 조직 코드
+                serviceUrl             // %s: 서비스 메인 URL
+        );
+    }
 }

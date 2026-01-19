@@ -57,10 +57,12 @@ public class UserController {
 
         //세션 삭제
         session.removeAttribute("exists.auth.usrId");
-        session.removeAttribute("signup.preauth.email");
-        session.removeAttribute("signup.preauth.sms");
-        session.removeAttribute("signup.preauth.emailVerifiedAt");
-        session.removeAttribute("signup.preauth.expiresAt");
+        session.removeAttribute("exists.auth.usrId.exists");
+        session.removeAttribute("exists.auth.usrId.target");
+        session.removeAttribute("signup.auth.email");
+        session.removeAttribute("signup.auth.sms");
+        session.removeAttribute("signup.auth.emailVerifiedAt");
+        session.removeAttribute("signup.auth.expiresAt");
 
         return ApiResponse.ok("회원가입 완료");
     }
