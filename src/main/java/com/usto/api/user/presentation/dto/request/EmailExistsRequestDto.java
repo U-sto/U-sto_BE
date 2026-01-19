@@ -2,14 +2,14 @@ package com.usto.api.user.presentation.dto.request;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
+@Setter
 @NoArgsConstructor
 public class EmailExistsRequestDto {
 
@@ -21,6 +21,9 @@ public class EmailExistsRequestDto {
 
     @JsonIgnore // 응답에 노출 방지 (필요 시)
     public String getEmail() {
+        if (emailId == null) {
+            return null;
+        }
         return emailId.trim() + "@" + FIXED_DOMAIN;
     }
 }
