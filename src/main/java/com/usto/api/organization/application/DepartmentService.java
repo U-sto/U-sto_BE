@@ -23,7 +23,7 @@ public class DepartmentService {
                         .orgCd(entity.getId().getOrgCd())
                         .deptCd(entity.getId().getDeptCd())
                         .deptNm(entity.getDeptNm())
-                        .deptTy(entity.getDeptTy())
+                        .deptTy(entity.getUpDeptNm())
                         .build())
                 .collect(Collectors.toList());
     }

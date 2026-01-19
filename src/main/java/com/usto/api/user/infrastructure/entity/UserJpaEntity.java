@@ -52,7 +52,7 @@ public class UserJpaEntity extends BaseTimeEntity {
     private Role roleId = Role.GUEST; //기본 값은 GUEST(승인 전)
 
     //조직코드
-    @Column(name = "ORG_CD" , length = 50 , nullable = false)
+    @Column(name = "ORG_CD", nullable = false, length = 7 , columnDefinition = "char(7)")
     private String orgCd;
 
     //승인여부

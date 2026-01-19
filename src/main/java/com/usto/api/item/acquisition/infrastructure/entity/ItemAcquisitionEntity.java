@@ -70,7 +70,7 @@ public class ItemAcquisitionEntity extends BaseTimeEntity {
     @Column(name = "APPR_AT")
     private LocalDate apprAt;     // 확정일자 (=정리일자)
 
-    @Column(name = "ORG_CD", nullable = false, length = 50)
+    @Column(name = "ORG_CD", nullable = false, length = 7 , columnDefinition = "char(7)")
     private String orgCd;         // 조직코드
 
     @Builder.Default

@@ -14,10 +14,10 @@ import java.util.Objects;
 @Getter
 public class DeptId implements Serializable {
 
-    @Column(name = "ORG_CD", length = 50, nullable = false)
+    @Column(name = "ORG_CD", length = 7, nullable = false, columnDefinition = "char(7)")
     private String orgCd;
 
-    @Column(name = "DEPT_CD", length = 50, nullable = false)
+    @Column(name = "DEPT_CD", length = 5, nullable = false, columnDefinition = "char(5)")
     private String deptCd;
 
     public DeptId(String orgCd, String deptCd) {
