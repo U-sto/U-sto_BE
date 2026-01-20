@@ -4,7 +4,6 @@ import com.usto.api.common.BaseTimeEntity;
 import com.usto.api.item.acquisition.domain.model.AcqArrangementType;
 import com.usto.api.item.common.model.ApprStatus;
 import com.usto.api.item.common.model.OperStatus;
-import com.usto.api.common.utils.UuidConverter;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
@@ -13,6 +12,7 @@ import org.hibernate.annotations.Where;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Table(name = "TB_ITEM001M")
@@ -24,9 +24,8 @@ import java.time.LocalDateTime;
 public class  ItemAcquisitionEntity extends BaseTimeEntity {
 
     @Id
-    @Convert(converter = UuidConverter.class)
     @Column(name = "ACQ_ID", columnDefinition = "BINARY(16)")
-    private String acqId;         // 취득 ID
+    private UUID acqId;           // 취득 ID
 
     @Column(name = "G2B_D_CD", nullable = false, length = 8, columnDefinition = "char(8)")
     private String g2bDCd;        // G2B 식별코드

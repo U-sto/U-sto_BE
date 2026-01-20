@@ -1,7 +1,6 @@
 package com.usto.api.item.acquisition.domain.model;
 
 import com.usto.api.common.exception.BusinessException;
-import com.usto.api.item.acquisition.domain.model.AcqArrangementType;
 import com.usto.api.item.common.model.ApprStatus;
 import com.usto.api.item.common.model.OperStatus;
 import lombok.Builder;
@@ -18,7 +17,7 @@ import java.util.UUID;
 public class Acquisition {
 
     // 식별자
-    private String acqId;  // UUID
+    private UUID acqId;  // UUID
 
     // 물품 정보
     private String g2bDCd;
@@ -70,7 +69,7 @@ public class Acquisition {
             String orgCd
     ) {
         return Acquisition.builder()
-                .acqId(UUID.randomUUID().toString())  // UUID 생성
+                .acqId(UUID.randomUUID())  // UUID 생성
                 .g2bDCd(g2bDCd)
                 .acqAt(acqAt)
                 .acqUpr(acqUpr)
