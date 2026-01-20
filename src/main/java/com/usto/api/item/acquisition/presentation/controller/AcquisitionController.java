@@ -16,6 +16,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @Tag(name = "item-acquisition-controller", description = "물품 취득 관리 API")
 @RestController
@@ -39,28 +40,28 @@ public class AcquisitionController {
 
     // 2. 등록
     @Operation(
-            summary = "물품 취득 등록 (ADMIN)",
+            summary = "물품 취득 등록 (MANAGER)",
             description = "새로운 물품 취득 정보를 등록합니다."
     )
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('MANAGER')")
     public ApiResponse<AcqRegisterResponse> register(
             @Valid @RequestBody AcqRegisterRequest request,
             @AuthenticationPrincipal UserPrincipal principal) {
-        String acqId = acquisitionService.registerAcquisition(
+        UUID acqId = acquisitionService.registerAcquisition(
                 request, principal.getUsername(), principal.getOrgCd());
         return ApiResponse.ok("취득 등록 성공", new AcqRegisterResponse(acqId));
     }
 
     // 3. 수정
     @Operation(
-            summary = "물품 취득 수정 (ADMIN)",
+            summary = "물품 취득 수정 (MANAGER)",
             description = "작성중(WAIT) 또는 반려(REJECTED) 상태인 취득 정보를 수정합니다. 승인 요청 중이거나 확정된 데이터는 수정할 수 없습니다."
     )
     @PutMapping("/{acqId}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('MANAGER')")
     public ApiResponse<Void> update(
-            @PathVariable String acqId,
+            @PathVariable UUID acqId,
             @Valid @RequestBody AcqRegisterRequest request,
             @AuthenticationPrincipal UserPrincipal principal) {
         acquisitionService.updateAcquisition(acqId, request, principal.getOrgCd());
@@ -69,13 +70,13 @@ public class AcquisitionController {
 
     // 4. 삭제
     @Operation(
-            summary = "물품 취득 삭제 (ADMIN)",
+            summary = "물품 취득 삭제 (MANAGER)",
             description = "작성중(WAIT) 또는 반려(REJECTED) 상태인 취득 정보를 논리 삭제(Soft Delete)합니다."
     )
     @DeleteMapping("/{acqId}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('MANAGER')")
     public ApiResponse<Void> delete(
-            @PathVariable String acqId,
+            @PathVariable UUID acqId,
             @AuthenticationPrincipal UserPrincipal principal) {
         acquisitionService.deleteAcquisition(acqId, principal.getOrgCd());
         return ApiResponse.ok("삭제 성공");
@@ -83,13 +84,13 @@ public class AcquisitionController {
 
     // 5. 승인 요청
     @Operation(
-            summary = "물품 취득 승인 요청 (ADMIN)",
-            description = "등록된 취득 정보를 결재자(MANAGER)에게 승인 요청(REQUEST)합니다."
+            summary = "물품 취득 승인 요청 (MANAGER)",
+            description = "등록된 취득 정보를 관리자(ADMIN)에게 승인 요청(REQUEST)합니다."
     )
     @PostMapping("/{acqId}/request")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('MANAGER')")
     public ApiResponse<Void> requestApproval(
-            @PathVariable String acqId,
+            @PathVariable UUID acqId,
             @AuthenticationPrincipal UserPrincipal principal) {
         acquisitionService.requestApproval(acqId, principal.getOrgCd());
         return ApiResponse.ok("승인 요청 완료");
@@ -97,13 +98,13 @@ public class AcquisitionController {
 
     // 6. 승인 취소
     @Operation(
-            summary = "물품 취득 승인 요청 취소 (ADMIN)",
+            summary = "물품 취득 승인 요청 취소 (MANAGER)",
             description = "승인 요청(REQUEST) 중인 건을 취소하여 다시 작성중(WAIT) 상태로 되돌립니다."
     )
     @PostMapping("/{acqId}/cancel")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('MANAGER')")
     public ApiResponse<Void> cancelRequest(
-            @PathVariable String acqId,
+            @PathVariable UUID acqId,
             @AuthenticationPrincipal UserPrincipal principal) {
         acquisitionService.cancelRequest(acqId, principal.getOrgCd());
         return ApiResponse.ok("승인 요청 취소 완료");
