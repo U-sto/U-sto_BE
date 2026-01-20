@@ -19,27 +19,27 @@ public class DepartmentJpaEntity extends BaseTimeEntity {
 
     @MapsId("orgCd")
     @ManyToOne(fetch = FetchType.LAZY) //운용부서 N : 조직 1
-    @JoinColumn(name = "ORG_CD", nullable = false)
+    @JoinColumn(name = "ORG_CD", nullable = false,columnDefinition = "char(7)")
     private OrganizationJpaEntity organization;
 
     @Column(name = "DEPT_NM", length = 100, nullable = false)
     private String deptNm;
 
-    @Column(name = "DEPT_TY", length = 20, nullable = false)
-    private String deptTy;
+    @Column(name = "UP_DEPT_NM", length = 255, nullable = false)
+    private String upDeptNm;
 
     // 필요 시 생성 규칙 메서드로만 생성
     public static DepartmentJpaEntity of(
             OrganizationJpaEntity org,
             String deptCd,
             String deptNm,
-            String deptTy
+            String upDeptNm
     ) {
         DepartmentJpaEntity e = new DepartmentJpaEntity();
         e.id = new DeptId(org.getOrgCd(), deptCd); //복합PK 완성
         e.organization = org;
         e.deptNm = deptNm;
-        e.deptTy = deptTy;
+        e.upDeptNm = upDeptNm;
         return e;
     }
 }

@@ -1,5 +1,7 @@
 package com.usto.api.user.application;
 
+import com.usto.api.organization.infrastructure.entity.OrganizationJpaEntity;
+import com.usto.api.organization.infrastructure.repository.OrganizationJpaRepository;
 import com.usto.api.user.domain.model.Role;
 import com.usto.api.user.domain.model.User;
 import com.usto.api.user.domain.repository.UserRepository;
@@ -15,15 +17,23 @@ import org.springframework.transaction.annotation.Transactional;
 public class ApprovalApplication {
 
     private final UserRepository userRepository;
+    private final EmailSendApplication emailSendApplication;
+    private final OrganizationJpaRepository organizationJpaRepository;
 
     @Transactional
-    public void approveUserWithRole(String usrId, Role assignedRole ,String apprUsrId) {
+    public void approveUserWithRole(String usrId, Role assignedRole, String apprUsrId) {
         User user = userRepository. getByUsrId(usrId);
 
         // 승인 + 역할 지정
         User approved = user.approve(assignedRole,apprUsrId);
 
         userRepository. save(approved);
+
+        String orgName = organizationJpaRepository.findByOrgCd(user.getOrgCd())
+                .map(OrganizationJpaEntity::getOrgNm) // 여기서 이름을 꺼냄
+                .orElse("알 수 없는 조직");
+
+        emailSendApplication.sendApprovalCompleteEmail(approved, orgName, assignedRole);
 
         log.info("[APPROVAL] 회원 승인 완료 - usrId: {}, role: {}, approver: {}",
                 usrId, assignedRole);
@@ -41,6 +51,12 @@ public class ApprovalApplication {
         User rejected = user.reject(apprUsrId);
 
         userRepository.save(rejected);
+
+        String orgName = organizationJpaRepository.findByOrgCd(user.getOrgCd())
+                .map(OrganizationJpaEntity::getOrgNm) // 여기서 이름을 꺼냄
+                .orElse("알 수 없는 조직");
+
+        emailSendApplication.sendApprovalRejectedEmail(rejected,orgName);
 
         log.info("[APPROVAL] 회원 반려 완료 - usrId: {}, approver: {}", usrId);
     }

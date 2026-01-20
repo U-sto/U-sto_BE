@@ -20,6 +20,6 @@ public class SignupRequestDto {
     private String pwd;
 
     @NotBlank(message = "조직을 입력해주세요.")
-    @Schema(example = "HANYANG_ERICA") //프론트에서는 orgNm으로 나와야한다
+    @Schema(example = "700111") //프론트에서는 orgNm으로 나와야한다
     private String orgCd;
 }

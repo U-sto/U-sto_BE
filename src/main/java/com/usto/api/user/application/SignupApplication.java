@@ -1,6 +1,8 @@
 package com.usto.api.user.application;
 
 import com.usto.api.common.exception.BusinessException;
+import com.usto.api.organization.infrastructure.entity.OrganizationJpaEntity;
+import com.usto.api.organization.infrastructure.repository.OrganizationJpaRepository;
 import com.usto.api.user.domain.model.ApprovalStatus;
 import com.usto.api.user.domain.model.Role;
 import com.usto.api.user.domain.model.User;
@@ -23,6 +25,7 @@ public class SignupApplication {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailSendApplication emailSendApplication;
+    private final OrganizationJpaRepository organizationJpaRepository;
 
     @Transactional
     public void signup(
@@ -58,7 +61,11 @@ public class SignupApplication {
 
         userRepository.save(user);
 
-        emailSendApplication.sendApprovalRequestEmail(user);
+        String orgName = organizationJpaRepository.findByOrgCd(user.getOrgCd())
+                .map(OrganizationJpaEntity::getOrgNm) // 여기서 이름을 꺼냄
+                .orElse("알 수 없는 조직");
+
+        emailSendApplication.sendApprovalRequestEmail(user,orgName);
     }
 }
 

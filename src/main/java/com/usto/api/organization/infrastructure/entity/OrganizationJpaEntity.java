@@ -18,7 +18,7 @@ public class OrganizationJpaEntity extends BaseTimeEntity{
 
     //조직코드
     @Id
-    @Column(name = "ORG_CD", length = 50, nullable = false)
+    @Column(name = "ORG_CD", length = 7, nullable = false, columnDefinition = "char(7)")
     private String orgCd;
 
     //조직명

@@ -21,7 +21,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @SQLDelete(sql = "UPDATE TB_ITEM001M SET del_yn = 'Y', del_at = NOW() WHERE acq_id = ?")
 @Where(clause = "DEL_YN = 'N'") // 조회 시 삭제 안 된 데이터만 기본으로 가져옴
-public class ItemAcquisitionEntity extends BaseTimeEntity {
+public class  ItemAcquisitionEntity extends BaseTimeEntity {
 
     @Id
     @Convert(converter = UuidConverter.class)
@@ -37,7 +37,7 @@ public class ItemAcquisitionEntity extends BaseTimeEntity {
     @Column(name = "ACQ_UPR", nullable = false, precision = 20)
     private BigDecimal acqUpr;    // 취득금액
 
-    @Column(name = "DEPT_CD", nullable = false, length = 50)
+    @Column(name = "DEPT_CD", nullable = false, length = 5, columnDefinition = "char(5)")
     private String deptCd;        // 운용부서코드
 
     @Enumerated(EnumType.STRING)
@@ -70,7 +70,7 @@ public class ItemAcquisitionEntity extends BaseTimeEntity {
     @Column(name = "APPR_AT")
     private LocalDate apprAt;     // 확정일자 (=정리일자)
 
-    @Column(name = "ORG_CD", nullable = false, length = 50)
+    @Column(name = "ORG_CD", nullable = false, length = 7 , columnDefinition = "char(7)")
     private String orgCd;         // 조직코드
 
     @Builder.Default

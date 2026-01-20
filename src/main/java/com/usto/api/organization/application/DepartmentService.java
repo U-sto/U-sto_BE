@@ -19,11 +19,12 @@ public class DepartmentService {
 
         // 특정 조직의 부서만 조회하도록 필터링
         return departmentRepository.findAllById_OrgCdOrderByDeptNmAsc(orgCd).stream()
-                .map(entity -> DepartmentResponse.builder()
+                .map(entity ->
+                        DepartmentResponse.builder()
                         .orgCd(entity.getId().getOrgCd())
                         .deptCd(entity.getId().getDeptCd())
                         .deptNm(entity.getDeptNm())
-                        .deptTy(entity.getDeptTy())
+                        .upDeptNm(entity.getUpDeptNm())
                         .build())
                 .collect(Collectors.toList());
     }
