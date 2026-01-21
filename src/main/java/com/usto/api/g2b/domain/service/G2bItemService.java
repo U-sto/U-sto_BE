@@ -7,9 +7,11 @@ import java.util.List;
 public interface G2bItemService {
 
     int updateChangedPrices();
+
     List<G2bItemJpaEntity> findByFilters(
             String mCd,
             String dCd,
             String dNm
     );
+
 }

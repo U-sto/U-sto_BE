@@ -19,7 +19,7 @@ import java.util.List;
  * @desc G2B 팝업 검색 API 컨트롤러
  */
 
-@Tag(name = "g2b-search-controller", description = "G2B 검색 관련 API")
+@Tag(name = "g2b-controller", description = "G2B API")
 @RestController
 @RequestMapping("/api/g2b")
 @RequiredArgsConstructor
