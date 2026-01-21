@@ -2,6 +2,7 @@ package com.usto.api.g2b.infrastructure.repository;
 
 import com.usto.api.g2b.infrastructure.entity.G2bItemJpaEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -22,4 +23,16 @@ public interface G2bItemJpaRepository extends JpaRepository<G2bItemJpaEntity, St
             @Param("mCd") String mCd,
             @Param("dCd") String dCd,
             @Param("dNm") String dNm);
+
+    //가격 업데이트 (단, 가격이 상이한 경우에만 업데이트를 해서 불필요한 작업을 최소화)
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query(value = """
+        UPDATE TB_G2B001D d
+        JOIN TB_G2B_STG s ON d.G2B_D_CD = s.G2B_D_CD
+        SET d.G2B_UPR = s.G2B_UPR,
+            d.UPD_AT = NOW(),
+            d.UPD_BY = 'BATCH'
+        WHERE d.G2B_UPR <> s.G2B_UPR
+        """, nativeQuery = true)
+    int updateChangedPrices();
 }
