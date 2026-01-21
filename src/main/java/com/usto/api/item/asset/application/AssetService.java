@@ -7,10 +7,12 @@ import com.usto.api.item.asset.domain.repository.AssetRepository;
 import com.usto.api.item.asset.presentation.dto.request.AssetSearchRequest;
 import com.usto.api.item.asset.presentation.dto.response.AssetListResponse;
 import com.usto.api.item.common.utils.ItemNumberGenerator;
+import com.usto.api.common.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -43,6 +45,12 @@ public class AssetService {
     // TODO: 해당 메서드 사용하여 acquistion 패키지에서 취득승인 로직 구현
     @Transactional
     public void registerAssetsFromAcquisition(Acquisition acq) {
+
+        // 중복 체크: 이미 자산 등록된 취득 건인지 확인
+        if (assetRepository.existsMasterByAcqId(acq.getAcqId())) {
+            throw new BusinessException("이미 자산으로 등록된 취득 건(ID: " + acq.getAcqId() + ")입니다.");
+        }
+
         // 1. 대장 기본(Master) 생성: 1건
         AssetMaster master = AssetMaster.create(
                 acq.getAcqId(), acq.getG2bDCd(), acq.getAcqQty(),
@@ -73,5 +81,22 @@ public class AssetService {
 
             assetRepository.save(asset); // 002D에 저장
         }
+    }
+
+    /**
+     * 개별 물품 정보 수정 (예시)
+     */
+    @Transactional
+    public void updateItemInfo(String itmNo, BigDecimal acqUpr, String drbYr, String rmk, String orgCd) {
+        // 1. 존재 여부 및 소속 조직 검증
+        Asset asset = assetRepository.findById(itmNo)
+                .orElseThrow(() -> new BusinessException("해당 물품을 찾을 수 없습니다."));
+
+        asset.validateOwnership(orgCd); // 기존에 만든 조직 검증 활용
+
+        // 2. 도메인 로직 실행 (내부에서 상태 및 값 검증 수행)
+        asset.updateAssetInfo(acqUpr, drbYr, rmk);
+
+        assetRepository.save(asset);
     }
 }

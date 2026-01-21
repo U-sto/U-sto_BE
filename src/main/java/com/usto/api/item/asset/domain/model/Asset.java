@@ -4,6 +4,7 @@ import com.usto.api.common.exception.BusinessException;
 import com.usto.api.item.common.model.OperStatus;
 import lombok.Builder;
 import lombok.Getter;
+import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -61,6 +62,14 @@ public class Asset {
      * 개별 물품 정보 수정 (취득단가, 내용연수, 비고만)
      */
     public void updateAssetInfo(BigDecimal acqUpr, String drbYr, String rmk) {
+        // 1. 상태 검증: 삭제되었거나 불용(DSU) 상태인 물품은 수정 불가
+        validateActiveStatus();
+
+        // 2. 값 검증: 취득단가는 0원 이상이어야 함
+        if (acqUpr == null || acqUpr.compareTo(BigDecimal.ZERO) < 0) {
+            throw new BusinessException("취득 단가는 0원 이상이어야 합니다.");
+        }
+
         this.acqUpr = acqUpr;
         this.drbYr = drbYr;
         this.rmk = rmk;
@@ -70,6 +79,12 @@ public class Asset {
      * 반납 처리 (부서코드 제거)
      */
     public void returnAsset() {
+        validateActiveStatus(); // 삭제/불용 체크
+
+        if (!StringUtils.hasText(deptCd) || "NONE".equals(deptCd)) {
+            throw new BusinessException("배정할 부서 코드가 유효하지 않습니다.");
+        }
+
         this.deptCd = "NONE";    // 반납 시 부서 공란
         this.operSts = OperStatus.RTN;
     }
@@ -83,6 +98,18 @@ public class Asset {
         }
         this.deptCd = deptCd;
         this.operSts = OperStatus.OPER;
+    }
+
+    /**
+     * 공통 검증: 물품이 수정 가능한 활성 상태인지 확인
+     */
+    private void validateActiveStatus() {
+        if (isDeleted()) {
+            throw new BusinessException("삭제된 물품은 수정할 수 없습니다.");
+        }
+        if (this.operSts == OperStatus.DSU) {
+            throw new BusinessException("불용(DSU) 처리된 물품은 수정할 수 없습니다.");
+        }
     }
 
     /**

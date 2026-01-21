@@ -14,6 +14,7 @@ public interface AssetRepository {
     void saveMaster(AssetMaster master);
     Optional<Asset> findById(String itmNo);
     List<AssetListResponse> findAllByFilter(AssetSearchRequest cond, String orgCd);
+    boolean existsMasterByAcqId(UUID acqId); // 중복 생성 방지용 존재 확인
     int getNextSequenceForYear(int year, String orgCd);  // 물품번호 순번 조회
     void delete(String itmNo);
 }

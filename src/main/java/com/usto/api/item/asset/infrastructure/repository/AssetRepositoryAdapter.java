@@ -21,6 +21,7 @@ import org.springframework.util.StringUtils;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static com.usto.api.item.asset.infrastructure.entity.QItemAssetDetailEntity.itemAssetDetailEntity;
 import static com.usto.api.item.asset.infrastructure.entity.QItemAssetMasterEntity.itemAssetMasterEntity;
@@ -99,6 +100,18 @@ public class AssetRepositoryAdapter implements AssetRepository {
                 )
                 .orderBy(itemAssetDetailEntity.itmNo.desc())
                 .fetch();
+    }
+
+    /**
+     * 자산 중복 생성 방지용 검사 메서드
+     */
+    @Override
+    public boolean existsMasterByAcqId(UUID acqId) {
+        return queryFactory
+                .selectOne()
+                .from(itemAssetMasterEntity)
+                .where(itemAssetMasterEntity.acqId.eq(acqId))
+                .fetchFirst() != null;
     }
 
     /**
