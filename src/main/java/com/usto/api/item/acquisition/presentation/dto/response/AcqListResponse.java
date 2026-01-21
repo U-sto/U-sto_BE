@@ -5,13 +5,14 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.UUID;
 
 @Getter @Builder
 @NoArgsConstructor @AllArgsConstructor
 @Schema(description = "물품 취득 목록 응답")
 public class AcqListResponse {
     @Schema(description = "취득ID")
-    private String acqId;
+    private UUID acqId;
 
     @Schema(description = "물품번호 (분류-식별)", example = "12345678-12345678")
     private String g2bItemNo;

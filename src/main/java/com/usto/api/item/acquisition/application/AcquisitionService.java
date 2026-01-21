@@ -6,9 +6,7 @@ import com.usto.api.g2b.infrastructure.repository.G2bItemJpaRepository;
 import com.usto.api.item.acquisition.domain.model.Acquisition;
 import com.usto.api.item.common.model.OperStatus;
 import com.usto.api.organization.infrastructure.repository.DepartmentJpaRepository;
-import com.usto.api.item.common.model.ApprStatus;
 import com.usto.api.item.acquisition.domain.repository.AcquisitionRepository;
-import com.usto.api.item.acquisition.infrastructure.entity.ItemAcquisitionEntity;
 import com.usto.api.item.acquisition.presentation.dto.request.AcqRegisterRequest;
 import com.usto.api.item.acquisition.presentation.dto.request.AcqSearchRequest;
 import com.usto.api.item.acquisition.presentation.dto.response.AcqListResponse;
@@ -19,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -34,7 +33,7 @@ public class AcquisitionService {
      * 1. 등록 (Domain Model 사용)
      */
     @Transactional
-    public String registerAcquisition(AcqRegisterRequest request, String userId, String orgCd) {
+    public UUID registerAcquisition(AcqRegisterRequest request, String userId, String orgCd) {
         // 검증
         G2bItemJpaEntity g2bItem = validateRequest(request, orgCd);
 
@@ -62,7 +61,7 @@ public class AcquisitionService {
      * 2. 수정
      */
     @Transactional
-    public void updateAcquisition(String acqId, AcqRegisterRequest request, String orgCd) {
+    public void updateAcquisition(UUID acqId, AcqRegisterRequest request, String orgCd) {
         // Domain 조회
         Acquisition acquisition = acquisitionRepository.findById(acqId)
                 .orElseThrow(() -> new BusinessException("존재하지 않는 취득 정보입니다."));
@@ -93,7 +92,7 @@ public class AcquisitionService {
      * 3. 삭제
      */
     @Transactional
-    public void deleteAcquisition(String acqId, String orgCd) {
+    public void deleteAcquisition(UUID acqId, String orgCd) {
         Acquisition acquisition = acquisitionRepository.findById(acqId)
                 .orElseThrow(() -> new BusinessException("존재하지 않는 취득 정보입니다."));
 
@@ -110,7 +109,7 @@ public class AcquisitionService {
      * 4. 승인 요청
      */
     @Transactional
-    public void requestApproval(String acqId, String orgCd) {
+    public void requestApproval(UUID acqId, String orgCd) {
         Acquisition acquisition = acquisitionRepository.findById(acqId)
                 .orElseThrow(() -> new BusinessException("존재하지 않는 취득 건입니다."));
 
@@ -127,7 +126,7 @@ public class AcquisitionService {
      * 5. 승인 요청 취소 → 소프트 삭제
      */
     @Transactional
-    public void cancelRequest(String acqId, String orgCd) {
+    public void cancelRequest(UUID acqId, String orgCd) {
         Acquisition acquisition = acquisitionRepository.findById(acqId)
                 .orElseThrow(() -> new BusinessException("존재하지 않는 취득 건입니다."));
 

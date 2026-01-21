@@ -19,6 +19,7 @@ import org.springframework.util.StringUtils;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static com.usto.api.item.acquisition.infrastructure.entity.QItemAcquisitionEntity.itemAcquisitionEntity;
 import static com.usto.api.g2b.infrastructure.entity.QG2bItemJpaEntity.g2bItemJpaEntity;
@@ -40,13 +41,13 @@ public class AcquisitionRepositoryAdapter implements AcquisitionRepository {
     }
 
     @Override
-    public Optional<Acquisition> findById(String id) {
+    public Optional<Acquisition> findById(UUID id) {
         return jpaRepository.findById(id)
                 .map(AcquisitionMapper::toDomain);
     }
 
     @Override
-    public void delete(String acqId) {
+    public void delete(UUID acqId) {
         ItemAcquisitionEntity entity = jpaRepository.findById(acqId)
                 .orElseThrow(() -> new BusinessException("존재하지 않는 취득 정보입니다."));
         jpaRepository.delete(entity);  // Soft Delete 실행
