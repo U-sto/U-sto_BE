@@ -11,7 +11,7 @@ public final class AssetMapper {
     /**
      * Entity → Domain
      */
-    public static Asset toDomain(ItemAssetDetailEntity entity) { // TODO: 대장기본 엔티티도 해야하는거아닌??
+    public static Asset toDomain(ItemAssetDetailEntity entity) {
         return Asset.builder()
                 .itmNo(entity.getItmNo())
                 .acqId(entity.getAcqId())
