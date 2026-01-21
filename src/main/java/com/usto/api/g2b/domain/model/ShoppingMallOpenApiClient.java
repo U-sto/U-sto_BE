@@ -10,8 +10,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.net.URI;
 import java.util.List;
 
-import static java.lang.Integer.parseInt;
-
 @Component
 @RequiredArgsConstructor
 public class ShoppingMallOpenApiClient {
@@ -29,9 +27,7 @@ public class ShoppingMallOpenApiClient {
     public PageResult fetch(
             String pageNo,
             String numberOfRows,
-            String inqryDiv,
-            String inqryBgnDate,
-            String inqryEndDate
+            String inqryDiv
             ) {
 
         var b = UriComponentsBuilder
@@ -42,10 +38,6 @@ public class ShoppingMallOpenApiClient {
                 .queryParam("numOfRows", numberOfRows)
                 .queryParam("inqryDiv", inqryDiv)
                 .queryParam("type", "json");
-
-        //빈값 체크 (혹시나 빠지면 로직 중단)
-        if (inqryBgnDate != null && !inqryBgnDate.isBlank()) b.queryParam("inqryBgnDate", inqryBgnDate);
-        if (inqryEndDate != null && !inqryEndDate.isBlank()) b.queryParam("inqryEndDate", inqryEndDate);
 
         URI uri = b.build(true).toUri();
 
@@ -59,7 +51,7 @@ public class ShoppingMallOpenApiClient {
         var body = (env == null || env.response() == null) ? null : env.response().body();
         if (body == null) return new PageResult(0, List.of());
 
-        int total = parseInt(body.totalCount());
+        int total = this.parseInt(body.totalCount());
         List<ShoppingMallEnvelope.Item> items = (body.items() == null) ? List.of() : body.items();
 
         return new PageResult(total, items);

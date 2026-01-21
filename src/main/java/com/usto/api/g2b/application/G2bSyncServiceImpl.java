@@ -1,17 +1,17 @@
 package com.usto.api.g2b.application;
 
+import com.usto.api.g2b.domain.model.G2bSyncResult;
 import com.usto.api.g2b.domain.model.StgPriceRowMapper;
 import com.usto.api.g2b.domain.model.ShoppingMallOpenApiClient;
 import com.usto.api.g2b.domain.model.StgPriceRow;
 import com.usto.api.g2b.domain.service.G2bItemService;
 import com.usto.api.g2b.domain.service.G2bStgService;
+import com.usto.api.g2b.presentation.dto.response.G2bSyncResponseDto;
 import com.usto.api.g2b.presentation.dto.response.ShoppingMallEnvelope;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,27 +26,22 @@ public class G2bSyncServiceImpl {
     private static final String INQRY_DIV = "1";     // 등록일자 기준
     private static final int NUM_OF_ROWS = 1000;     // 페이지 사이즈
 
-    private static final int AUTO_SYNC_DAYS = 1;
-
     @Transactional
-    public int syncLatest() {
-        DateRange range = DateRange.recentDays(AUTO_SYNC_DAYS);
-        List<ShoppingMallEnvelope.Item> items = fetchAll(range);
+    public G2bSyncResponseDto syncLatest() {
+        List<ShoppingMallEnvelope.Item> items = fetchAll();
         List<StgPriceRow> rows = StgPriceRowMapper.toStgRows(items);
 
         g2bStgService.truncate();
         g2bStgService.bulkInsert(rows);
 
-        return g2bItemService.updateChangedPrices();
-    }
+        var changed = g2bItemService.updateChangedPricesWithDiff();
+        return G2bSyncResult.of(changed);    }
 
-    private List<ShoppingMallEnvelope.Item> fetchAll(DateRange range) {
+    private List<ShoppingMallEnvelope.Item> fetchAll() {
         var first = client.fetch(
                 "1",
                 String.valueOf(NUM_OF_ROWS),
-                INQRY_DIV,
-                range.begin(),
-                range.end()
+                INQRY_DIV
         );
 
         var items = new ArrayList<>(first.items());
@@ -58,23 +53,10 @@ public class G2bSyncServiceImpl {
             var page = client.fetch(
                     String.valueOf(p),
                     String.valueOf(NUM_OF_ROWS),
-                    INQRY_DIV,
-                    range.begin(),
-                    range.end()
+                    INQRY_DIV
             );
             items.addAll(page.items());
         }
         return items;
-    }
-
-    public record DateRange(String begin, String end) {
-
-        public static DateRange recentDays(int days) {
-            LocalDate end = LocalDate.now().minusDays(1);
-            LocalDate begin = end.minusDays(days - 1);
-
-            DateTimeFormatter f = DateTimeFormatter.BASIC_ISO_DATE;
-            return new DateRange(begin.format(f), end.format(f));
-        }
     }
 }
