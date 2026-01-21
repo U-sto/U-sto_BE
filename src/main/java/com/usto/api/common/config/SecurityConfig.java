@@ -70,7 +70,8 @@ public class SecurityConfig {
                             "/api/auth/verification/**", //이메일/전화번호 인증 when 회원가입,아이디/비번찾기
                             "/api/auth/login", //로그인
                             "/api/auth/logout", //로그아웃
-                            "/api/approval/**" //일단은 열어두는데 추후에 막아야한다.
+                            "/api/approval/**", //일단은 열어두는데 추후에 막아야한다.
+                            "/api/g2b/sync" //일단은 열어두는데 추후에 막아야한다.
                     ).permitAll();
 
                     //역할별 접근 제한
@@ -79,6 +80,7 @@ public class SecurityConfig {
 
                     if (isDev) {
                         // 개발 환경(dev)일 때만 로그인 없이 스웨거 테스트하고 싶은 API 작성 가능
+
                     }
 
                     auth.requestMatchers(
