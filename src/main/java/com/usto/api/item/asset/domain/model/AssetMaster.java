@@ -34,7 +34,7 @@ public class AssetMaster {
                 .g2bDCd(g2bDCd)
                 .qty(qty)
                 .acqAt(acqAt)
-                .arrgAt(arrgAt)
+                .arrgAt(arrgAt) // 취득 엔티티의 apprAt을 받아 정리일자로 매핑
                 .orgCd(orgCd)
                 .delYn("N")
                 .build();

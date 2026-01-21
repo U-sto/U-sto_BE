@@ -23,6 +23,7 @@ public class ItemNumberGenerator {
         return String.format("M%04d%05d", year, sequence);
     }
 
+
     /**
      * 현재 연도 기준 물품고유번호 생성
      */

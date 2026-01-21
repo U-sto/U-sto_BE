@@ -101,7 +101,10 @@ public class AssetRepositoryAdapter implements AssetRepository {
                 .fetch();
     }
 
-    // TODO: 주석 좀
+    /**
+     * 신규 물품번호 생성을 위한 다음 순번 조회
+     * - JpaRepository의 Native Query를 호출하여 DB의 MAX값 조회
+     */
     @Override
     public int getNextSequenceForYear(int year, String orgCd) {
         int maxSequence = jpaRepository.findMaxSequenceByYear(year, orgCd);
