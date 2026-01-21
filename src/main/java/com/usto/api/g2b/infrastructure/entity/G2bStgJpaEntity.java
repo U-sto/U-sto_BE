@@ -7,7 +7,6 @@ import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
 import java.math.BigDecimal;
 
 @Entity
@@ -20,7 +19,6 @@ public class G2bStgJpaEntity {
     @Column(name = "G2B_D_CD", length = 8, columnDefinition = "char(8)")
     private String g2bDCd;
 
-    @Column(name = "G2B_UPR", precision = 20, scale = 0)
+    @Column(name = "G2B_UPR", precision = 20, scale = 0, nullable = false)
     private BigDecimal g2bUpr;
-
 }
