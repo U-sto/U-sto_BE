@@ -1,7 +1,9 @@
 package com.usto.api.item.asset.infrastructure.mapper;
 
 import com.usto.api.item.asset.domain.model.Asset;
+import com.usto.api.item.asset.domain.model.AssetMaster;
 import com.usto.api.item.asset.infrastructure.entity.ItemAssetDetailEntity;
+import com.usto.api.item.asset.infrastructure.entity.ItemAssetMasterEntity;
 
 public final class AssetMapper {
     private AssetMapper() {}
@@ -47,6 +49,37 @@ public final class AssetMapper {
                 .orgCd(domain.getOrgCd())
                 .delYn(domain.getDelYn())
                 .delAt(domain.getDelAt())
+                .build();
+    }
+
+
+    /**
+     * Entity → Domain
+     */
+    public static AssetMaster toMasterDomain(ItemAssetMasterEntity entity) {
+        return AssetMaster.builder()
+                .acqId(entity.getAcqId())
+                .g2bDCd(entity.getG2bDCd())
+                .qty(entity.getQty())
+                .acqAt(entity.getAcqAt())
+                .arrgAt(entity.getArrgAt())
+                .orgCd(entity.getOrgCd())
+                .delYn(entity.getDelYn())
+                .build();
+    }
+
+    /**
+     * Domain → Entity
+     */
+    public static ItemAssetMasterEntity toMasterEntity(AssetMaster domain) {
+        return ItemAssetMasterEntity.builder()
+                .acqId(domain.getAcqId())
+                .g2bDCd(domain.getG2bDCd())
+                .qty(domain.getQty())
+                .acqAt(domain.getAcqAt())
+                .arrgAt(domain.getArrgAt())
+                .orgCd(domain.getOrgCd())
+                .delYn(domain.getDelYn())
                 .build();
     }
 }

@@ -38,20 +38,40 @@ public class Asset {
     // ===== 비즈니스 로직 메서드 =====
 
     /**
-     * 신규 물품 대장기본/상세 생성 (물품번호 생성기를 사용)
+     * 신규 물품대장 디테일 생성 팩토리 메서드
      */
-    // TODO: 물품취득 승인 시 이용할 메서드 구현 - 대장기본을 한개 생성하고,
-    //  물품번호생성기를 사용해서 대장상세를 취득수량만큼 만들고 필요한 스냅샷 등을 취득 건으로부터 채워넣음
-    public static Asset create() { return null; }
-
+    public static Asset createFromAcquisition(String itmNo, UUID acqId, String g2bDCd,
+                                              String deptCd, OperStatus operStatus,
+                                              BigDecimal acqUpr, String drbYr, String orgCd) {
+        return Asset.builder()
+                .itmNo(itmNo)
+                .acqId(acqId)
+                .g2bDCd(g2bDCd)
+                .deptCd(deptCd)
+                .operSts(operStatus)
+                .acqUpr(acqUpr)
+                .drbYr(drbYr)
+                .orgCd(orgCd)
+                .printYn("N")
+                .delYn("N")
+                .build();
+    }
 
     /**
-     * 물품 정보 수정 (취득단가, 내용연수, 비고)
+     * 개별 물품 정보 수정 (취득단가, 내용연수, 비고만)
      */
-    public void updateInfo(BigDecimal acqUpr, String drbYr, String rmk) {
+    public void updateAssetInfo(BigDecimal acqUpr, String drbYr, String rmk) {
         this.acqUpr = acqUpr;
         this.drbYr = drbYr;
         this.rmk = rmk;
+    }
+
+    /**
+     * 반납 처리 (부서코드 제거)
+     */
+    public void returnAsset() {
+        this.deptCd = "NONE";    // 반납 시 부서 공란
+        this.operSts = OperStatus.RTN;
     }
 
     /**

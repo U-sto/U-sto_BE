@@ -63,32 +63,4 @@ public class ItemAssetDetailEntity extends BaseTimeEntity {
 
     @Column(name = "DEL_AT")
     private LocalDateTime delAt;
-
-    /**
-     * 개별 물품 정보 수정 (취득단가, 내용연수, 비고만)
-     */
-    public void updateAssetInfo(BigDecimal acqUpr, String drbYr, String rmk) {
-        this.acqUpr = acqUpr;
-        this.drbYr = drbYr;
-        this.rmk = rmk;
-    }
-
-    /**
-     * 운용부서 변경 (반납 상태일 때만 가능)
-     */
-    public void assignDepartment(String deptCd) {
-        if (this.operSts != OperStatus.RTN) {
-            throw new IllegalStateException("반납 상태일 때만 부서 배정이 가능합니다.");
-        }
-        this.deptCd = deptCd;
-        this.operSts = OperStatus.OPER;  // 운용 상태로 변경
-    }
-
-    /**
-     * 반납 처리 (부서코드 제거)
-     */
-    public void returnAsset() {
-        this.deptCd = null;
-        this.operSts = OperStatus.RTN;
-    }
 }

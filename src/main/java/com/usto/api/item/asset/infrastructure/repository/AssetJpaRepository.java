@@ -7,7 +7,6 @@ import org.springframework.data.repository.query.Param;
 
 public interface AssetJpaRepository extends JpaRepository<ItemAssetDetailEntity, String> {
 
-    // TODO: 이게 여기 구현되는게 맞나?? 위치가
     /**
      * 특정 연도의 마지막 순번 조회 (물품번호 생성용)
      * 예: M2026XXXXX 형식에서 XXXXX 부분의 최대값

@@ -48,14 +48,4 @@ public class ItemAssetMasterEntity extends BaseTimeEntity {
 
     @Column(name = "DEL_AT")
     private LocalDateTime delAt;
-
-    /**
-     * 수량 감소 (처분 시)
-     */
-    public void decreaseQuantity(int amount) {
-        if (this.qty < amount) {
-            throw new IllegalStateException("수량이 부족합니다.");
-        }
-        this.qty -= amount;
-    }
 }

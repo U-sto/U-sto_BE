@@ -6,8 +6,10 @@ import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.usto.api.common.exception.BusinessException;
 import com.usto.api.item.asset.domain.model.Asset;
+import com.usto.api.item.asset.domain.model.AssetMaster;
 import com.usto.api.item.asset.domain.repository.AssetRepository;
 import com.usto.api.item.asset.infrastructure.entity.ItemAssetDetailEntity;
+import com.usto.api.item.asset.infrastructure.entity.ItemAssetMasterEntity;
 import com.usto.api.item.asset.infrastructure.mapper.AssetMapper;
 import com.usto.api.item.asset.presentation.dto.request.AssetSearchRequest;
 import com.usto.api.item.asset.presentation.dto.response.AssetListResponse;
@@ -30,6 +32,7 @@ import static com.usto.api.organization.infrastructure.entity.QDepartmentJpaEnti
 public class AssetRepositoryAdapter implements AssetRepository {
 
     private final AssetJpaRepository jpaRepository;
+    private final AssetMasterJpaRepository jpaMasterRepository;
     private final JPAQueryFactory queryFactory;
 
     @Override
@@ -40,9 +43,14 @@ public class AssetRepositoryAdapter implements AssetRepository {
     }
 
     @Override
+    public void saveMaster(AssetMaster master) {
+        ItemAssetMasterEntity entity = AssetMapper.toMasterEntity(master);
+        jpaMasterRepository.save(entity);
+    }
+
+    @Override
     public Optional<Asset> findById(String itmNo) {
-        return jpaRepository.findById(itmNo)
-                .map(AssetMapper::toDomain);
+        return jpaRepository.findById(itmNo).map(AssetMapper::toDomain);
     }
 
     /**
@@ -89,7 +97,7 @@ public class AssetRepositoryAdapter implements AssetRepository {
                         operStsEq(cond.getOperSts()),
                         itmNoEq(cond.getItmNo())
                 )
-                .orderBy(itemAssetDetailEntity.creAt.desc())
+                .orderBy(itemAssetDetailEntity.itmNo.desc())
                 .fetch();
     }
 
@@ -98,6 +106,11 @@ public class AssetRepositoryAdapter implements AssetRepository {
     public int getNextSequenceForYear(int year, String orgCd) {
         int maxSequence = jpaRepository.findMaxSequenceByYear(year, orgCd);
         return maxSequence + 1;
+    }
+
+    @Override
+    public void delete(String itmNo) {
+        jpaRepository.deleteById(itmNo);
     }
 
     /**
