@@ -39,6 +39,9 @@ public class ItemAssetMasterEntity extends BaseTimeEntity {
     @Column(name = "ARRG_AT")
     private LocalDate arrgAt;  // 정리일자 (스냅샷)
 
+    @Column(name = "ACQ_ARRG_TY", nullable = false, length = 20)
+    private String acqArrgTy;  // 정리구분
+
     @Column(name = "ORG_CD", nullable = false, length = 7, columnDefinition = "char(7)")
     private String orgCd;
 

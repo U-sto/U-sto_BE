@@ -7,11 +7,15 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.usto.api.common.exception.BusinessException;
 import com.usto.api.item.asset.domain.model.Asset;
 import com.usto.api.item.asset.domain.model.AssetMaster;
+import com.usto.api.item.asset.domain.model.AssetStatusHistory;
 import com.usto.api.item.asset.domain.repository.AssetRepository;
 import com.usto.api.item.asset.infrastructure.entity.ItemAssetDetailEntity;
+import com.usto.api.item.asset.infrastructure.entity.ItemAssetDetailId;
 import com.usto.api.item.asset.infrastructure.entity.ItemAssetMasterEntity;
+import com.usto.api.item.asset.infrastructure.entity.ItemAssetStatusHistoryEntity;
 import com.usto.api.item.asset.infrastructure.mapper.AssetMapper;
 import com.usto.api.item.asset.presentation.dto.request.AssetSearchRequest;
+import com.usto.api.item.asset.presentation.dto.response.AssetDetailResponse;
 import com.usto.api.item.asset.presentation.dto.response.AssetListResponse;
 import com.usto.api.item.common.model.OperStatus;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +26,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
+
 
 import static com.usto.api.item.asset.infrastructure.entity.QItemAssetDetailEntity.itemAssetDetailEntity;
 import static com.usto.api.item.asset.infrastructure.entity.QItemAssetMasterEntity.itemAssetMasterEntity;
@@ -34,6 +40,7 @@ public class AssetRepositoryAdapter implements AssetRepository {
 
     private final AssetJpaRepository jpaRepository;
     private final AssetMasterJpaRepository jpaMasterRepository;
+    private final AssetStatusHistoryJpaRepository statusHistoryJpaRepository;
     private final JPAQueryFactory queryFactory;
 
     @Override
@@ -50,8 +57,8 @@ public class AssetRepositoryAdapter implements AssetRepository {
     }
 
     @Override
-    public Optional<Asset> findById(String itmNo) {
-        return jpaRepository.findById(itmNo).map(AssetMapper::toDomain);
+    public Optional<Asset> findById(String itmNo, String orgCd) {
+        return jpaRepository.findById(new ItemAssetDetailId(itmNo, orgCd)).map(AssetMapper::toDomain);
     }
 
     /**
@@ -63,7 +70,7 @@ public class AssetRepositoryAdapter implements AssetRepository {
     public List<AssetListResponse> findAllByFilter(AssetSearchRequest cond, String orgCd) {
         return queryFactory
                 .select(Projections.fields(AssetListResponse.class,
-                        itemAssetDetailEntity.itmNo,
+                        itemAssetDetailEntity.itemId.itmNo,
                         Expressions.stringTemplate("CONCAT({0}, '-', {1})",
                                 g2bItemJpaEntity.g2bMCd,
                                 itemAssetDetailEntity.g2bDCd).as("g2bItemNo"),
@@ -86,11 +93,11 @@ public class AssetRepositoryAdapter implements AssetRepository {
                 )
                 // 부서 조인
                 .leftJoin(departmentJpaEntity).on(
-                        itemAssetDetailEntity.orgCd.eq(departmentJpaEntity.id.orgCd),
+                        itemAssetDetailEntity.itemId.orgCd.eq(departmentJpaEntity.id.orgCd),
                         itemAssetDetailEntity.deptCd.eq(departmentJpaEntity.id.deptCd)
                 )
                 .where(
-                        itemAssetDetailEntity.orgCd.eq(orgCd),
+                        itemAssetDetailEntity.itemId.orgCd.eq(orgCd),
                         g2bDCdEq(cond.getG2bDCd()),
                         acqAtBetween(cond.getStartAcqAt(), cond.getEndAcqAt()),
                         arrgAtBetween(cond.getStartArrgAt(), cond.getEndArrgAt()),
@@ -98,8 +105,74 @@ public class AssetRepositoryAdapter implements AssetRepository {
                         operStsEq(cond.getOperSts()),
                         itmNoEq(cond.getItmNo())
                 )
-                .orderBy(itemAssetDetailEntity.itmNo.desc())
+                .orderBy(itemAssetDetailEntity.itemId.itmNo.desc())
                 .fetch();
+    }
+
+    @Override
+    public Optional<AssetDetailResponse> findDetailById(String itmNo, String orgCd) {
+        AssetDetailResponse detail = queryFactory
+                .select(Projections.fields(AssetDetailResponse.class,
+                        itemAssetDetailEntity.itemId.itmNo,
+                        g2bItemJpaEntity.g2bDNm.as("g2bDNm"),
+                        Expressions.stringTemplate("CONCAT({0}, '-', {1})",
+                                g2bItemJpaEntity.g2bMCd,
+                                itemAssetDetailEntity.g2bDCd).as("g2bItemNo"),
+                        itemAssetMasterEntity.acqAt,
+                        itemAssetMasterEntity.arrgAt,
+                        itemAssetDetailEntity.operSts.stringValue().as("operSts"),
+                        itemAssetDetailEntity.drbYr,
+                        itemAssetDetailEntity.acqUpr,
+                        itemAssetMasterEntity.qty,
+                        itemAssetMasterEntity.acqArrgTy,
+                        departmentJpaEntity.deptNm.as("deptNm"),
+                        itemAssetDetailEntity.deptCd,
+                        itemAssetDetailEntity.rmk
+                ))
+                .from(itemAssetDetailEntity)
+                .leftJoin(itemAssetMasterEntity).on(
+                        itemAssetDetailEntity.acqId.eq(itemAssetMasterEntity.acqId)
+                )
+                .leftJoin(g2bItemJpaEntity).on(
+                        itemAssetDetailEntity.g2bDCd.eq(g2bItemJpaEntity.g2bDCd)
+                )
+                .leftJoin(departmentJpaEntity).on(
+                        itemAssetDetailEntity.itemId.orgCd.eq(departmentJpaEntity.id.orgCd),
+                        itemAssetDetailEntity.deptCd.eq(departmentJpaEntity.id.deptCd)
+                )
+                .where(
+                        itemAssetDetailEntity.itemId.itmNo.eq(itmNo),
+                        itemAssetDetailEntity.itemId.orgCd.eq(orgCd)
+                )
+                .fetchOne();
+
+        return Optional.ofNullable(detail);
+    }
+
+    @Override
+    public List<AssetDetailResponse.StatusHistoryDto> findStatusHistoriesByItmNo(String itmNo, String orgCd) {
+        List<ItemAssetStatusHistoryEntity> entities =
+                statusHistoryJpaRepository.findByItmNoAndOrgCdOrderByApprAtDesc(itmNo, orgCd);
+
+        return entities.stream()
+                .map(entity -> AssetDetailResponse.StatusHistoryDto.builder()
+                        .itemHisId(entity.getItemHisId().toString())
+                        .itmNo(entity.getItmNo())
+                        .prevSts(entity.getPrevSts().name())
+                        .newSts(entity.getNewSts().name())
+                        .chgRsn(entity.getChgRsn())
+                        .reqUsrId(entity.getReqUsrId())
+                        .reqAt(entity.getReqAt())
+                        .apprUsrId(entity.getApprUsrId())
+                        .apprAt(entity.getApprAt())
+                        .build())
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public void saveStatusHistory(AssetStatusHistory history) {
+        ItemAssetStatusHistoryEntity entity = AssetMapper.toStatusHistoryEntity(history);
+        statusHistoryJpaRepository.save(entity);
     }
 
     /**
@@ -120,13 +193,13 @@ public class AssetRepositoryAdapter implements AssetRepository {
      */
     @Override
     public int getNextSequenceForYear(int year, String orgCd) {
-        int maxSequence = jpaRepository.findMaxSequenceByYear(year, orgCd);
+        int maxSequence = jpaRepository.findMaxSequenceByYear(String.valueOf(year), orgCd);
         return maxSequence + 1;
     }
 
     @Override
-    public void delete(String itmNo) {
-        jpaRepository.deleteById(itmNo);
+    public void delete(String itmNo, String orgCd) {
+        jpaRepository.deleteById(new ItemAssetDetailId(itmNo, orgCd));
     }
 
     /**
@@ -159,6 +232,6 @@ public class AssetRepositoryAdapter implements AssetRepository {
     }
 
     private BooleanExpression itmNoEq(String itmNo) {
-        return StringUtils.hasText(itmNo) ? itemAssetDetailEntity.itmNo.eq(itmNo) : null;
+        return StringUtils.hasText(itmNo) ? itemAssetDetailEntity.itemId.itmNo.eq(itmNo) : null;
     }
 }

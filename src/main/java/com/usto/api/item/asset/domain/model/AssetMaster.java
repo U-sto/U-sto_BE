@@ -19,6 +19,7 @@ public class AssetMaster {
     private Integer qty;             // 총 수량 (가변)
     private final LocalDate acqAt;   // 취득일자
     private final LocalDate arrgAt;  // 정리일자
+    private final String acqArrgTy;     // 취득정리구분
     private final String orgCd;      // 조직코드
     private String delYn;
     private LocalDateTime delAt;
@@ -28,13 +29,15 @@ public class AssetMaster {
      * 신규 물품대장 마스터 생성 팩토리 메서드
      */
     public static AssetMaster create(UUID acqId, String g2bDCd, Integer qty,
-                                     LocalDate acqAt, LocalDate arrgAt, String orgCd) {
+                                     LocalDate acqAt, LocalDate arrgAt,
+                                     String acqArrgTy, String orgCd) {
         return AssetMaster.builder()
                 .acqId(acqId)
                 .g2bDCd(g2bDCd)
                 .qty(qty)
                 .acqAt(acqAt)
-                .arrgAt(arrgAt) // 취득 엔티티의 apprAt을 받아 정리일자로 매핑
+                .arrgAt(arrgAt)
+                .acqArrgTy(acqArrgTy)
                 .orgCd(orgCd)
                 .delYn("N")
                 .build();

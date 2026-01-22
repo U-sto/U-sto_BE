@@ -20,10 +20,10 @@ public class AssetListResponse {
     @Schema(description = "물품고유번호", example = "M202600001")
     private String itmNo;
 
-    @Schema(description = "G2B 물품번호 (분류-식별)", example = "12345678-12345678")
+    @Schema(description = "G2B 목록번호 (분류-식별)", example = "12345678-12345678")
     private String g2bItemNo;
 
-    @Schema(description = "G2B 물품명")
+    @Schema(description = "G2B 목록명")
     private String g2bItemNm;
 
     @Schema(description = "취득일자")

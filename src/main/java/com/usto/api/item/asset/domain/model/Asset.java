@@ -41,7 +41,7 @@ public class Asset {
     /**
      * 신규 물품대장 디테일 생성 팩토리 메서드
      */
-    public static Asset createFromAcquisition(String itmNo, UUID acqId, String g2bDCd,
+    public static Asset create(String itmNo, UUID acqId, String g2bDCd,
                                               String deptCd, OperStatus operStatus,
                                               BigDecimal acqUpr, String drbYr, String orgCd) {
         return Asset.builder()

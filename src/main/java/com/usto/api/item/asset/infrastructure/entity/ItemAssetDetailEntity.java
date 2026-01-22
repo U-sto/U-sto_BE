@@ -24,9 +24,8 @@ import java.util.UUID;
 @Where(clause = "DEL_YN = 'N'")
 public class ItemAssetDetailEntity extends BaseTimeEntity {
 
-    @Id
-    @Column(name = "ITM_NO", length = 10, columnDefinition = "char(10)")
-    private String itmNo;  // 물품고유번호 (M + 연도4자리 + 순번5자리)
+    @EmbeddedId
+    private ItemAssetDetailId itemId; // PK = ITEM_NO + ORG_CD
 
     @Column(name = "ACQ_ID", nullable = false, columnDefinition = "BINARY(16)")
     private UUID acqId;    // 취득ID
@@ -53,9 +52,6 @@ public class ItemAssetDetailEntity extends BaseTimeEntity {
     @Builder.Default
     @Column(name = "PRINT_YN", nullable = false, length = 1, columnDefinition = "char(1)")
     private String printYn = "N";
-
-    @Column(name = "ORG_CD", nullable = false, length = 7, columnDefinition = "char(7)")
-    private String orgCd;
 
     @Builder.Default
     @Column(name = "DEL_YN", nullable = false, length = 1, columnDefinition = "char(1)")
