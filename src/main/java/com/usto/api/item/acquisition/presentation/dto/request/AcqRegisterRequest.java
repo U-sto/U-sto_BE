@@ -32,10 +32,6 @@ public class AcqRegisterRequest {
     @NotNull(message = "정리구분은 필수입니다.")
     private AcqArrangementType arrgTy;
 
-    @Schema(description = "운용상태 (ACQ:취득, OPER:운용)", example = "ACQ")
-    @NotNull(message = "운용상태는 필수입니다.")
-    private OperStatus operSts;
-
     @Schema(description = "운용부서코드", example = "ADM_FAC")
     @NotBlank(message = "운용부서코드는 필수입니다.")
     private String deptCd;

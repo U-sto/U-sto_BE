@@ -49,7 +49,7 @@ public class Asset {
                 .acqId(acqId)
                 .g2bDCd(g2bDCd)
                 .deptCd(deptCd)
-                .operSts(operStatus)
+                .operSts(OperStatus.OPER)
                 .acqUpr(acqUpr)
                 .drbYr(drbYr)
                 .orgCd(orgCd)
