@@ -24,24 +24,27 @@ public class G2bSyncServiceImpl {
     private final G2bItemService g2bItemService;
     private final G2bItemCategoryService g2bItemCategoryService;
     private final ShoppingMallOpenApiClient client; //API연동
+    private final Object lock = new Object(); //동시제어
 
     private static final String INQRY_DIV = "1";     // 등록일자 기준
     private static final int NUM_OF_ROWS = 300;     // 페이지 사이즈
 
     @Transactional
     public int syncLatest() {
+        synchronized (lock) {
 
-        g2bStgService.truncate();
+            g2bStgService.truncate();
 
-        List<ShoppingMallEnvelope.Item> items = fetch();
-        List<G2bSync> rows = G2bSyncMapper.toG2bSync(items);
+            List<ShoppingMallEnvelope.Item> items = fetch();
+            List<G2bSync> rows = G2bSyncMapper.toG2bSync(items);
 
-        g2bStgService.bulkInsert(rows);
+            g2bStgService.bulkInsert(rows);
 
-        int masterChanges = g2bItemCategoryService.updateMaster();
-        int detailChanges = g2bItemService.updateDetail();
+            int masterChanges = g2bItemCategoryService.updateMaster();
+            int detailChanges = g2bItemService.updateDetail();
 
-        return detailChanges+masterChanges;
+            return detailChanges + masterChanges;
+        }
     }
 
     private List<ShoppingMallEnvelope.Item> fetch() {

@@ -31,8 +31,16 @@ public interface G2bItemJpaRepository extends JpaRepository<G2bItemJpaEntity, St
         SELECT s.G2B_D_CD,s.G2B_M_CD, s.G2B_D_NM, s.G2B_UPR,'SYSTEM'
         FROM TB_G2B_STG s
         ON DUPLICATE KEY UPDATE
-          G2B_D_NM = VALUES(G2B_D_NM),
-          G2B_UPR  = VALUES(G2B_UPR);
+          G2B_D_NM = CASE 
+                        WHEN TB_G2B001D.G2B_D_NM <> VALUES(G2B_D_NM)
+                        THEN VALUES(G2B_D_NM) 
+                        ELSE TB_G2B001D.G2B_D_NM 
+                      END,
+          G2B_UPR  = CASE 
+                        WHEN TB_G2B001D.G2B_UPR <> VALUES(G2B_UPR)
+                        THEN VALUES(G2B_UPR) 
+                        ELSE TB_G2B001D.G2B_UPR 
+                      END;
         """, nativeQuery = true)
     int updateDetail();
 }

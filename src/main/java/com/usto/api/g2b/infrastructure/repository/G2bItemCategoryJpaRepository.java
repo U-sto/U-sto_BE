@@ -28,7 +28,11 @@ public interface G2bItemCategoryJpaRepository extends JpaRepository<G2bItemCateg
         SELECT s.G2B_M_CD, s.G2B_M_NM,'SYSTEM'
         FROM TB_G2B_STG s
         ON DUPLICATE KEY UPDATE
-          G2B_M_NM = VALUES(G2B_M_NM);
+          G2B_M_NM = CASE 
+                        WHEN TB_G2B001M.G2B_M_NM <> VALUES(G2B_M_NM)
+                        THEN VALUES(G2B_M_NM) 
+                        ELSE TB_G2B001M.G2B_M_NM 
+                      END;
         """, nativeQuery = true)
     int updateMaster();
 }

@@ -33,7 +33,7 @@ public class G2bInitServiceImpl {
 
     private static final String INQRY_DIV = "1";     // 등록일자 기준
     private static final int NUM_OF_ROWS = 50;     // 페이지 사이즈
-    private static final long PAGE_SLEEP_MS = 200;
+    private static final long PAGE_SLEEP_MS = 300;
 
     public int syncInit1y(LocalDate seedEndDate) {
         if (seedEndDate == null) {
@@ -64,8 +64,9 @@ public class G2bInitServiceImpl {
 
         g2bStgService.bulkInsert(rows);
 
-        int detail = g2bItemService.updateDetail();
         int master = g2bItemCategoryService.updateMaster();
+        int detail = g2bItemService.updateDetail();
+
         return detail + master;
     }
 
