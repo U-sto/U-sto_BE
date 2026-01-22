@@ -1,33 +1,54 @@
 package com.usto.api.g2b.domain.model;
 
 import com.usto.api.g2b.presentation.dto.response.ShoppingMallEnvelope;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
+import reactor.util.retry.Retry;
 
 import java.net.URI;
+import java.time.Duration;
 import java.util.List;
 
 @Component
-@RequiredArgsConstructor
 public class ShoppingMallOpenApiClient {
 
-    private final WebClient.Builder webClientBuilder;
+    private final WebClient webClient;
 
-    @Value("${g2b.api.url}")
-    private String baseUrl;
-
+    private String baseUrl = "https://apis.data.go.kr/1230000/at/ShoppingMallPrdctInfoService";
     private String path = "/getShoppingMallPrdctInfoList";
+
 
     @Value("${g2b.api.key}")
     private String serviceKey;
+
+    public ShoppingMallOpenApiClient(WebClient.Builder builder) {
+        ExchangeStrategies strategies = ExchangeStrategies.builder()
+                .codecs(c -> c.defaultCodecs().maxInMemorySize(10 * 1024 * 1024))
+                .build();
+
+        this.webClient = builder
+                .exchangeStrategies(strategies)
+                .build();
+    }
 
     public PageResult fetch(
             String pageNo,
             String numberOfRows,
             String inqryDiv
+    )
+    {
+        return fetch(pageNo, numberOfRows, inqryDiv, null, null);
+    }
+
+    public PageResult fetch(
+            String pageNo,
+            String numberOfRows,
+            String inqryDiv,
+            String begin,
+            String end
             ) {
 
         var b = UriComponentsBuilder
@@ -39,21 +60,39 @@ public class ShoppingMallOpenApiClient {
                 .queryParam("inqryDiv", inqryDiv)
                 .queryParam("type", "json");
 
+        if (begin != null && !begin.isBlank()) b.queryParam("inqryBgnDate", begin);
+        if (end != null && !end.isBlank()) b.queryParam("inqryEndDate", end);
+
         URI uri = b.build(true).toUri();
 
-        ShoppingMallEnvelope env = webClientBuilder.build()
+        ShoppingMallEnvelope env = webClient
                 .get()
                 .uri(uri)
                 .retrieve()
                 .bodyToMono(ShoppingMallEnvelope.class)
-                .block();
+                .retryWhen(
+                        Retry.backoff(3, Duration.ofMillis(500))
+                                .maxBackoff(Duration.ofSeconds(5))
+                                .filter(ex ->
+                                        ex instanceof org.springframework.web.reactive.function.client.WebClientResponseException w &&
+                                                (w.getStatusCode().is5xxServerError() || w.getStatusCode().value() == 504)
+                                )
+                )
+                .block(Duration.ofSeconds(25));
 
-        var body = (env == null || env.response() == null) ? null : env.response().body();
+        var resp = (env == null) ? null : env.response();
+        var header = (resp == null) ? null : resp.header();
+        var body = (resp == null) ? null : resp.body();
+
+        if (header == null || !"00".equals(header.resultCode())) {
+            String code = (header == null) ? "NO_HEADER" : header.resultCode();
+            String msg = (header == null) ? "no header" : header.resultMsg();
+            throw new IllegalStateException("G2B API error: code=" + code + ", msg=" + msg);
+        }
         if (body == null) return new PageResult(0, List.of());
 
-        int total = this.parseInt(body.totalCount());
+        int total = parseInt(body.totalCount());
         List<ShoppingMallEnvelope.Item> items = (body.items() == null) ? List.of() : body.items();
-
         return new PageResult(total, items);
     }
 
