@@ -32,7 +32,7 @@ public class G2bInitServiceImpl {
     private G2bInitServiceImpl self;
 
     private static final String INQRY_DIV = "1";     // 등록일자 기준
-    private static final int NUM_OF_ROWS = 50;     // 페이지 사이즈
+    private static final int NUM_OF_ROWS = 10000;     // 페이지 사이즈
     private static final long PAGE_SLEEP_MS = 300;
 
     public int syncInit1y(LocalDate seedEndDate) {
