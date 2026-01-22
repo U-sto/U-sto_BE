@@ -24,15 +24,15 @@ public interface G2bItemJpaRepository extends JpaRepository<G2bItemJpaEntity, St
             @Param("dCd") String dCd,
             @Param("dNm") String dNm);
 
-    //가격 업데이트 (단, 가격이 상이한 경우에만 업데이트를 해서 불필요한 작업을 최소화)
+    //G2B정보 업데이트
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query(value = """
-        UPDATE TB_G2B001D d
-        JOIN TB_G2B_STG s ON d.G2B_D_CD = s.G2B_D_CD
-        SET d.G2B_UPR = s.G2B_UPR,
-            d.UPD_AT = NOW(),
-            d.UPD_BY = 'BATCH'
-        WHERE d.G2B_UPR <> s.G2B_UPR
+        INSERT INTO TB_G2B001D (G2B_D_CD,G2B_M_CD, G2B_D_NM, G2B_UPR,CRE_BY)
+        SELECT s.G2B_D_CD,s.G2B_M_CD, s.G2B_D_NM, s.G2B_UPR,'SYSTEM'
+        FROM TB_G2B_STG s
+        ON DUPLICATE KEY UPDATE
+          G2B_D_NM = VALUES(G2B_D_NM),
+          G2B_UPR  = VALUES(G2B_UPR);
         """, nativeQuery = true)
-    int updateChangedPrices();
+    int updateDetail();
 }

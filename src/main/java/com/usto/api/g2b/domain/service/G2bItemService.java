@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface G2bItemService {
 
-    int updateChangedPrices();
+    int updateDetail();
 
     List<G2bItemJpaEntity> findByFilters(
             String mCd,

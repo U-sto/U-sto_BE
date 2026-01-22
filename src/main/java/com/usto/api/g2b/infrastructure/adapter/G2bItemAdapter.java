@@ -16,8 +16,8 @@ public class G2bItemAdapter implements G2bItemService {
     private final G2bItemJpaRepository jpaItemjpaRepository;
 
     @Override
-    public int updateChangedPrices() {
-        return jpaItemjpaRepository.updateChangedPrices();
+    public int updateDetail() {
+        return jpaItemjpaRepository.updateDetail();
     }
 
     @Override

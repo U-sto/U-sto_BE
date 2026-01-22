@@ -2,6 +2,7 @@ package com.usto.api.g2b.infrastructure.repository;
 
 import com.usto.api.g2b.infrastructure.entity.G2bItemCategoryJpaEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -19,4 +20,15 @@ public interface G2bItemCategoryJpaRepository extends JpaRepository<G2bItemCateg
     List<G2bItemCategoryJpaEntity> findByFilters(
             @Param("code") String code,
             @Param("name") String name);
+
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query(value = """
+        INSERT INTO TB_G2B001M (G2B_M_CD,G2B_M_NM,CRE_BY)
+        SELECT s.G2B_M_CD, s.G2B_M_NM,'SYSTEM'
+        FROM TB_G2B_STG s
+        ON DUPLICATE KEY UPDATE
+          G2B_M_NM = VALUES(G2B_M_NM);
+        """, nativeQuery = true)
+    int updateMaster();
 }
