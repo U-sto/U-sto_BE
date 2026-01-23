@@ -190,6 +190,7 @@ public class AssetRepositoryAdapter implements AssetRepository {
     /**
      * 신규 물품번호 생성을 위한 다음 순번 조회
      * - JpaRepository의 Native Query를 호출하여 DB의 MAX값 조회
+     * TODO: DB 레벨에서 원자적으로 순번을 발급하도록 개선 필요
      */
     @Override
     public int getNextSequenceForYear(int year, String orgCd) {

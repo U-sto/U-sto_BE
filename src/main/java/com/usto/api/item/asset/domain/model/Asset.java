@@ -42,14 +42,13 @@ public class Asset {
      * 신규 물품대장 디테일 생성 팩토리 메서드
      */
     public static Asset create(String itmNo, UUID acqId, String g2bDCd,
-                                              String deptCd, OperStatus operStatus,
-                                              BigDecimal acqUpr, String drbYr, String orgCd) {
+                               String deptCd, BigDecimal acqUpr, String drbYr, String orgCd) {
         return Asset.builder()
                 .itmNo(itmNo)
                 .acqId(acqId)
                 .g2bDCd(g2bDCd)
                 .deptCd(deptCd)
-                .operSts(OperStatus.OPER)
+                .operSts(OperStatus.OPER) // 취득 승인 후 대장으로 넘어오면 자동으로 운용 전환
                 .acqUpr(acqUpr)
                 .drbYr(drbYr)
                 .orgCd(orgCd)

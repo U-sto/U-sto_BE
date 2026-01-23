@@ -43,7 +43,7 @@ public class AcquisitionService {
                 request.getAcqAt(),
                 g2bItem.getG2bUpr(),
                 request.getDeptCd(),
-                request.getOperSts(),
+                OperStatus.ACQ,
                 "5",  // TODO: 내용연수 로직
                 request.getAcqQty(),
                 request.getArrgTy(),
@@ -77,7 +77,7 @@ public class AcquisitionService {
                 request.getAcqAt(),
                 g2bItem.getG2bUpr(),
                 request.getDeptCd(),
-                request.getOperSts(),
+                acquisition.getOperSts(),
                 "5",
                 request.getAcqQty(),
                 request.getArrgTy(),
@@ -148,7 +148,7 @@ public class AcquisitionService {
     }
 
     /**
-     * 공통 검증 로직 (변경 없음)
+     * 공통 검증 로직
      */
     private G2bItemJpaEntity validateRequest(AcqRegisterRequest request, String orgCd) {
         G2bItemJpaEntity g2bItem = g2bItemJpaRepository.findById(request.getG2bDCd())
@@ -160,10 +160,6 @@ public class AcquisitionService {
 
         if (request.getAcqAt().isAfter(LocalDate.now(KOREA_ZONE))) {
             throw new BusinessException("취득일자는 현재 날짜 이후일 수 없습니다.");
-        }
-
-        if (request.getOperSts() != OperStatus.ACQ && request.getOperSts() != OperStatus.OPER) {
-            throw new BusinessException("취득 등록 시 운용상태는 '취득' 또는 '운용'만 가능합니다.");
         }
 
         return g2bItem;

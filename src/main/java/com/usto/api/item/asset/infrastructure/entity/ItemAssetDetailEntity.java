@@ -20,7 +20,7 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@SQLDelete(sql = "UPDATE TB_ITEM002D SET del_yn = 'Y', del_at = NOW() WHERE itm_no = ?")
+@SQLDelete(sql = "UPDATE TB_ITEM002D SET del_yn = 'Y', del_at = NOW() WHERE itm_no = ? AND org_cd = ?")
 @Where(clause = "DEL_YN = 'N'")
 public class ItemAssetDetailEntity extends BaseTimeEntity {
 

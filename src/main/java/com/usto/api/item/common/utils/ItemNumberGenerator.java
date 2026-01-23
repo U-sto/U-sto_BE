@@ -3,7 +3,6 @@ package com.usto.api.item.common.utils;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 
 /**
  * 물품고유번호 생성기
