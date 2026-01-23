@@ -1,8 +1,8 @@
-package com.usto.api.g2b.presentation.dto.response;
+package com.usto.api.common.utils;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.usto.api.common.utils.ItemsFlexibleDeserializer;
+
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
