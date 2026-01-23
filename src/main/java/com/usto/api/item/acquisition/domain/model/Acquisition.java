@@ -74,12 +74,12 @@ public class Acquisition {
                 .acqAt(acqAt)
                 .acqUpr(acqUpr)
                 .deptCd(deptCd)
-                .operSts(operSts)
+                .operSts(OperStatus.ACQ)   // 초기 운용상태
                 .drbYr(drbYr)
                 .acqQty(acqQty)
                 .arrgTy(arrgTy)
                 .rmk(rmk)
-                .apprSts(ApprStatus.WAIT)  // 초기 상태
+                .apprSts(ApprStatus.WAIT)  // 초기 승인상태
                 .aplyUsrId(aplyUsrId)
                 .orgCd(orgCd)
                 .delYn("N")
