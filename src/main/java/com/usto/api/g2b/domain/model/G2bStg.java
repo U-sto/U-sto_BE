@@ -6,7 +6,7 @@ import lombok.Getter;
 //내부객체 - 변경을 위한 최소 정보
 @Getter
 @Builder
-public class G2bSync {
+public class G2bStg {
 
     private final String g2bMCd;   // 물품분류코드 -> G2B_M_CD
     private final String g2bMNm;   // 물품분류명   -> G2B_M_NM
