@@ -1,6 +1,5 @@
-package com.usto.api.g2b.domain.model;
+package com.usto.api.common.utils;
 
-import com.usto.api.g2b.presentation.dto.response.ShoppingMallEnvelope;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.ExchangeStrategies;
@@ -17,7 +16,7 @@ public class ShoppingMallOpenApiClient {
 
     private final WebClient webClient;
 
-    private String baseUrl = "https://apis.data.go.kr/1230000/at/ShoppingMallPrdctInfoService";
+    private String baseUrl = "http://apis.data.go.kr/1230000/at/ShoppingMallPrdctInfoService";
     private String path = "/getShoppingMallPrdctInfoList";
 
 
@@ -26,7 +25,7 @@ public class ShoppingMallOpenApiClient {
 
     public ShoppingMallOpenApiClient(WebClient.Builder builder) {
         ExchangeStrategies strategies = ExchangeStrategies.builder()
-                .codecs(c -> c.defaultCodecs().maxInMemorySize(10 * 1024 * 1024))
+                .codecs(c -> c.defaultCodecs().maxInMemorySize(1024 * 1024 * 1024))
                 .build();
 
         this.webClient = builder
@@ -78,7 +77,7 @@ public class ShoppingMallOpenApiClient {
                                                 (w.getStatusCode().is5xxServerError() || w.getStatusCode().value() == 504)
                                 )
                 )
-                .block(Duration.ofSeconds(25));
+                .block(Duration.ofSeconds(999999999));
 
         var resp = (env == null) ? null : env.response();
         var header = (resp == null) ? null : resp.header();
