@@ -41,7 +41,8 @@ public interface G2bItemCategoryJpaRepository extends JpaRepository<G2bItemCateg
       GROUP BY S.G2B_M_CD
     ) S ON S.G2B_M_CD = M.G2B_M_CD
     SET M.G2B_M_NM = S.G2B_M_NM,
-        M.UPD_BY   = :actor
+        M.UPD_BY   = :actor,
+        M.UPD_AT   = CURRENT_TIMESTAMP
     WHERE M.G2B_M_NM <> S.G2B_M_NM
     """, nativeQuery = true)
     int updateCategory(String actor);

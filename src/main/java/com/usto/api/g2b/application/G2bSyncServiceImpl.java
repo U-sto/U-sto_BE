@@ -32,7 +32,7 @@ public class G2bSyncServiceImpl {
     private static final String PAGE_NO = "1";        // 페이지 번호 (1페이지부터 조회해야 함)
     private static final String INQRY_DIV = "1";     // 등록일자 기준
     private static final int NUM_OF_ROWS = 10000;     // 페이지 사이즈 (테스트 성공 값인 10,000 권장)
-    private String actor = "SYSTEM";
+    private static final String ACTOR = "SYSTEM";
 
     @Transactional
     public long syncDaily() {
@@ -69,12 +69,12 @@ public class G2bSyncServiceImpl {
         }
 
         // DB에 추가 사항 반영
-        g2bItemCategoryService.insertCategory(actor);
-         g2bItemService.insertItems(actor);
+        g2bItemCategoryService.insertCategory(ACTOR);
+         g2bItemService.insertItems(ACTOR);
 
         // DB에 수정 사항 반영
-        g2bItemCategoryService.updateCategory(actor);
-        g2bItemService.updateItems(actor);
+        g2bItemCategoryService.updateCategory(ACTOR);
+        g2bItemService.updateItems(ACTOR);
 
         long count = g2bStgService.countChanged();
 
@@ -98,7 +98,9 @@ public class G2bSyncServiceImpl {
 
         for (int p = 2; p <= pages; p++) {
             var page = client.fetch(String.valueOf(p), String.valueOf(NUM_OF_ROWS), INQRY_DIV, begin, end);
-            items.addAll(page.items());
+            if (page != null && page.items() != null) {
+                items.addAll(page.items());
+            }
         }
         return items;
     }

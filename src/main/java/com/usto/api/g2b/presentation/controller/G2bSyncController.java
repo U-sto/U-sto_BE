@@ -17,15 +17,16 @@ import java.time.format.DateTimeFormatter;
 public class G2bSyncController {
 
     private final G2bSyncServiceImpl g2bSyncServiceImpl;
-    LocalDate now = LocalDate.now();
-    String begin = now.minusDays(2).format(DateTimeFormatter.BASIC_ISO_DATE);
-    String end = now.minusDays(1).format(DateTimeFormatter.BASIC_ISO_DATE);
 
     @Operation(
             summary = "G2B 목록정보 최신화(자동)"
     )
     @PutMapping("/sync")
     public ApiResponse<?> sync() {
+        LocalDate now = LocalDate.now();
+        String begin = now.minusDays(2).format(DateTimeFormatter.BASIC_ISO_DATE);
+        String end = now.minusDays(1).format(DateTimeFormatter.BASIC_ISO_DATE);
+
         long counts = g2bSyncServiceImpl.syncLatest(begin,end);
 
         if(counts == 0){

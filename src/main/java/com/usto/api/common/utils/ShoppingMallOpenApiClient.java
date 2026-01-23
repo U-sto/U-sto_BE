@@ -77,7 +77,7 @@ public class ShoppingMallOpenApiClient {
                                                 (w.getStatusCode().is5xxServerError() || w.getStatusCode().value() == 504)
                                 )
                 )
-                .block(Duration.ofSeconds(999999999));
+                .block(Duration.ofSeconds(600));
 
         var resp = (env == null) ? null : env.response();
         var header = (resp == null) ? null : resp.header();
