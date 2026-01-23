@@ -1,6 +1,6 @@
 package com.usto.api.g2b.application;
 
-import com.usto.api.g2b.domain.model.ShoppingMallOpenApiClient;
+import com.usto.api.common.utils.ShoppingMallOpenApiClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
