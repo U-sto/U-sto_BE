@@ -1,17 +1,8 @@
 package com.usto.api.g2b.domain.service;
 
-import com.usto.api.g2b.infrastructure.entity.G2bItemJpaEntity;
-
-import java.util.List;
 
 public interface G2bItemService {
 
-    int updateDetail();
-
-    List<G2bItemJpaEntity> findByFilters(
-            String mCd,
-            String dCd,
-            String dNm
-    );
-
+    int updateItems(String actor);
+    int insertItems(String actor);
 }

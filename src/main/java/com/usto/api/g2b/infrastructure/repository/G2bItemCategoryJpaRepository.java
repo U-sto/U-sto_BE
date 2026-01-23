@@ -24,15 +24,25 @@ public interface G2bItemCategoryJpaRepository extends JpaRepository<G2bItemCateg
 
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query(value = """
-        INSERT INTO TB_G2B001M (G2B_M_CD,G2B_M_NM,CRE_BY)
-        SELECT s.G2B_M_CD, s.G2B_M_NM,'SYSTEM'
-        FROM TB_G2B_STG s
-        ON DUPLICATE KEY UPDATE
-          G2B_M_NM = CASE 
-                        WHEN TB_G2B001M.G2B_M_NM <> VALUES(G2B_M_NM)
-                        THEN VALUES(G2B_M_NM) 
-                        ELSE TB_G2B001M.G2B_M_NM 
-                      END;
-        """, nativeQuery = true)
-    int updateMaster();
+    INSERT INTO TB_G2B001M (G2B_M_CD, G2B_M_NM, CRE_BY)
+    SELECT DISTINCT S.G2B_M_CD, S.G2B_M_NM, :actor
+    FROM TB_G2B_STG S
+    LEFT JOIN TB_G2B001M M ON M.G2B_M_CD = S.G2B_M_CD
+    WHERE M.G2B_M_CD IS NULL
+    """, nativeQuery = true)
+    int insertCategory(String actor);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query(value = """
+    UPDATE TB_G2B001M M
+    JOIN (
+      SELECT S.G2B_M_CD, MAX(S.G2B_M_NM) AS G2B_M_NM
+      FROM TB_G2B_STG S
+      GROUP BY S.G2B_M_CD
+    ) S ON S.G2B_M_CD = M.G2B_M_CD
+    SET M.G2B_M_NM = S.G2B_M_NM,
+        M.UPD_BY   = :actor
+    WHERE M.G2B_M_NM <> S.G2B_M_NM
+    """, nativeQuery = true)
+    int updateCategory(String actor);
 }

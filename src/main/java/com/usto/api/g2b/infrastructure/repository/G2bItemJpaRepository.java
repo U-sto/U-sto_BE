@@ -27,20 +27,25 @@ public interface G2bItemJpaRepository extends JpaRepository<G2bItemJpaEntity, St
     //G2B정보 업데이트
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query(value = """
-        INSERT INTO TB_G2B001D (G2B_D_CD,G2B_M_CD, G2B_D_NM, G2B_UPR,CRE_BY)
-        SELECT s.G2B_D_CD,s.G2B_M_CD, s.G2B_D_NM, s.G2B_UPR,'SYSTEM'
-        FROM TB_G2B_STG s
-        ON DUPLICATE KEY UPDATE
-          G2B_D_NM = CASE 
-                        WHEN TB_G2B001D.G2B_D_NM <> VALUES(G2B_D_NM)
-                        THEN VALUES(G2B_D_NM) 
-                        ELSE TB_G2B001D.G2B_D_NM 
-                      END,
-          G2B_UPR  = CASE 
-                        WHEN TB_G2B001D.G2B_UPR <> VALUES(G2B_UPR)
-                        THEN VALUES(G2B_UPR) 
-                        ELSE TB_G2B001D.G2B_UPR 
-                      END;
-        """, nativeQuery = true)
-    int updateDetail();
+    INSERT INTO TB_G2B001D (G2B_D_CD, G2B_M_CD, G2B_D_NM, G2B_UPR, CRE_BY)
+    SELECT S.G2B_D_CD, S.G2B_M_CD, S.G2B_D_NM, S.G2B_UPR, :actor
+    FROM TB_G2B_STG S
+    LEFT JOIN TB_G2B001D D ON D.G2B_D_CD = S.G2B_D_CD
+    WHERE D.G2B_D_CD IS NULL
+    """, nativeQuery = true)
+    int insertItems(String actor);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query(value = """
+    UPDATE TB_G2B001D D
+    JOIN TB_G2B_STG S ON S.G2B_D_CD = D.G2B_D_CD
+    SET D.G2B_M_CD = S.G2B_M_CD,
+        D.G2B_D_NM = S.G2B_D_NM,
+        D.G2B_UPR  = S.G2B_UPR,
+        D.UPD_BY   = :actor
+    WHERE (D.G2B_M_CD <> S.G2B_M_CD
+        OR D.G2B_D_NM <> S.G2B_D_NM
+        OR D.G2B_UPR  <> S.G2B_UPR)
+    """, nativeQuery = true)
+    int updateItems(String actor);
 }
