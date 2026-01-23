@@ -1,23 +1,23 @@
 package com.usto.api.g2b.infrastructure.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import com.usto.api.g2b.domain.model.G2bStg;
+import jakarta.persistence.*;
+import lombok.*;
+
 import java.math.BigDecimal;
 
 @Entity
 @Table(name = "TB_G2B_STG")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Builder
 public class G2bStgJpaEntity {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "STG_ID")
-    private Long stgId;
+    private Long id;
 
     @Column(name = "G2B_M_CD", length = 8, nullable = false, columnDefinition = "char(8)")
     private String g2bMCd;
@@ -32,4 +32,6 @@ public class G2bStgJpaEntity {
     private String g2bDNm;
 
     @Column(name = "G2B_UPR", precision = 20, scale = 0, nullable = false)
-    private BigDecimal g2bUpr;}
+    private BigDecimal g2bUpr;
+
+}
