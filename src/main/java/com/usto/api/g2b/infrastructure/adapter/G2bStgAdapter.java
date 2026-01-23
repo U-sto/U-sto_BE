@@ -1,8 +1,9 @@
 package com.usto.api.g2b.infrastructure.adapter;
 
-import com.usto.api.g2b.domain.model.G2bSync;
-import com.usto.api.g2b.domain.service.G2bSyncService;
-import com.usto.api.g2b.infrastructure.repository.G2bSyncJpaRepository;
+import com.usto.api.g2b.domain.model.G2bStg;
+import com.usto.api.g2b.domain.service.G2bStgService;
+import com.usto.api.g2b.infrastructure.entity.G2bStgMapper;
+import com.usto.api.g2b.infrastructure.repository.G2bStgJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -11,9 +12,9 @@ import java.util.List;
 
 @Repository
 @RequiredArgsConstructor
-public class G2bSyncAdapter implements G2bSyncService {
+public class G2bStgAdapter implements G2bStgService {
 
-    private final G2bSyncJpaRepository g2bStgJpaRepository;
+    private final G2bStgJpaRepository g2bStgJpaRepository;
     private final JdbcTemplate jdbcTemplate;
 
     @Override
@@ -22,7 +23,7 @@ public class G2bSyncAdapter implements G2bSyncService {
     }
 
     @Override
-    public void bulkInsert(List<G2bSync> rows) {
+    public void bulkInsert(List<G2bStg> rows) {
         jdbcTemplate.batchUpdate(
                 "INSERT INTO TB_G2B_STG (G2B_M_CD, G2B_M_NM, G2B_D_CD, G2B_D_NM, G2B_UPR) " +
                         "VALUES (?, ?, ?, ?, ?)",
@@ -36,5 +37,17 @@ public class G2bSyncAdapter implements G2bSyncService {
                     ps.setLong(5, r.getG2bUpr());
                 }
         );
+    }
+
+    @Override
+    public long countChanged() {
+        return g2bStgJpaRepository.countChanged();
+    }
+    
+    @Override
+    public List<G2bStg> findAll() {
+        return g2bStgJpaRepository.findAll().stream()
+                .map(G2bStgMapper::toDomain)
+                .toList();
     }
 }
