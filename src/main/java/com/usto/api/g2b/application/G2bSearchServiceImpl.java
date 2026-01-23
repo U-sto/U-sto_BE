@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.usto.api.common.exception.G2bBusinessException;
-import java.util.Collections;
 import java.util.List;
 
 /**
