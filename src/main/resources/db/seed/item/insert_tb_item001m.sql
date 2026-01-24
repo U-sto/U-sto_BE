@@ -8,7 +8,7 @@
  * 3. Soft Delete(DEL_YN='Y') 처리된 데이터 포함
  * 4. PK: UUID (BINARY 16) - UNHEX 변환 포맷 적용
  *******************************************************************************/
-
+USE usto;
 -- 1. 기존 데이터 초기화
 SET FOREIGN_KEY_CHECKS = 0;
 TRUNCATE TABLE `TB_ITEM001M`;

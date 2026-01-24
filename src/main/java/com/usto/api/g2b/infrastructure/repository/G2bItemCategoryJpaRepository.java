@@ -2,6 +2,7 @@ package com.usto.api.g2b.infrastructure.repository;
 
 import com.usto.api.g2b.infrastructure.entity.G2bItemCategoryJpaEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -19,4 +20,30 @@ public interface G2bItemCategoryJpaRepository extends JpaRepository<G2bItemCateg
     List<G2bItemCategoryJpaEntity> findByFilters(
             @Param("code") String code,
             @Param("name") String name);
+
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query(value = """
+    INSERT INTO TB_G2B001M (G2B_M_CD, G2B_M_NM, CRE_BY)
+    SELECT DISTINCT S.G2B_M_CD, S.G2B_M_NM, :actor
+    FROM TB_G2B_STG S
+    LEFT JOIN TB_G2B001M M ON M.G2B_M_CD = S.G2B_M_CD
+    WHERE M.G2B_M_CD IS NULL
+    """, nativeQuery = true)
+    int insertCategory(String actor);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query(value = """
+    UPDATE TB_G2B001M M
+    JOIN (
+      SELECT S.G2B_M_CD, MAX(S.G2B_M_NM) AS G2B_M_NM
+      FROM TB_G2B_STG S
+      GROUP BY S.G2B_M_CD
+    ) S ON S.G2B_M_CD = M.G2B_M_CD
+    SET M.G2B_M_NM = S.G2B_M_NM,
+        M.UPD_BY   = :actor,
+        M.UPD_AT   = CURRENT_TIMESTAMP
+    WHERE M.G2B_M_NM <> S.G2B_M_NM
+    """, nativeQuery = true)
+    int updateCategory(String actor);
 }

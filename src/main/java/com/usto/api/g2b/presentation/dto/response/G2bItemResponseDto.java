@@ -1,4 +1,4 @@
-package com.usto.api.g2b.presentation.dto;
+package com.usto.api.g2b.presentation.dto.response;
 
 import java.math.BigDecimal;
 /**
