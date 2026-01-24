@@ -69,6 +69,11 @@ public class Asset {
             throw new BusinessException("취득 단가는 0원 이상이어야 합니다.");
         }
 
+        // 내용연수는 1 이상의 정수여야 함
+        if (!StringUtils.hasText(drbYr) || !drbYr.matches("^[1-9]\\d*$")) {
+            throw new BusinessException("내용연수는 1 이상의 정수여야 합니다.");
+        }
+
         this.acqUpr = acqUpr;
         this.drbYr = drbYr;
         this.rmk = rmk;

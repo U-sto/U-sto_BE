@@ -17,8 +17,8 @@ public class AssetStatusHistory {
 
     private UUID itemHisId;              // 상태이력ID (PK)
     private String itmNo;                // 물품고유번호
-    private OperStatus prevSts;          // 이전상태
-    private OperStatus newSts;           // 변경상태
+    private String prevSts;              // 이전상태
+    private String newSts;               // 변경상태
     private String chgRsn;               // 변경사유
     private String reqUsrId;             // 등록자ID
     private LocalDate reqAt;             // 등록일자
@@ -37,8 +37,8 @@ public class AssetStatusHistory {
      */
     public static AssetStatusHistory create(
             String itmNo,
-            OperStatus prevSts,
-            OperStatus newSts,
+            String prevSts,
+            String newSts,
             String chgRsn,
             String reqUsrId,
             LocalDate reqAt,
