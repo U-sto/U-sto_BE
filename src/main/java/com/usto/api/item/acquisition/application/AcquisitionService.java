@@ -191,9 +191,6 @@ public class AcquisitionService {
             throw new BusinessException("요청한 항목 중 존재하지 않는 취득 정보가 포함되어 있습니다.");
         }
 
-        List<AssetMaster> newAssets = new ArrayList<>();
-
-
         for (Acquisition acquisition : acquisitions) {
             acquisition.validateOwnership(orgCd);
             acquisition.confirmApproval(userId);
