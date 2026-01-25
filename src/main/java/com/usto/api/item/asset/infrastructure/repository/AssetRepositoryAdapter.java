@@ -4,7 +4,7 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.usto.api.common.exception.BusinessException;
+import com.usto.api.item.acquisition.domain.model.Acquisition;
 import com.usto.api.item.asset.domain.model.Asset;
 import com.usto.api.item.asset.domain.model.AssetMaster;
 import com.usto.api.item.asset.domain.model.AssetStatusHistory;
@@ -57,7 +57,7 @@ public class AssetRepositoryAdapter implements AssetRepository {
     }
 
     @Override
-    public void saveAll(List<AssetMaster> assetMasters) {
+    public void saveAll(List<Acquisition> assetMasters) {
 
         List<ItemAssetMasterEntity> entities = assetMasters.stream()
                 .map(AssetMapper::toMasterEntity) // 하나씩 변환 (Master -> Entity)

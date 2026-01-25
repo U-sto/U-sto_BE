@@ -4,6 +4,7 @@ import com.usto.api.common.exception.BusinessException;
 import com.usto.api.g2b.infrastructure.entity.G2bItemJpaEntity;
 import com.usto.api.g2b.infrastructure.repository.G2bItemJpaRepository;
 import com.usto.api.item.acquisition.domain.model.Acquisition;
+import com.usto.api.item.asset.application.AssetService;
 import com.usto.api.item.asset.domain.model.Asset;
 import com.usto.api.item.asset.domain.model.AssetMaster;
 import com.usto.api.item.asset.domain.repository.AssetRepository;
@@ -40,6 +41,7 @@ public class AcquisitionService {
     private final DepartmentJpaRepository departmentJpaRepository;
 
     private final AssetRepository assetRepository;
+    private final AssetService assetService;
 
     private static final ZoneId KOREA_ZONE = ZoneId.of("Asia/Seoul");
 
@@ -195,11 +197,8 @@ public class AcquisitionService {
         for (Acquisition acquisition : acquisitions) {
             acquisition.validateOwnership(orgCd);
             acquisition.confirmApproval(userId);
-            AssetMaster newAsset = AssetMapper.toMasterDomain(acquisition); //여기서 새로운 물품을 마스터 테이블에서 생성해야한다.
-            newAssets.add(newAsset);
+            assetService.registerAssetsFromAcquisition(acquisition);
         }
-
         acquisitionRepository.saveAll(acquisitions);
-        assetRepository.saveAll(newAssets);
     }
 }

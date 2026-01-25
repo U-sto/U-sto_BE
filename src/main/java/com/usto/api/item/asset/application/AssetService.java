@@ -106,7 +106,7 @@ public class AssetService {
                 acq.getAcqId(), acq.getG2bDCd(), acq.getAcqQty(),
                 acq.getAcqAt(), acq.getApprAt(), acq.getArrgTy(), acq.getOrgCd()
         );
-        assetRepository.saveMaster(master);
+        assetRepository.saveMaster(master); //002M에 저장
 
         // 2. 현재 연도 + 다음 순번 조회
         int currentYear = LocalDate.now().getYear();

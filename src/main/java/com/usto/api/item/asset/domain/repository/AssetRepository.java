@@ -1,5 +1,6 @@
 package com.usto.api.item.asset.domain.repository;
 
+import com.usto.api.item.acquisition.domain.model.Acquisition;
 import com.usto.api.item.asset.domain.model.Asset;
 import com.usto.api.item.asset.domain.model.AssetMaster;
 import com.usto.api.item.asset.domain.model.AssetStatusHistory;
@@ -31,5 +32,5 @@ public interface AssetRepository {
 
     List<AssetMaster> findAllById(List<UUID> acqIds);
 
-    void saveAll(List<AssetMaster> assetMasters);
+    void saveAll(List<Acquisition> assetMasters);
 }
