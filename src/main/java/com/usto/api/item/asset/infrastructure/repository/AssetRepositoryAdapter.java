@@ -57,15 +57,6 @@ public class AssetRepositoryAdapter implements AssetRepository {
     }
 
     @Override
-    public void saveAll(List<Acquisition> assetMasters) {
-
-        List<ItemAssetMasterEntity> entities = assetMasters.stream()
-                .map(AssetMapper::toMasterEntity) // 하나씩 변환 (Master -> Entity)
-                .toList(); // 결과를 리스트로 수집
-        jpaMasterRepository.saveAll(entities);
-    }
-
-    @Override
     public Optional<Asset> findById(String itmNo, String orgCd) {
         return jpaRepository.findById(new ItemAssetDetailId(itmNo, orgCd)).map(AssetMapper::toDomain);
     }

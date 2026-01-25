@@ -31,6 +31,4 @@ public interface AssetRepository {
     void delete(String itmNo, String orgCd);
 
     List<AssetMaster> findAllById(List<UUID> acqIds);
-
-    void saveAll(List<Acquisition> assetMasters);
 }
