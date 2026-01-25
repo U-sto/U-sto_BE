@@ -1,6 +1,7 @@
 package com.usto.api.item.asset.infrastructure.entity;
 
 import com.usto.api.common.BaseTimeEntity;
+import com.usto.api.item.acquisition.domain.model.AcqArrangementType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
@@ -39,8 +40,9 @@ public class ItemAssetMasterEntity extends BaseTimeEntity {
     @Column(name = "ARRG_AT")
     private LocalDate arrgAt;  // 정리일자 (스냅샷)
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "ACQ_ARRG_TY", nullable = false, length = 20)
-    private String acqArrgTy;  // 정리구분
+    private AcqArrangementType acqArrgTy;  // 정리구분
 
     @Column(name = "ORG_CD", nullable = false, length = 7, columnDefinition = "char(7)")
     private String orgCd;
