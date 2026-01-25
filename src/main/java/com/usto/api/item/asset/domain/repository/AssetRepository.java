@@ -1,5 +1,6 @@
 package com.usto.api.item.asset.domain.repository;
 
+import com.usto.api.item.acquisition.domain.model.Acquisition;
 import com.usto.api.item.asset.domain.model.Asset;
 import com.usto.api.item.asset.domain.model.AssetMaster;
 import com.usto.api.item.asset.domain.model.AssetStatusHistory;
@@ -28,4 +29,6 @@ public interface AssetRepository {
     // 물품번호 순번 조회
     int getNextSequenceForYear(int year, String orgCd);
     void delete(String itmNo, String orgCd);
+
+    List<AssetMaster> findAllById(List<UUID> acqIds);
 }

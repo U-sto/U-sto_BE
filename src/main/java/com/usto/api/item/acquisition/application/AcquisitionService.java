@@ -4,6 +4,10 @@ import com.usto.api.common.exception.BusinessException;
 import com.usto.api.g2b.infrastructure.entity.G2bItemJpaEntity;
 import com.usto.api.g2b.infrastructure.repository.G2bItemJpaRepository;
 import com.usto.api.item.acquisition.domain.model.Acquisition;
+import com.usto.api.item.asset.application.AssetService;
+import com.usto.api.item.asset.domain.model.Asset;
+import com.usto.api.item.asset.domain.model.AssetMaster;
+import com.usto.api.item.asset.domain.repository.AssetRepository;
 import com.usto.api.item.common.model.OperStatus;
 import com.usto.api.organization.infrastructure.repository.DepartmentJpaRepository;
 import com.usto.api.item.acquisition.domain.repository.AcquisitionRepository;
@@ -19,6 +23,8 @@ import java.time.ZoneId;
 import java.util.List;
 import java.util.UUID;
 
+
+
 @Service
 @RequiredArgsConstructor
 public class AcquisitionService {
@@ -26,6 +32,9 @@ public class AcquisitionService {
     private final AcquisitionRepository acquisitionRepository;
     private final G2bItemJpaRepository g2bItemJpaRepository;
     private final DepartmentJpaRepository departmentJpaRepository;
+
+    private final AssetRepository assetRepository;
+    private final AssetService assetService;
 
     private static final ZoneId KOREA_ZONE = ZoneId.of("Asia/Seoul");
 
@@ -163,5 +172,23 @@ public class AcquisitionService {
         }
 
         return g2bItem;
+    }
+
+    @Transactional
+    public void ApprovalAcquisition(List<UUID> acqIds, String userId, String orgCd) {
+
+        List<Acquisition> acquisitions = acquisitionRepository.findAllById(acqIds);
+
+        //갯수 안 맞다? 문제 있는거
+        if (acquisitions.size() != acqIds.size()) {
+            throw new BusinessException("요청한 항목 중 존재하지 않는 취득 정보가 포함되어 있습니다.");
+        }
+
+        for (Acquisition acquisition : acquisitions) {
+            acquisition.validateOwnership(orgCd);
+            acquisition.confirmApproval(userId);
+            assetService.registerAssetsFromAcquisition(acquisition);
+        }
+        acquisitionRepository.saveAll(acquisitions);
     }
 }

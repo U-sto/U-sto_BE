@@ -1,11 +1,14 @@
 package com.usto.api.item.asset.domain.model;
 
 import com.usto.api.common.exception.BusinessException;
+import com.usto.api.item.acquisition.domain.model.AcqArrangementType;
+import com.usto.api.item.common.model.ApprStatus;
 import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.UUID;
 
 /**
@@ -18,11 +21,13 @@ public class AssetMaster {
     private final String g2bDCd;     // G2B 식별코드
     private Integer qty;             // 총 수량 (가변)
     private final LocalDate acqAt;   // 취득일자
-    private final LocalDate arrgAt;  // 정리일자
-    private final String acqArrgTy;     // 취득정리구분
+    private LocalDate arrgAt;  // 정리일자
+    private final AcqArrangementType acqArrgTy;     // 취득정리구분
     private final String orgCd;      // 조직코드
     private String delYn;
     private LocalDateTime delAt;
+
+    private static final ZoneId KOREA_ZONE = ZoneId.of("Asia/Seoul");
 
 
     /**
@@ -30,7 +35,7 @@ public class AssetMaster {
      */
     public static AssetMaster create(UUID acqId, String g2bDCd, Integer qty,
                                      LocalDate acqAt, LocalDate arrgAt,
-                                     String acqArrgTy, String orgCd) {
+                                     AcqArrangementType acqArrgTy, String orgCd) {
         return AssetMaster.builder()
                 .acqId(acqId)
                 .g2bDCd(g2bDCd)
@@ -56,4 +61,10 @@ public class AssetMaster {
         this.qty -= amount;
     }
 
+    public void confirmApproval(UUID acqId, String userId) {
+        if(acqId.equals(this.acqId)){
+            this.arrgAt = LocalDate.now(KOREA_ZONE);
+
+        }
+    }
 }

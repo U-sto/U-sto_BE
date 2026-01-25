@@ -3,6 +3,7 @@ package com.usto.api.item.acquisition.domain.model;
 import com.usto.api.common.exception.BusinessException;
 import com.usto.api.item.common.model.ApprStatus;
 import com.usto.api.item.common.model.OperStatus;
+import com.usto.api.user.domain.UserPrincipal;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -123,6 +124,17 @@ public class Acquisition {
         if (newStatus == ApprStatus.APPROVED) {
             this.apprAt = LocalDate.now(KOREA_ZONE);
         }
+    }
+
+    //승인 확정
+    public void confirmApproval(String userId) {
+
+        if (this.apprSts != ApprStatus.REQUEST) {
+            throw new BusinessException("승인 요청 상태에서만 확정할 수 있습니다.");
+        }
+        this.apprUsrId = userId;
+        changeStatus(ApprStatus.APPROVED);
+
     }
 
     /**

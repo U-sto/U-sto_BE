@@ -17,6 +17,11 @@ SET ROLE_ID = 'GUEST',
     APPR_STS = 'WAIT'
 WHERE USR_ID = 'badbergjr';
 
+UPDATE TB_USER001M
+SET ROLE_ID = 'ADMIN',
+    APPR_STS = 'APPROVED'
+WHERE USR_ID = 'badbergjr';
+
 -- 강제 삭제
 DELETE FROM tb_user001m
 WHERE USR_ID = 'badbergjr';

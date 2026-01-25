@@ -4,7 +4,7 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.usto.api.common.exception.BusinessException;
+import com.usto.api.item.acquisition.domain.model.Acquisition;
 import com.usto.api.item.asset.domain.model.Asset;
 import com.usto.api.item.asset.domain.model.AssetMaster;
 import com.usto.api.item.asset.domain.model.AssetStatusHistory;
@@ -203,6 +203,17 @@ public class AssetRepositoryAdapter implements AssetRepository {
         jpaRepository.deleteById(new ItemAssetDetailId(itmNo, orgCd));
     }
 
+    @Override
+    public List<AssetMaster> findAllById(List<UUID> acqIds){
+        // 1. DB에서 엔티티 리스트 조회 (List<ItemAssetMasterEntity>)
+        List<ItemAssetMasterEntity> entities = jpaMasterRepository.findAllById(acqIds);
+
+        // 2. [필수] 엔티티 -> 도메인으로 변환하여 반환
+        return entities.stream()
+                .map(AssetMapper::toMasterDomain) // Entity를 Domain으로 바꾸는 매퍼 필요
+                .toList();
+    }
+
     /**
      * 동적 쿼리를 위한 헬퍼 메서드들 (값이 null이면 조건이 무시됨)
      */
@@ -235,4 +246,6 @@ public class AssetRepositoryAdapter implements AssetRepository {
     private BooleanExpression itmNoEq(String itmNo) {
         return StringUtils.hasText(itmNo) ? itemAssetDetailEntity.itemId.itmNo.eq(itmNo) : null;
     }
+
+
 }

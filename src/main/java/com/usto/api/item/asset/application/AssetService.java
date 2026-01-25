@@ -104,9 +104,9 @@ public class AssetService {
         // 1. 대장 기본(Master) 생성: 1건
         AssetMaster master = AssetMaster.create(
                 acq.getAcqId(), acq.getG2bDCd(), acq.getAcqQty(),
-                acq.getAcqAt(), acq.getApprAt(), acq.getArrgTy().name(), acq.getOrgCd()
+                acq.getAcqAt(), acq.getApprAt(), acq.getArrgTy(), acq.getOrgCd()
         );
-        assetRepository.saveMaster(master);
+        assetRepository.saveMaster(master); //002M에 저장
 
         // 2. 현재 연도 + 다음 순번 조회
         int currentYear = LocalDate.now().getYear();
