@@ -26,6 +26,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.usto.api.user.domain.model.Role.ADMIN;
+
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor // 생성자 주입용
@@ -76,7 +78,7 @@ public class SecurityConfig {
                     ).permitAll();
 
                     //역할별 접근 제한
-                    auth.requestMatchers("/api/admin/**").hasRole("ADMIN");
+                    auth.requestMatchers("/api/item/acquisitions/admin/**").hasRole("ADMIN");
                     auth.requestMatchers("/api/**").hasAnyRole("MANAGER", "ADMIN");
 
                     if (isDev) {
