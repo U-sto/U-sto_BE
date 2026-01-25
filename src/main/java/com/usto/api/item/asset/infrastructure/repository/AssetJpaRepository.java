@@ -3,15 +3,193 @@ package com.usto.api.item.asset.infrastructure.repository;
 import com.usto.api.item.asset.infrastructure.entity.ItemAssetDetailEntity;
 import com.usto.api.item.asset.infrastructure.entity.ItemAssetDetailId;
 import com.usto.api.item.asset.infrastructure.entity.ItemAssetMasterEntity;
+import com.usto.api.item.asset.presentation.dto.response.AssetAiItemDetailResponse;
+import com.usto.api.item.asset.presentation.dto.response.AssetDetailResponse;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 
 public interface AssetJpaRepository extends JpaRepository<ItemAssetDetailEntity, ItemAssetDetailId> {
 
+    @Query("""
+    SELECT NEW com.usto.api.item.asset.presentation.dto.response.AssetAiItemDetailResponse(
+        d.itemId.itmNo,
+        g.g2bDNm,
+        c.g2bMCd,
+        g.g2bDCd,
+        m.acqAt,
+        m.arrgAt,
+        d.operSts,
+        d.drbYr,
+        d.acqUpr,
+        m.qty,
+        a.acqQty,
+        a.arrgTy,
+        d.deptCd,
+        d.rmk
+    )
+    FROM ItemAssetDetailEntity d
+        JOIN ItemAssetMasterEntity m
+            ON m.acqId = d.acqId
+        JOIN ItemAcquisitionEntity a
+            ON a.acqId = d.acqId
+        JOIN G2bItemJpaEntity g
+            ON g.g2bDCd = d.g2bDCd
+        JOIN G2bItemCategoryJpaEntity c
+            ON c.g2bMCd = g.g2bMCd
+    WHERE d.itemId.orgCd = :orgCd
+      AND d.delYn = 'N'
+      AND m.delYn = 'N'
+      AND a.delYn = 'N'
+      AND c.g2bMCd = :g2bMCd
+      AND g.g2bDCd = :g2bDCd
+    ORDER BY m.acqAt DESC, d.itemId.itmNo ASC
+""")
+    List<AssetAiItemDetailResponse> findAllByG2bCode(
+            @Param("g2bMCd") String g2bMCd,
+            @Param("g2bDCd") String g2bDCd,
+            @Param("orgCd") String orgCd
+    );
+
+        @Query("""
+    SELECT NEW com.usto.api.item.asset.presentation.dto.response.AssetAiItemDetailResponse(
+        d.itemId.itmNo,
+        g.g2bDNm,
+        c.g2bMCd,
+        g.g2bDCd,
+        m.acqAt,
+        m.arrgAt,
+        d.operSts,
+        d.drbYr,
+        d.acqUpr,
+        m.qty,
+        a.acqQty,
+        a.arrgTy,
+        d.deptCd,
+        d.rmk
+    )
+    FROM ItemAssetDetailEntity d
+        JOIN ItemAssetMasterEntity m ON m.acqId = d.acqId
+        JOIN ItemAcquisitionEntity a ON a.acqId = d.acqId
+        JOIN G2bItemJpaEntity g ON g.g2bDCd = d.g2bDCd
+        JOIN G2bItemCategoryJpaEntity c ON c.g2bMCd = g.g2bMCd
+    WHERE d.itemId.orgCd = :orgCd
+      AND d.delYn = 'N'
+      AND m.delYn = 'N'
+      AND a.delYn = 'N'
+      AND g.g2bDNm LIKE CONCAT('%', :g2bDNm, '%')
+    ORDER BY m.acqAt DESC, d.itemId.itmNo ASC
+""")
+    List<AssetAiItemDetailResponse> findAllByG2bName(
+            @Param("g2bDNm") String g2bDNm,
+            @Param("orgCd") String orgCd
+    );
+
+    @Query("""
+    SELECT NEW com.usto.api.item.asset.presentation.dto.response.AssetAiItemDetailResponse(
+        d.itemId.itmNo,
+        g.g2bDNm,
+        c.g2bMCd,
+        g.g2bDCd,
+        m.acqAt,
+        m.arrgAt,
+        d.operSts,
+        d.drbYr,
+        d.acqUpr,
+        m.qty,
+        a.acqQty,
+        a.arrgTy,
+        d.deptCd,
+        d.rmk
+    )
+    FROM ItemAssetDetailEntity d
+        JOIN ItemAssetMasterEntity m ON m.acqId = d.acqId
+        JOIN ItemAcquisitionEntity a ON a.acqId = d.acqId
+        JOIN G2bItemJpaEntity g ON g.g2bDCd = d.g2bDCd
+        JOIN G2bItemCategoryJpaEntity c ON c.g2bMCd = g.g2bMCd
+    WHERE d.itemId.orgCd = :orgCd
+      AND d.delYn = 'N'
+      AND m.delYn = 'N'
+      AND a.delYn = 'N'
+      AND g.g2bDCd = :g2bDCd
+    ORDER BY m.acqAt DESC, d.itemId.itmNo ASC
+""")
+    List<AssetAiItemDetailResponse> findAllByG2bDCd(
+            @Param("g2bDCd") String g2bDCd,
+            @Param("orgCd") String orgCd
+    );
+
+
+    @Query("""
+    SELECT NEW com.usto.api.item.asset.presentation.dto.response.AssetAiItemDetailResponse(
+        d.itemId.itmNo,
+        g.g2bDNm,
+        c.g2bMCd,
+        g.g2bDCd,
+        m.acqAt,
+        m.arrgAt,
+        d.operSts,
+        d.drbYr,
+        d.acqUpr,
+        m.qty,
+        a.acqQty,
+        a.arrgTy,
+        d.deptCd,
+        d.rmk
+    )
+    FROM ItemAssetDetailEntity d
+        JOIN ItemAssetMasterEntity m ON m.acqId = d.acqId
+        JOIN ItemAcquisitionEntity a ON a.acqId = d.acqId
+        JOIN G2bItemJpaEntity g ON g.g2bDCd = d.g2bDCd
+        JOIN G2bItemCategoryJpaEntity c ON c.g2bMCd = g.g2bMCd
+    WHERE d.itemId.orgCd = :orgCd
+      AND d.delYn = 'N'
+      AND m.delYn = 'N'
+      AND a.delYn = 'N'
+      AND c.g2bMCd = :g2bMCd
+    ORDER BY m.acqAt DESC, d.itemId.itmNo ASC
+""")
+    List<AssetAiItemDetailResponse> findAllByG2bMCd(
+            @Param("g2bMCd") String g2bMCd,
+            @Param("orgCd") String orgCd
+    );
+
+    @Query("""
+    SELECT NEW com.usto.api.item.asset.presentation.dto.response.AssetAiItemDetailResponse(
+        d.itemId.itmNo,
+        g.g2bDNm,
+        c.g2bMCd,
+        g.g2bDCd,
+        m.acqAt,
+        m.arrgAt,
+        d.operSts,
+        d.drbYr,
+        d.acqUpr,
+        m.qty,
+        a.acqQty,
+        a.arrgTy,
+        d.deptCd,
+        d.rmk
+    )
+    FROM ItemAssetDetailEntity d
+        JOIN ItemAssetMasterEntity m ON m.acqId = d.acqId
+        JOIN ItemAcquisitionEntity a ON a.acqId = d.acqId
+        JOIN G2bItemJpaEntity g ON g.g2bDCd = d.g2bDCd
+        JOIN G2bItemCategoryJpaEntity c ON c.g2bMCd = g.g2bMCd
+    WHERE d.itemId.itmNo = :itmNo
+      AND d.itemId.orgCd = :orgCd
+      AND d.delYn = 'N'
+      AND m.delYn = 'N'
+      AND a.delYn = 'N'
+""")
+    List<AssetAiItemDetailResponse> findOneByItmNo(
+            @Param("itmNo") String itmNo,
+            @Param("orgCd") String orgCd
+    );
     /**
      * 특정 연도에 한 조직에서 마지막 물품의 순번 조회 (물품번호 생성용)
      * 예: M2026XXXXX 형식에서 XXXXX 부분의 최대값
