@@ -1,5 +1,6 @@
 package com.usto.api.item.asset.infrastructure.mapper;
 
+import com.usto.api.item.acquisition.domain.model.Acquisition;
 import com.usto.api.item.asset.domain.model.Asset;
 import com.usto.api.item.asset.domain.model.AssetMaster;
 import com.usto.api.item.asset.domain.model.AssetStatusHistory;
@@ -7,6 +8,7 @@ import com.usto.api.item.asset.infrastructure.entity.ItemAssetDetailEntity;
 import com.usto.api.item.asset.infrastructure.entity.ItemAssetDetailId;
 import com.usto.api.item.asset.infrastructure.entity.ItemAssetMasterEntity;
 import com.usto.api.item.asset.infrastructure.entity.ItemAssetStatusHistoryEntity;
+
 
 public final class AssetMapper {
     private AssetMapper() {}
@@ -71,6 +73,20 @@ public final class AssetMapper {
                 .build();
     }
 
+    //
+    public static AssetMaster toMasterDomain(Acquisition acquisition) {
+        return AssetMaster.builder()
+                .acqId(acquisition.getAcqId())
+                .g2bDCd(acquisition.getG2bDCd())
+                .qty(acquisition.getAcqQty())
+                .acqAt(acquisition.getAcqAt())
+                .arrgAt(acquisition.getApprAt())
+                .acqArrgTy(acquisition.getArrgTy())
+                .orgCd(acquisition.getOrgCd())
+                .delYn(acquisition.getDelYn())
+                .build();
+    }
+
     /**
      * Domain → Entity
      */
@@ -86,7 +102,6 @@ public final class AssetMapper {
                 .delYn(domain.getDelYn())
                 .build();
     }
-
 
     /**
      * Entity → Domain (AssetStatusHistory)
@@ -131,4 +146,5 @@ public final class AssetMapper {
                 .delAt(domain.getDelAt())
                 .build();
     }
+
 }
