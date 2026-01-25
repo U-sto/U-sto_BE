@@ -8,8 +8,6 @@ import com.usto.api.item.asset.application.AssetService;
 import com.usto.api.item.asset.domain.model.Asset;
 import com.usto.api.item.asset.domain.model.AssetMaster;
 import com.usto.api.item.asset.domain.repository.AssetRepository;
-import com.usto.api.item.asset.infrastructure.mapper.AssetMapper;
-import com.usto.api.item.common.model.ApprStatus;
 import com.usto.api.item.common.model.OperStatus;
 import com.usto.api.organization.infrastructure.repository.DepartmentJpaRepository;
 import com.usto.api.item.acquisition.domain.repository.AcquisitionRepository;
@@ -17,20 +15,15 @@ import com.usto.api.item.acquisition.presentation.dto.request.AcqRegisterRequest
 import com.usto.api.item.acquisition.presentation.dto.request.AcqSearchRequest;
 import com.usto.api.item.acquisition.presentation.dto.response.AcqListResponse;
 import lombok.RequiredArgsConstructor;
-import okio.ForwardingTimeout;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
-import static com.usto.api.item.common.model.ApprStatus.APPROVED;
+
 
 @Service
 @RequiredArgsConstructor

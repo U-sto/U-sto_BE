@@ -26,8 +26,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.usto.api.user.domain.model.Role.ADMIN;
-
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor // 생성자 주입용

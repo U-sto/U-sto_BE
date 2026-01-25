@@ -129,9 +129,11 @@ public class Acquisition {
     //승인 확정
     public void confirmApproval(String userId) {
 
-            this.apprUsrId = userId;
-            this.apprSts = ApprStatus.APPROVED;
-            this.apprAt = LocalDate.now(KOREA_ZONE);
+        if (this.apprSts != ApprStatus.REQUEST) {
+            throw new BusinessException("승인 요청 상태에서만 확정할 수 있습니다.");
+        }
+        this.apprUsrId = userId;
+        changeStatus(ApprStatus.APPROVED);
 
     }
 
