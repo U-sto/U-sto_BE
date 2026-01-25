@@ -143,4 +143,28 @@ public class AcquisitionRepositoryAdapter implements AcquisitionRepository {
 
         return itemAcquisitionEntity.apprSts.eq(s);
     }
+
+    //여기서 저장됨
+    @Override
+    public void saveAll(List<Acquisition> acquisitions) {
+        // 도메인 리스트 -> 엔티티 리스트 변환
+        List<ItemAcquisitionEntity> entities = acquisitions.stream()
+                .map(AcquisitionMapper::toEntity)
+                .toList();
+
+        jpaRepository.saveAll(entities);
+
+    }
+
+    //야기서 보낸 도메인들
+    @Override
+    public List<Acquisition> findAllById(List<UUID> acqIds) {
+        // JPA 딸깍
+        List<ItemAcquisitionEntity> entities = jpaRepository.findAllById(acqIds);
+
+        // 엔티티 리스트 -> 도메인 리스트 변환 후 반환
+        return entities.stream()
+                .map(AcquisitionMapper::toDomain)
+                .toList();
+    }
 }

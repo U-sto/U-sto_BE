@@ -28,4 +28,8 @@ public interface AssetRepository {
     // 물품번호 순번 조회
     int getNextSequenceForYear(int year, String orgCd);
     void delete(String itmNo, String orgCd);
+
+    List<AssetMaster> findAllById(List<UUID> acqIds);
+
+    void saveAll(List<AssetMaster> assetMasters);
 }

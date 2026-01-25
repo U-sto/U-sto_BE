@@ -2,9 +2,12 @@ package com.usto.api.item.asset.infrastructure.repository;
 
 import com.usto.api.item.asset.infrastructure.entity.ItemAssetDetailEntity;
 import com.usto.api.item.asset.infrastructure.entity.ItemAssetDetailId;
+import com.usto.api.item.asset.infrastructure.entity.ItemAssetMasterEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+
+import java.util.List;
 
 
 public interface AssetJpaRepository extends JpaRepository<ItemAssetDetailEntity, ItemAssetDetailId> {
@@ -21,4 +24,5 @@ public interface AssetJpaRepository extends JpaRepository<ItemAssetDetailEntity,
       AND ORG_CD = :orgCd
     """, nativeQuery = true)
     int findMaxSequenceByYear(@Param("year") String year, @Param("orgCd") String orgCd);
+
 }

@@ -16,4 +16,8 @@ public interface AcquisitionRepository {
 
     // 조회는 Response DTO 직접 반환 (변경 없음)
     List<AcqListResponse> findAllByFilter(AcqSearchRequest cond, String orgCd);
+
+    List<Acquisition> findAllById(List<UUID> acqIds);
+
+    void saveAll(List<Acquisition> acquisitions);
 }
