@@ -2,6 +2,7 @@ package com.usto.api.item.acquisition.presentation.controller;
 
 import com.usto.api.common.utils.ApiResponse;
 import com.usto.api.item.acquisition.application.AcquisitionService;
+import com.usto.api.item.acquisition.presentation.dto.request.AcqApprovalBulkRequestDto;
 import com.usto.api.item.acquisition.presentation.dto.request.AcqRegisterRequest;
 import com.usto.api.item.acquisition.presentation.dto.request.AcqSearchRequest;
 import com.usto.api.item.acquisition.presentation.dto.response.AcqListResponse;
@@ -108,5 +109,23 @@ public class AcquisitionController {
             @AuthenticationPrincipal UserPrincipal principal) {
         acquisitionService.cancelRequest(acqId, principal.getOrgCd());
         return ApiResponse.ok("승인 요청 취소 완료");
+    }
+
+    // 7. 승인 완료
+    @Operation(
+            summary = "물품 취득 승인 확정 (ADMIN)",
+            description = "승인 요청(REQUEST) 건을 승인하여 승인(APPROVAL) 상태로 만듭니다.."
+    )
+    @PutMapping("/admin/approval")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ApiResponse<?> approvalRequest(
+            @RequestBody @Valid AcqApprovalBulkRequestDto request, // DTO로 변경
+            @AuthenticationPrincipal UserPrincipal principal) {
+            acquisitionService.ApprovalAcquisition(
+                    request.getAcqIds(),
+                    principal.getUsername(),
+                    principal.getOrgCd());
+
+        return ApiResponse.ok("취득 승인 확정 성공");
     }
 }
