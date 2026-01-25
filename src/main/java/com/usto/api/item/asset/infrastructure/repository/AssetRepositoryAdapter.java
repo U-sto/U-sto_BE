@@ -4,17 +4,19 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.usto.api.g2b.infrastructure.entity.QG2bItemCategoryJpaEntity;
+import com.usto.api.g2b.infrastructure.entity.QG2bItemJpaEntity;
 import com.usto.api.item.acquisition.domain.model.Acquisition;
+import com.usto.api.item.acquisition.infrastructure.entity.QItemAcquisitionEntity;
 import com.usto.api.item.asset.domain.model.Asset;
+import com.usto.api.item.asset.domain.model.AssetDetailRow;
 import com.usto.api.item.asset.domain.model.AssetMaster;
 import com.usto.api.item.asset.domain.model.AssetStatusHistory;
 import com.usto.api.item.asset.domain.repository.AssetRepository;
-import com.usto.api.item.asset.infrastructure.entity.ItemAssetDetailEntity;
-import com.usto.api.item.asset.infrastructure.entity.ItemAssetDetailId;
-import com.usto.api.item.asset.infrastructure.entity.ItemAssetMasterEntity;
-import com.usto.api.item.asset.infrastructure.entity.ItemAssetStatusHistoryEntity;
+import com.usto.api.item.asset.infrastructure.entity.*;
 import com.usto.api.item.asset.infrastructure.mapper.AssetMapper;
 import com.usto.api.item.asset.presentation.dto.request.AssetSearchRequest;
+import com.usto.api.item.asset.presentation.dto.response.AssetAiItemDetailResponse;
 import com.usto.api.item.asset.presentation.dto.response.AssetDetailResponse;
 import com.usto.api.item.asset.presentation.dto.response.AssetListResponse;
 import com.usto.api.item.common.model.OperStatus;
@@ -63,7 +65,8 @@ public class AssetRepositoryAdapter implements AssetRepository {
 
     /**
      * 필터 조건에 따른 운용대장목록 검색
-     * @param cond 검색 조건 (DTO)
+     *
+     * @param cond  검색 조건 (DTO)
      * @param orgCd 현재 로그인한 유저의 조직코드
      */
     @Override
@@ -204,7 +207,7 @@ public class AssetRepositoryAdapter implements AssetRepository {
     }
 
     @Override
-    public List<AssetMaster> findAllById(List<UUID> acqIds){
+    public List<AssetMaster> findAllById(List<UUID> acqIds) {
         // 1. DB에서 엔티티 리스트 조회 (List<ItemAssetMasterEntity>)
         List<ItemAssetMasterEntity> entities = jpaMasterRepository.findAllById(acqIds);
 
@@ -213,6 +216,32 @@ public class AssetRepositoryAdapter implements AssetRepository {
                 .map(AssetMapper::toMasterDomain) // Entity를 Domain으로 바꾸는 매퍼 필요
                 .toList();
     }
+
+    @Override
+    public List<AssetAiItemDetailResponse> findAllByG2bCode(String g2bMCd, String g2bDCd, String orgCd){
+        return jpaRepository.findAllByG2bCode(g2bMCd, g2bDCd, orgCd);
+    }
+
+    @Override
+    public List<AssetAiItemDetailResponse> findAllByG2bName(String g2bDNm, String orgCd){
+        return jpaRepository.findAllByG2bName(g2bDNm, orgCd);
+    }
+
+    @Override
+    public List<AssetAiItemDetailResponse> findAllByG2bDCd(String g2bDCd, String orgCd){
+        return jpaRepository.findAllByG2bDCd(g2bDCd, orgCd);
+    }
+
+    @Override
+    public List<AssetAiItemDetailResponse> findAllByG2bMCd(String g2bMCd, String orgCd){
+        return jpaRepository.findAllByG2bMCd(g2bMCd, orgCd);
+    }
+
+    @Override
+    public List<AssetAiItemDetailResponse> findOneByItmNo(String itmNo, String orgCd) {
+        return jpaRepository.findOneByItmNo(itmNo, orgCd);
+    }
+
 
     /**
      * 동적 쿼리를 위한 헬퍼 메서드들 (값이 null이면 조건이 무시됨)
