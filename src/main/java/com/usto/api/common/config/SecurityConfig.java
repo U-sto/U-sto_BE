@@ -121,12 +121,15 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.setAllowedOrigins(List.of("http://localhost:3000","http://localhost:8080")); // 프론트엔드 포트에 맞게 수정 (예: 3000)
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedOrigins(List.of(
+                "https://u-sto-backend.vercel.app/v3/api-docs",
+                "http://localhost:3000",
+                "http://localhost:8080",
+                "http://localhost:5500" //로컬 테스트용
+        ));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
-        configuration.setAllowCredentials(true);
-        //세션 생성여부 확인
-        configuration.setExposedHeaders(List.of("X-Session-Exists"));
+        configuration.setAllowCredentials(true); // 세션 기반이면 true 유지
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
