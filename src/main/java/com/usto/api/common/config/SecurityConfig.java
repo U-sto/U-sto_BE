@@ -12,6 +12,7 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -68,6 +69,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> {
                     // 기본 허용 경로 (언제든 접근 가능)
                     auth.requestMatchers(
+                            "/v3/api-docs/**",
                             "/api/users/sign-up", //회원가입
                             "/api/users/exists/**", //중복조회 when 회원가입
                             "/api/auth/find/**", //아이디/비밀번호 찾기
@@ -76,8 +78,9 @@ public class SecurityConfig {
                             "/api/auth/logout", //로그아웃
                             "/api/approval/**", //일단은 열어두는데 추후에 막아야한다.
                             "/api/g2b/sync", //일단은 열어두는데 추후에 막아야한다.
-                            "/api/g2b/test" //일단은 열어두는데 추후에 막아야한다.
+                            "/api/g2b/test"//일단은 열어두는데 추후에 막아야한다.
                     ).permitAll();
+
 
                     //역할별 접근 제한
                     auth.requestMatchers("/api/item/acquisitions/admin/**").hasRole("ADMIN");
@@ -121,12 +124,16 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.setAllowedOrigins(List.of("http://localhost:3000","http://localhost:8080")); // 프론트엔드 포트에 맞게 수정 (예: 3000)
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedOrigins(List.of(
+                "https://u-sto-backend.vercel.app",
+                "http://localhost:3000",
+                "http://localhost:8080",
+                "http://localhost:5500", //로컬 테스트용
+                "https://avengeful-shaunte-revolvingly.ngrok-free.dev" //로컬 테스트용
+        ));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
-        configuration.setAllowCredentials(true);
-        //세션 생성여부 확인
-        configuration.setExposedHeaders(List.of("X-Session-Exists"));
+        configuration.setAllowCredentials(true); // 세션 기반이면 true 유지
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
