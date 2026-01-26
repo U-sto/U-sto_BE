@@ -12,6 +12,7 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -40,10 +41,6 @@ public class SecurityConfig {
 
         http
                 .csrf(csrf -> csrf.disable())
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/v3/api-docs/**").permitAll()
-                        .anyRequest().authenticated()
-                )
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 // 세션 기반 인증 구조
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)) //필요할 때만(남용x)
@@ -68,6 +65,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> {
                     // 기본 허용 경로 (언제든 접근 가능)
                     auth.requestMatchers(
+                            "/v3/api-docs/**",
                             "/api/users/sign-up", //회원가입
                             "/api/users/exists/**", //중복조회 when 회원가입
                             "/api/auth/find/**", //아이디/비밀번호 찾기
@@ -76,8 +74,9 @@ public class SecurityConfig {
                             "/api/auth/logout", //로그아웃
                             "/api/approval/**", //일단은 열어두는데 추후에 막아야한다.
                             "/api/g2b/sync", //일단은 열어두는데 추후에 막아야한다.
-                            "/api/g2b/test" //일단은 열어두는데 추후에 막아야한다.
+                            "/api/g2b/test"//일단은 열어두는데 추후에 막아야한다.
                     ).permitAll();
+
 
                     //역할별 접근 제한
                     auth.requestMatchers("/api/item/acquisitions/admin/**").hasRole("ADMIN");
@@ -125,7 +124,8 @@ public class SecurityConfig {
                 "https://u-sto-backend.vercel.app",
                 "http://localhost:3000",
                 "http://localhost:8080",
-                "http://localhost:5500" //로컬 테스트용
+                "http://localhost:5500", //로컬 테스트용
+                "https://avengeful-shaunte-revolvingly.ngrok-free.dev" //로컬 테스트용
         ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
