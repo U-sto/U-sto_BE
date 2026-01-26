@@ -144,6 +144,7 @@ public class AssetService {
             String itmNo, String g2bMCd, String g2bDCd, String g2bDNm, String orgCd
     )
     {
+        //정리일자
 
         // 물품고유번호로 조회 -> 1건 조회
         if (hasText(itmNo)) {
@@ -151,17 +152,17 @@ public class AssetService {
         }
 
         // G2B 목록번호(MCd + DCd)로 조회 -> 결과 여러개
-        if (hasText(g2bMCd)&&hasText(g2bDCd)) {
+        if (hasText(g2bMCd) && hasText(g2bDCd)) {
             return assetRepository.findAllByG2bCode(g2bMCd, g2bDCd, orgCd);
         }
 
         // G2B 식별번호로 조회 DCd -> 결과 여러개 (사실 목록번호랑 같은 결과)
-        if(hasText(g2bDCd)){
+        if (hasText(g2bDCd)) {
             return assetRepository.findAllByG2bDCd(g2bDCd, orgCd);
         }
 
         // G2B 분류번호로 조회 MCd -> 결과 엄청 여러개
-        if(hasText(g2bMCd)){
+        if (hasText(g2bMCd)) {
             return assetRepository.findAllByG2bMCd(g2bMCd, orgCd);
         }
 
