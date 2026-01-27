@@ -29,7 +29,7 @@
 <script>
     window.onload = function () {
         SwaggerUIBundle({
-            url: "/swagger.json",  // 정적 파일이라서 API 변동이 생기며 업데이트 해줘야함
+            url: "./swagger.json",  // 상대 경로로 변경
             dom_id: "#swagger-ui",
             deepLinking: true,
             presets: [

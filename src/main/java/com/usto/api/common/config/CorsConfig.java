@@ -15,7 +15,7 @@ public class CorsConfig {
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
                         .allowedOrigins(
-                                "https://docs-usto-swagger.vercel.app,",
+                                "https://u-sto.github.io",
                                 "http://localhost:3000" // 필요 시 로컬 프론트 테스트용
                         )
                         .allowedMethods("GET","POST","PUT","PATCH","DELETE","OPTIONS")
