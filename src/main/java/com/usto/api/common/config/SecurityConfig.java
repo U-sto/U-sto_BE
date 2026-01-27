@@ -121,7 +121,7 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
 
         configuration.setAllowedOrigins(List.of(
-                "https://u-sto-backend.vercel.app",
+                "https://u-sto.github.io",
                 "http://localhost:3000",
                 "http://localhost:8080",
                 "http://localhost:5500", //로컬 테스트용
