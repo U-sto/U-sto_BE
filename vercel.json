@@ -1,0 +1,22 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "build.gradle",
+      "use": "@vercel/java"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/v3/api-docs.*",
+      "dest": "/"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/"
+    }
+  ],
+  "env": {
+    "SPRING_PROFILES_ACTIVE": "prod"
+  }
+}
