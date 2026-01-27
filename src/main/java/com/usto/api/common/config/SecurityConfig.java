@@ -121,6 +121,7 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
 
         configuration.setAllowedOrigins(List.of(
+                "https://u-sto-backend.vercel.app",  // Vercel 배포 도메인
                 "http://localhost:3000",
                 "http://localhost:8080"
         ));
