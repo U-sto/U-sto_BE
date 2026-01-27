@@ -42,7 +42,7 @@ public class Asset {
      * 신규 물품대장 디테일 생성 팩토리 메서드
      */
     public static Asset create(String itmNo, UUID acqId, String g2bDCd,
-                               String deptCd, BigDecimal acqUpr, String drbYr, String orgCd) {
+                               String deptCd, BigDecimal acqUpr, String drbYr, String orgCd,String rmk) {
         return Asset.builder()
                 .itmNo(itmNo)
                 .acqId(acqId)
@@ -52,6 +52,7 @@ public class Asset {
                 .acqUpr(acqUpr)
                 .drbYr(drbYr)
                 .orgCd(orgCd)
+                .rmk(rmk)
                 .printYn("N")
                 .delYn("N")
                 .build();

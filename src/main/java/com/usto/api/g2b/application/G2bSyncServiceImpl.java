@@ -29,6 +29,7 @@ public class G2bSyncServiceImpl {
     private final G2bItemCategoryService g2bItemCategoryService;
     private final ShoppingMallOpenApiClient client; //API연동
 
+    //이쪽 값을 정의해야할거같다.
     private static final String PAGE_NO = "1";        // 페이지 번호 (1페이지부터 조회해야 함)
     private static final String INQRY_DIV = "1";     // 등록일자 기준
     private static final int NUM_OF_ROWS = 10000;     // 페이지 사이즈 (테스트 성공 값인 10,000 권장)

@@ -5,6 +5,7 @@ import com.usto.api.item.asset.domain.model.Asset;
 import com.usto.api.item.asset.domain.model.AssetMaster;
 import com.usto.api.item.asset.domain.model.AssetStatusHistory;
 import com.usto.api.item.asset.presentation.dto.request.AssetSearchRequest;
+import com.usto.api.item.asset.presentation.dto.response.AssetAiItemDetailResponse;
 import com.usto.api.item.asset.presentation.dto.response.AssetDetailResponse;
 import com.usto.api.item.asset.presentation.dto.response.AssetListResponse;
 
@@ -31,4 +32,14 @@ public interface AssetRepository {
     void delete(String itmNo, String orgCd);
 
     List<AssetMaster> findAllById(List<UUID> acqIds);
+
+    List<AssetAiItemDetailResponse> findAllByG2bCode(String g2bMCd, String g2bDCd, String orgCd);
+
+    List<AssetAiItemDetailResponse> findAllByG2bName(String g2bDNm, String orgCd);
+
+    List<AssetAiItemDetailResponse> findAllByG2bDCd(String g2bDCd, String orgCd);
+
+    List<AssetAiItemDetailResponse> findAllByG2bMCd(String g2bMCd, String orgCd);
+
+    List<AssetAiItemDetailResponse> findOneByItmNo(String itmNo, String orgCd);
 }

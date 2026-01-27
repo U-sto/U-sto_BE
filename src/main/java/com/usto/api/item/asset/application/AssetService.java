@@ -6,6 +6,7 @@ import com.usto.api.item.asset.domain.model.AssetMaster;
 import com.usto.api.item.asset.domain.repository.AssetRepository;
 import com.usto.api.item.asset.presentation.dto.request.AssetSearchRequest;
 import com.usto.api.item.asset.presentation.dto.request.AssetUpdateRequest;
+import com.usto.api.item.asset.presentation.dto.response.AssetAiItemDetailResponse;
 import com.usto.api.item.asset.presentation.dto.response.AssetDetailResponse;
 import com.usto.api.item.asset.presentation.dto.response.AssetListResponse;
 import com.usto.api.item.common.utils.ItemNumberGenerator;
@@ -125,10 +126,56 @@ public class AssetService {
                     acq.getDeptCd(),
                     acq.getAcqUpr(),
                     acq.getDrbYr(),
-                    acq.getOrgCd()
-            );
+                    acq.getOrgCd(),
+                    acq.getRmk()
+                    );
 
             assetRepository.save(asset); // 002D에 저장
         }
+    }
+
+    /**
+     * AI 챗봇 질의용 물품 상세 정보 조회
+     * - 우선순위: ITM_NO(고유번호) > G2B Code(목록번호) > G2B Name(품명)
+     * - G2B 마스터/디테일 정보를 조인하여 정확한 스펙 정보를 반환
+     */
+    @Transactional(readOnly = true)
+    public List<AssetAiItemDetailResponse> getAssetList(
+            String itmNo, String g2bMCd, String g2bDCd, String g2bDNm, String orgCd
+    )
+    {
+        //정리일자
+
+        // 물품고유번호로 조회 -> 1건 조회
+        if (hasText(itmNo)) {
+            return assetRepository.findOneByItmNo(itmNo, orgCd);
+        }
+
+        // G2B 목록번호(MCd + DCd)로 조회 -> 결과 여러개
+        if (hasText(g2bMCd) && hasText(g2bDCd)) {
+            return assetRepository.findAllByG2bCode(g2bMCd, g2bDCd, orgCd);
+        }
+
+        // G2B 식별번호로 조회 DCd -> 결과 여러개 (사실 목록번호랑 같은 결과)
+        if (hasText(g2bDCd)) {
+            return assetRepository.findAllByG2bDCd(g2bDCd, orgCd);
+        }
+
+        // G2B 분류번호로 조회 MCd -> 결과 엄청 여러개
+        if (hasText(g2bMCd)) {
+            return assetRepository.findAllByG2bMCd(g2bMCd, orgCd);
+        }
+
+        // G2B 목록명으로 조회 -> 가장 애매함 -> 그래서 가장 후순위
+        if (hasText(g2bDNm)) {
+            return assetRepository.findAllByG2bName(g2bDNm, orgCd);
+        }
+
+        return List.of();
+    }
+
+    //존재여부 확인 간단하게
+    private boolean hasText(String s) {
+        return s != null && !s.isBlank();
     }
 }
