@@ -41,10 +41,6 @@ public class SecurityConfig {
 
         http
                 .csrf(csrf -> csrf.disable())
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/v3/api-docs/**").permitAll()
-                        .anyRequest().authenticated()
-                )
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 // 세션 기반 인증 구조
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)) //필요할 때만(남용x)
@@ -125,11 +121,9 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
 
         configuration.setAllowedOrigins(List.of(
-                "https://u-sto-backend.vercel.app",
+                "https://u-sto-backend.vercel.app",  // Vercel 배포 도메인
                 "http://localhost:3000",
-                "http://localhost:8080",
-                "http://localhost:5500", //로컬 테스트용
-                "https://avengeful-shaunte-revolvingly.ngrok-free.dev" //로컬 테스트용
+                "http://localhost:8080"
         ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
