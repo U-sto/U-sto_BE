@@ -184,17 +184,6 @@ public class ReturningRepositoryAdapter implements ReturningRepository {
         return itemReturningMasterEntity.aplyAt.between(s, e);
     }
 
-    private BooleanExpression apprAtBetween(LocalDate s, LocalDate e) {
-        if (s == null && e == null) return null;
-        if (s != null && e == null) return itemReturningMasterEntity.rtrnApprAt.goe(s);
-        if (s == null) return itemReturningMasterEntity.rtrnApprAt.loe(e);
-        return itemReturningMasterEntity.rtrnApprAt.between(s, e);
-    }
-
-    private BooleanExpression itemStsEq(ItemStatus sts) {
-        return sts != null ? itemReturningMasterEntity.itemSts.eq(sts) : null;
-    }
-
     private BooleanExpression apprStsEq(ApprStatus sts) {
         return sts != null ? itemReturningMasterEntity.apprSts.eq(sts) : null;
     }

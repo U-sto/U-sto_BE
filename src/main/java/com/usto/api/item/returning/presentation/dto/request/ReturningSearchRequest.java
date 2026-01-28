@@ -1,7 +1,6 @@
 package com.usto.api.item.returning.presentation.dto.request;
 
 import com.usto.api.item.common.model.ApprStatus;
-import com.usto.api.item.common.model.ItemStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;

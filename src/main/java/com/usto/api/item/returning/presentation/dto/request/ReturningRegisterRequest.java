@@ -3,7 +3,6 @@ package com.usto.api.item.returning.presentation.dto.request;
 import com.usto.api.item.common.model.ItemStatus;
 import com.usto.api.item.returning.domain.model.ReturningReason;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
