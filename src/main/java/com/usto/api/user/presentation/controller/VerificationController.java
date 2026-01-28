@@ -12,10 +12,12 @@ import com.usto.api.user.presentation.dto.request.SmsVerifyRequestDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -217,5 +219,6 @@ public class VerificationController {
             case RESET_PASSWORD -> "findPassword";
         };
     }
+
 
 }

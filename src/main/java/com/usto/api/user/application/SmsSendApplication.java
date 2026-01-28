@@ -7,6 +7,7 @@
 package com.usto.api.user.application;
 
 
+import com.usto.api.common.exception.BusinessException;
 import com.usto.api.common.utils.SmsUtil;
 import com.usto.api.user.domain.model.Verification;
 import com.usto.api.user.domain.model.VerificationPurpose;
@@ -15,6 +16,7 @@ import com.usto.api.user.domain.repository.VerificationRepository;
 import com.usto.api.user.presentation.dto.request.SmsSendRequestDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.nurigo.sdk.message.response.SingleMessageSentResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -79,7 +81,11 @@ public class SmsSendApplication {
 
         // SMS 발송 (숫자만 남기도록 정규화)
         String to = request.getTarget().replaceAll("[^0-9]", "");
-        smsUtil.sendVerificationCode(to, code);
+        SingleMessageSentResponse response = smsUtil.sendVerificationCode(to, code);
+
+        if(response.getStatusCode().equals("3059")){
+            throw new BusinessException("재 전송 해주세요.");
+        }
 
         log.info("[SMS-SEND] 발송 완료 - to: {}", to);
     }

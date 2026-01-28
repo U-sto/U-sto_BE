@@ -49,6 +49,14 @@ public class SmsUtil {
         message.setFrom(defaultFrom);
         message.setTo(target);
         message.setText("[U-sto]\n본인확인인증번호\n["+code+"]입니다.\n*타인 노출 금지*");
-        return this.messageService.sendOne(new SingleMessageSendingRequest(message));
+
+        SingleMessageSentResponse response =
+                this.messageService.sendOne(new SingleMessageSendingRequest(message));
+
+        String statusCode = response.getStatusCode();       // 예: "2000", 실패면 다른 값
+        String statusMsg  = response.getStatusMessage();    // 예: "정상 접수..."
+        // (원하면 여기서 로그만 찍고 그대로 return)
+
+        return response;
     }
 }
