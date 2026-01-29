@@ -80,13 +80,22 @@ public class SmsSendApplication {
 
         // SMS 발송 (숫자만 남기도록 정규화)
         String to = request.getTarget().replaceAll("[^0-9]", "");
-        SingleMessageSentResponse response = smsUtil.sendVerificationCode(to, code);
+        try {
+            SingleMessageSentResponse response = smsUtil.sendVerificationCode(to, code);
 
-        if(response.getStatusCode().equals("3059")){
+            String statusCode = response.getStatusCode();
+            log.info("[SMS-SEND] statusCode={}", statusCode);
+
+            if ("3059".equals(statusCode)) { //변작된 전화번호 오류 발생
+                throw new BusinessException("재 전송 해주세요.");
+            }
+
+        } catch (Exception e) {
+            // response 없이 터지는 실패까지 커버
             throw new BusinessException("재 전송 해주세요.");
         }
 
-        log.info("[SMS-SEND] 발송 완료 - to: {}", to);
+        log.info("[SMS-SEND] sms sent to= {}", to);
     }
 
 
