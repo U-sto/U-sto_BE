@@ -3,8 +3,8 @@ package com.usto.api.user.presentation.controller;
 import com.usto.api.common.utils.ApiResponse;
 import com.usto.api.user.application.LoginApplication;
 import com.usto.api.user.domain.model.User;
-import com.usto.api.user.presentation.dto.request.LoginRequestDto;
-import com.usto.api.user.presentation.dto.response.LoginResponseDto;
+import com.usto.api.user.presentation.dto.request.LoginRequest;
+import com.usto.api.user.presentation.dto.response.LoginResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
@@ -37,7 +37,7 @@ public class LogController {
     @PostMapping("/login")
     @Operation(summary = "로그인")
     public ApiResponse<?> login(
-            @Valid @RequestBody LoginRequestDto request,
+            @Valid @RequestBody LoginRequest request,
             HttpServletRequest httpRequest,
             HttpServletResponse httpResponse
     ) {
@@ -58,7 +58,7 @@ public class LogController {
 
         return ApiResponse.ok(
                 "로그인 성공",
-                new LoginResponseDto(
+                new LoginResponse(
                         user.getUsrId(),
                         user.getUsrNm()
                 )

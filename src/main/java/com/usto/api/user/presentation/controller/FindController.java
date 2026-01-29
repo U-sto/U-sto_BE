@@ -2,8 +2,8 @@ package com.usto.api.user.presentation.controller;
 
 import com.usto.api.common.utils.ApiResponse;
 import com.usto.api.user.application.*;
-import com.usto.api.user.presentation.dto.request.PasswordResetRequestDto;
-import com.usto.api.user.presentation.dto.response.UserIdFindResponseDto;
+import com.usto.api.user.presentation.dto.request.PasswordResetRequest;
+import com.usto.api.user.presentation.dto.response.UserIdFindResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpSession;
@@ -40,19 +40,19 @@ public class FindController {
         session.removeAttribute("findId.auth.email");
         session.removeAttribute("findId.auth.expiresAt");
 
-        return ApiResponse.ok("아이디 찾기 완료", new UserIdFindResponseDto(userId));
+        return ApiResponse.ok("아이디 찾기 완료", new UserIdFindResponse(userId));
     }
 
 
     @PostMapping("/password")
     @Operation(summary = "비밀번호 재설정")
     public ApiResponse<?> FindPassword(
-            @RequestBody PasswordResetRequestDto request,
+            @RequestBody PasswordResetRequest request,
             HttpSession session
     )
     {
-        String email = (String) session.getAttribute("findPassword.auth.email");
-        String usrId = (String) session.getAttribute("findPassword.auth.usrId");
+        String email = (String) session.getAttribute("resetPwd.auth.email");
+        String usrId = (String) session.getAttribute("resetPwd.auth.usrId");
 
         if (email == null || usrId == null) {  // ← 둘 다 먼저 체크
             return ApiResponse.fail("이메일 인증이 필요합니다.");
@@ -64,9 +64,9 @@ public class FindController {
 
         passwordUpdateApplication.updatePassword(usrId, request.getPwd());
 
-        session.removeAttribute("findPassword.auth.email");
-        session.removeAttribute("findPassword.auth.expiresAt");
-        session.removeAttribute("findPassword.auth.usrId");
+        session.removeAttribute("resetPwd.auth.email");
+        session.removeAttribute("resetPwd.auth.expiresAt");
+        session.removeAttribute("resetPwd.auth.usrId");
 
         return ApiResponse.ok("비밀번호 재설정 완료");
     }

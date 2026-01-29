@@ -4,11 +4,10 @@ import com.usto.api.common.exception.BusinessException;
 import com.usto.api.common.utils.ApiResponse;
 import com.usto.api.user.application.*;
 import com.usto.api.user.domain.model.VerificationPurpose;
-import com.usto.api.user.domain.repository.UserRepository;
-import com.usto.api.user.presentation.dto.request.EmailSendRequestDto;
-import com.usto.api.user.presentation.dto.request.EmailVerifyRequestDto;
-import com.usto.api.user.presentation.dto.request.SmsSendRequestDto;
-import com.usto.api.user.presentation.dto.request.SmsVerifyRequestDto;
+import com.usto.api.user.presentation.dto.request.EmailSendRequest;
+import com.usto.api.user.presentation.dto.request.EmailVerifyRequest;
+import com.usto.api.user.presentation.dto.request.SmsSendRequest;
+import com.usto.api.user.presentation.dto.request.SmsVerifyRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
@@ -37,7 +36,7 @@ public class VerificationController {
     @PostMapping("/email/send")
     @Operation(summary = "이메일 인증번호 전송")
     public ApiResponse<?> sendEmail(
-            @Valid @RequestBody EmailSendRequestDto request,
+            @Valid @RequestBody EmailSendRequest request,
             HttpServletRequest http,
             HttpSession session
 
@@ -86,7 +85,7 @@ public class VerificationController {
     @PostMapping("/email/check")
     @Operation(summary = "이메일 인증번호 확인")
     public ApiResponse<?> verifyEmail(
-            @Valid @RequestBody EmailVerifyRequestDto request,
+            @Valid @RequestBody EmailVerifyRequest request,
             HttpSession session
 
     ) {
@@ -139,10 +138,9 @@ public class VerificationController {
     @PostMapping("/sms/send")
     @Operation(summary = "휴대폰 인증번호 전송")
     public ApiResponse<?> sendSms(
-            @Valid @RequestBody SmsSendRequestDto request,
+            @Valid @RequestBody SmsSendRequest request,
             HttpServletRequest http,
             HttpSession session
-
     ) {
 
         Boolean isExistsSms = (Boolean) session.getAttribute("exists.auth.sms.exists");
@@ -151,10 +149,10 @@ public class VerificationController {
             throw new BusinessException("전화번호 중복확인이 필요합니다.");
         }
 
-        VerificationPurpose purpose = VerificationPurpose.SIGNUP; // 전화번호 인증은 회원가입에서만 쓰임
 
         log.debug("[SIGNUP] 전화번호 중복 확인 완료: {}", request.getTarget());
 
+        session.setAttribute("sms.pending.purpose", request.getPurpose());
         session.setAttribute("sms.pending.target", request.getTarget());
         session.setAttribute("sms.pending.sentAt", LocalDateTime.now());
 
@@ -162,7 +160,6 @@ public class VerificationController {
 
         smsSendApplication.sendCodeToSms(
                 request,
-                purpose,
                 actor);
 
         session.removeAttribute("exists.auth.sms.exists");
@@ -175,12 +172,12 @@ public class VerificationController {
     @Operation(summary = "휴대폰 인증번호 확인")
     public ApiResponse<?> verifyCode(
             @Valid @RequestBody
-            SmsVerifyRequestDto request,
+            SmsVerifyRequest request,
             HttpSession session
     )
     {
 
-        VerificationPurpose purpose = VerificationPurpose.SIGNUP; // 전화번호 인증은 회원가입에서만 쓰임
+        VerificationPurpose purpose = (VerificationPurpose) session.getAttribute("sms.pending.purpose");
 
         String target = (String) session.getAttribute("sms.pending.target");
 
@@ -214,8 +211,7 @@ public class VerificationController {
         return switch (purpose) {
             case SIGNUP -> "signup";
             case FIND_ID -> "findId";
-            case RESET_PASSWORD -> "findPassword";
+            case RESET_PASSWORD -> "resetPwd";
         };
     }
-
 }

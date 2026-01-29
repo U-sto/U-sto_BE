@@ -11,16 +11,12 @@ import com.usto.api.user.domain.model.Verification;
 import com.usto.api.user.domain.model.VerificationPurpose;
 import com.usto.api.user.domain.model.VerificationType;
 import com.usto.api.user.domain.repository.VerificationRepository;
-import com.usto.api.user.presentation.dto.request.EmailVerifyRequestDto;
-import com.usto.api.user.presentation.dto.request.SmsVerifyRequestDto;
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.xml.crypto.KeySelector;
 import java.time.LocalDateTime;
 
 @Slf4j

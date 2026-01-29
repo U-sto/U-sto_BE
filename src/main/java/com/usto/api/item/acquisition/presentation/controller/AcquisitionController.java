@@ -7,7 +7,7 @@ import com.usto.api.item.acquisition.presentation.dto.request.AcqRegisterRequest
 import com.usto.api.item.acquisition.presentation.dto.request.AcqSearchRequest;
 import com.usto.api.item.acquisition.presentation.dto.response.AcqListResponse;
 import com.usto.api.item.acquisition.presentation.dto.response.AcqRegisterResponse;
-import com.usto.api.user.domain.UserPrincipal;
+import com.usto.api.user.domain.model.UserPrincipal;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;

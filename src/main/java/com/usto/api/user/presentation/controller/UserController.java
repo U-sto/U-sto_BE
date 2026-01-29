@@ -2,14 +2,12 @@ package com.usto.api.user.presentation.controller;
 
 import com.usto.api.common.exception.BusinessException;
 import com.usto.api.common.utils.ApiResponse;
-import com.usto.api.user.application.SignupApplication;
-import com.usto.api.user.application.UserDeleteApplication;
-import com.usto.api.user.application.UserUpdateApplication;
-import com.usto.api.user.domain.UserPrincipal;
-import com.usto.api.user.presentation.dto.request.SignupRequestDto;
-import com.usto.api.user.presentation.dto.request.UserDeleteRequestDto;
-import com.usto.api.user.presentation.dto.request.UserUpdateRequestDto;
-import com.usto.api.user.presentation.dto.response.UserUpdateResponseDto;
+import com.usto.api.user.application.*;
+import com.usto.api.user.domain.model.UserPrincipal;
+import com.usto.api.user.presentation.dto.request.*;
+import com.usto.api.user.presentation.dto.response.UserInfoResponse;
+import com.usto.api.user.presentation.dto.response.UserPwdUpdateResponse;
+import com.usto.api.user.presentation.dto.response.UserSmsUpdateResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpSession;
@@ -30,10 +28,11 @@ public class UserController {
     private final UserUpdateApplication userUpdateApplication;
     private final UserDeleteApplication userDeleteApplication;
 
+
     @PostMapping("sign-up")
     @Operation(summary = "회원 가입")
     public ApiResponse<?> signup(
-            @RequestBody SignupRequestDto request,
+            @RequestBody SignupRequest request,
             HttpSession session
     ){
 
@@ -67,26 +66,61 @@ public class UserController {
         return ApiResponse.ok("회원가입 완료");
     }
 
-    @PutMapping("/update")
-        @Operation(summary = "회원 수정")
-        public ApiResponse<UserUpdateResponseDto> updateUser(
-                @Valid @RequestBody UserUpdateRequestDto request,
+    @GetMapping("/info")
+        @Operation(summary = "회원 정보")
+        public ApiResponse<UserInfoResponse> infoUser(
             @AuthenticationPrincipal UserPrincipal userPrincipal
             ) {
 
-        UserUpdateResponseDto result = userUpdateApplication.update(userPrincipal.getUsername(),request);
+        UserInfoResponse result = userUpdateApplication.info(userPrincipal.getUsername());
 
         return ApiResponse.ok(
-                    "회원정보가 정상적으로 수정되었습니다.",
+                    "회원정보 조회 성공",
                     result
             );
+    }
+
+    @PutMapping("/update/password")
+    @Operation(summary = "회원수정 - 비밀번호 변경")
+    public ApiResponse<UserPwdUpdateResponse> updatePwd(
+            @Valid @RequestBody PasswordResetRequestForInfo request,
+            @AuthenticationPrincipal UserPrincipal userPrincipal
+    ) {
+
+        UserPwdUpdateResponse result = userUpdateApplication.updatePwd(
+                userPrincipal.getUsername(),
+                request.getOldPwd(),
+                request.getNewPwd());
+
+        return ApiResponse.ok(
+                "비밀번호가 정상적으로 수정되었습니다.",
+                result
+        );
+    }
+
+    @PutMapping("/update/sms")
+    @Operation(summary = "휴대폰 번호 변경")
+    public ApiResponse<UserSmsUpdateResponse> updateSms(
+            @AuthenticationPrincipal UserPrincipal userPrincipal,
+            HttpSession session
+    ) {
+
+        String verifiedSms = (String) session.getAttribute("resetPwd.auth.sms");
+
+        UserSmsUpdateResponse result = userUpdateApplication.updateSms(userPrincipal.getUsername(),verifiedSms);
+
+        session.removeAttribute("resetPwd.auth.sms");
+        return ApiResponse.ok(
+                "휴대폰 번호가 정상적으로 수정되었습니다.",
+                result
+        );
     }
 
     @DeleteMapping("/delete")
     @Operation(summary = "회원 탈퇴")
     public ApiResponse<?> deleteMe(
             @AuthenticationPrincipal UserPrincipal me,
-            @RequestBody UserDeleteRequestDto request
+            @RequestBody UserDeleteRequest request
     ) {
         userDeleteApplication.deleteMe(me, request);
         return ApiResponse.ok("회원 탈퇴 완료");
