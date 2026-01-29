@@ -1,9 +1,9 @@
 package com.usto.api.user.application;
 
 import com.usto.api.common.exception.BusinessException;
-import com.usto.api.user.domain.UserPrincipal;
+import com.usto.api.user.domain.model.UserPrincipal;
 import com.usto.api.user.domain.repository.UserRepository;
-import com.usto.api.user.presentation.dto.request.UserDeleteRequestDto;
+import com.usto.api.user.presentation.dto.request.UserDeleteRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -16,7 +16,7 @@ public class UserDeleteApplication {
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
-    public void deleteMe(UserPrincipal me, UserDeleteRequestDto request) {
+    public void deleteMe(UserPrincipal me, UserDeleteRequest request) {
 
         if (request == null || request.getCurrentPw() == null || request.getCurrentPw().isBlank()) {
             throw new BusinessException("현재 비밀번호가 필요합니다.");

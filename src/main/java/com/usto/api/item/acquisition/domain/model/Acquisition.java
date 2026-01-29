@@ -3,7 +3,6 @@ package com.usto.api.item.acquisition.domain.model;
 import com.usto.api.common.exception.BusinessException;
 import com.usto.api.item.common.model.ApprStatus;
 import com.usto.api.item.common.model.OperStatus;
-import com.usto.api.user.domain.UserPrincipal;
 import lombok.Builder;
 import lombok.Getter;
 

@@ -7,16 +7,10 @@ import com.usto.api.user.domain.model.ApprovalStatus;
 import com.usto.api.user.domain.model.Role;
 import com.usto.api.user.domain.model.User;
 import com.usto.api.user.domain.repository.UserRepository;
-import com.usto.api.user.infrastructure.entity.UserJpaEntity;
-import com.usto.api.user.presentation.dto.request.SignupRequestDto;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor

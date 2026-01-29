@@ -4,9 +4,9 @@ import com.usto.api.common.utils.ApiResponse;
 import com.usto.api.user.application.EmailExistsApplication;
 import com.usto.api.user.application.SmsExistsApplication;
 import com.usto.api.user.application.UserIdExistsApplication;
-import com.usto.api.user.presentation.dto.response.EmailExistsResponseDto;
-import com.usto.api.user.presentation.dto.response.SmsExistsResponseDto;
-import com.usto.api.user.presentation.dto.response.UsrIdExistsResponseDto;
+import com.usto.api.user.presentation.dto.response.EmailExistsResponse;
+import com.usto.api.user.presentation.dto.response.SmsExistsResponse;
+import com.usto.api.user.presentation.dto.response.UsrIdExistsResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -52,14 +52,14 @@ public class ExistsController {
 
         if (exists) {
             return ApiResponse.fail("이미 가입된 이메일입니다",
-                    new EmailExistsResponseDto(true));
+                    new EmailExistsResponse(true));
         }
 
         session.setAttribute("exists.auth.email.exists",exists);
         session.setAttribute("exists.auth.email.target",fullEmail);
 
         return ApiResponse.ok("이용 가능한 이메일입니다",
-                new EmailExistsResponseDto(false));
+                new EmailExistsResponse(false));
     }
 
     @GetMapping("/sms")
@@ -81,14 +81,14 @@ public class ExistsController {
 
         if (exists) {
             return ApiResponse.fail("이미 가입된 전화번호입니다",
-                    new SmsExistsResponseDto(true));
+                    new SmsExistsResponse(true));
         }
 
         session.setAttribute("exists.auth.sms.exists",exists);
         session.setAttribute("exists.auth.sms.target",sms);
 
         return ApiResponse.ok("이용 가능한 전화번호입니다",
-                new SmsExistsResponseDto(false));
+                new SmsExistsResponse(false));
     }
 
     @GetMapping("/user-id")
@@ -109,14 +109,14 @@ public class ExistsController {
 
         if (exists) {
             return ApiResponse.fail("이미 가입된 아이디입니다",
-                    new UsrIdExistsResponseDto(true));
+                    new UsrIdExistsResponse(true));
         }
 
         session.setAttribute("exists.auth.usrId.exists",exists);
         session.setAttribute("exists.auth.usrId.target",usrId);
 
         return ApiResponse.ok("이용 가능한 아이디입니다",
-                new UsrIdExistsResponseDto(false));
+                new UsrIdExistsResponse(false));
     }
 
 }

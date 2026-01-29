@@ -6,9 +6,9 @@ import com.usto.api.organization.infrastructure.entity.OrganizationJpaEntity;
 import com.usto.api.organization.infrastructure.repository.OrganizationJpaRepository;
 import com.usto.api.user.domain.model.User;
 import com.usto.api.user.domain.repository.UserRepository;
-import com.usto.api.user.presentation.dto.response.UserInfoResponseDto;
-import com.usto.api.user.presentation.dto.response.UserPwdUpdateResponseDto;
-import com.usto.api.user.presentation.dto.response.UserSmsUpdateResponseDto;
+import com.usto.api.user.presentation.dto.response.UserInfoResponse;
+import com.usto.api.user.presentation.dto.response.UserPwdUpdateResponse;
+import com.usto.api.user.presentation.dto.response.UserSmsUpdateResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -24,7 +24,7 @@ public class UserUpdateApplication {
     private final OrganizationJpaRepository organizationJpaRepository;
 
     @Transactional
-    public UserInfoResponseDto info (String usrId) {
+    public UserInfoResponse info (String usrId) {
 
         String loginUsrId = CurrentUser.usrId();
 
@@ -43,7 +43,7 @@ public class UserUpdateApplication {
                 .map(OrganizationJpaEntity::getOrgNm)
                 .orElse(null);
 
-        return UserInfoResponseDto.builder()
+        return UserInfoResponse.builder()
                 .usrId(user.getUsrId())
                 .usrNm(user.getUsrNm())
                 .email(user.getEmail())
@@ -54,7 +54,7 @@ public class UserUpdateApplication {
     }
 
     @Transactional
-    public UserPwdUpdateResponseDto updatePwd(String usrId, String oldPwd, String newPwd) {
+    public UserPwdUpdateResponse updatePwd(String usrId, String oldPwd, String newPwd) {
         String loginUsrId = CurrentUser.usrId();
 
         if (loginUsrId == null) {
@@ -84,13 +84,13 @@ public class UserUpdateApplication {
         //저장
         User saved = userRepository.save(updated);
 
-        return UserPwdUpdateResponseDto.builder()
+        return UserPwdUpdateResponse.builder()
                 .usrId(saved.getUsrId())
                 .build();
     }
 
     @Transactional
-    public UserSmsUpdateResponseDto updateSms(String usrId, String target) {
+    public UserSmsUpdateResponse updateSms(String usrId, String target) {
         String loginUsrId = CurrentUser.usrId();
 
         if (loginUsrId == null) {
@@ -110,7 +110,7 @@ public class UserUpdateApplication {
 
         User saved = userRepository.save(updated);
 
-        return UserSmsUpdateResponseDto.builder()
+        return UserSmsUpdateResponse.builder()
                 .usrId(saved.getUsrId())
                 .newSms(saved.getSms())
                 .build();    }

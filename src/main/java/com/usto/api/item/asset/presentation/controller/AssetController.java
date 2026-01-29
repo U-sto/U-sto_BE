@@ -6,7 +6,7 @@ import com.usto.api.item.asset.presentation.dto.request.AssetSearchRequest;
 import com.usto.api.item.asset.presentation.dto.request.AssetUpdateRequest;
 import com.usto.api.item.asset.presentation.dto.response.AssetDetailResponse;
 import com.usto.api.item.asset.presentation.dto.response.AssetListResponse;
-import com.usto.api.user.domain.UserPrincipal;
+import com.usto.api.user.domain.model.UserPrincipal;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;

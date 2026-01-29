@@ -10,10 +10,9 @@ package com.usto.api.user.application;
 import com.usto.api.common.exception.BusinessException;
 import com.usto.api.common.utils.SmsUtil;
 import com.usto.api.user.domain.model.Verification;
-import com.usto.api.user.domain.model.VerificationPurpose;
 import com.usto.api.user.domain.model.VerificationType;
 import com.usto.api.user.domain.repository.VerificationRepository;
-import com.usto.api.user.presentation.dto.request.SmsSendRequestDto;
+import com.usto.api.user.presentation.dto.request.SmsSendRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.nurigo.sdk.message.response.SingleMessageSentResponse;
@@ -33,7 +32,7 @@ public class SmsSendApplication {
 
     @Transactional
     public void sendCodeToSms(
-            SmsSendRequestDto request,
+            SmsSendRequest request,
             String actor
     )
     {

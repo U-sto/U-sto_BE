@@ -16,13 +16,4 @@ public class G2bItem {
     private final String g2bMCd;
     private final String g2bDNm;
     private final BigDecimal g2bUpr;
-
-    public static G2bItem from(G2bStg stg) {
-        return G2bItem.builder()
-                .g2bDCd(stg.getG2bDCd())
-                .g2bMCd(stg.getG2bMCd())
-                .g2bDNm(stg.getG2bDNm())
-                .g2bUpr(BigDecimal.valueOf(stg.getG2bUpr()))
-                .build();
-    }
 }
