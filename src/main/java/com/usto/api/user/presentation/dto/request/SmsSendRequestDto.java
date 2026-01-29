@@ -16,6 +16,7 @@ public class SmsSendRequestDto {
     @Pattern(regexp = "^[0-9]{11}$", message = "전화번호는 숫자 11자리여야 합니다.")
     private String target;
 
+    @NotNull(message = "인증 목적을 명시해주세요.")
     @Schema(example = "SIGNUP/RESET_PASSWORD")
     private VerificationPurpose purpose;
 

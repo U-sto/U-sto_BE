@@ -87,7 +87,7 @@ public class SmsSendApplication {
             log.info("[SMS-SEND] statusCode={}", statusCode);
 
             if ("3059".equals(statusCode)) { //변작된 전화번호 오류 발생
-                throw new BusinessException("재 전송 해주세요.");
+                throw new BusinessException("재 전송 해주세요."); //타 업체 로직 추가?
             }
 
         } catch (Exception e) {
