@@ -30,7 +30,7 @@ INSERT INTO `TB_ITEM002D` (ITM_NO, ACQ_ID, G2B_D_CD, DEPT_CD, OPER_STS, ACQ_UPR,
 VALUES
     ('M202600001', @ACQ_ID_ERICA, '25241236', 'A350', 'OPER', 255, '3', '소방본부 기증품-1', '7008277', 'dev-user'),
     ('M202600002', @ACQ_ID_ERICA, '25241236', 'A350', 'OPER', 255, '3', '소방본부 기증품-2', '7008277', 'dev-user'),
-    ('M202600003', @ACQ_ID_ERICA, '25241236', 'NONE', 'RTN',  255, '3', '기증품(반납테스트용)', '7008277', 'dev-user');
+    ('M202600003', @ACQ_ID_ERICA, '25241236', 'NONE', 'RTN',  255, '3', '기증품', '7008277', 'dev-user');
 
 -- -----------------------------------------------------------------------------
 -- [SEOUL 캠퍼스] 연구정보팀: 워크스테이션 구매 건 (3개 전체)
@@ -54,11 +54,8 @@ VALUES
 
 INSERT INTO `TB_ITEM006M` (ITEM_HIS_ID, ITM_NO, PREV_STS, NEW_STS, CHG_RSN, REQ_USR_ID, REQ_AT, APPR_USR_ID, APPR_AT, ORG_CD, CRE_BY)
 VALUES
--- 1. 기증품 1번: 운용 (자동 승인 시점)
-(UNHEX(REPLACE(UUID(), '-', '')), 'M202600001', 'NONE', 'OPER', '최초 취득 승인에 따른 자산 등록', 'dev-user', '2026-01-13', 'admin', '2026-01-13', '7008277', 'system'),
+-- M202600001 운용 (취득 승인 시점)
+(UNHEX(REPLACE(UUID(), '-', '')), 'M202600001', 'ACQ', 'OPER', '최초 취득 승인에 따른 자산 등록', 'dev-user', '2026-01-13', 'admin', '2026-01-13', '7008277', 'system'),
 
--- 2. 기증품 3번: 운용 -> 반납 (사용자가 반납 신청)
-(UNHEX(REPLACE(UUID(), '-', '')), 'M202600003', 'OPER', 'RTN', '프로젝트 종료로 인한 기기 반납', 'dev-user', '2026-01-20', 'admin', '2026-01-21', '7008277', 'system'),
-
--- 3. 워크스테이션 6번: 운용 -> 불용 (고장으로 인한 불용)
-(UNHEX(REPLACE(UUID(), '-', '')), 'M202600006', 'OPER', 'DSU', '메인보드 고장으로 인한 수리 불가 판정', 'dev-user', '2026-01-21', 'admin', '2026-01-22', '7002282', 'system');
+-- M202600001 운용 -> 반납 (사용자가 반납 신청)
+(UNHEX(REPLACE(UUID(), '-', '')), 'M202600001', 'OPER', 'RTN', '프로젝트 종료로 인한 반납', 'dev-user', '2026-01-20', 'admin', '2026-01-21', '7008277', 'system');
