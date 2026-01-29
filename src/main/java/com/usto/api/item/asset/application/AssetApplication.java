@@ -4,6 +4,8 @@ import com.usto.api.item.acquisition.domain.model.Acquisition;
 import com.usto.api.item.asset.domain.model.Asset;
 import com.usto.api.item.asset.domain.model.AssetMaster;
 import com.usto.api.item.asset.domain.repository.AssetRepository;
+import com.usto.api.item.asset.domain.service.AssetPolicy;
+import com.usto.api.item.asset.infrastructure.mapper.AssetMapper;
 import com.usto.api.item.asset.presentation.dto.request.AssetSearchRequest;
 import com.usto.api.item.asset.presentation.dto.request.AssetUpdateRequest;
 import com.usto.api.item.asset.presentation.dto.response.AssetAiItemDetailResponse;
@@ -24,9 +26,10 @@ import java.util.List;
  */
 @Service
 @RequiredArgsConstructor
-public class AssetService {
+public class AssetApplication {
 
     private final AssetRepository assetRepository;
+    private final AssetPolicy assetPolicy;
     private final ItemNumberGenerator itemNumberGenerator;
 
     /**
@@ -78,8 +81,7 @@ public class AssetService {
         // 1. 물품 존재 여부 및 소속 조직 검증
         Asset asset = assetRepository.findById(itmNo, orgCd)
                 .orElseThrow(() -> new BusinessException("해당 물품을 찾을 수 없습니다."));
-
-        asset.validateOwnership(orgCd);
+        assetPolicy.validateUpdate(asset, orgCd);
 
         // 2. 도메인 로직 실행 (내부에서 상태 및 값 검증 수행)
         asset.updateAssetInfo(request.getAcqUpr(), request.getDrbYr(), request.getRmk());
@@ -93,19 +95,22 @@ public class AssetService {
      * - 하나의 취득 ID에 대해 1개의 마스터와 N개의 상세 데이터를 생성함
      * @param acq 승인 완료된 취득 도메인 모델
      */
-    // TODO: 해당 메서드 사용하여 acquistion 패키지에서 취득승인 로직 구현
     @Transactional
     public void registerAssetsFromAcquisition(Acquisition acq) {
 
-        // 중복 체크: 이미 자산 등록된 취득 건인지 확인
         if (assetRepository.existsMasterByAcqId(acq.getAcqId())) {
             throw new BusinessException("이미 자산으로 등록된 취득 건(ID: " + acq.getAcqId() + ")입니다.");
         }
 
         // 1. 대장 기본(Master) 생성: 1건
-        AssetMaster master = AssetMaster.create(
-                acq.getAcqId(), acq.getG2bDCd(), acq.getAcqQty(),
-                acq.getAcqAt(), acq.getApprAt(), acq.getArrgTy(), acq.getOrgCd()
+        AssetMaster master = AssetMapper.toMasterDomain(
+                acq.getAcqId(),
+                acq.getG2bDCd(),
+                acq.getAcqQty(),
+                acq.getAcqAt(),
+                acq.getApprAt(),
+                acq.getArrgTy(),
+                acq.getOrgCd()
         );
         assetRepository.saveMaster(master); //002M에 저장
 
@@ -113,13 +118,13 @@ public class AssetService {
         int currentYear = LocalDate.now().getYear();
         int nextSeq = assetRepository.getNextSequenceForYear(currentYear, acq.getOrgCd());
 
-        // 3. [핵심] 수량만큼 반복문 수행
+        // 3. 취득수량만큼 반복문 수행
         for (int i = 0; i < acq.getAcqQty(); i++) {
             // 고유번호 생성 (예: M202600001, M202600002...)
             String itmNo = itemNumberGenerator.generate(currentYear, nextSeq + i);
 
             // 개별물품 생성
-            Asset asset = Asset.create(
+            Asset asset = AssetMapper.toDomain(
                     itmNo,
                     acq.getAcqId(),
                     acq.getG2bDCd(),
@@ -128,8 +133,7 @@ public class AssetService {
                     acq.getDrbYr(),
                     acq.getOrgCd(),
                     acq.getRmk()
-                    );
-
+            );
             assetRepository.save(asset); // 002D에 저장
         }
     }

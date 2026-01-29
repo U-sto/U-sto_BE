@@ -4,7 +4,7 @@ import com.usto.api.common.exception.BusinessException;
 import com.usto.api.g2b.infrastructure.entity.G2bItemJpaEntity;
 import com.usto.api.g2b.infrastructure.repository.G2bItemJpaRepository;
 import com.usto.api.item.acquisition.domain.model.Acquisition;
-import com.usto.api.item.asset.application.AssetService;
+import com.usto.api.item.asset.application.AssetApplication;
 import com.usto.api.item.asset.domain.repository.AssetRepository;
 import com.usto.api.item.common.model.OperStatus;
 import com.usto.api.organization.infrastructure.repository.DepartmentJpaRepository;
@@ -32,7 +32,7 @@ public class AcquisitionApplication {
     private final DepartmentJpaRepository departmentJpaRepository;
 
     private final AssetRepository assetRepository;
-    private final AssetService assetService;
+    private final AssetApplication assetApplication;
 
     private static final ZoneId KOREA_ZONE = ZoneId.of("Asia/Seoul");
 
@@ -185,7 +185,7 @@ public class AcquisitionApplication {
         for (Acquisition acquisition : acquisitions) {
             acquisition.validateOwnership(orgCd);
             acquisition.confirmApproval(userId);
-            assetService.registerAssetsFromAcquisition(acquisition);
+            assetApplication.registerAssetsFromAcquisition(acquisition);
         }
         acquisitionRepository.saveAll(acquisitions);
     }

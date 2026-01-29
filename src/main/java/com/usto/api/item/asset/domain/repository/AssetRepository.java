@@ -14,23 +14,28 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface AssetRepository {
+
+    // Asset CRUD
     Asset save(Asset asset);
     void saveMaster(AssetMaster master);
     Optional<Asset> findById(String itmNo, String orgCd);
-    List<AssetListResponse> findAllByFilter(AssetSearchRequest cond, String orgCd);
+    void delete(String itmNo, String orgCd);
 
-    // 개별 물품 상세 조회
+    // Asset 조회
+    List<AssetListResponse> findAllByFilter(AssetSearchRequest cond, String orgCd);
     Optional<AssetDetailResponse> findDetailById(String itmNo, String orgCd);
+
     // 상태 이력 조회
-    List<AssetDetailResponse.StatusHistoryDto> findStatusHistoriesByItmNo(String itmNo, String orgCd);    // 상태 이력 저장
     void saveStatusHistory(AssetStatusHistory history);
+    List<AssetDetailResponse.StatusHistoryDto> findStatusHistoriesByItmNo(String itmNo, String orgCd);    // 상태 이력 저장
 
     // 중복 생성 방지용 존재 확인
     boolean existsMasterByAcqId(UUID acqId);
+
     // 물품번호 순번 조회
     int getNextSequenceForYear(int year, String orgCd);
-    void delete(String itmNo, String orgCd);
 
+    // AI 조회용
     List<AssetMaster> findAllById(List<UUID> acqIds);
 
     List<AssetAiItemDetailResponse> findAllByG2bCode(String g2bMCd, String g2bDCd, String orgCd);

@@ -31,33 +31,4 @@ public class AssetStatusHistory {
     private LocalDateTime creAt;
     private String updBy;
     private LocalDateTime updAt;
-
-    /**
-     * 상태 이력 생성 팩토리 메서드
-     */
-    public static AssetStatusHistory create(
-            String itmNo,
-            OperStatus prevSts,
-            OperStatus newSts,
-            String chgRsn,
-            String reqUsrId,
-            LocalDate reqAt,
-            String apprUsrId,
-            LocalDate apprAt,
-            String orgCd
-    ) {
-        return AssetStatusHistory.builder()
-                .itemHisId(UUID.randomUUID())
-                .itmNo(itmNo)
-                .prevSts(prevSts)
-                .newSts(newSts)
-                .chgRsn(chgRsn)
-                .reqUsrId(reqUsrId)
-                .reqAt(reqAt)
-                .apprUsrId(apprUsrId)
-                .apprAt(apprAt)
-                .orgCd(orgCd)
-                .delYn("N")
-                .build();
-    }
 }
