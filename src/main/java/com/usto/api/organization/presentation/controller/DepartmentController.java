@@ -3,7 +3,7 @@ package com.usto.api.organization.presentation.controller;
 import com.usto.api.common.utils.ApiResponse;
 import com.usto.api.organization.application.DepartmentService;
 import com.usto.api.organization.presentation.dto.response.DepartmentResponse;
-import com.usto.api.user.domain.UserPrincipal;
+import com.usto.api.user.domain.model.UserPrincipal;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;

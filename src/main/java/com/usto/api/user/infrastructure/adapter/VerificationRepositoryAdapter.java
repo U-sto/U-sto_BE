@@ -1,4 +1,4 @@
-package com.usto.api.user.infrastructure.repository;
+package com.usto.api.user.infrastructure.adapter;
 
 import com.usto.api.user.domain.model.Verification;
 import com.usto.api.user.domain.model.VerificationPurpose;
@@ -6,6 +6,7 @@ import com.usto.api.user.domain.model.VerificationType;
 import com.usto.api.user.domain.repository.VerificationRepository;
 import com.usto.api.user.infrastructure.entity.VerificationJpaEntity;
 import com.usto.api.user.infrastructure.mapper.VerificationMapper;
+import com.usto.api.user.infrastructure.repository.VerificationJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 

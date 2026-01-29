@@ -1,7 +1,7 @@
 package com.usto.api.user.application;
 
 import com.usto.api.common.exception.BusinessException;
-import com.usto.api.user.domain.UserPrincipal;
+import com.usto.api.user.domain.model.UserPrincipal;
 import com.usto.api.user.domain.model.ApprovalStatus;
 import com.usto.api.user.domain.model.Role;
 import com.usto.api.user.infrastructure.entity.UserJpaEntity;

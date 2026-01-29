@@ -1,8 +1,5 @@
-package com.usto.api.user.domain;
+package com.usto.api.user.domain.model;
 
-import com.usto.api.user.domain.model.ApprovalStatus;
-import com.usto.api.user.domain.model.Role;
-import com.usto.api.user.domain.model.User;
 import com.usto.api.user.infrastructure.entity.UserJpaEntity;
 import com.usto.api.user.infrastructure.mapper.UserMapper;
 import org.springframework.security.core.GrantedAuthority;

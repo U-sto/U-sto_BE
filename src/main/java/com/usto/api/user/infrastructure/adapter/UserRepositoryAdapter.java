@@ -1,4 +1,4 @@
-package com.usto.api.user.infrastructure.repository;
+package com.usto.api.user.infrastructure.adapter;
 
 import com.usto.api.common.exception.UserNotFoundException;
 import com.usto.api.user.domain.model.Role;
@@ -6,6 +6,7 @@ import com.usto.api.user.domain.model.User;
 import com.usto.api.user.domain.repository.UserRepository;
 import com.usto.api.user.infrastructure.entity.UserJpaEntity;
 import com.usto.api.user.infrastructure.mapper.UserMapper;
+import com.usto.api.user.infrastructure.repository.UserJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
