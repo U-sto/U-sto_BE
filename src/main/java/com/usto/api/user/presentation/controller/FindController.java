@@ -51,8 +51,8 @@ public class FindController {
             HttpSession session
     )
     {
-        String email = (String) session.getAttribute("findPassword.auth.email");
-        String usrId = (String) session.getAttribute("findPassword.auth.usrId");
+        String email = (String) session.getAttribute("resetPwd.auth.email");
+        String usrId = (String) session.getAttribute("resetPwd.auth.usrId");
 
         if (email == null || usrId == null) {  // ← 둘 다 먼저 체크
             return ApiResponse.fail("이메일 인증이 필요합니다.");
@@ -64,9 +64,9 @@ public class FindController {
 
         passwordUpdateApplication.updatePassword(usrId, request.getPwd());
 
-        session.removeAttribute("findPassword.auth.email");
-        session.removeAttribute("findPassword.auth.expiresAt");
-        session.removeAttribute("findPassword.auth.usrId");
+        session.removeAttribute("resetPwd.auth.email");
+        session.removeAttribute("resetPwd.auth.expiresAt");
+        session.removeAttribute("resetPwd.auth.usrId");
 
         return ApiResponse.ok("비밀번호 재설정 완료");
     }
