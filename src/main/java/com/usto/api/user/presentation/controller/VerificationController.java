@@ -2,7 +2,9 @@ package com.usto.api.user.presentation.controller;
 
 import com.usto.api.common.exception.BusinessException;
 import com.usto.api.common.utils.ApiResponse;
+import com.usto.api.common.utils.CurrentUser;
 import com.usto.api.user.application.*;
+import com.usto.api.user.domain.UserPrincipal;
 import com.usto.api.user.domain.model.VerificationPurpose;
 import com.usto.api.user.domain.repository.UserRepository;
 import com.usto.api.user.presentation.dto.request.EmailSendRequestDto;
@@ -144,7 +146,6 @@ public class VerificationController {
             @Valid @RequestBody SmsSendRequestDto request,
             HttpServletRequest http,
             HttpSession session
-
     ) {
 
         Boolean isExistsSms = (Boolean) session.getAttribute("exists.auth.sms.exists");
@@ -153,10 +154,10 @@ public class VerificationController {
             throw new BusinessException("전화번호 중복확인이 필요합니다.");
         }
 
-        VerificationPurpose purpose = VerificationPurpose.SIGNUP; // 전화번호 인증은 회원가입에서만 쓰임
 
         log.debug("[SIGNUP] 전화번호 중복 확인 완료: {}", request.getTarget());
 
+        session.setAttribute("sms.pending.purpose", request.getPurpose());
         session.setAttribute("sms.pending.target", request.getTarget());
         session.setAttribute("sms.pending.sentAt", LocalDateTime.now());
 
@@ -164,7 +165,6 @@ public class VerificationController {
 
         smsSendApplication.sendCodeToSms(
                 request,
-                purpose,
                 actor);
 
         session.removeAttribute("exists.auth.sms.exists");
@@ -182,7 +182,7 @@ public class VerificationController {
     )
     {
 
-        VerificationPurpose purpose = VerificationPurpose.SIGNUP; // 전화번호 인증은 회원가입에서만 쓰임
+        VerificationPurpose purpose = (VerificationPurpose) session.getAttribute("sms.pending.purpose");
 
         String target = (String) session.getAttribute("sms.pending.target");
 
@@ -216,9 +216,7 @@ public class VerificationController {
         return switch (purpose) {
             case SIGNUP -> "signup";
             case FIND_ID -> "findId";
-            case RESET_PASSWORD -> "findPassword";
+            case RESET_PASSWORD -> "resetPwd";
         };
     }
-
-
 }
