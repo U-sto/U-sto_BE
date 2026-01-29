@@ -86,17 +86,17 @@ public class G2bSyncApplication {
             g2bStgRepository.bulkInsert(distinctDomainList);
         }
 
-        // DB에 추가 사항 반영
-        int countOfInsertedCategory = g2bItemCategoryRepository.insertCategory(ACTOR);
-        int countOfInsertedItem = g2bItemRepository.insertItems(ACTOR);
-
-        // DB에 수정 사항 반영
+        // DB에 추가 사항 반영(부모) - 마스터테이블
         int countOfUpdatedCategory = g2bItemCategoryRepository.updateCategory(ACTOR);
+        int countOfInsertedCategory = g2bItemCategoryRepository.insertCategory(ACTOR);
+
+        // DB에 수정 사항 반영(자식) - 디테일테이블
         int countOfUpdatedItem = g2bItemRepository.updateItems(ACTOR);
+        int countOfInsertedItem = g2bItemRepository.insertItems(ACTOR);
 
         long changed  = g2bStgRepository.countChanged();
 
-        //스테이징 테이블 순번 초기화
+        // 스테이징테이블 아이디 초기화
         g2bStgRepository.resetId();
 
         return new SyncResult(
