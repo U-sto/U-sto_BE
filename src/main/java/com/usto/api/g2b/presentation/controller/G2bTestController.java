@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class G2bTestController {
 
-    private final G2bTestApplication g2bTextServiceImpl;
+    private final G2bTestApplication g2bTestApplication;
 
     @Operation(
             summary = "공공데이터 포털 연동 테스트"
@@ -37,7 +37,7 @@ public class G2bTestController {
         if (inqryBgnDate != null && inqryBgnDate.length() != 8) inqryBgnDate = null;
         if (inqryEndDate != null && inqryEndDate.length() != 8) inqryEndDate = null;
 
-        var result = g2bTextServiceImpl.test(
+        var result = g2bTestApplication.test(
                 pageNo,
                 numOfRows,
                 inqryDiv,

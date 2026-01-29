@@ -9,11 +9,11 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class G2bDailySyncJob {
 
-    private final G2bSyncApplication g2bSyncServiceImpl; // 또는 Daily 전용 서비스
+    private final G2bSyncApplication g2bSyncApplication; // 또는 Daily 전용 서비스
 
     // 매일 00:01 (Asia/Seoul)
     @Scheduled(cron = "0 01 0 * * *", zone = "Asia/Seoul")
     public void runDaily() {
-        g2bSyncServiceImpl.syncDaily();
+        g2bSyncApplication.syncDaily();
     }
 }

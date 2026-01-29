@@ -16,7 +16,7 @@ import java.time.format.DateTimeFormatter;
 @RequiredArgsConstructor
 public class G2bSyncController {
 
-    private final G2bSyncApplication g2bSyncServiceImpl;
+    private final G2bSyncApplication g2bSyncApplication;
 
     @Operation(
             summary = "G2B 목록정보 최신화(자동)"
@@ -27,7 +27,7 @@ public class G2bSyncController {
         String begin = now.minusDays(2).format(DateTimeFormatter.BASIC_ISO_DATE);
         String end = now.minusDays(1).format(DateTimeFormatter.BASIC_ISO_DATE);
 
-        long counts = g2bSyncServiceImpl.syncLatest(begin,end);
+        long counts = g2bSyncApplication.syncLatest(begin,end);
 
         if(counts == 0){
             ApiResponse.fail("이미 동기화 된 상태입니다.");

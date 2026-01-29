@@ -24,7 +24,7 @@ import java.util.List;
 @RequestMapping("/api/g2b")
 @RequiredArgsConstructor
 public class G2bSearchController {
-    private final G2bSearchRepository g2bSearchService;
+    private final G2bSearchRepository g2bSearchRepository;
 
     @Operation(
             summary = "G2B 물품 분류 조회",
@@ -37,7 +37,7 @@ public class G2bSearchController {
             @RequestParam(required = false) String code,
             @Parameter(description = "물품분류명")
             @RequestParam(required = false) String name) {
-        List<G2bCategoryResponse> categories = g2bSearchService.findCategoryList(code, name)
+        List<G2bCategoryResponse> categories = g2bSearchRepository.findCategoryList(code, name)
                 .stream()
                 .map(e -> new G2bCategoryResponse(e.getG2bMCd(), e.getG2bMNm()))
                 .toList();
@@ -60,7 +60,7 @@ public class G2bSearchController {
             @RequestParam(required = false) String itemCode,
             @Parameter(description = "물품품목명")
             @RequestParam(required = false) String itemName) {
-        List<G2bItemResponse> items = g2bSearchService.findItemList(
+        List<G2bItemResponse> items = g2bSearchRepository.findItemList(
                         categoryCode, itemCode, itemName)
                 .stream()
                 .map(e -> new G2bItemResponse(e.getG2bDCd(), e.getG2bDNm(), e.getG2bUpr()))
