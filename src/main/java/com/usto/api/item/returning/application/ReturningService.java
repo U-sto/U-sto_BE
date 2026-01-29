@@ -3,6 +3,7 @@ package com.usto.api.item.returning.application;
 import com.usto.api.common.exception.BusinessException;
 import com.usto.api.item.asset.domain.model.Asset;
 import com.usto.api.item.asset.domain.repository.AssetRepository;
+import com.usto.api.item.asset.domain.service.AssetPolicy;
 import com.usto.api.item.common.model.OperStatus;
 import com.usto.api.item.returning.domain.model.ReturningDetail;
 import com.usto.api.item.returning.domain.model.ReturningMaster;
@@ -25,6 +26,7 @@ public class ReturningService {
 
     private final ReturningRepository returningRepository;
     private final AssetRepository assetRepository;
+    private final AssetPolicy assetPolicy;
 
     private static final ZoneId KOREA_ZONE = ZoneId.of("Asia/Seoul");
 
@@ -52,7 +54,7 @@ public class ReturningService {
             Asset asset = assetRepository.findById(itmNo, orgCd)
                     .orElseThrow(() -> new BusinessException("물품을 찾을 수 없습니다: " + itmNo));
 
-            asset.validateOwnership(orgCd);
+            assetPolicy.validateUpdate(asset, orgCd);
 
             // 2-2. 이미 대기 중인 다른 반납 건에 포함되어 있는지 확인
             if (returningRepository.existsInOtherReturning(itmNo, null, orgCd)) {
@@ -122,7 +124,7 @@ public class ReturningService {
             Asset asset = assetRepository.findById(itmNo, orgCd)
                     .orElseThrow(() -> new BusinessException("물품을 찾을 수 없습니다: " + itmNo));
 
-            asset.validateOwnership(orgCd);
+            assetPolicy.validateUpdate(asset, orgCd);
 
             if (asset.getOperSts() != OperStatus.OPER) {
                 throw new BusinessException("운용 중인 물품만 반납할 수 있습니다: " + itmNo);
