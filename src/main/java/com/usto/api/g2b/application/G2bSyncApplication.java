@@ -80,7 +80,7 @@ public class G2bSyncApplication {
         int duplicated = fetched - deduped;
 
         // 스테이징테이블 비우기 (데이터 준비 후 삭제)
-        g2bStgRepository.truncate();
+        g2bStgRepository.delete();
 
         if (!distinctDomainList.isEmpty()) {
             g2bStgRepository.bulkInsert(distinctDomainList);
@@ -96,7 +96,8 @@ public class G2bSyncApplication {
 
         long changed  = g2bStgRepository.countChanged();
 
-
+        //스테이징 테이블 순번 초기화
+        g2bStgRepository.resetId();
 
         return new SyncResult(
                 begin,

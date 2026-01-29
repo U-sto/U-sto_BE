@@ -12,10 +12,11 @@ import java.util.List;
 @Repository
 public interface G2bStgJpaRepository extends JpaRepository<G2bStgJpaEntity,Long> {
 
+    /*
     @Modifying
     @Query(value = "TRUNCATE TABLE TB_G2B_STG", nativeQuery = true)
     void truncate();
-
+*/
     @Query("""
       SELECT COUNT(DISTINCT D.g2bDCd)
       FROM G2bStgJpaEntity S
@@ -29,4 +30,12 @@ public interface G2bStgJpaRepository extends JpaRepository<G2bStgJpaEntity,Long>
         OR COALESCE(S.g2bUpr, 0) <> COALESCE(D.g2bUpr, 0)
     """)
     long countChanged();
+
+    @Modifying
+    @Query(value = "ALTER TABLE TB_G2B_STG AUTO_INCREMENT = 1", nativeQuery = true)
+    void resetId();
+
+    @Modifying
+    @Query(value = "DELETE FROM TB_G2B_STG", nativeQuery = true)
+    void delete();
 }

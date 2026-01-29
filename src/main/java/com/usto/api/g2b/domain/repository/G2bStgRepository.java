@@ -6,7 +6,10 @@ import java.util.List;
 
 public interface G2bStgRepository {
     //비워놓고
-    void truncate();
+    //void truncate();
+
+    void delete();
+    void resetId();
     //새로 채우고
     void bulkInsert(List<G2bStg> rows);
     //변경 건 세기

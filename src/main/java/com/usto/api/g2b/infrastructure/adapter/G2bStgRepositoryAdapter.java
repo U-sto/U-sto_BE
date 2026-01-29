@@ -16,12 +16,12 @@ public class G2bStgRepositoryAdapter implements G2bStgRepository {
 
     private final G2bStgJpaRepository g2bStgJpaRepository;
     private final JdbcTemplate jdbcTemplate;
-
+/*
     @Override
     public void truncate() {
         g2bStgJpaRepository.truncate();
     }
-
+*/
 
     @Override
     public void bulkInsert(List<G2bStg> rows) {
@@ -55,4 +55,13 @@ public class G2bStgRepositoryAdapter implements G2bStgRepository {
                 .map(G2bStgMapper::toDomain)
                 .toList();
     }
+
+    @Override
+    public void delete(){
+        g2bStgJpaRepository.delete();
+    };
+    @Override
+    public void resetId(){
+        g2bStgJpaRepository.resetId();
+    };
 }
