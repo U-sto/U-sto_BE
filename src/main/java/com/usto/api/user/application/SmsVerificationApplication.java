@@ -12,14 +12,10 @@ import com.usto.api.user.domain.model.Verification;
 import com.usto.api.user.domain.model.VerificationPurpose;
 import com.usto.api.user.domain.model.VerificationType;
 import com.usto.api.user.domain.repository.VerificationRepository;
-import com.usto.api.user.infrastructure.entity.VerificationJpaEntity;
-import com.usto.api.user.infrastructure.repository.VerificationJpaRepository;
-import com.usto.api.user.presentation.dto.request.SmsVerifyRequestDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.xml.crypto.KeySelector;
 import java.time.LocalDateTime;
 
 @Service

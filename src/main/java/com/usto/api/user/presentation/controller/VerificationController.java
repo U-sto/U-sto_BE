@@ -2,24 +2,19 @@ package com.usto.api.user.presentation.controller;
 
 import com.usto.api.common.exception.BusinessException;
 import com.usto.api.common.utils.ApiResponse;
-import com.usto.api.common.utils.CurrentUser;
 import com.usto.api.user.application.*;
-import com.usto.api.user.domain.UserPrincipal;
 import com.usto.api.user.domain.model.VerificationPurpose;
-import com.usto.api.user.domain.repository.UserRepository;
-import com.usto.api.user.presentation.dto.request.EmailSendRequestDto;
-import com.usto.api.user.presentation.dto.request.EmailVerifyRequestDto;
-import com.usto.api.user.presentation.dto.request.SmsSendRequestDto;
-import com.usto.api.user.presentation.dto.request.SmsVerifyRequestDto;
+import com.usto.api.user.presentation.dto.request.EmailSendRequest;
+import com.usto.api.user.presentation.dto.request.EmailVerifyRequest;
+import com.usto.api.user.presentation.dto.request.SmsSendRequest;
+import com.usto.api.user.presentation.dto.request.SmsVerifyRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -41,7 +36,7 @@ public class VerificationController {
     @PostMapping("/email/send")
     @Operation(summary = "이메일 인증번호 전송")
     public ApiResponse<?> sendEmail(
-            @Valid @RequestBody EmailSendRequestDto request,
+            @Valid @RequestBody EmailSendRequest request,
             HttpServletRequest http,
             HttpSession session
 
@@ -90,7 +85,7 @@ public class VerificationController {
     @PostMapping("/email/check")
     @Operation(summary = "이메일 인증번호 확인")
     public ApiResponse<?> verifyEmail(
-            @Valid @RequestBody EmailVerifyRequestDto request,
+            @Valid @RequestBody EmailVerifyRequest request,
             HttpSession session
 
     ) {
@@ -143,7 +138,7 @@ public class VerificationController {
     @PostMapping("/sms/send")
     @Operation(summary = "휴대폰 인증번호 전송")
     public ApiResponse<?> sendSms(
-            @Valid @RequestBody SmsSendRequestDto request,
+            @Valid @RequestBody SmsSendRequest request,
             HttpServletRequest http,
             HttpSession session
     ) {
@@ -177,7 +172,7 @@ public class VerificationController {
     @Operation(summary = "휴대폰 인증번호 확인")
     public ApiResponse<?> verifyCode(
             @Valid @RequestBody
-            SmsVerifyRequestDto request,
+            SmsVerifyRequest request,
             HttpSession session
     )
     {

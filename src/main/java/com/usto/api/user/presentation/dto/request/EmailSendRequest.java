@@ -2,17 +2,18 @@ package com.usto.api.user.presentation.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 
 @Getter
-public class UserIdFindRequestDto {
+public class EmailSendRequest {
 
-    @NotBlank(message = "이름을 입력해주세요.")
-    @Schema(example = "ustoId")
+    @Schema(description = "아이디 찾기 시 필요" , example = "김철수")
     private String usrNm;
+
+    @Schema(description = "비밀번호 찾기 시 필요" , example = "ustoId")
+    private String usrId;
 
     private static final String FIXED_DOMAIN = "hanyang.ac.kr";
 
@@ -24,5 +25,4 @@ public class UserIdFindRequestDto {
     public String getEmail() {
         return emailId.trim() + "@" + FIXED_DOMAIN;
     }
-
 }

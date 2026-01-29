@@ -1,14 +1,13 @@
 package com.usto.api.user.presentation.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class UserUpdateRequestDto {
+public class UserUpdateRequest {
 
     //회원 수정에 인증 과정 별도로 구현 필요함 !
 

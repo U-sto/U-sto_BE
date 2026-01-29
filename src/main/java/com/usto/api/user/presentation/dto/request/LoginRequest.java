@@ -5,13 +5,13 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 
 @Getter
-public class PasswordResetRequestDto {
+public class LoginRequest {
+
+    @NotBlank(message = "아이디를 입력해주세요")
+    @Schema(example = "ustoId")
+    private String usrId;
 
     @NotBlank(message = "비밀번호를 입력해주세요")
-    @Schema(example = "123qwe!")
+    @Schema(example = "1234qwe!")
     private String pwd;
-
-    @NotBlank(message = "비밀번호 확인란을 입력해주세요")
-    @Schema(example = "123qwe!")
-    private String pwdConfirm;
 }

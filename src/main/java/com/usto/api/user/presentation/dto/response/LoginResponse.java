@@ -1,7 +1,7 @@
 package com.usto.api.user.presentation.dto.response;
 
 
-public record LoginResponseDto (
+public record LoginResponse(
         String usrId,
         String usrNm
 ){

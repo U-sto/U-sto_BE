@@ -8,14 +8,11 @@ package com.usto.api.user.application;
 
 import com.usto.api.user.domain.model.*;
 import com.usto.api.user.domain.repository.VerificationRepository;
-import com.usto.api.user.presentation.dto.request.EmailSendRequestDto;
-import com.usto.api.user.presentation.dto.request.SmsSendRequestDto;
-import com.usto.api.user.presentation.dto.request.SmsVerifyRequestDto;
+import com.usto.api.user.presentation.dto.request.EmailSendRequest;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.transaction.Transactional;
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -40,7 +37,7 @@ public class EmailSendApplication {
 
     @Transactional
     public void sendCodeToEmail(
-            EmailSendRequestDto request,
+            EmailSendRequest request,
             VerificationPurpose purpose,
             String actor)
     {

@@ -2,8 +2,8 @@ package com.usto.api.user.presentation.controller;
 
 import com.usto.api.common.utils.ApiResponse;
 import com.usto.api.user.application.*;
-import com.usto.api.user.presentation.dto.request.PasswordResetRequestDto;
-import com.usto.api.user.presentation.dto.response.UserIdFindResponseDto;
+import com.usto.api.user.presentation.dto.request.PasswordResetRequest;
+import com.usto.api.user.presentation.dto.response.UserIdFindResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpSession;
@@ -40,14 +40,14 @@ public class FindController {
         session.removeAttribute("findId.auth.email");
         session.removeAttribute("findId.auth.expiresAt");
 
-        return ApiResponse.ok("아이디 찾기 완료", new UserIdFindResponseDto(userId));
+        return ApiResponse.ok("아이디 찾기 완료", new UserIdFindResponse(userId));
     }
 
 
     @PostMapping("/password")
     @Operation(summary = "비밀번호 재설정")
     public ApiResponse<?> FindPassword(
-            @RequestBody PasswordResetRequestDto request,
+            @RequestBody PasswordResetRequest request,
             HttpSession session
     )
     {

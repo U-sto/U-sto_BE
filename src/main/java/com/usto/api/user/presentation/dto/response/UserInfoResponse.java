@@ -7,7 +7,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class UserInfoResponseDto {
+public class UserInfoResponse {
 
     private String usrId; //표시
 
