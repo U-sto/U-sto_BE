@@ -7,6 +7,7 @@
 package com.usto.api.user.application;
 
 
+import com.usto.api.common.exception.BusinessException;
 import com.usto.api.common.utils.SmsUtil;
 import com.usto.api.user.domain.model.Verification;
 import com.usto.api.user.domain.model.VerificationPurpose;
@@ -15,6 +16,7 @@ import com.usto.api.user.domain.repository.VerificationRepository;
 import com.usto.api.user.presentation.dto.request.SmsSendRequestDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.nurigo.sdk.message.response.SingleMessageSentResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,7 +34,6 @@ public class SmsSendApplication {
     @Transactional
     public void sendCodeToSms(
             SmsSendRequestDto request,
-            VerificationPurpose purpose,  // ← 추가
             String actor
     )
     {
@@ -45,7 +46,7 @@ public class SmsSendApplication {
                 .find(
                         request.getTarget(),
                         VerificationType.SMS,
-                        purpose
+                        request.getPurpose()
                         )
                 .orElse(null); //없으면? Null 처리
 
@@ -55,7 +56,7 @@ public class SmsSendApplication {
             // 새로 생성
             verificationToSave  = Verification.builder()
                     .creBy(actor)
-                    .purpose(purpose)
+                    .purpose(request.getPurpose())
                     .target(request.getTarget())
                     .type(VerificationType.SMS)
                     .code(code)
@@ -63,7 +64,7 @@ public class SmsSendApplication {
                     .isVerified(false)
                     .build();
             log.info("[SMS-SEND] 새 인증 생성 - target: {}, purpose: {}",
-                    request.getTarget(), purpose);
+                    request.getTarget(), request.getPurpose());
         } else {
             //재발송하는 경우
             Verification renewed = existingVerification.renew(code, timeLimit);
@@ -73,15 +74,25 @@ public class SmsSendApplication {
                     .build();
 
             log.info("[SMS-SEND] 인증 재발송 - target: {}, purpose: {}",
-                    request.getTarget(), purpose);
+                    request.getTarget(), request.getPurpose());
         }
         verificationRepository.save(verificationToSave);
 
         // SMS 발송 (숫자만 남기도록 정규화)
         String to = request.getTarget().replaceAll("[^0-9]", "");
-        smsUtil.sendVerificationCode(to, code);
+        try {
+            SingleMessageSentResponse response = smsUtil.sendVerificationCode(to, code);
 
-        log.info("[SMS-SEND] 발송 완료 - to: {}", to);
+            String statusCode = response.getStatusCode();
+            log.info("[SMS-SEND] statusCode={}", statusCode);
+
+        } catch (Exception e) {
+            // response 없이 터지는 실패 처리
+            log.error("[SMS-SEND] SMS sending failed unexpectedly", e);
+            throw new BusinessException("재 전송 해주세요.");
+        }
+
+        log.info("[SMS-SEND] sms sent to= {}", to);
     }
 
 

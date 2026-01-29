@@ -6,8 +6,9 @@ import com.usto.api.organization.infrastructure.entity.OrganizationJpaEntity;
 import com.usto.api.organization.infrastructure.repository.OrganizationJpaRepository;
 import com.usto.api.user.domain.model.User;
 import com.usto.api.user.domain.repository.UserRepository;
-import com.usto.api.user.presentation.dto.request.UserUpdateRequestDto;
-import com.usto.api.user.presentation.dto.response.UserUpdateResponseDto;
+import com.usto.api.user.presentation.dto.response.UserInfoResponseDto;
+import com.usto.api.user.presentation.dto.response.UserPwdUpdateResponseDto;
+import com.usto.api.user.presentation.dto.response.UserSmsUpdateResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -23,8 +24,73 @@ public class UserUpdateApplication {
     private final OrganizationJpaRepository organizationJpaRepository;
 
     @Transactional
-    public UserUpdateResponseDto update(String usrId, UserUpdateRequestDto request) {
+    public UserInfoResponseDto info (String usrId) {
 
+        String loginUsrId = CurrentUser.usrId();
+
+        if (loginUsrId == null) {
+            throw new BusinessException("로그인이 필요합니다");
+        }
+        if (!loginUsrId.equals(usrId)) {
+            throw new AccessDeniedException("본인만 조회 가능합니다.");
+        }
+
+        User user = userRepository.getByUsrId(usrId);
+
+        //다른 애들도 가져오기(수정은 안되지만 보여주긴 해야하는 것들)
+        String roleNm = user.getRoleId().displayName();
+        String orgNm = organizationJpaRepository.findByOrgCd(user.getOrgCd())
+                .map(OrganizationJpaEntity::getOrgNm)
+                .orElse(null);
+
+        return UserInfoResponseDto.builder()
+                .usrId(user.getUsrId())
+                .usrNm(user.getUsrNm())
+                .email(user.getEmail())
+                .sms(user.getSms())
+                .orgNm(orgNm)
+                .roleNm(roleNm)
+                .build();
+    }
+
+    @Transactional
+    public UserPwdUpdateResponseDto updatePwd(String usrId, String oldPwd, String newPwd) {
+        String loginUsrId = CurrentUser.usrId();
+
+        if (loginUsrId == null) {
+            throw new BusinessException("로그인이 필요합니다");
+        }
+        if (!loginUsrId.equals(usrId)) {
+            throw new AccessDeniedException("본인만 수정 가능합니다.");
+        }
+
+        //사용자 조회
+        User user = userRepository.getByUsrId(usrId);
+
+        if (!passwordEncoder.matches(oldPwd, user.getPwHash())) {
+            throw new BusinessException("비밀번호가 일치하지 않습니다.");
+        }
+
+        if (passwordEncoder.matches(newPwd, user.getPwHash())) {
+            throw new BusinessException("기존 비밀번호와 다른 비밀번호를 사용하세요.");
+        }
+
+        //비밀번호 암호화
+        String encodedPassword = passwordEncoder.encode(newPwd);
+
+        //Domain메서드로 변경
+        User updated = user.changePassword(encodedPassword);
+
+        //저장
+        User saved = userRepository.save(updated);
+
+        return UserPwdUpdateResponseDto.builder()
+                .usrId(saved.getUsrId())
+                .build();
+    }
+
+    @Transactional
+    public UserSmsUpdateResponseDto updateSms(String usrId, String target) {
         String loginUsrId = CurrentUser.usrId();
 
         if (loginUsrId == null) {
@@ -36,33 +102,17 @@ public class UserUpdateApplication {
 
         User user = userRepository.getByUsrId(usrId);
 
-        User updated = user.updateProfile(
-                request.getNewUsrNm(),
-                request.getNewSms()
-        );
-
-        //비밀번호 변경이 있다면 (로직 분리)
-        if (request.getNewPw() != null && ! request.getNewPw().isBlank()) {
-            String encodedPw = passwordEncoder.encode(request.getNewPw());
-            updated = updated.changePassword(encodedPw);
+        if(!target.equals(user.getSms()) && userRepository.existsBySms(target)){
+            throw new BusinessException("이미 사용 중인 전화번호입니다.");
         }
+
+        User updated = user.changeSms(target);
 
         User saved = userRepository.save(updated);
 
-        //다른 애들도 가져오기(수정은 안되지만 보여주긴 해야하는 것들)
-        String roleNm = user.getRoleId().displayName();
-        String orgNm = organizationJpaRepository.findByOrgCd(user.getOrgCd())
-                .map(OrganizationJpaEntity::getOrgNm)
-                .orElse(null);
-
-        return UserUpdateResponseDto.builder()
+        return UserSmsUpdateResponseDto.builder()
                 .usrId(saved.getUsrId())
-                .usrNm(saved.getUsrNm())
-                .email(saved.getEmail())
-                .sms(saved.getSms()) //있다면
-                .orgNm(orgNm)
-                .roleNm(roleNm)
-                .build();
-    }
+                .newSms(saved.getSms())
+                .build();    }
 }
 

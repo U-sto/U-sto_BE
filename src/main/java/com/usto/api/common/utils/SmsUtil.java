@@ -6,6 +6,7 @@
  */
 package com.usto.api.common.utils;
 
+import com.usto.api.common.exception.BusinessException;
 import jakarta.annotation.PostConstruct;
 import net.nurigo.sdk.NurigoApp;
 import net.nurigo.sdk.message.model.Message;
@@ -49,6 +50,16 @@ public class SmsUtil {
         message.setFrom(defaultFrom);
         message.setTo(target);
         message.setText("[U-sto]\n본인확인인증번호\n["+code+"]입니다.\n*타인 노출 금지*");
-        return this.messageService.sendOne(new SingleMessageSendingRequest(message));
+
+        SingleMessageSentResponse response =
+                this.messageService.sendOne(new SingleMessageSendingRequest(message));
+
+        String statusCode = response.getStatusCode();       // 예: "2000", 실패면 다른 값
+
+        if(statusCode.equals("3059")){
+            throw new BusinessException("재전송 필요");
+        }
+
+        return response;
     }
 }

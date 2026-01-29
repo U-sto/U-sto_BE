@@ -1,6 +1,5 @@
 package com.usto.api.user.presentation.dto.response;
 
-import com.usto.api.user.domain.model.Role;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Pattern;
 import lombok.Builder;
@@ -8,7 +7,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class UserUpdateResponseDto {
+public class UserInfoResponseDto {
 
     private String usrId; //표시
 
