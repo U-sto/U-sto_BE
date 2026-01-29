@@ -6,6 +6,7 @@
  */
 package com.usto.api.common.utils;
 
+import com.usto.api.common.exception.BusinessException;
 import jakarta.annotation.PostConstruct;
 import net.nurigo.sdk.NurigoApp;
 import net.nurigo.sdk.message.model.Message;
@@ -54,8 +55,10 @@ public class SmsUtil {
                 this.messageService.sendOne(new SingleMessageSendingRequest(message));
 
         String statusCode = response.getStatusCode();       // 예: "2000", 실패면 다른 값
-        String statusMsg  = response.getStatusMessage();    // 예: "정상 접수..."
-        // (원하면 여기서 로그만 찍고 그대로 return)
+
+        if(statusCode.equals("3059")){
+            throw new BusinessException("재전송 필요");
+        }
 
         return response;
     }

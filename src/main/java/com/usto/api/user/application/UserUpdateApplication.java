@@ -54,7 +54,7 @@ public class UserUpdateApplication {
     }
 
     @Transactional
-    public UserPwdUpdateResponseDto updatePwd(String usrId, String newPwd) {
+    public UserPwdUpdateResponseDto updatePwd(String usrId, String oldPwd, String newPwd) {
         String loginUsrId = CurrentUser.usrId();
 
         if (loginUsrId == null) {
@@ -66,16 +66,26 @@ public class UserUpdateApplication {
 
         //사용자 조회
         User user = userRepository.getByUsrId(usrId);
+
+        if (!passwordEncoder.matches(oldPwd, user.getPwHash())) {
+            throw new BusinessException("비밀번호가 일치하지 않습니다.");
+        }
+
+        if (passwordEncoder.matches(newPwd, user.getPwHash())) {
+            throw new BusinessException("기존 비밀번호와 다른 비밀번호를 사용하세요.");
+        }
+
         //비밀번호 암호화
         String encodedPassword = passwordEncoder.encode(newPwd);
+
         //Domain메서드로 변경
         User updated = user.changePassword(encodedPassword);
+
         //저장
         User saved = userRepository.save(updated);
 
         return UserPwdUpdateResponseDto.builder()
                 .usrId(saved.getUsrId())
-                .newPwd(saved.getPwHash())
                 .build();
     }
 
@@ -92,8 +102,8 @@ public class UserUpdateApplication {
 
         User user = userRepository.getByUsrId(usrId);
 
-        if(userRepository.existsBySms(target)){
-            throw new BusinessException("기존과 동일한 전화번호 입니다.");
+        if(!target.equals(user.getSms()) && userRepository.existsBySms(target)){
+            throw new BusinessException("이미 사용 중인 전화번호입니다.");
         }
 
         User updated = user.changeSms(target);

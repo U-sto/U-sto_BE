@@ -11,7 +11,4 @@ import lombok.Getter;
 public class UserPwdUpdateResponseDto {
 
     private String usrId;
-
-    @NotBlank(message = "새 비밀번호를 입력해주세요.")
-    private String newPwd;
 }

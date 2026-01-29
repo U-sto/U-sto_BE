@@ -90,7 +90,10 @@ public class UserController {
             @AuthenticationPrincipal UserPrincipal userPrincipal
     ) {
 
-        UserPwdUpdateResponseDto result = userUpdateApplication.updatePwd(userPrincipal.getUsername(),request.getNewPwd());
+        UserPwdUpdateResponseDto result = userUpdateApplication.updatePwd(
+                userPrincipal.getUsername(),
+                request.getOldPwd(),
+                request.getNewPwd());
 
         return ApiResponse.ok(
                 "비밀번호가 정상적으로 수정되었습니다.",
