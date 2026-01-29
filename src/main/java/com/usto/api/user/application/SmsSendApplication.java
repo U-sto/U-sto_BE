@@ -34,7 +34,6 @@ public class SmsSendApplication {
     @Transactional
     public void sendCodeToSms(
             SmsSendRequestDto request,
-            VerificationPurpose purpose,  // ← 추가
             String actor
     )
     {
@@ -47,7 +46,7 @@ public class SmsSendApplication {
                 .find(
                         request.getTarget(),
                         VerificationType.SMS,
-                        purpose
+                        request.getPurpose()
                         )
                 .orElse(null); //없으면? Null 처리
 
@@ -57,7 +56,7 @@ public class SmsSendApplication {
             // 새로 생성
             verificationToSave  = Verification.builder()
                     .creBy(actor)
-                    .purpose(purpose)
+                    .purpose(request.getPurpose())
                     .target(request.getTarget())
                     .type(VerificationType.SMS)
                     .code(code)
@@ -65,7 +64,7 @@ public class SmsSendApplication {
                     .isVerified(false)
                     .build();
             log.info("[SMS-SEND] 새 인증 생성 - target: {}, purpose: {}",
-                    request.getTarget(), purpose);
+                    request.getTarget(), request.getPurpose());
         } else {
             //재발송하는 경우
             Verification renewed = existingVerification.renew(code, timeLimit);
@@ -75,7 +74,7 @@ public class SmsSendApplication {
                     .build();
 
             log.info("[SMS-SEND] 인증 재발송 - target: {}, purpose: {}",
-                    request.getTarget(), purpose);
+                    request.getTarget(), request.getPurpose());
         }
         verificationRepository.save(verificationToSave);
 
