@@ -41,9 +41,9 @@ public class G2bSyncController {
 
         String msg = String.format(
                 "G2B 물품정보 동기화 완료. (기간 %s~%s) " +
-                        "수집 %d건 → 적재 %d건(중복 %d건 제거). " +
-                        "카테고리 신규 %d건 / 수정 %d건, 품목 신규 %d건 / 수정 %d건. " +
-                        "총 변경 %d건.",
+                        "수집 %d건 → 적재 %d건(중복 %d건 제거) " +
+                        "(카테고리 신규 %d건 / 수정 %d건), (품목 신규 %d건 / 수정 %d건) " +
+                        "총 변경 %d건입니다.",
                 result.begin(), result.end(),
                 result.fetched(), result.deduped(), result.duplicated(),
                 result.insertedCategory(), result.updatedCategory(),
