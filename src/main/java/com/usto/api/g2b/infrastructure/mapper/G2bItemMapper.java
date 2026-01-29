@@ -1,6 +1,7 @@
-package com.usto.api.g2b.infrastructure.entity;
+package com.usto.api.g2b.infrastructure.mapper;
 
 import com.usto.api.g2b.domain.model.G2bItem;
+import com.usto.api.g2b.infrastructure.entity.G2bItemJpaEntity;
 
 public class G2bItemMapper {
 

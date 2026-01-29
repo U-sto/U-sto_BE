@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class G2bTestServiceImpl {
+public class G2bTestApplication {
 
     private final ShoppingMallOpenApiClient client;
 

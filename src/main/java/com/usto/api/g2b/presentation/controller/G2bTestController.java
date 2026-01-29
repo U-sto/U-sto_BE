@@ -1,7 +1,7 @@
 package com.usto.api.g2b.presentation.controller;
 
 import com.usto.api.common.utils.ApiResponse;
-import com.usto.api.g2b.application.G2bTestServiceImpl;
+import com.usto.api.g2b.application.G2bTestApplication;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class G2bTestController {
 
-    private final G2bTestServiceImpl g2bTextServiceImpl;
+    private final G2bTestApplication g2bTextServiceImpl;
 
     @Operation(
             summary = "공공데이터 포털 연동 테스트"

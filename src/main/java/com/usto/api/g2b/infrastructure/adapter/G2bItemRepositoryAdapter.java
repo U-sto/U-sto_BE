@@ -1,5 +1,5 @@
 package com.usto.api.g2b.infrastructure.adapter;
-import com.usto.api.g2b.domain.service.G2bItemService;
+import com.usto.api.g2b.domain.repository.G2bItemRepository;
 import com.usto.api.g2b.infrastructure.repository.G2bItemJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
-public class G2bItemAdapter implements G2bItemService {
+public class G2bItemRepositoryAdapter implements G2bItemRepository {
 
     private final G2bItemJpaRepository jpaItemjpaRepository;
 

@@ -1,7 +1,9 @@
-package com.usto.api.g2b.infrastructure.entity;
+package com.usto.api.g2b.infrastructure.mapper;
 
 import com.usto.api.common.utils.ShoppingMallEnvelope;
 import com.usto.api.g2b.domain.model.G2bStg;
+import com.usto.api.g2b.infrastructure.entity.G2bStgJpaEntity;
+
 import java.math.BigDecimal;
 
 public class G2bStgMapper {

@@ -1,8 +1,8 @@
 package com.usto.api.g2b.infrastructure.adapter;
 
 import com.usto.api.g2b.domain.model.G2bStg;
-import com.usto.api.g2b.domain.service.G2bStgService;
-import com.usto.api.g2b.infrastructure.entity.G2bStgMapper;
+import com.usto.api.g2b.domain.repository.G2bStgRepository;
+import com.usto.api.g2b.infrastructure.mapper.G2bStgMapper;
 import com.usto.api.g2b.infrastructure.repository.G2bStgJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -12,7 +12,7 @@ import java.util.List;
 
 @Repository
 @RequiredArgsConstructor
-public class G2bStgAdapter implements G2bStgService {
+public class G2bStgRepositoryAdapter implements G2bStgRepository {
 
     private final G2bStgJpaRepository g2bStgJpaRepository;
     private final JdbcTemplate jdbcTemplate;

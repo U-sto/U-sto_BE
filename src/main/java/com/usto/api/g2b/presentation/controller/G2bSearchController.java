@@ -1,9 +1,9 @@
 package com.usto.api.g2b.presentation.controller;
 
 import com.usto.api.common.utils.ApiResponse;
-import com.usto.api.g2b.domain.service.G2bSearchService;
-import com.usto.api.g2b.presentation.dto.response.G2bCategoryResponseDto;
-import com.usto.api.g2b.presentation.dto.response.G2bItemResponseDto;
+import com.usto.api.g2b.domain.repository.G2bSearchRepository;
+import com.usto.api.g2b.presentation.dto.response.G2bCategoryResponse;
+import com.usto.api.g2b.presentation.dto.response.G2bItemResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -24,7 +24,7 @@ import java.util.List;
 @RequestMapping("/api/g2b")
 @RequiredArgsConstructor
 public class G2bSearchController {
-    private final G2bSearchService g2bSearchService;
+    private final G2bSearchRepository g2bSearchService;
 
     @Operation(
             summary = "G2B 물품 분류 조회",
@@ -32,14 +32,14 @@ public class G2bSearchController {
                     "검색어 미입력 시 전체 목록을 반환합니다."
     )
     @GetMapping("/categories")
-    public ApiResponse<List<G2bCategoryResponseDto>> getCategoryList(
+    public ApiResponse<List<G2bCategoryResponse>> getCategoryList(
             @Parameter(description = "물품분류코드")
             @RequestParam(required = false) String code,
             @Parameter(description = "물품분류명")
             @RequestParam(required = false) String name) {
-        List<G2bCategoryResponseDto> categories = g2bSearchService.findCategoryList(code, name)
+        List<G2bCategoryResponse> categories = g2bSearchService.findCategoryList(code, name)
                 .stream()
-                .map(e -> new G2bCategoryResponseDto(e.getG2bMCd(), e.getG2bMNm()))
+                .map(e -> new G2bCategoryResponse(e.getG2bMCd(), e.getG2bMNm()))
                 .toList();
         if (categories.isEmpty()) {
             return ApiResponse.ok("조회 결과가 없습니다.", categories);
@@ -53,17 +53,17 @@ public class G2bSearchController {
                     "검색어 미입력 시 빈 리스트를 반환합니다."
     )
     @GetMapping("/items")
-    public ApiResponse<List<G2bItemResponseDto>> getItemList(
+    public ApiResponse<List<G2bItemResponse>> getItemList(
             @Parameter(description = "물품분류코드")
             @RequestParam(required = false) String categoryCode,
             @Parameter(description = "물품식별코드")
             @RequestParam(required = false) String itemCode,
             @Parameter(description = "물품품목명")
             @RequestParam(required = false) String itemName) {
-        List<G2bItemResponseDto> items = g2bSearchService.findItemList(
+        List<G2bItemResponse> items = g2bSearchService.findItemList(
                         categoryCode, itemCode, itemName)
                 .stream()
-                .map(e -> new G2bItemResponseDto(e.getG2bDCd(), e.getG2bDNm(), e.getG2bUpr()))
+                .map(e -> new G2bItemResponse(e.getG2bDCd(), e.getG2bDNm(), e.getG2bUpr()))
                 .toList();
         if (items.isEmpty()) {
             return ApiResponse.ok("조회 결과가 없습니다.", items);

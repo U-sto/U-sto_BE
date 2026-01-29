@@ -1,6 +1,6 @@
 package com.usto.api.g2b.application;
 
-import com.usto.api.g2b.domain.service.G2bSearchService;
+import com.usto.api.g2b.domain.repository.G2bSearchRepository;
 import com.usto.api.g2b.infrastructure.entity.G2bItemCategoryJpaEntity;
 import com.usto.api.g2b.infrastructure.entity.G2bItemJpaEntity;
 import com.usto.api.g2b.infrastructure.repository.G2bItemCategoryJpaRepository;
@@ -17,7 +17,7 @@ import java.util.List;
  */
 @Service
 @RequiredArgsConstructor
-public class G2bSearchServiceImpl implements G2bSearchService {
+public class G2bSearchApplication implements G2bSearchRepository {
     private final G2bItemCategoryJpaRepository categoryRepository;
     private final G2bItemJpaRepository itemRepository;
 

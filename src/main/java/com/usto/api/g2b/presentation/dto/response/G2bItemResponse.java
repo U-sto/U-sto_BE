@@ -8,4 +8,4 @@ import java.math.BigDecimal;
  * @param dNm 물품품목명
  * @param upr 단가
  */
-public record G2bItemResponseDto(String dCd, String dNm, BigDecimal upr) {}
+public record G2bItemResponse(String dCd, String dNm, BigDecimal upr) {}

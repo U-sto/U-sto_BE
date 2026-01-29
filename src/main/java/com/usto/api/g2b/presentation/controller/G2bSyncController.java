@@ -1,7 +1,7 @@
 package com.usto.api.g2b.presentation.controller;
 
 import com.usto.api.common.utils.ApiResponse;
-import com.usto.api.g2b.application.G2bSyncServiceImpl;
+import com.usto.api.g2b.application.G2bSyncApplication;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +16,7 @@ import java.time.format.DateTimeFormatter;
 @RequiredArgsConstructor
 public class G2bSyncController {
 
-    private final G2bSyncServiceImpl g2bSyncServiceImpl;
+    private final G2bSyncApplication g2bSyncServiceImpl;
 
     @Operation(
             summary = "G2B 목록정보 최신화(자동)"

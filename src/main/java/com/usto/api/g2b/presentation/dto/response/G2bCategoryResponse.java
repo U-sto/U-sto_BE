@@ -6,4 +6,4 @@ package com.usto.api.g2b.presentation.dto.response;
  * @param mCd 물품분류코드
  * @param mNm 물품분류명
  */
-public record G2bCategoryResponseDto(String mCd, String mNm) {}
+public record G2bCategoryResponse(String mCd, String mNm) {}

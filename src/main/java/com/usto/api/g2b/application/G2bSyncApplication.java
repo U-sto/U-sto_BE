@@ -2,11 +2,11 @@ package com.usto.api.g2b.application;
 
 import com.usto.api.common.utils.ShoppingMallEnvelope;
 import com.usto.api.common.utils.ShoppingMallOpenApiClient;
-import com.usto.api.g2b.infrastructure.entity.G2bStgMapper;
+import com.usto.api.g2b.infrastructure.mapper.G2bStgMapper;
 import com.usto.api.g2b.domain.model.G2bStg;
-import com.usto.api.g2b.domain.service.G2bItemCategoryService;
-import com.usto.api.g2b.domain.service.G2bItemService;
-import com.usto.api.g2b.domain.service.G2bStgService;
+import com.usto.api.g2b.domain.repository.G2bItemCategoryRepository;
+import com.usto.api.g2b.domain.repository.G2bItemRepository;
+import com.usto.api.g2b.domain.repository.G2bStgRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -22,11 +22,11 @@ import static org.springframework.transaction.annotation.Propagation.REQUIRES_NE
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class G2bSyncServiceImpl {
+public class G2bSyncApplication {
 
-    private final G2bStgService g2bStgService;
-    private final G2bItemService g2bItemService;
-    private final G2bItemCategoryService g2bItemCategoryService;
+    private final G2bStgRepository g2bStgService;
+    private final G2bItemRepository g2bItemService;
+    private final G2bItemCategoryRepository g2bItemCategoryService;
     private final ShoppingMallOpenApiClient client; //API연동
 
     //이쪽 값을 정의해야할거같다.

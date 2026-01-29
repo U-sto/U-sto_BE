@@ -1,10 +1,10 @@
-package com.usto.api.g2b.domain.service;
+package com.usto.api.g2b.domain.repository;
 
 import com.usto.api.g2b.domain.model.G2bStg;
 
 import java.util.List;
 
-public interface G2bStgService {
+public interface G2bStgRepository {
     //비워놓고
     void truncate();
     //새로 채우고
