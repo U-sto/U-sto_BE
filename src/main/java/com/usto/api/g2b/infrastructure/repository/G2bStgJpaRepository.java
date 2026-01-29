@@ -1,5 +1,6 @@
 package com.usto.api.g2b.infrastructure.repository;
 
+import com.usto.api.g2b.domain.model.G2bStg;
 import com.usto.api.g2b.infrastructure.entity.G2bStgJpaEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -28,5 +29,4 @@ public interface G2bStgJpaRepository extends JpaRepository<G2bStgJpaEntity,Long>
         OR COALESCE(S.g2bUpr, 0) <> COALESCE(D.g2bUpr, 0)
     """)
     long countChanged();
-
 }

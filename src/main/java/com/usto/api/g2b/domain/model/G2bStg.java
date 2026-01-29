@@ -7,7 +7,7 @@ import lombok.Getter;
 @Getter
 @Builder
 public class G2bStg {
-
+    //private final long stgId; //순번
     private final String g2bMCd;   // 물품분류코드 -> G2B_M_CD
     private final String g2bMNm;   // 물품분류명   -> G2B_M_NM
     private final String g2bDCd;   // 물품식별코드 -> G2B_D_CD
