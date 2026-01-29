@@ -1,7 +1,7 @@
 package com.usto.api.organization.presentation.controller;
 
 import com.usto.api.common.utils.ApiResponse;
-import com.usto.api.organization.application.DepartmentService;
+import com.usto.api.organization.application.DepartmentApplication;
 import com.usto.api.organization.presentation.dto.response.DepartmentResponse;
 import com.usto.api.user.domain.model.UserPrincipal;
 import io.swagger.v3.oas.annotations.Operation;
@@ -19,7 +19,7 @@ import java.util.List;
 @RequestMapping("/api/organization")
 @RequiredArgsConstructor
 public class DepartmentController {
-    private final DepartmentService departmentService;
+    private final DepartmentApplication departmentService;
 
     @Operation(summary = "운용부서 목록 조회", description = "현재 로그인한 사용자가 속한 조직의 부서 목록을 조회합니다.")
     @GetMapping("/departments")

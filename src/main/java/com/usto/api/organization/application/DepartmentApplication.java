@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class DepartmentService {
+public class DepartmentApplication {
     private final DepartmentJpaRepository departmentRepository;
 
     @Transactional(readOnly = true)
