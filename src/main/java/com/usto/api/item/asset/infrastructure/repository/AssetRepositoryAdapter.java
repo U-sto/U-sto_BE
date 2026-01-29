@@ -127,7 +127,7 @@ public class AssetRepositoryAdapter implements AssetRepository {
                         itemAssetDetailEntity.drbYr,
                         itemAssetDetailEntity.acqUpr,
                         itemAssetMasterEntity.qty,
-                        itemAssetMasterEntity.acqArrgTy,
+                        itemAssetMasterEntity.acqArrgTy.stringValue().as("acqArrgTy"),
                         departmentJpaEntity.deptNm.as("deptNm"),
                         itemAssetDetailEntity.deptCd,
                         itemAssetDetailEntity.rmk
