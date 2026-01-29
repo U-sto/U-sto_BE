@@ -41,7 +41,7 @@ public class ItemReturningMasterEntity extends BaseTimeEntity {
     private ItemStatus itemSts;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "CHG_RSN", nullable = false, length = 30)
+    @Column(name = "CHG_RSN", nullable = false, length = 200)
     private ReturningReason rtrnRsn;
 
     @Column(name = "APPR_USR_ID", length = 30)

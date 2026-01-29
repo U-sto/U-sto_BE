@@ -34,6 +34,8 @@ public class ReturningMaster {
     private String updBy;
     private LocalDateTime updAt;
 
+    private static final ZoneId KOREA_ZONE = ZoneId.of("Asia/Seoul");
+
 
     /**
      * 신규 반납 신청서 생성
@@ -110,7 +112,7 @@ public class ReturningMaster {
      * 반납일자 검증
      */
     private static void validateAplyAt(LocalDate aplyAt) {
-        if (aplyAt == null || aplyAt.isAfter(LocalDate.now(ZoneId.of("Asia/Seoul")))) {
+        if (aplyAt == null || aplyAt.isAfter(LocalDate.now(KOREA_ZONE))) {
             throw new BusinessException("반납일자는 미래 날짜를 선택할 수 없습니다.");
         }
     }

@@ -2,6 +2,7 @@ package com.usto.api.item.returning.infrastructure.repository;
 
 import com.usto.api.item.returning.infrastructure.entity.ItemReturningDetailEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -12,4 +13,8 @@ public interface ReturningDetailJpaRepository extends JpaRepository<ItemReturnin
 
     @Query("SELECT d.itmNo FROM ItemReturningDetailEntity d WHERE d.rtrnMId = :rtrnMId AND d.orgCd = :orgCd")
     List<String> findItemNosByRtrnMIdAndOrgCd(@Param("rtrnMId") UUID rtrnMId, @Param("orgCd") String orgCd);
+
+    @Modifying
+    @Query("UPDATE ItemReturningDetailEntity d SET d.delYn = 'Y', d.delAt = CURRENT_TIMESTAMP WHERE d.rtrnMId = :rtrnMId")
+    void deleteAllByRtrnMId(@Param("rtrnMId") UUID rtrnMId);
 }

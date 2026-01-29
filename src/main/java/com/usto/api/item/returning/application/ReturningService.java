@@ -55,8 +55,8 @@ public class ReturningService {
             asset.validateOwnership(orgCd);
 
             // 2-2. 이미 대기 중인 다른 반납 건에 포함되어 있는지 확인
-            if (returningRepository.existsPendingReturnDetail(itmNo, orgCd)) {
-                throw new BusinessException("이미 반납 신청이 진행 중인 물품입니다: " + itmNo);
+            if (returningRepository.existsInOtherReturning(itmNo, null, orgCd)) {
+                throw new BusinessException("이미 다른 반납 신청에 포함된 물품입니다: " + itmNo);
             }
 
             // 2-3. 운용 상태 확인 (OPER만 반납 가능)
@@ -103,13 +103,41 @@ public class ReturningService {
      */
     @Transactional
     public void updateReturning(UUID rtrnMId, ReturningRegisterRequest request, String orgCd) {
+        // 1. 마스터 조회 및 상태 검증
         ReturningMaster master = returningRepository.findMasterById(rtrnMId, orgCd)
                 .orElseThrow(() -> new BusinessException("존재하지 않는 반납 신청입니다."));
 
         master.validateOwnership(orgCd);
-        master.updateInfo(request.getItemSts(), request.getRtrnRsn());
+        master.validateModifiable();
 
+        // 2. 마스터 기본 정보 업데이트 (사유, 상태 등)
+        master.updateInfo(request.getItemSts(), request.getRtrnRsn());
         returningRepository.saveMaster(master);
+
+        // 3. 기존 상세 내역(물품 목록) 전체 삭제
+        returningRepository.deleteAllDetailsByMasterId(rtrnMId);
+
+        // 4. 새로운 Detail 생성 (물품 목록 전체 교체)
+        for (String itmNo : request.getItmNos()) {
+            Asset asset = assetRepository.findById(itmNo, orgCd)
+                    .orElseThrow(() -> new BusinessException("물품을 찾을 수 없습니다: " + itmNo));
+
+            asset.validateOwnership(orgCd);
+
+            if (asset.getOperSts() != OperStatus.OPER) {
+                throw new BusinessException("운용 중인 물품만 반납할 수 있습니다: " + itmNo);
+            }
+            // "현재 수정 중인 이 신청서"를 제외하고 다른 신청서에 등록되었는지 확인
+            if (returningRepository.existsInOtherReturning(itmNo, rtrnMId, orgCd)) {
+                throw new BusinessException("이미 다른 반납 신청에 포함된 물품입니다: " + itmNo);
+            }
+
+            ReturningDetail detail = ReturningDetail.create(
+                    rtrnMId, itmNo, asset.getDeptCd(), orgCd
+            );
+
+            returningRepository.saveDetail(detail);
+        }
     }
 
     /**
@@ -123,6 +151,8 @@ public class ReturningService {
         master.validateOwnership(orgCd);
         master.validateModifiable();
 
+        // 고아 레코드 방지를 위해 상세 먼저 삭제 후 마스터 삭제
+        returningRepository.deleteAllDetailsByMasterId(rtrnMId);
         returningRepository.deleteMaster(rtrnMId);
     }
 
@@ -151,6 +181,7 @@ public class ReturningService {
         master.validateOwnership(orgCd);
         master.validateCancellable();
 
+        returningRepository.deleteAllDetailsByMasterId(rtrnMId);
         returningRepository.deleteMaster(rtrnMId);
     }
 

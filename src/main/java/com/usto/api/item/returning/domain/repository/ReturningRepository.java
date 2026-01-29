@@ -19,7 +19,13 @@ public interface ReturningRepository {
     // 반납물품목록 조회
     List<ReturningItemListResponse> findItemsByMasterId(UUID rtrnMId, String orgCd);
 
-    boolean existsPendingReturnDetail(String itmNo, String orgCd);
     void deleteMaster(UUID rtrnMId);
+
+    // 마스터 ID에 묶인 모든 상세 내역 삭제
+    void deleteAllDetailsByMasterId(UUID rtrnMId);
+
+    // 물품 고유번호 목록 조회
     List<String> findItemNosByMasterId(UUID rtrnMId, String orgCd);
+
+    boolean existsInOtherReturning(String itmNo, UUID excludeRtrnMId, String orgCd);
 }

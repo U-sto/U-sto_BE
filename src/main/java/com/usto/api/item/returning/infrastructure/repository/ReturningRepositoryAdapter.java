@@ -5,7 +5,6 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.usto.api.item.common.model.ApprStatus;
-import com.usto.api.item.common.model.ItemStatus;
 import com.usto.api.item.returning.domain.model.ReturningDetail;
 import com.usto.api.item.returning.domain.model.ReturningMaster;
 import com.usto.api.item.returning.domain.repository.ReturningRepository;
@@ -144,11 +143,25 @@ public class ReturningRepositoryAdapter implements ReturningRepository {
                 .fetch();
     }
 
+    @Override
+    public void deleteMaster(UUID rtrnMId) {
+        masterJpaRepository.deleteById(rtrnMId);
+    }
+
+    @Override
+    public void deleteAllDetailsByMasterId(UUID rtrnMId) {
+        detailJpaRepository.deleteAllByRtrnMId(rtrnMId);
+    }
+
     /**
-     * 이미 존재하는 반납 신청서에 포함되어 승인 대기 중인 물품인지 확인하는 메서드
+     * 중복 체크: 특정 물품이 다른 반납 신청서에 이미 등록되어 있는지 확인
+     * @param itmNo 물품고유번호
+     * @param excludeRtrnMId 제외할 반납ID (현재 수정 중인 신청서)
+     * @param orgCd 조직코드
+     * @return true = 다른 신청서에 이미 존재함 (중복)
      */
     @Override
-    public boolean existsPendingReturnDetail(String itmNo, String orgCd) {
+    public boolean existsInOtherReturning(String itmNo, UUID excludeRtrnMId, String orgCd) {
         return queryFactory
                 .selectOne()
                 .from(itemReturningDetailEntity)
@@ -157,15 +170,11 @@ public class ReturningRepositoryAdapter implements ReturningRepository {
                 .where(
                         itemReturningDetailEntity.itmNo.eq(itmNo),
                         itemReturningDetailEntity.orgCd.eq(orgCd),
-                        itemReturningMasterEntity.apprSts.in(ApprStatus.WAIT, ApprStatus.REQUEST),
-                        itemReturningMasterEntity.delYn.eq("N")
+                        excludeRtrnMId != null ? itemReturningMasterEntity.rtrnMId.ne(excludeRtrnMId) : null,  // 현재 신청서는 제외
+                        // 승인완료 또는 요청중인 건만 중복 체크
+                        itemReturningMasterEntity.apprSts.in(ApprStatus.REQUEST, ApprStatus.APPROVED)
                 )
                 .fetchFirst() != null;
-    }
-
-    @Override
-    public void deleteMaster(UUID rtrnMId) {
-        masterJpaRepository.deleteById(rtrnMId);
     }
 
     /**
