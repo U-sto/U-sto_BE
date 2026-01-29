@@ -5,8 +5,6 @@ import com.usto.api.g2b.infrastructure.entity.G2bItemJpaEntity;
 import com.usto.api.g2b.infrastructure.repository.G2bItemJpaRepository;
 import com.usto.api.item.acquisition.domain.model.Acquisition;
 import com.usto.api.item.asset.application.AssetService;
-import com.usto.api.item.asset.domain.model.Asset;
-import com.usto.api.item.asset.domain.model.AssetMaster;
 import com.usto.api.item.asset.domain.repository.AssetRepository;
 import com.usto.api.item.common.model.OperStatus;
 import com.usto.api.organization.infrastructure.repository.DepartmentJpaRepository;
@@ -27,7 +25,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class AcquisitionService {
+public class AcquisitionApplication {
 
     private final AcquisitionRepository acquisitionRepository;
     private final G2bItemJpaRepository g2bItemJpaRepository;
