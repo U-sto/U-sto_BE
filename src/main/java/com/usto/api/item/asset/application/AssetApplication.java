@@ -81,12 +81,15 @@ public class AssetApplication {
         // 1. 물품 존재 여부 및 소속 조직 검증
         Asset asset = assetRepository.findById(itmNo, orgCd)
                 .orElseThrow(() -> new BusinessException("해당 물품을 찾을 수 없습니다."));
-        assetPolicy.validateUpdate(asset, orgCd);
 
-        // 2. 도메인 로직 실행 (내부에서 상태 및 값 검증 수행)
+        // 2. 정책 검증
+        assetPolicy.validateUpdate(asset, orgCd);
+        assetPolicy.validateAcquisitionPrice(request.getAcqUpr());
+
+        // 3. 도메인 로직 실행
         asset.updateAssetInfo(request.getAcqUpr(), request.getDrbYr(), request.getRmk());
 
-        // 3. 저장
+        // 4. 저장
         assetRepository.save(asset);
     }
 
