@@ -13,6 +13,7 @@ public class G2bItemMapper {
                 .g2bDNm(entity.getG2bDNm())
                 .g2bUpr(entity.getG2bUpr())
                 .build();
+
     }
 
     public static G2bItemJpaEntity toEntity(G2bItem domain) {
@@ -24,4 +25,5 @@ public class G2bItemMapper {
                 .g2bUpr(domain.getG2bUpr())
                 .build();
     }
+
 }

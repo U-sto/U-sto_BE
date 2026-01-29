@@ -24,9 +24,9 @@ import static org.springframework.transaction.annotation.Propagation.REQUIRES_NE
 @RequiredArgsConstructor
 public class G2bSyncApplication {
 
-    private final G2bStgRepository g2bStgService;
-    private final G2bItemRepository g2bItemService;
-    private final G2bItemCategoryRepository g2bItemCategoryService;
+    private final G2bStgRepository g2bStgRepository;
+    private final G2bItemRepository g2bItemRepository;
+    private final G2bItemCategoryRepository g2bItemCategoryRepository;
     private final ShoppingMallOpenApiClient client; //API연동
 
     //이쪽 값을 정의해야할거같다.
@@ -61,23 +61,23 @@ public class G2bSyncApplication {
                 .toList();
 
         // 스테이징테이블 비우기 (데이터 준비 후 삭제)
-        g2bStgService.truncate();
+        g2bStgRepository.truncate();
 
         // 분할 저장 (Batch Insert)-터지지 않게
         int batchSize =1000;
         for (int i = 0; i < domainList.size(); i+= batchSize) {
-            g2bStgService.bulkInsert(domainList.subList(i, Math.min(i + batchSize, domainList.size())));
+            g2bStgRepository.bulkInsert(domainList.subList(i, Math.min(i + batchSize, domainList.size())));
         }
 
         // DB에 추가 사항 반영
-        g2bItemCategoryService.insertCategory(ACTOR);
-         g2bItemService.insertItems(ACTOR);
+        g2bItemCategoryRepository.insertCategory(ACTOR);
+        g2bItemRepository.insertItems(ACTOR);
 
         // DB에 수정 사항 반영
-        g2bItemCategoryService.updateCategory(ACTOR);
-        g2bItemService.updateItems(ACTOR);
+        g2bItemCategoryRepository.updateCategory(ACTOR);
+        g2bItemRepository.updateItems(ACTOR);
 
-        long count = g2bStgService.countChanged();
+        long count = g2bStgRepository.countChanged();
 
 
         
