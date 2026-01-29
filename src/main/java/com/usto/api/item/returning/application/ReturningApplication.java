@@ -22,7 +22,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class ReturningService {
+public class ReturningApplication {
 
     private final ReturningRepository returningRepository;
     private final AssetRepository assetRepository;
