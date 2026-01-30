@@ -3,6 +3,7 @@ USE usto;
 SHOW VARIABLES LIKE 'local_infile'; -- ON이여야합니다.
 SET GLOBAL local_infile = 1;
 
+-- 이전 데이터 삭제
 SET FOREIGN_KEY_CHECKS = 0;
 TRUNCATE TABLE TB_G2B_STG;
 TRUNCATE TABLE TB_G2B001M;
@@ -10,6 +11,7 @@ TRUNCATE TABLE TB_G2B001D;
 TRUNCATE TABLE TB_G2B_SYNC_HIS;
 SET FOREIGN_KEY_CHECKS = 1;
 
+-- 경로는 사용자에 따라서 다르게 설정해주세요
 LOAD DATA LOCAL INFILE './src/main/resources/db/data/g2b_list.csv'
     INTO TABLE TB_G2B_RAW
     CHARACTER SET utf8mb4
