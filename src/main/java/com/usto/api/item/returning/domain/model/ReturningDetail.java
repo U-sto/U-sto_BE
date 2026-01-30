@@ -24,23 +24,4 @@ public class ReturningDetail {
     private LocalDateTime creAt;
     private String updBy;
     private LocalDateTime updAt;
-
-    /**
-     * 신규 반납 상세 생성
-     */
-    public static ReturningDetail create(
-            UUID rtrnMId,
-            String itmNo,
-            String deptCd,
-            String orgCd
-    ) {
-        return ReturningDetail.builder()
-                .rtrnDId(UUID.randomUUID())
-                .rtrnMId(rtrnMId)
-                .itmNo(itmNo)
-                .deptCd(deptCd)  // 반납 당시 부서코드 스냅샷
-                .orgCd(orgCd)
-                .delYn("N")
-                .build();
-    }
 }
