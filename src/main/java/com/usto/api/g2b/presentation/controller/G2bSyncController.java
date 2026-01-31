@@ -2,6 +2,8 @@ package com.usto.api.g2b.presentation.controller;
 
 import com.usto.api.common.utils.ApiResponse;
 import com.usto.api.g2b.application.G2bSyncApplication;
+import com.usto.api.g2b.application.G2bSyncHistoryApplication;
+import com.usto.api.g2b.domain.model.SyncResult;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +19,7 @@ import java.time.format.DateTimeFormatter;
 public class G2bSyncController {
 
     private final G2bSyncApplication g2bSyncApplication;
+    private final G2bSyncHistoryApplication g2bSyncHistoryApplication;
 
     @Operation(
             summary = "G2B 목록정보 최신화(자동)"
@@ -27,11 +30,27 @@ public class G2bSyncController {
         String begin = now.minusDays(2).format(DateTimeFormatter.BASIC_ISO_DATE);
         String end = now.minusDays(1).format(DateTimeFormatter.BASIC_ISO_DATE);
 
-        long counts = g2bSyncApplication.syncLatest(begin,end);
+        SyncResult result = g2bSyncApplication.syncLatest(begin,end);
 
-        if(counts == 0){
-            ApiResponse.fail("이미 동기화 된 상태입니다.");
+        if(result.changed() == 0){
+            ApiResponse.fail("해당 일자는 이미 동기화 되었거나, 변경사항이 없습니다.");
+            g2bSyncHistoryApplication.fail(begin,end,"SYSTEM","409"); //중복 요청에 대한 에러
         }
-        return ApiResponse.ok("G2B물품정보 동기화 완료 ! 총"+counts+"건 변경됐습니다.");
+
+        g2bSyncHistoryApplication.success(result,"SYSTEM");
+
+        String msg = String.format(
+                "G2B 물품정보 동기화 완료. (기간 %s~%s) " +
+                        "수집 %d건 → 적재 %d건(중복 %d건 제거) " +
+                        "(카테고리 신규 %d건 / 수정 %d건), (품목 신규 %d건 / 수정 %d건) " +
+                        "총 변경 %d건입니다.",
+                result.begin(), result.end(),
+                result.fetched(), result.deduped(), result.duplicated(),
+                result.insertedCategory(), result.updatedCategory(),
+                result.insertedItem(), result.updatedItem(),
+                result.changed()
+        );
+
+        return ApiResponse.ok(msg);
     }
 }
