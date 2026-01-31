@@ -33,8 +33,8 @@ public class G2bSyncController {
         SyncResult result = g2bSyncApplication.syncLatest(begin,end);
 
         if(result.changed() == 0){
-            ApiResponse.fail("동기화 결과, 변경사항이 없습니다..");
-            g2bSyncHistoryApplication.fail(begin,end,"SYSTEM","200");
+            ApiResponse.fail("해당 일자는 이미 동기화 되었거나, 변경사항이 없습니다.");
+            g2bSyncHistoryApplication.fail(begin,end,"SYSTEM","409"); //중복 요청에 대한 에러
         }
 
         g2bSyncHistoryApplication.success(result,"SYSTEM");
