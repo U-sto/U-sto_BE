@@ -25,7 +25,7 @@ public class ShoppingMallOpenApiClient {
 
     public ShoppingMallOpenApiClient(WebClient.Builder builder) {
         ExchangeStrategies strategies = ExchangeStrategies.builder()
-                .codecs(c -> c.defaultCodecs().maxInMemorySize(1024 * 1024 * 1024))
+                .codecs(c -> c.defaultCodecs().maxInMemorySize(10 * 1024 * 1024))
                 .build();
 
         this.webClient = builder
@@ -77,7 +77,7 @@ public class ShoppingMallOpenApiClient {
                                                 (w.getStatusCode().is5xxServerError() || w.getStatusCode().value() == 504)
                                 )
                 )
-                .block(Duration.ofSeconds(600));
+                .block(Duration.ofSeconds(10));
 
         var resp = (env == null) ? null : env.response();
         var header = (resp == null) ? null : resp.header();

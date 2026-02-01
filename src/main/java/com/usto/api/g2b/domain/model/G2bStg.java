@@ -13,5 +13,4 @@ public class G2bStg {
     private final String g2bDCd;   // 물품식별코드 -> G2B_D_CD
     private final String g2bDNm;   // 물품품목명   -> G2B_D_NM
     private final long   g2bUpr;   // 단가
-    private final String drbYr;    // 내용연수
 }
