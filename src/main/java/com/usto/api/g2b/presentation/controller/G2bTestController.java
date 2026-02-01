@@ -1,6 +1,8 @@
 package com.usto.api.g2b.presentation.controller;
 
 import com.usto.api.common.utils.ApiResponse;
+import com.usto.api.common.utils.PrdctUsefulLifeOpenApiClient;
+import com.usto.api.common.utils.PrdctUsefulLifeOpenApiClient.PageResult;
 import com.usto.api.g2b.application.G2bTestApplication;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -17,9 +19,9 @@ public class G2bTestController {
     private final G2bTestApplication g2bTestApplication;
 
     @Operation(
-            summary = "공공데이터 포털 연동 테스트"
+            summary = "공공데이터 포털 연동 테스트 - Sync"
     )
-    @GetMapping("/test")
+    @GetMapping("/test/sync")
     public ApiResponse<?> test(
             @Parameter(description = "페이지번호")
             @RequestParam(required = false) String pageNo ,
@@ -43,6 +45,25 @@ public class G2bTestController {
                 inqryDiv,
                 inqryBgnDate,
                 inqryEndDate);
+
+        return ApiResponse.ok("테스트 완료",result);
+    }
+
+    @Operation(
+            summary = "공공데이터 포털 연동 테스트 - 내용연수"
+    )
+    @GetMapping("/test/usefulLife")
+    public ApiResponse<?> testUsefulLife(
+            @Parameter(description = "페이지번호")
+            @RequestParam(required = false) String pageNo ,
+            @Parameter(description = "한 페이지 결과 수 ")
+            @RequestParam(required = false) String numOfRows
+    ) {
+
+        PageResult result = g2bTestApplication.testUsefulLife(
+                pageNo,
+                numOfRows
+                );
 
         return ApiResponse.ok("테스트 완료",result);
     }
