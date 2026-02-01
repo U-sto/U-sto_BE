@@ -1,8 +1,10 @@
 package com.usto.api.g2b.application;
 
+import com.usto.api.common.utils.PrdctUsefulLifeOpenApiClient;
 import com.usto.api.common.utils.ShoppingMallOpenApiClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
@@ -10,7 +12,9 @@ import org.springframework.stereotype.Service;
 public class G2bTestApplication {
 
     private final ShoppingMallOpenApiClient client;
+    private final PrdctUsefulLifeOpenApiClient usefulLifeOpenApiClient;
 
+    @Transactional
     public ShoppingMallOpenApiClient.PageResult test(
             String pageNo,
             String numOfRows,
@@ -32,6 +36,18 @@ public class G2bTestApplication {
         }
 
         return client.fetch(p, n, d, b, e);
+    }
+
+    @Transactional
+    public PrdctUsefulLifeOpenApiClient.PageResult testUsefulLife(
+            String pageNo,
+            String numOfRows
+    ){
+
+        String p = (pageNo == null || pageNo.isBlank()) ? "1" : pageNo.trim();
+        String r = (numOfRows == null || numOfRows.isBlank()) ? "10" : numOfRows.trim();
+
+        return usefulLifeOpenApiClient.fetch(p, r);
     }
 
     private String normalizeYyyyMMdd(String v) {
