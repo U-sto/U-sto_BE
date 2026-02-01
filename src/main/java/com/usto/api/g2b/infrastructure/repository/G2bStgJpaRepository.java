@@ -47,17 +47,4 @@ public interface G2bStgJpaRepository extends JpaRepository<G2bStgJpaEntity,Long>
       ORDER BY G2B_M_CD
     """, nativeQuery = true)
     List<String> findDistinctCategoryCodes();
-
-    @Modifying(clearAutomatically = true, flushAutomatically = true)
-    @Query(value = """
-      UPDATE TB_G2B_STG
-      SET DRB_YR = :drbYr
-      WHERE G2B_M_CD = :g2bMCd
-        AND (
-          DRB_YR IS NULL OR DRB_YR = ''
-          OR DRB_YR <> :drbYr
-        )
-    """, nativeQuery = true)
-    int updateDrbYrIfDifferent(@Param("g2bMCd") String g2bMCd,
-                               @Param("drbYr") String drbYr);
 }

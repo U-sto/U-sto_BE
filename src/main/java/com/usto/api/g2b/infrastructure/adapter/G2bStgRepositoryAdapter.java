@@ -62,11 +62,6 @@ public class G2bStgRepositoryAdapter implements G2bStgRepository {
     }
 
     @Override
-    public int updateDrbYrIfDifferent(String prdctClsfcNo, String drbYr) {
-        return updateDrbYrIfDifferent(prdctClsfcNo, drbYr);
-    }
-
-    @Override
     public void delete(){
         g2bStgJpaRepository.delete();
     };

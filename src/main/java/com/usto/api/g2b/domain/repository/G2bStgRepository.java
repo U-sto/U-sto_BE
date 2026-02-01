@@ -19,5 +19,4 @@ public interface G2bStgRepository {
 
     List<String> findDistinctCategoryCodes();
 
-    int updateDrbYrIfDifferent(String prdctClsfcNo, String drbYr);
 }
