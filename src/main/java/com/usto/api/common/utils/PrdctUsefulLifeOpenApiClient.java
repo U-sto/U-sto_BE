@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
+import org.springframework.web.util.UriUtils;
 import reactor.util.retry.Retry;
 
 import java.net.URI;
@@ -31,16 +32,10 @@ public class PrdctUsefulLifeOpenApiClient {
         this.webClient = builder.exchangeStrategies(strategies).build();
     }
 
-    public PageResult fetchByRange(String prdctClsfcNoBgnNo, String prdctClsfcNoEndNo) {
-        return fetchByRange("1", "10", prdctClsfcNoBgnNo, prdctClsfcNoEndNo);
-    }
 
-    public PageResult fetchByRange(
-            String pageNo,
-            String numOfRows,
-            String prdctClsfcNoBgnNo,
-            String prdctClsfcNoEndNo
-    ) {
+
+    public PageResult fetch(String pageNo , String numOfRows) {
+
         var b = UriComponentsBuilder
                 .fromHttpUrl(baseUrl + path)
                 // 문서 표기는 serviceKey (대소문자 이슈 있으면 여기만 변경)
@@ -48,13 +43,6 @@ public class PrdctUsefulLifeOpenApiClient {
                 .queryParam("pageNo", pageNo)
                 .queryParam("numOfRows", numOfRows)
                 .queryParam("type", "json");
-
-        if (prdctClsfcNoBgnNo != null && !prdctClsfcNoBgnNo.isBlank()) {
-            b.queryParam("prdctClsfcNoBgnNo", prdctClsfcNoBgnNo);
-        }
-        if (prdctClsfcNoEndNo != null && !prdctClsfcNoEndNo.isBlank()) {
-            b.queryParam("prdctClsfcNoEndNo", prdctClsfcNoEndNo);
-        }
 
         URI uri = b.build(true).toUri();
 

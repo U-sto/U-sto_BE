@@ -1,6 +1,5 @@
 package com.usto.api.common.utils;
 
-import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
@@ -27,9 +26,7 @@ public record PrdctUsefulLifeEnvelope(Response response) {
     @JsonIgnoreProperties(ignoreUnknown = true)
     public record Item(
             String prdctClsfcNo,     // 물품분류번호
-
-            // 내용연수 필드명은 실제 응답에 따라 다를 수 있어서 alias로 방어
-            @JsonAlias({"uslfsvc", "usefulLife", "drbYr", "drb_yr"})
-            String drbYr            // 내용연수
+            String prdctClsfcNoNm,   // 품명
+            String uslfsvc            // 내용연수
     ) {}
 }
