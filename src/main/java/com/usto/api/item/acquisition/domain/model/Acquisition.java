@@ -58,7 +58,7 @@ public class Acquisition {
     // ===== 비즈니스 로직 메서드 =====
 
     /**
-     * 취득 정보 수정 (WAIT 상태만 가능)
+     * 취득 정보 수정
      */
     public void updateInfo(
             String g2bDCd,
@@ -81,12 +81,9 @@ public class Acquisition {
     }
 
     /**
-     * 승인 요청 (WAIT → REQUEST)
+     * 승인 요청
      */
     public void requestApproval() {
-        if (this.apprSts != ApprStatus.WAIT && this.apprSts != ApprStatus.REJECTED) {
-            throw new BusinessException("승인요청이 가능한 상태가 아닙니다.");
-        }
         this.apprSts = ApprStatus.REQUEST;
     }
 
@@ -94,10 +91,6 @@ public class Acquisition {
      * 승인 확정
      */
     public void confirmApproval(String userId) {
-
-        if (this.apprSts != ApprStatus.REQUEST) {
-            throw new BusinessException("승인 요청 상태에서만 확정할 수 있습니다.");
-        }
         this.apprUsrId = userId;
         this.apprSts = ApprStatus.APPROVED;
         this.apprAt = LocalDate.now(KOREA_ZONE);

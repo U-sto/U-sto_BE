@@ -146,7 +146,7 @@ public class AcquisitionApplication {
      * 승인 확정
      */
     @Transactional
-    public void ApprovalAcquisition(List<UUID> acqIds, String userId, String orgCd) {
+    public void approvalAcquisition(List<UUID> acqIds, String userId, String orgCd) {
 
         List<Acquisition> acquisitions = acquisitionRepository.findAllById(acqIds);
 

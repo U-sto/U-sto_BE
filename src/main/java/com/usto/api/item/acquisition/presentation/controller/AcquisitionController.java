@@ -121,7 +121,7 @@ public class AcquisitionController {
     public ApiResponse<?> approvalRequest(
             @RequestBody @Valid AcqApprovalBulkRequestDto request, // DTO로 변경
             @AuthenticationPrincipal UserPrincipal principal) {
-            acquisitionApplication.ApprovalAcquisition(
+            acquisitionApplication.approvalAcquisition(
                     request.getAcqIds(),
                     principal.getUsername(),
                     principal.getOrgCd());
