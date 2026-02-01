@@ -34,4 +34,6 @@ public class G2bStgJpaEntity {
     @Column(name = "G2B_UPR", precision = 20, scale = 0, nullable = false)
     private BigDecimal g2bUpr;
 
+    @Column(name = "DRB_YR", length = 20) // 내용연수
+    private String drbYr;
 }

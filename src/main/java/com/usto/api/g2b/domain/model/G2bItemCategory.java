@@ -12,4 +12,5 @@ import com.usto.api.g2b.domain.model.G2bStg;
 public class G2bItemCategory {
     private final String g2bMCd;
     private final String g2bMNm;
+    private final String drbYr;
 }
