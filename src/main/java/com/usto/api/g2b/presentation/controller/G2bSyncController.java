@@ -27,17 +27,17 @@ public class G2bSyncController {
     @PutMapping("/sync")
     public ApiResponse<?> sync() {
         LocalDate now = LocalDate.now();
-        String begin = now.minusDays(2).format(DateTimeFormatter.BASIC_ISO_DATE);
-        String end = now.minusDays(1).format(DateTimeFormatter.BASIC_ISO_DATE);
+        String begin = now.minusDays(3).format(DateTimeFormatter.BASIC_ISO_DATE);
+        String end = now.minusDays(2).format(DateTimeFormatter.BASIC_ISO_DATE);
 
-        SyncResult result = g2bSyncApplication.syncLatest(begin,end);
+        SyncResult result = g2bSyncApplication.syncLatest(begin, end);
 
-        if(result.changed() == 0){
+        if (result.changed() == 0) {
             ApiResponse.fail("해당 일자는 이미 동기화 되었거나, 변경사항이 없습니다.");
-            g2bSyncHistoryApplication.fail(begin,end,"SYSTEM","409"); //중복 요청에 대한 에러
+            g2bSyncHistoryApplication.fail(begin, end, "SYSTEM", "409"); //중복 요청에 대한 에러
         }
 
-        g2bSyncHistoryApplication.success(result,"SYSTEM");
+        g2bSyncHistoryApplication.success(result, "SYSTEM");
 
         String msg = String.format(
                 "G2B 물품정보 동기화 완료. (기간 %s~%s) " +
@@ -52,5 +52,13 @@ public class G2bSyncController {
         );
 
         return ApiResponse.ok(msg);
+    }
+
+    @PutMapping("/add-drbYr")
+    public ApiResponse<?> addDrbYr() {
+
+        g2bSyncApplication.addDrbYr();
+
+        return ApiResponse.ok("내용연수 초기업데이트 완료!");
     }
 }
