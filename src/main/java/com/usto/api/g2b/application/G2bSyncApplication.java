@@ -1,5 +1,7 @@
 package com.usto.api.g2b.application;
 
+import com.usto.api.common.utils.PrdctUsefulLifeEnvelope;
+import com.usto.api.common.utils.PrdctUsefulLifeOpenApiClient;
 import com.usto.api.common.utils.ShoppingMallEnvelope;
 import com.usto.api.common.utils.ShoppingMallOpenApiClient;
 import com.usto.api.g2b.domain.model.SyncResult;
@@ -31,6 +33,7 @@ public class G2bSyncApplication {
     private final G2bItemRepository g2bItemRepository;
     private final G2bItemCategoryRepository g2bItemCategoryRepository;
     private final ShoppingMallOpenApiClient client; //API연동
+    private final PrdctUsefulLifeOpenApiClient usefulApiClient ;
 
     //이쪽 값을 정의해야할거같다.
     private static final String PAGE_NO = "1";        // 페이지 번호 (1페이지부터 조회해야 함)
@@ -86,8 +89,33 @@ public class G2bSyncApplication {
             g2bStgRepository.bulkInsert(distinctDomainList);
         }
 
+        int updated = 0;
+
+        // 스테이징 테이블에 내용연수 추가 (fetch)
+
+        //이것도 별도로 객체 만들어서 옮기는 작업이 필요할 것으로 보임.
+
+        List<String> prdctClsfcNos = g2bStgRepository.findDistinctCategoryCodes();//물품분류번호 조회
+
+        for (String prdctClsfcNo : prdctClsfcNos) {
+            List<PrdctUsefulLifeEnvelope.Item> usefulLifeItems  = fetchUsefulLifeItems(prdctClsfcNo);
+
+            String drbYr = usefulLifeItems .stream()
+                    .filter(it -> prdctClsfcNo.equals(it.prdctClsfcNo()))
+                    .map(PrdctUsefulLifeEnvelope.Item::drbYr)
+                    .filter(v -> v != null && !v.isBlank())
+                    .findFirst()
+                    .orElse(null);
+
+            if (drbYr == null) continue;
+
+            updated += g2bStgRepository.updateDrbYrIfDifferent(prdctClsfcNo, drbYr); //STG테이블에 내용연수 내용 추가!
+            log.info("UsefulLife updated rows in STG: {}", updated); //진행상황 추적
+        }
+
+
         // DB에 추가 사항 반영(부모) - 마스터테이블
-        int countOfUpdatedCategory = g2bItemCategoryRepository.updateCategory(ACTOR);
+        int countOfUpdatedCategory = g2bItemCategoryRepository.updateCategory(ACTOR); //내용연수 추가
         int countOfInsertedCategory = g2bItemCategoryRepository.insertCategory(ACTOR);
 
         // DB에 수정 사항 반영(자식) - 디테일테이블
@@ -113,6 +141,30 @@ public class G2bSyncApplication {
         );
     }
 
+    @Transactional
+    public void addDrbYr() {
+
+        int updated = 0;
+        // 스테이징 테이블에 내용연수 추가 (fetch)
+        List<String> prdctClsfcNos = g2bItemCategoryRepository.findDistinctCategoryCodes();//물품분류번호 조회
+
+        for (String prdctClsfcNo : prdctClsfcNos) {
+            List<PrdctUsefulLifeEnvelope.Item> usefulLifeItems  = fetchUsefulLifeItems(prdctClsfcNo);
+
+            String drbYr = usefulLifeItems .stream()
+                    .filter(it -> prdctClsfcNo.equals(it.prdctClsfcNo()))
+                    .map(PrdctUsefulLifeEnvelope.Item::drbYr)
+                    .filter(v -> v != null && !v.isBlank())
+                    .findFirst()
+                    .orElse(null);
+
+            if (drbYr == null) continue;
+
+            updated += g2bItemCategoryRepository.updateDrbYrIfDifferent(prdctClsfcNo, drbYr); //G2B 마스터 테이블에 내용연수 내용 추가!
+            log.info("First || UsefulLife updated rows in STG: {}", updated); //진행상황 추적
+        }
+    }
+
     private List<ShoppingMallEnvelope.Item> fetch(String begin, String end) {
         log.info("G2B API Request - Date: {} ~ {}, Page: {}, Rows: {}", begin, end, PAGE_NO, NUM_OF_ROWS);
 
@@ -134,5 +186,11 @@ public class G2bSyncApplication {
             }
         }
         return items;
+    }
+
+    private List<PrdctUsefulLifeEnvelope.Item> fetchUsefulLifeItems(String prdctClsfcNo) {
+        if (prdctClsfcNo == null || prdctClsfcNo.isBlank()) return List.of();
+        var page = usefulApiClient.fetchByRange(prdctClsfcNo, prdctClsfcNo);
+        return (page == null || page.items() == null) ? List.of() : page.items();
     }
 }
