@@ -1,6 +1,6 @@
 package com.usto.api.item.asset.infrastructure.mapper;
 
-import com.usto.api.item.acquisition.domain.model.Acquisition;
+import com.usto.api.item.acquisition.domain.model.AcqArrangementType;
 import com.usto.api.item.asset.domain.model.Asset;
 import com.usto.api.item.asset.domain.model.AssetMaster;
 import com.usto.api.item.asset.domain.model.AssetStatusHistory;
@@ -8,18 +8,45 @@ import com.usto.api.item.asset.infrastructure.entity.ItemAssetDetailEntity;
 import com.usto.api.item.asset.infrastructure.entity.ItemAssetDetailId;
 import com.usto.api.item.asset.infrastructure.entity.ItemAssetMasterEntity;
 import com.usto.api.item.asset.infrastructure.entity.ItemAssetStatusHistoryEntity;
+import com.usto.api.item.common.model.OperStatus;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.UUID;
 
 public final class AssetMapper {
     private AssetMapper() {}
+
+    /**
+     * 신규 Asset 도메인 생성 (기존 Asset.create() 메서드)
+     * Domain -> Domain
+     */
+    public static Asset toDomain(
+            String itmNo, UUID acqId, String g2bDCd,
+            String deptCd, BigDecimal acqUpr, String drbYr, String orgCd, String rmk
+    ) {
+        return Asset.builder()
+                .itmNo(itmNo)
+                .acqId(acqId)
+                .g2bDCd(g2bDCd)
+                .deptCd(deptCd)
+                .operSts(OperStatus.OPER)
+                .acqUpr(acqUpr)
+                .drbYr(drbYr)
+                .orgCd(orgCd)
+                .rmk(rmk)
+                .printYn("N")
+                .delYn("N")
+                .build();
+    }
 
     /**
      * Entity → Domain
      */
     public static Asset toDomain(ItemAssetDetailEntity entity) {
         return Asset.builder()
-                .itmNo(entity.getItemId().getItmNo())  // id 객체에서 꺼내기
-                .orgCd(entity.getItemId().getOrgCd())  // id 객체에서 꺼내기
+                .itmNo(entity.getItemId().getItmNo())
+                .orgCd(entity.getItemId().getOrgCd())
                 .acqId(entity.getAcqId())
                 .g2bDCd(entity.getG2bDCd())
                 .deptCd(entity.getDeptCd())
@@ -42,7 +69,7 @@ public final class AssetMapper {
      */
     public static ItemAssetDetailEntity toEntity(Asset domain) {
         return ItemAssetDetailEntity.builder()
-                .itemId(new ItemAssetDetailId(domain.getItmNo(), domain.getOrgCd())) // ID 객체 생성
+                .itemId(new ItemAssetDetailId(domain.getItmNo(), domain.getOrgCd()))
                 .acqId(domain.getAcqId())
                 .g2bDCd(domain.getG2bDCd())
                 .deptCd(domain.getDeptCd())
@@ -56,9 +83,28 @@ public final class AssetMapper {
                 .build();
     }
 
+    /**
+     * 신규 AssetMaster 도메인 생성 (기존 AssetMaster.create() 메서드)
+     */
+    public static AssetMaster toMasterDomain(
+            UUID acqId, String g2bDCd, Integer qty,
+            LocalDate acqAt, LocalDate arrgAt,
+            AcqArrangementType acqArrgTy, String orgCd
+    ) {
+        return AssetMaster.builder()
+                .acqId(acqId)
+                .g2bDCd(g2bDCd)
+                .qty(qty)
+                .acqAt(acqAt)
+                .arrgAt(arrgAt)
+                .acqArrgTy(acqArrgTy)
+                .orgCd(orgCd)
+                .delYn("N")
+                .build();
+    }
 
     /**
-     * Entity → Domain
+     * Entity → Domain (AssetMaster)
      */
     public static AssetMaster toMasterDomain(ItemAssetMasterEntity entity) {
         return AssetMaster.builder()
@@ -73,22 +119,8 @@ public final class AssetMapper {
                 .build();
     }
 
-    //
-    public static AssetMaster toMasterDomain(Acquisition acquisition) {
-        return AssetMaster.builder()
-                .acqId(acquisition.getAcqId())
-                .g2bDCd(acquisition.getG2bDCd())
-                .qty(acquisition.getAcqQty())
-                .acqAt(acquisition.getAcqAt())
-                .arrgAt(acquisition.getApprAt())
-                .acqArrgTy(acquisition.getArrgTy())
-                .orgCd(acquisition.getOrgCd())
-                .delYn(acquisition.getDelYn())
-                .build();
-    }
-
     /**
-     * Domain → Entity
+     * Domain → Entity (AssetMaster)
      */
     public static ItemAssetMasterEntity toMasterEntity(AssetMaster domain) {
         return ItemAssetMasterEntity.builder()
@@ -100,6 +132,35 @@ public final class AssetMapper {
                 .acqArrgTy(domain.getAcqArrgTy())
                 .orgCd(domain.getOrgCd())
                 .delYn(domain.getDelYn())
+                .build();
+    }
+
+    /**
+     * 신규 AssetStatusHistory 도메인 생성 (기존 create() 메서드 이동)
+     */
+    public static AssetStatusHistory toStatusHistoryDomain(
+            String itmNo,
+            OperStatus prevSts,
+            OperStatus newSts,
+            String chgRsn,
+            String reqUsrId,
+            LocalDate reqAt,
+            String apprUsrId,
+            LocalDate apprAt,
+            String orgCd
+    ) {
+        return AssetStatusHistory.builder()
+                .itemHisId(UUID.randomUUID())
+                .itmNo(itmNo)
+                .prevSts(prevSts)
+                .newSts(newSts)
+                .chgRsn(chgRsn)
+                .reqUsrId(reqUsrId)
+                .reqAt(reqAt)
+                .apprUsrId(apprUsrId)
+                .apprAt(apprAt)
+                .orgCd(orgCd)
+                .delYn("N")
                 .build();
     }
 
@@ -146,5 +207,4 @@ public final class AssetMapper {
                 .delAt(domain.getDelAt())
                 .build();
     }
-
 }

@@ -1,7 +1,7 @@
 package com.usto.api.item.asset.presentation.controller;
 
 import com.usto.api.common.utils.ApiResponse;
-import com.usto.api.item.asset.application.AssetService;
+import com.usto.api.item.asset.application.AssetApplication;
 import com.usto.api.item.asset.presentation.dto.request.AssetSearchRequest;
 import com.usto.api.item.asset.presentation.dto.request.AssetUpdateRequest;
 import com.usto.api.item.asset.presentation.dto.response.AssetDetailResponse;
@@ -23,7 +23,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AssetController {
 
-    private final AssetService assetService;
+    private final AssetApplication assetApplication;
 
     @Operation(
             summary = "운용대장 목록 조회",
@@ -34,7 +34,7 @@ public class AssetController {
             @Valid AssetSearchRequest searchRequest,
             @AuthenticationPrincipal UserPrincipal principal) {
         return ApiResponse.ok("조회 성공",
-                assetService.getAssetList(searchRequest, principal.getOrgCd()));
+                assetApplication.getAssetList(searchRequest, principal.getOrgCd()));
     }
 
     @Operation(
@@ -47,7 +47,7 @@ public class AssetController {
             @PathVariable String itmNo,
             @AuthenticationPrincipal UserPrincipal principal) {
         return ApiResponse.ok("조회 성공",
-                assetService.getAssetDetail(itmNo, principal.getOrgCd()));
+                assetApplication.getAssetDetail(itmNo, principal.getOrgCd()));
     }
 
     @Operation(
@@ -60,7 +60,7 @@ public class AssetController {
             @PathVariable String itmNo,
             @Valid @RequestBody AssetUpdateRequest request,
             @AuthenticationPrincipal UserPrincipal principal) {
-        assetService.updateAssetInfo(itmNo, request, principal.getOrgCd());
+        assetApplication.updateAssetInfo(itmNo, request, principal.getOrgCd());
         return ApiResponse.ok("수정 성공");
     }
 }

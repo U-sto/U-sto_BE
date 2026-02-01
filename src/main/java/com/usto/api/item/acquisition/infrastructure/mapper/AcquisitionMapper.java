@@ -1,10 +1,51 @@
 package com.usto.api.item.acquisition.infrastructure.mapper;
 
+import com.usto.api.item.acquisition.domain.model.AcqArrangementType;
 import com.usto.api.item.acquisition.domain.model.Acquisition;
 import com.usto.api.item.acquisition.infrastructure.entity.ItemAcquisitionEntity;
+import com.usto.api.item.common.model.ApprStatus;
+import com.usto.api.item.common.model.OperStatus;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.UUID;
 
 public final class AcquisitionMapper {
     private AcquisitionMapper() {}
+
+    /**
+     * 신규 Acquisition 도메인 생성 (기존 Acquisition.create() 메서드 이동)
+     * Domain -> Domain
+     */
+    public static Acquisition toDomain(
+            String g2bDCd,
+            LocalDate acqAt,
+            BigDecimal acqUpr,
+            String deptCd,
+            String drbYr,
+            Integer acqQty,
+            AcqArrangementType arrgTy,
+            String rmk,
+            String aplyUsrId,
+            String orgCd
+    ) {
+        return Acquisition.builder()
+                .acqId(UUID.randomUUID())
+                .g2bDCd(g2bDCd)
+                .acqAt(acqAt)
+                .acqUpr(acqUpr)
+                .deptCd(deptCd)
+                .operSts(OperStatus.ACQ)  // 초기 운용상태
+                .drbYr(drbYr)
+                .acqQty(acqQty)
+                .arrgTy(arrgTy)
+                .rmk(rmk)
+                .apprSts(ApprStatus.WAIT) // 초기 승인상태
+                .aplyUsrId(aplyUsrId)
+                .orgCd(orgCd)
+                .delYn("N")
+                .build();
+    }
 
     /**
      * Entity → Domain 변환
@@ -28,7 +69,6 @@ public final class AcquisitionMapper {
                 .orgCd(entity.getOrgCd())
                 .delYn(entity.getDelYn())
                 .delAt(entity.getDelAt())
-                // BaseTime
                 .creBy(entity.getCreBy())
                 .creAt(entity.getCreAt())
                 .updBy(entity.getUpdBy())

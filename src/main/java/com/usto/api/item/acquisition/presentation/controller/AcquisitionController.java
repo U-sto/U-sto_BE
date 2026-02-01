@@ -1,7 +1,7 @@
 package com.usto.api.item.acquisition.presentation.controller;
 
 import com.usto.api.common.utils.ApiResponse;
-import com.usto.api.item.acquisition.application.AcquisitionService;
+import com.usto.api.item.acquisition.application.AcquisitionApplication;
 import com.usto.api.item.acquisition.presentation.dto.request.AcqApprovalBulkRequestDto;
 import com.usto.api.item.acquisition.presentation.dto.request.AcqRegisterRequest;
 import com.usto.api.item.acquisition.presentation.dto.request.AcqSearchRequest;
@@ -25,7 +25,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class AcquisitionController {
 
-    private final AcquisitionService acquisitionService;
+    private final AcquisitionApplication acquisitionApplication;
 
     // 1. 조회
     @Operation(
@@ -36,7 +36,7 @@ public class AcquisitionController {
     public ApiResponse<List<AcqListResponse>> getList(
             @Valid AcqSearchRequest searchRequest,
             @AuthenticationPrincipal UserPrincipal principal) {
-        return ApiResponse.ok("조회 성공", acquisitionService.getAcquisitionList(searchRequest, principal.getOrgCd()));
+        return ApiResponse.ok("조회 성공", acquisitionApplication.getAcquisitionList(searchRequest, principal.getOrgCd()));
     }
 
     // 2. 등록
@@ -49,7 +49,7 @@ public class AcquisitionController {
     public ApiResponse<AcqRegisterResponse> register(
             @Valid @RequestBody AcqRegisterRequest request,
             @AuthenticationPrincipal UserPrincipal principal) {
-        UUID acqId = acquisitionService.registerAcquisition(
+        UUID acqId = acquisitionApplication.registerAcquisition(
                 request, principal.getUsername(), principal.getOrgCd());
         return ApiResponse.ok("취득 등록 성공", new AcqRegisterResponse(acqId));
     }
@@ -57,7 +57,7 @@ public class AcquisitionController {
     // 3. 수정
     @Operation(
             summary = "물품 취득 수정 (MANAGER)",
-            description = "작성중(WAIT) 또는 반려(REJECTED) 상태인 취득 정보를 수정합니다. 승인 요청 중이거나 확정된 데이터는 수정할 수 없습니다."
+            description = "작성중(WAIT) 상태인 취득 정보를 수정합니다. 승인 요청 중이거나 확정 및 반려된 데이터는 수정할 수 없습니다."
     )
     @PutMapping("/{acqId}")
     @PreAuthorize("hasRole('MANAGER')")
@@ -65,21 +65,21 @@ public class AcquisitionController {
             @PathVariable UUID acqId,
             @Valid @RequestBody AcqRegisterRequest request,
             @AuthenticationPrincipal UserPrincipal principal) {
-        acquisitionService.updateAcquisition(acqId, request, principal.getOrgCd());
+        acquisitionApplication.updateAcquisition(acqId, request, principal.getOrgCd());
         return ApiResponse.ok("수정 성공");
     }
 
     // 4. 삭제
     @Operation(
             summary = "물품 취득 삭제 (MANAGER)",
-            description = "작성중(WAIT) 또는 반려(REJECTED) 상태인 취득 정보를 논리 삭제(Soft Delete)합니다."
+            description = "작성중(WAIT) 상태인 취득 정보를 논리 삭제(Soft Delete)합니다."
     )
     @DeleteMapping("/{acqId}")
     @PreAuthorize("hasRole('MANAGER')")
     public ApiResponse<Void> delete(
             @PathVariable UUID acqId,
             @AuthenticationPrincipal UserPrincipal principal) {
-        acquisitionService.deleteAcquisition(acqId, principal.getOrgCd());
+        acquisitionApplication.deleteAcquisition(acqId, principal.getOrgCd());
         return ApiResponse.ok("삭제 성공");
     }
 
@@ -93,21 +93,21 @@ public class AcquisitionController {
     public ApiResponse<Void> requestApproval(
             @PathVariable UUID acqId,
             @AuthenticationPrincipal UserPrincipal principal) {
-        acquisitionService.requestApproval(acqId, principal.getOrgCd());
+        acquisitionApplication.requestApproval(acqId, principal.getOrgCd());
         return ApiResponse.ok("승인 요청 완료");
     }
 
     // 6. 승인 취소
     @Operation(
             summary = "물품 취득 승인 요청 취소 (MANAGER)",
-            description = "승인 요청(REQUEST) 중인 건을 취소하여 다시 작성중(WAIT) 상태로 되돌립니다."
+            description = "승인 요청(REQUEST) 중인 건을 취소하여 삭제시킵니다."
     )
     @PostMapping("/{acqId}/cancel")
     @PreAuthorize("hasRole('MANAGER')")
     public ApiResponse<Void> cancelRequest(
             @PathVariable UUID acqId,
             @AuthenticationPrincipal UserPrincipal principal) {
-        acquisitionService.cancelRequest(acqId, principal.getOrgCd());
+        acquisitionApplication.cancelRequest(acqId, principal.getOrgCd());
         return ApiResponse.ok("승인 요청 취소 완료");
     }
 
@@ -121,7 +121,7 @@ public class AcquisitionController {
     public ApiResponse<?> approvalRequest(
             @RequestBody @Valid AcqApprovalBulkRequestDto request, // DTO로 변경
             @AuthenticationPrincipal UserPrincipal principal) {
-            acquisitionService.ApprovalAcquisition(
+            acquisitionApplication.approvalAcquisition(
                     request.getAcqIds(),
                     principal.getUsername(),
                     principal.getOrgCd());

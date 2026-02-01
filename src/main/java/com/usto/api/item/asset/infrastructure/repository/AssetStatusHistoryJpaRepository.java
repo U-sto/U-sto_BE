@@ -7,6 +7,5 @@ import java.util.List;
 import java.util.UUID;
 
 public interface AssetStatusHistoryJpaRepository extends JpaRepository<ItemAssetStatusHistoryEntity, UUID> {
-
     List<ItemAssetStatusHistoryEntity> findByItmNoAndOrgCdOrderByApprAtDesc(String itmNo, String orgCd);
 }

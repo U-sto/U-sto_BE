@@ -12,6 +12,11 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.UUID;
 
+/**
+ * 취득 도메인 모델
+ * - 팩토리 메서드 제거 (Mapper로 이동)
+ * - 비즈니스 로직만 유지
+ */
 @Getter
 @Builder
 public class Acquisition {
@@ -53,60 +58,22 @@ public class Acquisition {
     // ===== 비즈니스 로직 메서드 =====
 
     /**
-     * 신규 취득 생성 (UUID 자동 생성)
-     */
-    public static Acquisition create(
-            String g2bDCd,
-            LocalDate acqAt,
-            BigDecimal acqUpr,
-            String deptCd,
-            OperStatus operSts,
-            String drbYr,
-            Integer acqQty,
-            AcqArrangementType arrgTy,
-            String rmk,
-            String aplyUsrId,
-            String orgCd
-    ) {
-        return Acquisition.builder()
-                .acqId(UUID.randomUUID())  // UUID 생성
-                .g2bDCd(g2bDCd)
-                .acqAt(acqAt)
-                .acqUpr(acqUpr)
-                .deptCd(deptCd)
-                .operSts(OperStatus.ACQ)   // 초기 운용상태
-                .drbYr(drbYr)
-                .acqQty(acqQty)
-                .arrgTy(arrgTy)
-                .rmk(rmk)
-                .apprSts(ApprStatus.WAIT)  // 초기 승인상태
-                .aplyUsrId(aplyUsrId)
-                .orgCd(orgCd)
-                .delYn("N")
-                .build();
-    }
-
-    /**
-     * 취득 정보 수정 (WAIT/REJECTED 상태만 가능)
+     * 취득 정보 수정
      */
     public void updateInfo(
             String g2bDCd,
             LocalDate acqAt,
             BigDecimal acqUpr,
             String deptCd,
-            OperStatus operSts,
             String drbYr,
             Integer acqQty,
             AcqArrangementType arrgTy,
             String rmk
     ) {
-        validateModifiable();
-
         this.g2bDCd = g2bDCd;
         this.acqAt = acqAt;
         this.acqUpr = acqUpr;
         this.deptCd = deptCd;
-        this.operSts = operSts;
         this.drbYr = drbYr;
         this.acqQty = acqQty;
         this.arrgTy = arrgTy;
@@ -114,63 +81,19 @@ public class Acquisition {
     }
 
     /**
-     * 승인 상태 변경
-     */
-    public void changeStatus(ApprStatus newStatus) {
-        this.apprSts = newStatus;
-
-        // 확정 시 확정일자 자동 설정
-        if (newStatus == ApprStatus.APPROVED) {
-            this.apprAt = LocalDate.now(KOREA_ZONE);
-        }
-    }
-
-    //승인 확정
-    public void confirmApproval(String userId) {
-
-        if (this.apprSts != ApprStatus.REQUEST) {
-            throw new BusinessException("승인 요청 상태에서만 확정할 수 있습니다.");
-        }
-        this.apprUsrId = userId;
-        changeStatus(ApprStatus.APPROVED);
-
-    }
-
-    /**
-     * 승인 요청 (WAIT/REJECTED → REQUEST)
+     * 승인 요청
      */
     public void requestApproval() {
-        if (this.apprSts != ApprStatus.WAIT && this.apprSts != ApprStatus.REJECTED) {
-            throw new BusinessException("승인요청이 가능한 상태가 아닙니다.");
-        }
-        changeStatus(ApprStatus.REQUEST);
+        this.apprSts = ApprStatus.REQUEST;
     }
 
     /**
-     * 승인 요청 취소 가능 여부 체크
+     * 승인 확정
      */
-    public void validateCancellable() {
-        if (this.apprSts != ApprStatus.REQUEST) {
-            throw new BusinessException("승인요청 중인 상태만 취소할 수 있습니다.");
-        }
-    }
-
-    /**
-     * 수정/삭제 가능 여부 체크
-     */
-    public void validateModifiable() {
-        if (this.apprSts == ApprStatus.REQUEST || this.apprSts == ApprStatus.APPROVED) {
-            throw new BusinessException("승인 요청 중이거나 확정된 데이터는 수정/삭제할 수 없습니다.");
-        }
-    }
-
-    /**
-     * 조직 소유권 검증: 다른 조직의 데이터 접근 방지
-     */
-    public void validateOwnership(String requestOrgCd) {
-        if (!this.orgCd.equals(requestOrgCd)) {
-            throw new BusinessException("해당 조직의 데이터가 아닙니다.");
-        }
+    public void confirmApproval(String userId) {
+        this.apprUsrId = userId;
+        this.apprSts = ApprStatus.APPROVED;
+        this.apprAt = LocalDate.now(KOREA_ZONE);
     }
 
     /**

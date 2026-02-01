@@ -1,7 +1,7 @@
 package com.usto.api.item.returning.presentation.controller;
 
 import com.usto.api.common.utils.ApiResponse;
-import com.usto.api.item.returning.application.ReturningService;
+import com.usto.api.item.returning.application.ReturningApplication;
 import com.usto.api.item.returning.presentation.dto.request.ReturningRegisterRequest;
 import com.usto.api.item.returning.presentation.dto.request.ReturningSearchRequest;
 import com.usto.api.item.returning.presentation.dto.response.ReturningItemListResponse;
@@ -25,7 +25,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ReturningController {
 
-    private final ReturningService returningService;
+    private final ReturningApplication returningApplication;
 
     @Operation(
             summary = "반납등록목록 조회",
@@ -36,7 +36,7 @@ public class ReturningController {
             @Valid ReturningSearchRequest searchRequest,
             @AuthenticationPrincipal UserPrincipal principal) {
         return ApiResponse.ok("조회 성공",
-                returningService.getReturningList(searchRequest, principal.getOrgCd()));
+                returningApplication.getReturningList(searchRequest, principal.getOrgCd()));
     }
 
     @Operation(
@@ -48,7 +48,7 @@ public class ReturningController {
             @PathVariable UUID rtrnMId,
             @AuthenticationPrincipal UserPrincipal principal) {
         return ApiResponse.ok("조회 성공",
-                returningService.getReturningItems(rtrnMId, principal.getOrgCd()));
+                returningApplication.getReturningItems(rtrnMId, principal.getOrgCd()));
     }
 
     @Operation(
@@ -60,7 +60,7 @@ public class ReturningController {
     public ApiResponse<ReturningRegisterResponse> register(
             @Valid @RequestBody ReturningRegisterRequest request,
             @AuthenticationPrincipal UserPrincipal principal) {
-        UUID rtrnMId = returningService.registerReturning(
+        UUID rtrnMId = returningApplication.registerReturning(
                 request,
                 principal.getUsername(),
                 principal.getOrgCd()
@@ -78,7 +78,7 @@ public class ReturningController {
             @PathVariable UUID rtrnMId,
             @Valid @RequestBody ReturningRegisterRequest request,
             @AuthenticationPrincipal UserPrincipal principal) {
-        returningService.updateReturning(rtrnMId, request, principal.getOrgCd());
+        returningApplication.updateReturning(rtrnMId, request, principal.getOrgCd());
         return ApiResponse.ok("수정 성공");
     }
 
@@ -91,7 +91,7 @@ public class ReturningController {
     public ApiResponse<Void> delete(
             @PathVariable UUID rtrnMId,
             @AuthenticationPrincipal UserPrincipal principal) {
-        returningService.deleteReturning(rtrnMId, principal.getOrgCd());
+        returningApplication.deleteReturning(rtrnMId, principal.getOrgCd());
         return ApiResponse.ok("삭제 성공");
     }
 
@@ -104,7 +104,7 @@ public class ReturningController {
     public ApiResponse<Void> requestApproval(
             @PathVariable UUID rtrnMId,
             @AuthenticationPrincipal UserPrincipal principal) {
-        returningService.requestApproval(rtrnMId, principal.getOrgCd());
+        returningApplication.requestApproval(rtrnMId, principal.getOrgCd());
         return ApiResponse.ok("승인 요청 완료");
     }
 
@@ -117,7 +117,7 @@ public class ReturningController {
     public ApiResponse<Void> cancelRequest(
             @PathVariable UUID rtrnMId,
             @AuthenticationPrincipal UserPrincipal principal) {
-        returningService.cancelRequest(rtrnMId, principal.getOrgCd());
+        returningApplication.cancelRequest(rtrnMId, principal.getOrgCd());
         return ApiResponse.ok("승인 요청 취소 완료");
     }
 

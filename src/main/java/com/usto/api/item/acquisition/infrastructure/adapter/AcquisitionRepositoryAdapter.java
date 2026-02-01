@@ -1,4 +1,4 @@
-package com.usto.api.item.acquisition.infrastructure.repository;
+package com.usto.api.item.acquisition.infrastructure.adapter;
 
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -7,6 +7,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.usto.api.common.exception.BusinessException;
 import com.usto.api.item.acquisition.domain.model.Acquisition;
 import com.usto.api.item.acquisition.infrastructure.mapper.AcquisitionMapper;
+import com.usto.api.item.acquisition.infrastructure.repository.AcquisitionJpaRepository;
 import com.usto.api.item.common.model.ApprStatus;
 import com.usto.api.item.acquisition.domain.repository.AcquisitionRepository;
 import com.usto.api.item.acquisition.infrastructure.entity.ItemAcquisitionEntity;

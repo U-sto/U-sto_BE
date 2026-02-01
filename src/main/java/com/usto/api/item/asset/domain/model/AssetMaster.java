@@ -2,7 +2,6 @@ package com.usto.api.item.asset.domain.model;
 
 import com.usto.api.common.exception.BusinessException;
 import com.usto.api.item.acquisition.domain.model.AcqArrangementType;
-import com.usto.api.item.common.model.ApprStatus;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -17,36 +16,17 @@ import java.util.UUID;
 @Getter
 @Builder
 public class AssetMaster {
-    private final UUID acqId;        // 취득ID (PK)
-    private final String g2bDCd;     // G2B 식별코드
-    private Integer qty;             // 총 수량 (가변)
-    private final LocalDate acqAt;   // 취득일자
-    private LocalDate arrgAt;  // 정리일자
-    private final AcqArrangementType acqArrgTy;     // 취득정리구분
-    private final String orgCd;      // 조직코드
+    private final UUID acqId;                    // 취득ID (PK)
+    private final String g2bDCd;                 // G2B 식별코드
+    private Integer qty;                         // 총 수량 (가변)
+    private final LocalDate acqAt;               // 취득일자
+    private LocalDate arrgAt;                    // 정리일자
+    private final AcqArrangementType acqArrgTy;  // 취득정리구분
+    private final String orgCd;                  // 조직코드
     private String delYn;
     private LocalDateTime delAt;
 
     private static final ZoneId KOREA_ZONE = ZoneId.of("Asia/Seoul");
-
-
-    /**
-     * 신규 물품대장 마스터 생성 팩토리 메서드
-     */
-    public static AssetMaster create(UUID acqId, String g2bDCd, Integer qty,
-                                     LocalDate acqAt, LocalDate arrgAt,
-                                     AcqArrangementType acqArrgTy, String orgCd) {
-        return AssetMaster.builder()
-                .acqId(acqId)
-                .g2bDCd(g2bDCd)
-                .qty(qty)
-                .acqAt(acqAt)
-                .arrgAt(arrgAt)
-                .acqArrgTy(acqArrgTy)
-                .orgCd(orgCd)
-                .delYn("N")
-                .build();
-    }
 
     /**
      * 수량 감소 로직 (일부 물품 처분 시)
@@ -59,12 +39,5 @@ public class AssetMaster {
             throw new BusinessException("현재 수량보다 많은 양을 처분할 수 없습니다.");
         }
         this.qty -= amount;
-    }
-
-    public void confirmApproval(UUID acqId, String userId) {
-        if(acqId.equals(this.acqId)){
-            this.arrgAt = LocalDate.now(KOREA_ZONE);
-
-        }
     }
 }

@@ -1,6 +1,6 @@
 package com.usto.api.item.asset.presentation.controller;
 
-import com.usto.api.item.asset.application.AssetService;
+import com.usto.api.item.asset.application.AssetApplication;
 import com.usto.api.item.asset.presentation.dto.response.AssetAiItemDetailResponse;
 import com.usto.api.user.domain.model.UserPrincipal;
 import io.swagger.v3.oas.annotations.Operation;
@@ -24,7 +24,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AssetSearchForAiController {
 
-    private final AssetService assetService;
+    private final AssetApplication assetApplication;
 
     @Operation(
             summary = "물품 조회 By AI",
@@ -51,7 +51,7 @@ public class AssetSearchForAiController {
         }
 
         List<AssetAiItemDetailResponse> result =
-                assetService.getAssetList(itmNo, g2bMCd, g2bDCd, g2bDNm, principal.getOrgCd());
+                assetApplication.getAssetList(itmNo, g2bMCd, g2bDCd, g2bDNm, principal.getOrgCd());
         return ApiResponseForAi.ok("조회 성공",result);
     }
 

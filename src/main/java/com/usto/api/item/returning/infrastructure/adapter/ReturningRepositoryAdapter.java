@@ -1,4 +1,4 @@
-package com.usto.api.item.returning.infrastructure.repository;
+package com.usto.api.item.returning.infrastructure.adapter;
 
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -9,6 +9,8 @@ import com.usto.api.item.returning.domain.model.ReturningDetail;
 import com.usto.api.item.returning.domain.model.ReturningMaster;
 import com.usto.api.item.returning.domain.repository.ReturningRepository;
 import com.usto.api.item.returning.infrastructure.mapper.ReturningMapper;
+import com.usto.api.item.returning.infrastructure.repository.ReturningDetailJpaRepository;
+import com.usto.api.item.returning.infrastructure.repository.ReturningMasterJpaRepository;
 import com.usto.api.item.returning.presentation.dto.request.ReturningSearchRequest;
 import com.usto.api.item.returning.presentation.dto.response.ReturningItemListResponse;
 import com.usto.api.item.returning.presentation.dto.response.ReturningListResponse;
