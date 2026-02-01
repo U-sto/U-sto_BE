@@ -41,9 +41,31 @@ public interface G2bItemCategoryJpaRepository extends JpaRepository<G2bItemCateg
       GROUP BY S.G2B_M_CD
     ) S ON S.G2B_M_CD = M.G2B_M_CD
     SET M.G2B_M_NM = S.G2B_M_NM,
+        M.DRB_YR = S.DRB_YR,
         M.UPD_BY   = :actor,
         M.UPD_AT   = CURRENT_TIMESTAMP
     WHERE M.G2B_M_NM <> S.G2B_M_NM
+        AND  S.DRB_YR IS NOT NULL
+               AND (
+                 M.DRB_YR IS NULL
+                 OR M.DRB_YR <> S.DRB_YR
+               )
     """, nativeQuery = true)
     int updateCategory(String actor);
+
+    @Query(value = "SELECT DISTINCT G2B_M_CD " +
+            "FROM TB_G2B001M", nativeQuery = true)
+    List<String> findDistinctCategoryCodes();
+
+
+    @Modifying
+    @Query(value = """
+    UPDATE TB_G2B001M M
+        SET M.DRB_YR = :drbYr
+    WHERE M.G2B_M_CD = :code
+    """, nativeQuery = true)
+    int updateDrbYrIfDifferent(
+            String code,
+            String drbYr
+            );
 }

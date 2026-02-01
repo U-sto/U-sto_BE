@@ -6,6 +6,7 @@ import com.usto.api.g2b.infrastructure.repository.G2bItemCategoryJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 
 
 @Repository
@@ -17,6 +18,16 @@ public class G2bItemCategoryRepositoryAdapter implements G2bItemCategoryReposito
     @Override
     public int updateCategory(String actor) {
         return g2bItemCategoryJpaRepository.updateCategory(actor);
+    }
+
+    @Override
+    public List<String> findDistinctCategoryCodes() {
+        return g2bItemCategoryJpaRepository.findDistinctCategoryCodes();
+    }
+
+    @Override
+    public int updateDrbYrIfDifferent(String prdctClsfcNo, String drbYr) {
+        return g2bItemCategoryJpaRepository.updateDrbYrIfDifferent(prdctClsfcNo, drbYr);
     }
 
     @Override
