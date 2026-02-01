@@ -1,5 +1,6 @@
 package com.usto.api.g2b.infrastructure.repository;
 
+import com.usto.api.g2b.domain.model.G2bItemCategory;
 import com.usto.api.g2b.infrastructure.entity.G2bItemCategoryJpaEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -41,15 +42,9 @@ public interface G2bItemCategoryJpaRepository extends JpaRepository<G2bItemCateg
       GROUP BY S.G2B_M_CD
     ) S ON S.G2B_M_CD = M.G2B_M_CD
     SET M.G2B_M_NM = S.G2B_M_NM,
-        M.DRB_YR = S.DRB_YR,
         M.UPD_BY   = :actor,
         M.UPD_AT   = CURRENT_TIMESTAMP
     WHERE M.G2B_M_NM <> S.G2B_M_NM
-        AND  S.DRB_YR IS NOT NULL
-               AND (
-                 M.DRB_YR IS NULL
-                 OR M.DRB_YR <> S.DRB_YR
-               )
     """, nativeQuery = true)
     int updateCategory(String actor);
 
@@ -68,4 +63,15 @@ public interface G2bItemCategoryJpaRepository extends JpaRepository<G2bItemCateg
             String code,
             String drbYr
             );
+
+    @Query(value =
+            """
+        SELECT G2B_M_NM FROM TB_G2B001M M
+        WHERE M.G2B_M_CD = :code
+        """
+            , nativeQuery = true)
+    String findDistinctCategoryNameByCode(
+            String code
+    );
+
 }

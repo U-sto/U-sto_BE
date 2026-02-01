@@ -13,4 +13,10 @@ public class G2bItemCategory {
     private final String g2bMCd;
     private final String g2bMNm;
     private final String drbYr;
+
+    public G2bItemCategory updateDrbYr(String newDrbYr) {
+        return new G2bItemCategory(
+                this.g2bMCd,
+                this.g2bMNm,
+                newDrbYr);    }
 }
