@@ -16,4 +16,8 @@ public interface G2bStgRepository {
     long countChanged();
 
     List<G2bStg> findAll();
+
+    List<String> findDistinctCategoryCodes();
+
+    int updateDrbYrIfDifferent(String prdctClsfcNo, String drbYr);
 }

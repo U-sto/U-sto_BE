@@ -5,6 +5,7 @@ import com.usto.api.g2b.infrastructure.entity.G2bStgJpaEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -38,4 +39,25 @@ public interface G2bStgJpaRepository extends JpaRepository<G2bStgJpaEntity,Long>
     @Modifying
     @Query(value = "DELETE FROM TB_G2B_STG", nativeQuery = true)
     void delete();
+
+    @Query(value = """
+      SELECT DISTINCT G2B_M_CD
+      FROM TB_G2B_STG
+      WHERE G2B_M_CD IS NOT NULL
+      ORDER BY G2B_M_CD
+    """, nativeQuery = true)
+    List<String> findDistinctCategoryCodes();
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query(value = """
+      UPDATE TB_G2B_STG
+      SET DRB_YR = :drbYr
+      WHERE G2B_M_CD = :g2bMCd
+        AND (
+          DRB_YR IS NULL OR DRB_YR = ''
+          OR DRB_YR <> :drbYr
+        )
+    """, nativeQuery = true)
+    int updateDrbYrIfDifferent(@Param("g2bMCd") String g2bMCd,
+                               @Param("drbYr") String drbYr);
 }
