@@ -1,15 +1,16 @@
 package com.usto.api.g2b.application;
 
-import com.usto.api.common.utils.PrdctUsefulLifeEnvelope;
-import com.usto.api.common.utils.PrdctUsefulLifeOpenApiClient;
-import com.usto.api.common.utils.ShoppingMallEnvelope;
-import com.usto.api.common.utils.ShoppingMallOpenApiClient;
+import com.usto.api.common.utils.*;
+import com.usto.api.g2b.domain.model.G2bItemCategory;
+import com.usto.api.g2b.domain.model.G2bUsrfulList;
 import com.usto.api.g2b.domain.model.SyncResult;
+import com.usto.api.g2b.domain.repository.G2bUsrfulListRepository;
 import com.usto.api.g2b.infrastructure.mapper.G2bStgMapper;
 import com.usto.api.g2b.domain.model.G2bStg;
 import com.usto.api.g2b.domain.repository.G2bItemCategoryRepository;
 import com.usto.api.g2b.domain.repository.G2bItemRepository;
 import com.usto.api.g2b.domain.repository.G2bStgRepository;
+import com.usto.api.g2b.infrastructure.mapper.G2bUsrfulListMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -20,8 +21,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Function;
 import java.util.stream.Collectors;
-
 import static org.springframework.transaction.annotation.Propagation.REQUIRES_NEW;
 
 @Slf4j
@@ -33,7 +34,9 @@ public class G2bSyncApplication {
     private final G2bItemRepository g2bItemRepository;
     private final G2bItemCategoryRepository g2bItemCategoryRepository;
     private final ShoppingMallOpenApiClient client; //API연동
-    private final PrdctUsefulLifeOpenApiClient usefulApiClient ;
+    private final PrdctUsefulLifeOpenApiClient usefulApiClient; //내용 연수 가져오기
+    private final G2bUsrfulListRepository g2bUsrfulListRepository;
+    private final G2bUsefulLifeMatcher matcher;
 
     //이쪽 값을 정의해야할거같다.
     private static final String PAGE_NO = "1";        // 페이지 번호 (1페이지부터 조회해야 함)
@@ -50,7 +53,7 @@ public class G2bSyncApplication {
     }
 
     @Transactional(propagation = REQUIRES_NEW)
-    public SyncResult syncLatest(String begin , String end) {
+    public SyncResult syncLatest(String begin, String end) {
         log.info("=== Sync Start: {} ~ {} ===", begin, end);
 
         // 외부 수집
@@ -89,40 +92,15 @@ public class G2bSyncApplication {
             g2bStgRepository.bulkInsert(distinctDomainList);
         }
 
-        int updated = 0;
-
-        // 스테이징 테이블에 내용연수 추가 (fetch)
-
-        //이것도 별도로 객체 만들어서 옮기는 작업이 필요할 것으로 보임.
-
-        List<String> prdctClsfcNos = g2bStgRepository.findDistinctCategoryCodes();//물품분류번호 조회
-
-        for (String prdctClsfcNo : prdctClsfcNos) {
-            List<PrdctUsefulLifeEnvelope.Item> usefulLifeItems  = fetchUsefulLifeItems(prdctClsfcNo);
-
-            String drbYr = usefulLifeItems .stream()
-                    .filter(it -> prdctClsfcNo.equals(it.prdctClsfcNo()))
-                    .map(PrdctUsefulLifeEnvelope.Item::drbYr)
-                    .filter(v -> v != null && !v.isBlank())
-                    .findFirst()
-                    .orElse(null);
-
-            if (drbYr == null) continue;
-
-            updated += g2bStgRepository.updateDrbYrIfDifferent(prdctClsfcNo, drbYr); //STG테이블에 내용연수 내용 추가!
-            log.info("UsefulLife updated rows in STG: {}", updated); //진행상황 추적
-        }
-
-
         // DB에 추가 사항 반영(부모) - 마스터테이블
-        int countOfUpdatedCategory = g2bItemCategoryRepository.updateCategory(ACTOR); //내용연수 추가
+        int countOfUpdatedCategory = g2bItemCategoryRepository.updateCategory(ACTOR);
         int countOfInsertedCategory = g2bItemCategoryRepository.insertCategory(ACTOR);
 
         // DB에 수정 사항 반영(자식) - 디테일테이블
         int countOfUpdatedItem = g2bItemRepository.updateItems(ACTOR);
         int countOfInsertedItem = g2bItemRepository.insertItems(ACTOR);
 
-        long changed  = g2bStgRepository.countChanged();
+        long changed = g2bStgRepository.countChanged();
 
         // 스테이징테이블 아이디 초기화
         g2bStgRepository.resetId();
@@ -139,30 +117,6 @@ public class G2bSyncApplication {
                 countOfUpdatedItem,
                 changed
         );
-    }
-
-    @Transactional
-    public void addDrbYr() {
-
-        int updated = 0;
-        // 스테이징 테이블에 내용연수 추가 (fetch)
-        List<String> prdctClsfcNos = g2bItemCategoryRepository.findDistinctCategoryCodes();//물품분류번호 조회
-
-        for (String prdctClsfcNo : prdctClsfcNos) {
-            List<PrdctUsefulLifeEnvelope.Item> usefulLifeItems  = fetchUsefulLifeItems(prdctClsfcNo);
-
-            String drbYr = usefulLifeItems .stream()
-                    .filter(it -> prdctClsfcNo.equals(it.prdctClsfcNo()))
-                    .map(PrdctUsefulLifeEnvelope.Item::drbYr)
-                    .filter(v -> v != null && !v.isBlank())
-                    .findFirst()
-                    .orElse(null);
-
-            if (drbYr == null) continue;
-
-            updated += g2bItemCategoryRepository.updateDrbYrIfDifferent(prdctClsfcNo, drbYr); //G2B 마스터 테이블에 내용연수 내용 추가!
-            log.info("First || UsefulLife updated rows in STG: {}", updated); //진행상황 추적
-        }
     }
 
     private List<ShoppingMallEnvelope.Item> fetch(String begin, String end) {
@@ -188,9 +142,82 @@ public class G2bSyncApplication {
         return items;
     }
 
-    private List<PrdctUsefulLifeEnvelope.Item> fetchUsefulLifeItems(String prdctClsfcNo) {
-        if (prdctClsfcNo == null || prdctClsfcNo.isBlank()) return List.of();
-        var page = usefulApiClient.fetchByRange(prdctClsfcNo, prdctClsfcNo);
-        return (page == null || page.items() == null) ? List.of() : page.items();
+    @Transactional
+    public int sync3Months() {
+        return addDrbYr();
+    }
+
+    @Transactional
+    public int addDrbYr() {
+
+        log.info("=== Sync Start: ===");
+
+        // 외부 수집
+        List<PrdctUsefulLifeEnvelope.Item> items = fetchUsefulLifeItems();
+        log.info("Fetched Total Items: : , count :{}", items.size());
+
+        if (items.isEmpty()) {
+            return 0;
+        }
+
+        // 가져온 데이터 -> domain
+        List<G2bUsrfulList> domainList = items.stream()
+                .map(G2bUsrfulListMapper::toDomain) // 변환
+                .filter(Objects::nonNull)                 // Null 제거
+                .collect(Collectors.toMap(
+                        G2bUsrfulList::getG2bMcd,
+                        Function.identity(),
+                        (existing, replacement) -> existing // 중복 시 기존 데이터 유지
+                ))
+                .values()
+                .stream()
+                .collect(Collectors.toList());
+
+        log.info("Total DomainList: : , count :{}", domainList.size());
+
+        //깨끗하게 한번 비우고 ~ (일회용을 사용함으로써, 최선의 업데이트)
+        g2bUsrfulListRepository.delete();
+
+        //테이블에 적재
+        if (!domainList.isEmpty()) {
+            g2bUsrfulListRepository.bulkInsert(domainList);
+        }
+
+        // G2B마스터테이블 -> domain으로 가져오기
+        List<G2bItemCategory> categoryDomainList = g2bItemCategoryRepository.findAll();
+
+        // 두 domain을 알고리즘에 넣기
+        int updated = matcher.matchBasedOnHierarchy(domainList,categoryDomainList);
+
+        // domain넣어서 G2B마스터 테이블 최신화 진행
+        g2bItemCategoryRepository.updateAll(categoryDomainList);
+
+        log.info("DB 업데이트 완료: {} 건", updated);
+
+        return updated; //총 업데이트 건
+    }
+
+
+    private List<PrdctUsefulLifeEnvelope.Item> fetchUsefulLifeItems() {
+        log.info("G2B API Request, Page: {}, Rows: {}", PAGE_NO, NUM_OF_ROWS);
+
+        var first = usefulApiClient.fetch(PAGE_NO, String.valueOf(NUM_OF_ROWS));
+        if (first == null || first.items() == null) {
+            return new ArrayList<>();
+        }
+        var items = new ArrayList<>(first.items());
+
+        int total = first.totalCount();
+        log.info("G2B API Response - Total Count: {}", total);
+        int pages = (int) Math.ceil(total / (double) NUM_OF_ROWS);
+
+        for (int p = 2; p <= pages; p++) {
+            log.info("Fetching page {}/{}", p, pages);
+            var page = usefulApiClient.fetch(String.valueOf(p), String.valueOf(NUM_OF_ROWS));
+            if (page != null && page.items() != null) {
+                items.addAll(page.items());
+            }
+        }
+        return items;
     }
 }
