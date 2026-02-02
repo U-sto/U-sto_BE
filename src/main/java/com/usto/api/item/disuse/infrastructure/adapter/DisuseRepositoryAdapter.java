@@ -9,6 +9,7 @@ import com.usto.api.item.common.model.ApprStatus;
 import com.usto.api.item.disuse.domain.model.DisuseDetail;
 import com.usto.api.item.disuse.domain.model.DisuseMaster;
 import com.usto.api.item.disuse.domain.repository.DisuseRepository;
+import com.usto.api.item.disuse.infrastructure.entity.ItemDisuseDetailEntity;
 import com.usto.api.item.disuse.infrastructure.mapper.DisuseMapper;
 import com.usto.api.item.disuse.infrastructure.repository.DisuseDetailJpaRepository;
 import com.usto.api.item.disuse.infrastructure.repository.DisuseMasterJpaRepository;
@@ -70,7 +71,25 @@ public class DisuseRepositoryAdapter implements DisuseRepository {
 
         QUserJpaEntity user = QUserJpaEntity.userJpaEntity;
 
-        JPAQuery<DisuseListResponse> query = queryFactory
+        // 1. Count 쿼리 (groupBy 없이)
+        Long total = queryFactory
+                .select(itemDisuseMasterEntity.dsuMId.countDistinct())
+                .from(itemDisuseMasterEntity)
+                .leftJoin(itemDisuseDetailEntity)
+                .on(itemDisuseMasterEntity.dsuMId.eq(itemDisuseDetailEntity.dsuMId))
+                .leftJoin(user)
+                .on(itemDisuseMasterEntity.aplyUsrId.eq(user.usrId))
+                .where(
+                        itemDisuseMasterEntity.orgCd.eq(orgCd),
+                        aplyAtBetween(cond.getStartAplyAt(), cond.getEndAplyAt()),
+                        apprStsEq(cond.getApprSts())
+                )
+                .fetchOne();
+
+        long totalCount = (total != null) ? total : 0L;
+
+        // 2. Data 쿼리 (groupBy 포함)
+        List<DisuseListResponse> content = queryFactory
                 .select(Projections.fields(DisuseListResponse.class,
                         itemDisuseMasterEntity.dsuMId.as("dsuMId"),
                         itemDisuseMasterEntity.aplyAt,
@@ -90,18 +109,13 @@ public class DisuseRepositoryAdapter implements DisuseRepository {
                         aplyAtBetween(cond.getStartAplyAt(), cond.getEndAplyAt()),
                         apprStsEq(cond.getApprSts())
                 )
-                .groupBy(itemDisuseMasterEntity.dsuMId);
-        // 전체 개수 조회
-        long total = query.fetchCount();
-
-        // 페이징 적용 데이터 조회
-        List<DisuseListResponse> content = query
+                .groupBy(itemDisuseMasterEntity.dsuMId)
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .orderBy(itemDisuseMasterEntity.creAt.asc())
                 .fetch();
 
-        return new PageImpl<>(content, pageable, total);
+        return new PageImpl<>(content, pageable, totalCount);
     }
 
     /**
@@ -110,7 +124,20 @@ public class DisuseRepositoryAdapter implements DisuseRepository {
     @Override
     public Page<DisuseItemListResponse> findItemsByMasterId(
             UUID dsuMId, String orgCd, Pageable pageable) {
-        JPAQuery<DisuseItemListResponse> query = queryFactory
+        // 1. 전체 개수 조회 (성능을 위해 조인을 최소화한 별도 쿼리)
+        Long total = queryFactory
+                .select(itemDisuseDetailEntity.count())
+                .from(itemDisuseDetailEntity)
+                .where(
+                        itemDisuseDetailEntity.dsuMId.eq(dsuMId),
+                        itemDisuseDetailEntity.orgCd.eq(orgCd)
+                )
+                .fetchOne();
+
+        long totalCount = (total != null) ? total : 0L;
+
+        // 2. 데이터 조회 쿼리
+        List<DisuseItemListResponse> content = queryFactory
                 .select(Projections.fields(DisuseItemListResponse.class,
                         // G2B 목록번호 (분류코드-식별코드)
                         Expressions.stringTemplate("CONCAT({0}, '-', {1})",
@@ -155,18 +182,13 @@ public class DisuseRepositoryAdapter implements DisuseRepository {
                 .where(
                         itemDisuseDetailEntity.dsuMId.eq(dsuMId),
                         itemDisuseDetailEntity.orgCd.eq(orgCd)
-                );
-        // 전체 개수 조회
-        long total = query.fetchCount();
-
-        // 페이징 적용 데이터 조회
-        List<DisuseItemListResponse> content = query
+                )
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .orderBy(itemDisuseDetailEntity.itmNo.asc())
                 .fetch();
 
-        return new PageImpl<>(content, pageable, total);
+        return new PageImpl<>(content, pageable, totalCount);
     }
 
     @Override
@@ -184,24 +206,31 @@ public class DisuseRepositoryAdapter implements DisuseRepository {
         return detailJpaRepository.findItemNosByDsuMIdAndOrgCd(dsuMId, orgCd);
     }
 
-    /**
-     * 중복 체크: 특정 물품이 다른 불용 신청서에 이미 등록되어 있는지 확인
-     */
     @Override
-    public boolean existsInOtherDisuse(String itmNo, UUID excludeDsuMId, String orgCd) {
+    public List<String> findDuplicatedItems(
+            List<String> itmNos, UUID excludeDsuMId, String orgCd
+    ) {
         return queryFactory
-                .selectOne()
+                .select(itemDisuseDetailEntity.itmNo)
                 .from(itemDisuseDetailEntity)
                 .join(itemDisuseMasterEntity)
                 .on(itemDisuseDetailEntity.dsuMId.eq(itemDisuseMasterEntity.dsuMId))
                 .where(
-                        itemDisuseDetailEntity.itmNo.eq(itmNo),
+                        itemDisuseDetailEntity.itmNo.in(itmNos),
                         itemDisuseDetailEntity.orgCd.eq(orgCd),
-                        excludeDsuMId != null ? itemDisuseMasterEntity.dsuMId.ne(excludeDsuMId) : null,
-                        // 승인완료 또는 요청중인 건만 중복 체크
+                        excludeDsuMId != null ?
+                                itemDisuseMasterEntity.dsuMId.ne(excludeDsuMId) : null,
                         itemDisuseMasterEntity.apprSts.in(ApprStatus.REQUEST, ApprStatus.APPROVED)
                 )
-                .fetchFirst() != null;
+                .fetch();
+    }
+
+    @Override
+    public void saveAllDetails(List<DisuseDetail> details) {
+        List<ItemDisuseDetailEntity> entities = details.stream()
+                .map(DisuseMapper::toDetailEntity)
+                .toList();
+        detailJpaRepository.saveAll(entities);  // Batch INSERT
     }
 
 

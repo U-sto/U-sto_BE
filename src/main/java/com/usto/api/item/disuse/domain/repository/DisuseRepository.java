@@ -28,5 +28,8 @@ public interface DisuseRepository {
     // 물품 고유번호 목록 조회
     List<String> findItemNosByMasterId(UUID dsuMId, String orgCd);
 
-    boolean existsInOtherDisuse(String itmNo, UUID excludeDsuMId, String orgCd);
+    // 중복 체크 (IN 쿼리)
+    List<String> findDuplicatedItems(List<String> itmNos, UUID excludeDsuMId, String orgCd);
+    // Batch 저장
+    void saveAllDetails(List<DisuseDetail> details);
 }

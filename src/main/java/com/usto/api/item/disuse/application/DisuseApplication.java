@@ -20,6 +20,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -48,37 +50,10 @@ public class DisuseApplication {
                 request.getDsuRsn(),
                 orgCd
         );
-
         DisuseMaster savedMaster = disuseRepository.saveMaster(master);
 
-        // 2. 각 물품 검증 및 불용 상세(Detail) 생성
-        for (String itmNo : request.getItmNos()) {
-            // 물품 조회 및 검증
-            Asset asset = assetRepository.findById(itmNo, orgCd)
-                    .orElseThrow(() -> new BusinessException("물품을 찾을 수 없습니다: " + itmNo));
-
-            assetPolicy.validateUpdate(asset, orgCd);
-
-            // 중복 체크
-            if (disuseRepository.existsInOtherDisuse(itmNo, null, orgCd)) {
-                throw new BusinessException("이미 다른 불용 신청에 포함된 물품입니다: " + itmNo);
-            }
-
-            // 반납 상태 확인 (RTN만 불용 가능)
-            if (asset.getOperSts() != OperStatus.RTN) {
-                throw new BusinessException("반납(RTN) 상태의 물품만 불용 신청할 수 있습니다: " + itmNo);
-            }
-
-            // 불용 상세 생성 (Mapper 사용)
-            DisuseDetail detail = DisuseMapper.toDetailDomain(
-                    savedMaster.getDsuMId(),
-                    itmNo,
-                    asset.getDeptCd(),
-                    orgCd
-            );
-
-            disuseRepository.saveDetail(detail);
-        }
+        // 공통 로직 호출
+        processDisuseItems(request.getItmNos(), savedMaster.getDsuMId(), null, orgCd);
 
         return savedMaster.getDsuMId();
     }
@@ -124,26 +99,8 @@ public class DisuseApplication {
         disuseRepository.deleteAllDetailsByMasterId(dsuMId);
 
         // 5. 새로운 Detail 생성
-        for (String itmNo : request.getItmNos()) {
-            Asset asset = assetRepository.findById(itmNo, orgCd)
-                    .orElseThrow(() -> new BusinessException("물품을 찾을 수 없습니다: " + itmNo));
-
-            assetPolicy.validateUpdate(asset, orgCd);
-
-            if (asset.getOperSts() != OperStatus.RTN) {
-                throw new BusinessException("반납(RTN) 상태의 물품만 불용 신청할 수 있습니다: " + itmNo);
-            }
-
-            if (disuseRepository.existsInOtherDisuse(itmNo, dsuMId, orgCd)) {
-                throw new BusinessException("이미 다른 불용 신청에 포함된 물품입니다: " + itmNo);
-            }
-
-            DisuseDetail detail = DisuseMapper.toDetailDomain(
-                    dsuMId, itmNo, asset.getDeptCd(), orgCd
-            );
-
-            disuseRepository.saveDetail(detail);
-        }
+        // 공통 로직 호출
+        processDisuseItems(request.getItmNos(), dsuMId, dsuMId, orgCd);
     }
 
     /**
@@ -195,6 +152,56 @@ public class DisuseApplication {
         disuseRepository.deleteAllDetailsByMasterId(dsuMId);
         disuseRepository.deleteMaster(dsuMId);
     }
+
+    /**
+     * 물품 검증 및 상세 생성 공통 로직
+     *
+     * @param itmNos 물품 번호 목록
+     * @param dsuMId 불용 Master ID
+     * @param excludeDsuMId 중복 체크 시 제외할 Master ID (수정 시)
+     * @param orgCd 조직코드
+     */
+    private void processDisuseItems(
+            List<String> itmNos, UUID dsuMId, UUID excludeDsuMId, String orgCd
+    ) {
+        // Batch 조회 - 모든 물품 한 번에 조회 (1번의 IN 쿼리)
+        List<Asset> assets = assetRepository.findAllById(itmNos, orgCd);
+
+        // 조회된 물품 개수 검증
+        if (assets.size() != itmNos.size()) {
+            throw new BusinessException("일부 물품을 찾을 수 없습니다.");
+        }
+
+        // Batch 중복 체크 (1번의 IN 쿼리)
+        List<String> duplicated = disuseRepository.findDuplicatedItems(
+                itmNos, excludeDsuMId, orgCd
+        );
+        if (!duplicated.isEmpty()) {
+            throw new BusinessException(
+                    "이미 다른 불용 신청에 포함된 물품입니다: " + String.join(", ", duplicated)
+            );
+        }
+
+        // 검증 및 Detail 생성 (메모리 연산)
+        List<DisuseDetail> details = new ArrayList<>();
+        for (Asset asset : assets) {
+            assetPolicy.validateUpdate(asset, orgCd);
+
+            if (asset.getOperSts() != OperStatus.RTN) {
+                throw new BusinessException(
+                        "반납(RTN) 상태의 물품만 불용 신청할 수 있습니다: " + asset.getItmNo()
+                );
+            }
+
+            details.add(DisuseMapper.toDetailDomain(
+                    dsuMId, asset.getItmNo(), asset.getDeptCd(), orgCd
+            ));
+        }
+
+        // 한 번에 저장 (1번의 Batch INSERT)
+        disuseRepository.saveAllDetails(details);
+    }
+
 
     /**
      * TODO: 불용 승인 (ADMIN 권한)
