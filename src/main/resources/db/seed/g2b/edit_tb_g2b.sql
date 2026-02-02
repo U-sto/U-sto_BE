@@ -7,13 +7,14 @@ where G2B_D_CD = 23236840
 
 SELECT COUNT(*) FROM TB_G2B001M;
 
-SELECT COUNT(*)
+SELECT G2B_M_CD,G2B_M_NM,DRB_YR
 FROM TB_G2B001M
 WHERE DRB_YR IS NOT NULL;
 
-SELECT *
+SELECT DRB_YR, COUNT(*)
 FROM TB_G2B001M
-WHERE DRB_YR IS NOT NULL;
+GROUP BY DRB_YR
+ORDER BY COUNT(*) DESC;
 
 SELECT COUNT(*)
 FROM TB_G2B001M
@@ -41,6 +42,9 @@ FROM TB_G2B001D
 where UPD_AT IS NOT NULL;
 
 SELECT count(*)
+FROM TB_G2B001D;
+
+SELECT count(*)
 FROM TB_G2B_STG;
 
 
@@ -52,6 +56,30 @@ FROM TB_G2B_SYNC_HIS;
 
 SELECT *
 FROM TB_G2B_USRFUL;
+
+SELECT
+    m.g2b_m_cd AS "물품분류코드(8)",
+    d.g2b_d_cd AS "물품식별코드(8)",
+    m.g2b_m_nm AS "품목명",
+    d.g2b_d_nm AS "분류명",
+    m.drb_yr   AS "내용연수",
+    d.g2b_upr  AS "평균단가(원)"
+FROM TB_G2B001M m
+join TB_G2B001D d
+on m.G2B_M_CD = d.G2B_M_CD;
+
+select count(*)
+from TB_G2B001M m
+         join TB_G2B001D d
+              on m.G2B_M_CD = d.G2B_M_CD;
+
+SELECT count(*)
+FROM TB_G2B001D d
+WHERE NOT EXISTS (SELECT 1 FROM TB_G2B001M m WHERE m.G2B_M_CD = d.G2B_M_CD);
+
+SELECT count(*)
+FROM TB_G2B001D d
+WHERE NOT EXISTS (SELECT 1 FROM TB_G2B_USRFUL u WHERE u.G2B_M_CD = d.G2B_M_CD);
 
 
 SET FOREIGN_KEY_CHECKS = 0;

@@ -31,7 +31,7 @@ public class G2bUsefulLifeMatcher {
         log.info("매칭 시작: Source {}건, Target {}건", sources.size(), targets.size());
 
         // 0. 성능 최적화를 위한 그룹핑
-        // [Step 0용] 코드 완전 일치 맵
+        // 8자리 일치
         Map<String, G2bUsrfulList> exactMatchMap = sources.stream()
                 .collect(Collectors.toMap(
                         i -> i.getG2bMcd().trim(),
@@ -39,17 +39,17 @@ public class G2bUsefulLifeMatcher {
                         (e, r) -> e
                 ));
 
-        // [유사도용] 분류별 그룹핑
+        // [유사도용] 그룹별 그룹핑
         Map<String, List<G2bUsrfulList>> smallClassMap = sources.stream()
-                .filter(i -> i.getG2bMcd().length() >= 6)
+                .filter(i -> i.getG2bMcd().length() >= 6)//(가) 6자리일치
                 .collect(Collectors.groupingBy(i -> i.getG2bMcd().substring(0, 6)));
 
         Map<String, List<G2bUsrfulList>> mediumClassMap = sources.stream()
-                .filter(i -> i.getG2bMcd().length() >= 4)
+                .filter(i -> i.getG2bMcd().length() >= 4)//(나) 4자리 일치
                 .collect(Collectors.groupingBy(i -> i.getG2bMcd().substring(0, 4)));
 
         Map<String, List<G2bUsrfulList>> largeClassMap = sources.stream()
-                .filter(i -> i.getG2bMcd().length() >= 2)
+                .filter(i -> i.getG2bMcd().length() >= 2)//(다) 2자리 일치
                 .collect(Collectors.groupingBy(i -> i.getG2bMcd().substring(0, 2)));
 
         int matchCount = 0;
@@ -80,7 +80,7 @@ public class G2bUsefulLifeMatcher {
                 if (bestResult.item != null && bestResult.score > 0.3) {
                     foundDrbYr = bestResult.item.getDrbYr();
                 } else {
-                    // 통계적 추론
+                    // 통계적 추론 - 단순하게 전체 종류 비율을 기준으로 계산 -> 거의 사용하지 않음
                     foundDrbYr = findMostFrequentDrbYr(code, smallClassMap, mediumClassMap, largeClassMap);
                     if (foundDrbYr == null) foundDrbYr = "9"; // 최후의 보루
                 }
@@ -101,7 +101,6 @@ public class G2bUsefulLifeMatcher {
         return matchCount;
     }
 
-    // (기존 private 메서드들: updateBestMatch, findMostFrequentDrbYr, MatchResult 클래스는 그대로 유지)
     private void updateBestMatch(MatchResult currentBest, String targetName, List<G2bUsrfulList> candidates) {
         if (candidates == null || candidates.isEmpty()) return;
         String normalizedTarget = similarityUtils.normalize(targetName);
