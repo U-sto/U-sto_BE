@@ -1,7 +1,7 @@
 package com.usto.api.item.disuse.presentation.dto.request;
 
 import com.usto.api.item.common.model.ItemStatus;
-import com.usto.api.item.returning.domain.model.ReturningReason;
+import com.usto.api.item.disuse.domain.model.DisuseReason;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -30,7 +30,7 @@ public class DisuseRegisterRequest {
 
     @Schema(description = "불용사유 (LIFE_EXPIRED:내용연수경과, OBSOLETE:구형화, NO_DEPT:활용부서부재, HIGH_REPAIR:수리비용과다)", example = "LIFE_EXPIRED")
     @NotNull(message = "불용사유는 필수입니다.")
-    private ReturningReason dsuRsn;
+    private DisuseReason dsuRsn;
 
     @Schema(description = "불용 등록할 물품 고유번호 목록", example = "[\"M202600001\", \"M202600002\"]")
     @NotEmpty(message = "등록할 물품을 최소 1개 이상 선택해야 합니다.")
