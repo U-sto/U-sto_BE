@@ -57,6 +57,11 @@ public class G2bStgRepositoryAdapter implements G2bStgRepository {
     }
 
     @Override
+    public List<String> findDistinctCategoryCodes() {
+        return g2bStgJpaRepository.findDistinctCategoryCodes();
+    }
+
+    @Override
     public void delete(){
         g2bStgJpaRepository.delete();
     };

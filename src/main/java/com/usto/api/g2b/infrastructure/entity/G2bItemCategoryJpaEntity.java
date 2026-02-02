@@ -30,4 +30,7 @@ public class G2bItemCategoryJpaEntity extends BaseTimeEntity {
 
     @Column(name = "G2B_M_NM", length = 300, nullable = false)
     private String g2bMNm;
+
+    @Column(name = "DRB_YR", length = 20) // 내용연수
+    private String drbYr;
 }

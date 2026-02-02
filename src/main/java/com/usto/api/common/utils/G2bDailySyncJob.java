@@ -16,4 +16,10 @@ public class G2bDailySyncJob {
     public void runDaily() {
         g2bSyncApplication.syncDaily();
     }
+
+    // 3개월에 한 번 내용연수를 업데이트 하면 될거같다.
+    @Scheduled(cron = "0 0 2 1 */3 *", zone = "Asia/Seoul")  // 3개월
+    public void syncContentYear() {
+        g2bSyncApplication.sync3Months();
+    }
 }

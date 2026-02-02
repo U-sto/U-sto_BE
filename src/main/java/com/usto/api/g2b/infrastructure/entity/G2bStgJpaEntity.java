@@ -1,6 +1,5 @@
 package com.usto.api.g2b.infrastructure.entity;
 
-import com.usto.api.g2b.domain.model.G2bStg;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -33,5 +32,4 @@ public class G2bStgJpaEntity {
 
     @Column(name = "G2B_UPR", precision = 20, scale = 0, nullable = false)
     private BigDecimal g2bUpr;
-
 }

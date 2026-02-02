@@ -10,6 +10,7 @@ public class G2bItemCategoryMapper {
         return G2bItemCategory.builder()
                 .g2bMCd(entity.getG2bMCd())
                 .g2bMNm(entity.getG2bMNm())
+                .drbYr(entity.getDrbYr())
                 .build();
     }
 
@@ -18,6 +19,7 @@ public class G2bItemCategoryMapper {
         return G2bItemCategoryJpaEntity.builder()
                 .g2bMCd(domain.getG2bMCd())
                 .g2bMNm(domain.getG2bMNm())
+                .drbYr(domain.getDrbYr())
                 .build();
     }
 }

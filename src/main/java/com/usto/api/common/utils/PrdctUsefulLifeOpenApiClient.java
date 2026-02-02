@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
+import org.springframework.web.util.UriUtils;
 import reactor.util.retry.Retry;
 
 import java.net.URI;
@@ -12,63 +13,44 @@ import java.time.Duration;
 import java.util.List;
 
 @Component
-public class ShoppingMallOpenApiClient {
+public class PrdctUsefulLifeOpenApiClient {
 
     private final WebClient webClient;
 
-    private String baseUrl = "http://apis.data.go.kr/1230000/at/ShoppingMallPrdctInfoService";
-    private String path = "/getShoppingMallPrdctInfoList";
-
+    // 요구사항 기준
+    private final String baseUrl = "https://apis.data.go.kr/1230000/ao/PrdctMngInfoService";
+    private final String path = "/getPrdctClsfcNoUslfsvc";
 
     @Value("${g2b.api.key}")
     private String serviceKey;
 
-    public ShoppingMallOpenApiClient(WebClient.Builder builder) {
+    public PrdctUsefulLifeOpenApiClient(WebClient.Builder builder) {
         ExchangeStrategies strategies = ExchangeStrategies.builder()
                 .codecs(c -> c.defaultCodecs().maxInMemorySize(10 * 1024 * 1024))
                 .build();
 
-        this.webClient = builder
-                .exchangeStrategies(strategies)
-                .build();
+        this.webClient = builder.exchangeStrategies(strategies).build();
     }
 
-    public PageResult fetch(
-            String pageNo,
-            String numberOfRows,
-            String inqryDiv
-    )
-    {
-        return fetch(pageNo, numberOfRows, inqryDiv, null, null);
-    }
 
-    public PageResult fetch(
-            String pageNo,
-            String numberOfRows,
-            String inqryDiv,
-            String begin,
-            String end
-            ) {
+
+    public PageResult fetch(String pageNo , String numOfRows) {
 
         var b = UriComponentsBuilder
                 .fromHttpUrl(baseUrl + path)
-                // 문서 기준으로 ServiceKey인지 serviceKey인지 여기만 맞추면 됨
+                // 문서 표기는 serviceKey (대소문자 이슈 있으면 여기만 변경)
                 .queryParam("serviceKey", serviceKey)
                 .queryParam("pageNo", pageNo)
-                .queryParam("numOfRows", numberOfRows)
-                .queryParam("inqryDiv", inqryDiv)
+                .queryParam("numOfRows", numOfRows)
                 .queryParam("type", "json");
-
-        if (begin != null && !begin.isBlank()) b.queryParam("inqryBgnDate", begin);
-        if (end != null && !end.isBlank()) b.queryParam("inqryEndDate", end);
 
         URI uri = b.build(true).toUri();
 
-        ShoppingMallEnvelope env = webClient
+        PrdctUsefulLifeEnvelope env = webClient
                 .get()
                 .uri(uri)
                 .retrieve()
-                .bodyToMono(ShoppingMallEnvelope.class)
+                .bodyToMono(PrdctUsefulLifeEnvelope.class)
                 .retryWhen(
                         Retry.backoff(3, Duration.ofMillis(500))
                                 .maxBackoff(Duration.ofSeconds(5))
@@ -91,7 +73,9 @@ public class ShoppingMallOpenApiClient {
         if (body == null) return new PageResult(0, List.of());
 
         int total = parseInt(body.totalCount());
-        List<ShoppingMallEnvelope.Item> items = (body.items() == null) ? List.of() : body.items();
+        List<PrdctUsefulLifeEnvelope.Item> items =
+                (body.items() == null) ? List.of() : body.items();
+
         return new PageResult(total, items);
     }
 
@@ -99,5 +83,5 @@ public class ShoppingMallOpenApiClient {
         try { return Integer.parseInt(v); } catch (Exception e) { return 0; }
     }
 
-    public record PageResult(int totalCount, List<ShoppingMallEnvelope.Item> items) {}
+    public record PageResult(int totalCount, List<PrdctUsefulLifeEnvelope.Item> items) {}
 }
