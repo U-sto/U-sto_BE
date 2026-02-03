@@ -76,7 +76,8 @@ public class SecurityConfig {
                             "/api/g2b/sync",
                             "/api/g2b/test",//일단은 열어두는데 추후에 막아야한다.
                             "/api/g2b/add-drbYr", //일단은 열어두는데 추후에 막아야한다.
-                            "/api/g2b/test/usefulLife" //일단은 열어두는데 추후에 막아야한다.
+                            "/api/g2b/test/usefulLife", //일단은 열어두는데 추후에 막아야한다.
+                            "/api/public/**"
                     ).permitAll();
 
 
