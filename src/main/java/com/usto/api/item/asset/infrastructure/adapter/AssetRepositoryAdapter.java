@@ -23,6 +23,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -62,6 +63,25 @@ public class AssetRepositoryAdapter implements AssetRepository {
     public Optional<Asset> findById(String itmNo, String orgCd) {
         return jpaRepository.findById(new ItemAssetDetailId(itmNo, orgCd))
                 .map(AssetMapper::toDomain);
+    }
+
+    @Override
+    public List<Asset> findAllById(List<String> itmNos, String orgCd) {
+        if (itmNos == null || itmNos.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        List<ItemAssetDetailEntity> entities = queryFactory
+                .selectFrom(itemAssetDetailEntity)
+                .where(
+                        itemAssetDetailEntity.itemId.itmNo.in(itmNos),
+                        itemAssetDetailEntity.itemId.orgCd.eq(orgCd)
+                )
+                .fetch();
+
+        return entities.stream()
+                .map(AssetMapper::toDomain)
+                .toList();
     }
 
     @Override

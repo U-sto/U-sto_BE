@@ -19,6 +19,7 @@ public interface AssetRepository {
     Asset save(Asset asset);
     void saveMaster(AssetMaster master);
     Optional<Asset> findById(String itmNo, String orgCd);
+    List<Asset> findAllById(List<String> itmNos, String orgCd);
     void delete(String itmNo, String orgCd);
 
     // Asset 조회
