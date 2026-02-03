@@ -2,7 +2,9 @@ package com.usto.api.item.returning.presentation.controller;
 
 import com.usto.api.common.utils.ApiResponse;
 import com.usto.api.item.returning.application.ReturningApplication;
+import com.usto.api.item.returning.presentation.dto.request.ReturningApprovalBulkRequest;
 import com.usto.api.item.returning.presentation.dto.request.ReturningRegisterRequest;
+import com.usto.api.item.returning.presentation.dto.request.ReturningRejectBulkRequest;
 import com.usto.api.item.returning.presentation.dto.request.ReturningSearchRequest;
 import com.usto.api.item.returning.presentation.dto.response.ReturningItemListResponse;
 import com.usto.api.item.returning.presentation.dto.response.ReturningListResponse;
@@ -122,4 +124,35 @@ public class ReturningController {
     }
 
     // TODO: 반납 승인 및 반려 구현 (ADMIN)
+    @Operation(
+            summary = "반납 승인 확정 (ADMIN)",
+            description = "승인 요청(REQUEST) 건을 승인하여 승인(APPROVED) 상태로 만듭니다."
+    )
+    @PutMapping("/admin/approval")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ApiResponse<Void> approvalRequest(
+            @RequestBody @Valid ReturningApprovalBulkRequest request,
+            @AuthenticationPrincipal UserPrincipal principal) {
+        returningApplication.approvalReturning(
+                request.getRtrnMIds(),
+                principal.getUsername(),
+                principal.getOrgCd());
+        return ApiResponse.ok("반납 승인 확정 성공");
+    }
+
+    @Operation(
+            summary = "반납 요청 반려 (ADMIN)",
+            description = "승인 요청(REQUEST) 건을 반려하여 반려(REJECTED) 상태로 만듭니다."
+    )
+    @DeleteMapping("/admin/reject")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ApiResponse<Void> approvalReject(
+            @RequestBody @Valid ReturningRejectBulkRequest request,
+            @AuthenticationPrincipal UserPrincipal principal) {
+        returningApplication.rejectReturning(
+                request.getRtrnMIds(),
+                principal.getUsername(),
+                principal.getOrgCd());
+        return ApiResponse.ok("반납 요청 반려 성공");
+    }
 }
