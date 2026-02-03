@@ -1,5 +1,6 @@
 package com.usto.api.item.asset.infrastructure.repository;
 
+import com.usto.api.item.asset.domain.model.Asset;
 import com.usto.api.item.asset.infrastructure.entity.ItemAssetDetailEntity;
 import com.usto.api.item.asset.infrastructure.entity.ItemAssetDetailId;
 import com.usto.api.item.asset.infrastructure.entity.ItemAssetMasterEntity;
@@ -203,4 +204,11 @@ public interface AssetJpaRepository extends JpaRepository<ItemAssetDetailEntity,
     """, nativeQuery = true)
     int findMaxSequenceByYear(@Param("year") String year, @Param("orgCd") String orgCd);
 
+    @Query(value =
+            "SELECT * " +
+                    "FROM TB_ITEM002D d " +
+                    "WHERE d.ITM_NO = :itmNo " +
+                    "AND d.ORG_CD = :orgCd"
+    ,nativeQuery = true)
+    Asset findAssetById(String itmNo, String orgCd);
 }

@@ -260,6 +260,11 @@ public class AssetRepositoryAdapter implements AssetRepository {
         return jpaRepository.findOneByItmNo(itmNo, orgCd);
     }
 
+    @Override
+    public Asset findAssetById(String itmNo, String orgCd){
+        return jpaRepository.findAssetById(itmNo, orgCd);
+    }
+
 
 
     // ===== 동적 쿼리 헬퍼 =====

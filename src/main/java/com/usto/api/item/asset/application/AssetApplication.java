@@ -185,4 +185,5 @@ public class AssetApplication {
     private boolean hasText(String s) {
         return s != null && !s.isBlank();
     }
+
 }

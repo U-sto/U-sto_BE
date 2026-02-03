@@ -48,4 +48,7 @@ public interface AssetRepository {
     List<AssetAiItemDetailResponse> findAllByG2bMCd(String g2bMCd, String orgCd);
 
     List<AssetAiItemDetailResponse> findOneByItmNo(String itmNo, String orgCd);
+
+    Asset findAssetById(String itmNo, String orgCd);
+
 }
