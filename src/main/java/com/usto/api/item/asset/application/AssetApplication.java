@@ -3,6 +3,7 @@ package com.usto.api.item.asset.application;
 import com.usto.api.item.acquisition.domain.model.Acquisition;
 import com.usto.api.item.asset.domain.model.Asset;
 import com.usto.api.item.asset.domain.model.AssetMaster;
+import com.usto.api.item.asset.domain.model.QrLabelData;
 import com.usto.api.item.asset.domain.repository.AssetRepository;
 import com.usto.api.item.asset.domain.service.AssetPolicy;
 import com.usto.api.item.asset.infrastructure.mapper.AssetMapper;
@@ -13,7 +14,10 @@ import com.usto.api.item.asset.presentation.dto.response.AssetDetailResponse;
 import com.usto.api.item.asset.presentation.dto.response.AssetListResponse;
 import com.usto.api.item.common.utils.ItemNumberGenerator;
 import com.usto.api.common.exception.BusinessException;
+import com.usto.api.item.common.utils.QrLabelPdfGenerator;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,6 +35,9 @@ public class AssetApplication {
     private final AssetRepository assetRepository;
     private final AssetPolicy assetPolicy;
     private final ItemNumberGenerator itemNumberGenerator;
+    private final QrLabelPdfGenerator qrLabelPdfGenerator;
+    @Value("${app.frontend.base-url:http://localhost:8080}")  // 임시(프론트엔드 연동시 바꿔야함)
+    private String frontendBaseUrl;
 
     /**
      * 운용대장 목록 조회
@@ -185,4 +192,46 @@ public class AssetApplication {
     private boolean hasText(String s) {
         return s != null && !s.isBlank();
     }
+
+    /**
+     * 물품 QR 라벨 PDF 생성
+     * - 선택된 물품들의 정보를 조회하여 QR 코드가 포함된 라벨 PDF 생성
+     */
+    @Transactional(readOnly = true)
+    public byte[] generateQrLabelsPdf(List<String> itmNos, String orgCd) {
+        // 1. 물품 존재 확인 (삭제되거나 권한 없는 물품 필터링)
+        List<Asset> assets = assetRepository.findAllById(itmNos, orgCd);
+
+        if (assets.isEmpty()) {
+            throw new BusinessException("선택된 물품을 찾을 수 없습니다.");
+        }
+
+        // 2. 라벨 데이터 생성 (물품고유번호 + QR URL만)
+        List<QrLabelData> labelDataList = assets.stream()
+                .map(asset -> QrLabelData.builder()
+                        .itmNo(asset.getItmNo())
+                        .qrContent(generateQrContentUrl(asset.getItmNo()))
+                        .build())
+                .toList();
+
+        // 3. PDF 생성
+
+        return qrLabelPdfGenerator.generate(labelDataList);
+    }
+
+    /**
+     * QR 코드 URL 생성
+     * - 프론트엔드 물품 상세 페이지 URL
+     */
+    //프론트엔드 연동 전
+    private String generateQrContentUrl(String itmNo) {
+        return "http://localhost:8080/item/print/" + itmNo;
+    }
+    /*프론트엔드 연동 후
+    private String generateQrContentUrl(String itmNo) {
+    // application.yml의 app.frontend.base-url 값 사용
+    return frontendBaseUrl + "/item/print/" + itmNo;
+    // 결과: http://localhost:3000/item/print/M202600001
+    */
+
 }
