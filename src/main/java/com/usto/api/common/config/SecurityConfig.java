@@ -12,7 +12,6 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -77,7 +76,9 @@ public class SecurityConfig {
                             "/api/g2b/test",//일단은 열어두는데 추후에 막아야한다.
                             "/api/g2b/add-drbYr", //일단은 열어두는데 추후에 막아야한다.
                             "/api/g2b/test/usefulLife", //일단은 열어두는데 추후에 막아야한다.
-                            "/api/public/**"
+                            "/api/public/**",
+                            "/public/**", //타임리프용
+                            "/images/**" //한양대 로고 보여주기 용
                     ).permitAll();
 
 
