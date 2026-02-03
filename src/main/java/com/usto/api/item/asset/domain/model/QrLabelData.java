@@ -12,5 +12,6 @@ import lombok.Getter;
 @Builder
 public class QrLabelData {
     private String itmNo;           // 물품고유번호 (라벨에 표시)
+    private String orgNm;           // 조직명 (추가)
     private String qrContent;       // QR 코드 내용 (URL)
 }
