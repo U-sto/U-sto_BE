@@ -12,10 +12,12 @@ import com.usto.api.item.asset.presentation.dto.request.AssetUpdateRequest;
 import com.usto.api.item.asset.presentation.dto.response.AssetAiItemDetailResponse;
 import com.usto.api.item.asset.presentation.dto.response.AssetDetailResponse;
 import com.usto.api.item.asset.presentation.dto.response.AssetListResponse;
+import com.usto.api.item.asset.presentation.dto.response.AssetPublicDetailResponse;
 import com.usto.api.item.common.utils.ItemNumberGenerator;
 import com.usto.api.common.exception.BusinessException;
 import com.usto.api.item.common.utils.QrLabelPdfGenerator;
-import jakarta.validation.constraints.NotEmpty;
+import com.usto.api.organization.infrastructure.repository.OrganizationJpaRepository;
+import com.usto.api.user.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -38,6 +40,7 @@ public class AssetApplication {
     private final QrLabelPdfGenerator qrLabelPdfGenerator;
     @Value("${app.frontend.base-url:http://localhost:8080}")  // 임시(프론트엔드 연동시 바꿔야함)
     private String frontendBaseUrl;
+    private final OrganizationJpaRepository organizationJpaRepository;
 
     /**
      * 운용대장 목록 조회
@@ -206,32 +209,44 @@ public class AssetApplication {
             throw new BusinessException("선택된 물품을 찾을 수 없습니다.");
         }
 
+        String orgNm = organizationJpaRepository.findOrgNmByOrgCd(orgCd)
+                .orElse("조직명 없음");
+
         // 2. 라벨 데이터 생성 (물품고유번호 + QR URL만)
         List<QrLabelData> labelDataList = assets.stream()
                 .map(asset -> QrLabelData.builder()
                         .itmNo(asset.getItmNo())
-                        .qrContent(generateQrContentUrl(asset.getItmNo()))
+                        .orgNm(orgNm)
+                        .qrContent(generateQrContentUrl(asset.getItmNo(),orgCd))
                         .build())
                 .toList();
 
         // 3. PDF 생성
-
         return qrLabelPdfGenerator.generate(labelDataList);
     }
 
     /**
      * QR 코드 URL 생성
-     * - 프론트엔드 물품 상세 페이지 URL
+     * - 물품고유번호+조직코드가 포함된 URL
+     * - 스캔 시 서버에서 최신 정보 조회
      */
-    //프론트엔드 연동 전
-    private String generateQrContentUrl(String itmNo) {
-        return "http://localhost:8080/item/print/" + itmNo;
+    private String generateQrContentUrl(String itmNo,String orgCd) {
+        // 옵션 1: 단순 URL (추천)
+        return String.format("%s/item/%s/%s", frontendBaseUrl, orgCd, itmNo);
     }
-    /*프론트엔드 연동 후
-    private String generateQrContentUrl(String itmNo) {
-    // application.yml의 app.frontend.base-url 값 사용
-    return frontendBaseUrl + "/item/print/" + itmNo;
-    // 결과: http://localhost:3000/item/print/M202600001
-    */
 
+    /**
+     * 물품 공개 정보 조회 (QR 스캔용)
+     * - 인증 불필요
+     * - 실시간 최신 데이터 반환
+     */
+    @Transactional(readOnly = true)
+    public AssetPublicDetailResponse getAssetPublicDetail(String orgCd, String itmNo) {
+
+        AssetPublicDetailResponse response = assetRepository.findPublicDetailByItmNoAndOrgCd(itmNo,orgCd);
+        if(response == null){
+            throw new BusinessException("해당 물품을 찾을 수 없습니다.");
+        }
+        return response;
+    }
 }

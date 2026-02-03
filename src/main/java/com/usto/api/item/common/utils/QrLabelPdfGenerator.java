@@ -106,7 +106,7 @@ public class QrLabelPdfGenerator {
     }
 
     /**
-     * 개별 라벨 그리기
+     * 개별 라벨 그리기 (가운데 정렬)
      */
     private void drawLabel(PDDocument document, PDPageContentStream contentStream,
                            QrLabelData data, float x, float y, PDType0Font font) throws Exception {
@@ -120,7 +120,6 @@ public class QrLabelPdfGenerator {
         byte[] qrImageBytes = generateQrCode(data.getQrContent());
         BufferedImage qrImage = ImageIO.read(new ByteArrayInputStream(qrImageBytes));
 
-        // BufferedImage를 PDImageXObject로 변환
         ByteArrayOutputStream qrBaos = new ByteArrayOutputStream();
         ImageIO.write(qrImage, "PNG", qrBaos);
         PDImageXObject pdImage = PDImageXObject.createFromByteArray(
@@ -131,22 +130,33 @@ public class QrLabelPdfGenerator {
 
         // QR 코드 중앙 배치
         float qrX = x + (LABEL_WIDTH - QR_SIZE) / 2;
-        float qrY = y - 50 - QR_SIZE;
+        float qrY = y - 30 - QR_SIZE;
         contentStream.drawImage(pdImage, qrX, qrY, QR_SIZE, QR_SIZE);
 
-        // 3. 물품고유번호 텍스트 (QR 코드 아래)
-        contentStream.beginText();
-        contentStream.setFont(font, 10);
-        contentStream.newLineAtOffset(x + 10, qrY - 20);
-        contentStream.showText("물품고유번호:");
-        contentStream.endText();
+        // 3. 물품고유번호 (가운데 정렬, 굵게)
+        float itmNoY = qrY - 20;
+        drawCenteredText(contentStream, font, 14, data.getItmNo(), x, itmNoY, LABEL_WIDTH);
+
+        // 4. 조직명 (가운데 정렬, 여러 줄 지원)
+        float orgNmY = itmNoY - 18;
+        drawCenteredText(contentStream, font, 12, data.getOrgNm(), x, orgNmY, LABEL_WIDTH);
+    }
+
+    /**
+     * 가운데 정렬 텍스트 출력
+     */
+    private void drawCenteredText(PDPageContentStream contentStream, PDType0Font font,
+                                  int fontSize, String text, float x, float y, float width) throws Exception {
+        float textWidth = font.getStringWidth(text) / 1000 * fontSize;
+        float centeredX = x + (width - textWidth) / 2;
 
         contentStream.beginText();
-        contentStream.setFont(font, 12);
-        contentStream.newLineAtOffset(x + 10, qrY - 35);
-        contentStream.showText(data.getItmNo());
+        contentStream.setFont(font, fontSize);
+        contentStream.newLineAtOffset(centeredX, y);
+        contentStream.showText(text);
         contentStream.endText();
     }
+
 
     /**
      * QR 코드 이미지 생성 (ZXing)

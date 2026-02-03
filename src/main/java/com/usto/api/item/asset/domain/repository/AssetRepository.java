@@ -1,6 +1,5 @@
 package com.usto.api.item.asset.domain.repository;
 
-import com.usto.api.item.acquisition.domain.model.Acquisition;
 import com.usto.api.item.asset.domain.model.Asset;
 import com.usto.api.item.asset.domain.model.AssetMaster;
 import com.usto.api.item.asset.domain.model.AssetStatusHistory;
@@ -8,6 +7,7 @@ import com.usto.api.item.asset.presentation.dto.request.AssetSearchRequest;
 import com.usto.api.item.asset.presentation.dto.response.AssetAiItemDetailResponse;
 import com.usto.api.item.asset.presentation.dto.response.AssetDetailResponse;
 import com.usto.api.item.asset.presentation.dto.response.AssetListResponse;
+import com.usto.api.item.asset.presentation.dto.response.AssetPublicDetailResponse;
 
 import java.util.List;
 import java.util.Optional;
@@ -48,4 +48,6 @@ public interface AssetRepository {
     List<AssetAiItemDetailResponse> findAllByG2bMCd(String g2bMCd, String orgCd);
 
     List<AssetAiItemDetailResponse> findOneByItmNo(String itmNo, String orgCd);
+
+    AssetPublicDetailResponse findPublicDetailByItmNoAndOrgCd(String itmNo, String orgCd);
 }
