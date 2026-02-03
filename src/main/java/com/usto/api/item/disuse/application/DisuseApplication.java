@@ -2,6 +2,7 @@ package com.usto.api.item.disuse.application;
 
 import com.usto.api.common.exception.BusinessException;
 import com.usto.api.item.asset.domain.model.Asset;
+import com.usto.api.item.asset.domain.model.AssetStatusHistory;
 import com.usto.api.item.asset.domain.repository.AssetRepository;
 import com.usto.api.item.asset.domain.service.AssetPolicy;
 import com.usto.api.item.common.model.OperStatus;
@@ -20,6 +21,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -209,8 +211,76 @@ public class DisuseApplication {
      * - 이후 해당 자산은 수정 불가하도록 잠금
      * - 상태 이력 테이블에 기록
      */
+    @Transactional
+    public void approvalDisuse(List<UUID> dsuMIds, String userId, String orgCd) {
+
+        List<DisuseMaster> disuses = dsuMIds.stream()
+                .map(id -> disuseRepository.findMasterById(id, orgCd)
+                        .orElseThrow(() -> new BusinessException("존재하지 않는 불용 신청입니다.")))
+                .toList();
+
+
+        for (DisuseMaster disuse : disuses) {
+            // 정책 검증
+            disusePolicy.validateOwnership(disuse, orgCd);
+            disusePolicy.validateApprovable(disuse);
+
+            // 도메인 로직 실행
+            disuse.confirmApproval(userId);
+
+            // 불용된 물품들의 상태 변경 (RTN → DSU)
+            List<String> itemNos = disuseRepository.findItemNosByMasterId(disuse.getDsuMId(), orgCd);
+            for (String itemNo : itemNos) {
+                Asset asset = assetRepository.findAssetById(itemNo, orgCd);
+                if(asset == null){
+                    throw new BusinessException("해당 물품 정보를 대장에서 찾을 수 없습니다.");
+                }
+
+                OperStatus prevStatus = asset.getOperSts();
+
+                asset.disuseAsset();
+                assetRepository.save(asset);
+
+                //물품 히스토리 저장 로직 실행
+                assetRepository.saveStatusHistory(AssetStatusHistory.builder()
+                        .itmNo(itemNo)
+                        .prevSts(prevStatus) //이전 상태
+                        .newSts(asset.getOperSts()) //현재 상태 = 반납
+                        .chgRsn("반납 신청 승인") //별도로 enum 관리를 하고싶다면 변동 가능성 있음.
+                        .reqUsrId(disuse.getAplyUsrId())
+                        .reqAt(disuse.getAplyAt())
+                        .apprUsrId(userId)
+                        .apprAt(LocalDate.now())
+                        .orgCd(orgCd)
+                        .build());
+            }
+
+            // 마스터 저장
+            disuseRepository.saveMaster(disuse);
+        }
+    }
 
     /**
      * TODO: 불용 반려 (ADMIN 권한)
+     * 다른 신청들과 비슷하게 소프트 삭제 진행
      */
+    @Transactional
+    public void rejectDisuse(List<UUID> dsuMIds, String userId, String orgCd) {
+        List<DisuseMaster> disuses = dsuMIds.stream()
+                .map(id -> disuseRepository.findMasterById(id, orgCd)
+                        .orElseThrow(() -> new BusinessException("존재하지 않는 불용 신청입니다.")))
+                .toList();
+
+        //소프트 삭제 전 상태 변경
+        for (DisuseMaster disuse : disuses) {
+            // 도메인 로직 실행(반납 신청 반려처리 -> 저장)
+            disuse.rejectApproval(userId);
+            disuseRepository.saveMaster(disuse);
+        }
+        // 소프트 삭제 진행
+        for (UUID rtrnMId : dsuMIds) {
+            disuseRepository.deleteMaster(rtrnMId);
+        }
+    }
+
 }
