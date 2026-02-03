@@ -102,4 +102,8 @@ public class Acquisition {
     public boolean isDeleted() {
         return "Y".equals(this.delYn);
     }
+
+
+    public void rejectApproval(String userId) {
+    }
 }
