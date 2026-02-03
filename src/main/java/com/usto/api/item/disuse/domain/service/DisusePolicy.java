@@ -60,4 +60,10 @@ public class DisusePolicy {
             throw new BusinessException("불용일자는 미래 날짜를 선택할 수 없습니다.");
         }
     }
+
+    public void validateApprovable(DisuseMaster master) {
+        if (master.getApprSts() != ApprStatus.REQUEST) {
+            throw new BusinessException("승인요청 중인 상태만 확정할 수 있습니다.");
+        }
+    }
 }
