@@ -33,12 +33,12 @@ public class DisposalItemListResponse {
     @Schema(description = "취득금액")
     private BigDecimal acqUpr;
 
+    @Schema(description = "처분방식")
+    private String dispType;
+
     @Schema(description = "물품상태 (불용 신청 당시)")
     private String itemSts;
 
     @Schema(description = "불용사유 (불용 신청 당시)")
     private String chgRsn;
-
-    @Schema(description = "처분방식")
-    private String dispType;
 }

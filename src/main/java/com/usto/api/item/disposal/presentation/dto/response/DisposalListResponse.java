@@ -20,12 +20,12 @@ public class DisposalListResponse {
     @Schema(description = "처분ID")
     private UUID dispMId;
 
-    @Schema(description = "처분정리구분")
-    private String dispType;
-
     @Schema(description = "처분일자")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate dispAt;
+
+    @Schema(description = "처분정리구분")
+    private String dispType;
 
     @Schema(description = "등록자ID")
     private String aplyUsrId;
