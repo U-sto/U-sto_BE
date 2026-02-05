@@ -208,54 +208,50 @@ public class ReturningApplication {
      */
     @Transactional
     public void approvalReturning(UUID rtrnMId, String userId, String orgCd) {
-        List<ReturningDetail> details = rtrnMIds.stream()
-                .map(id -> returningRepository.findMasterById(id, orgCd)
-                        .orElseThrow(() -> new BusinessException("존재하지 않는 반납 신청입니다.")))
-                .toList();
 
+        ReturningMaster master = returningRepository.findMasterById(rtrnMId, orgCd)
+                .orElseThrow(() -> new BusinessException("존재하지 않는 반납 신청입니다."));
+
+        returningPolicy.validateOwnership(master, orgCd);
+
+        List<ReturningDetail> details = returningRepository.findDetailsByMasterId(rtrnMId, orgCd);
+        if (details.isEmpty()) {
+            throw new BusinessException("반납 상세 정보가 없습니다.");
+        }
 
         for (ReturningDetail detail : details) {
-            // 정책 검증
-            returningPolicy.validateOwnership(detail, orgCd);
-            assetPolicy.validateReturn(detail);
 
-            // 마스터 도메인 로직 실행
-            returning.confirmApproval(userId);
-
-            // 물품 디테일 로직 실행
-            // 반납된 물품들의 상태 변경 (OPER → RTN)
-            List<String> itemNos = returningRepository.findItemNosByMasterId(returning.getRtrnMId(), orgCd);
-            for (String itemNo : itemNos) {
-                Asset asset = assetRepository.findAssetById(itemNo, orgCd);
-                if(asset == null){
-                    throw new BusinessException("해당 물품 정보를 대장에서 찾을 수 없습니다.");
-                }
-                //이전 상태 저장
-                OperStatus prevStatus = asset.getOperSts();
-
-                asset.returnAsset(); //반납처리 + 부서초기화 후
-                assetRepository.save(asset); //물품세부정보저장
-
-                //물품 히스토리 저장 로직 실행
-                assetRepository.saveStatusHistory(AssetStatusHistory.builder()
-                        .itmNo(itemNo)
-                        .prevSts(prevStatus) //이전 상태
-                        .newSts(asset.getOperSts()) //현재 상태 = 반납
-                        .chgRsn("반납 신청 승인") //별도로 enum 관리를 하고싶다면 변동 가능성 있음.
-                        .reqUsrId(returning.getAplyUsrId())
-                        .reqAt(returning.getAplyAt())
-                        .apprUsrId(userId)
-                        .apprAt(LocalDate.now())
-                        .orgCd(orgCd)
-                        .build());
+            String itemNo = detail.getItmNo();
+            Asset asset = assetRepository.findAssetById(itemNo, orgCd);
+            if (asset == null) {
+                throw new BusinessException("해당 물품 정보를 대장에서 찾을 수 없습니다: " + itemNo);
             }
 
-            returning.confirmApproval(userId);
-
-            // 마스터 저장
-            returningRepository.saveMaster(returning);
+            // 반납된 물품들의 상태 변경 (OPER → RTN)
+            //이전 상태 저장
+            OperStatus prevStatus = asset.getOperSts();
+            asset.returnAsset(); //반납처리 + 부서초기화 후
+            assetRepository.save(asset); //물품세부정보저장
+            assetRepository.saveStatusHistory(AssetStatusHistory.builder()
+                    .itemHisId(UUID.randomUUID())
+                    .itmNo(itemNo)
+                    .prevSts(prevStatus) //이전 상태
+                    .newSts(asset.getOperSts()) //현재 상태 = 반납
+                    .chgRsn("반납 신청 승인") //별도로 enum 관리를 하고싶다면 변동 가능성 있음.
+                    .reqUsrId(master.getAplyUsrId())
+                    .reqAt(master.getAplyAt())
+                    .apprUsrId(userId)
+                    .orgCd(orgCd)
+                    .apprAt(LocalDate.now())
+                    .delAt(asset.getDelAt())
+                    .delYn(asset.getDelYn())
+                    .build());
         }
+
+            master.confirmApproval(userId);
+            returningRepository.saveMaster(master);
     }
+
 
 
     /**
@@ -263,21 +259,17 @@ public class ReturningApplication {
      * 승인요청 취소와 비슷하게 진행
      */
     @Transactional
-    public void rejectReturning(List<UUID> rtrnMIds, String userId, String orgCd) {
-        List<ReturningMaster> returnings = rtrnMIds.stream()
-                .map(id -> returningRepository.findMasterById(id, orgCd)
-                        .orElseThrow(() -> new BusinessException("존재하지 않는 반납 신청입니다.")))
-                .toList();
+    public void rejectReturning(UUID rtrnMId, String userId, String orgCd) {
 
-        //소프트 삭제 전 상태 변경
-        for (ReturningMaster returning : returnings) {
-            // 도메인 로직 실행(반납 신청 반려처리 -> 저장)
-            returning.rejectApproval(userId);
-            returningRepository.saveMaster(returning);
-        }
+        ReturningMaster master = returningRepository.findMasterById(rtrnMId, orgCd)
+                .orElseThrow(() -> new BusinessException("존재하지 않는 반납 신청입니다."));
+
+        //소프트 삭제 전 상태 변경(반납 신청 반려처리 -> 저장)
+        master.rejectApproval(userId);
+        returningRepository.saveMaster(master);
+
         // 소프트 삭제 진행
-        for (UUID rtrnMId : rtrnMIds) {
-            returningRepository.deleteMaster(rtrnMId);
-        }
+        returningRepository.deleteMaster(rtrnMId);
+
     }
 }

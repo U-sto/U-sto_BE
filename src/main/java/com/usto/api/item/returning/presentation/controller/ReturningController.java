@@ -126,7 +126,7 @@ public class ReturningController {
             summary = "반납 승인 확정 (ADMIN)",
             description = "승인 요청(REQUEST) 건을 승인하여 승인(APPROVED) 상태로 만듭니다."
     )
-    @PutMapping("/admin/approval")
+    @PutMapping("/admin/{rtrnMId}/approval")
     @PreAuthorize("hasRole('ADMIN')")
     public ApiResponse<Void> approvalRequest(
             @PathVariable UUID rtrnMId,
@@ -142,7 +142,7 @@ public class ReturningController {
             summary = "반납 요청 반려 (ADMIN)",
             description = "승인 요청(REQUEST) 건을 반려하여 반려(REJECTED) 상태로 만듭니다."
     )
-    @DeleteMapping("/admin/reject")
+    @DeleteMapping("/admin/{rtrnMId}/reject")
     @PreAuthorize("hasRole('ADMIN')")
     public ApiResponse<Void> approvalReject(
             @PathVariable UUID rtrnMId,

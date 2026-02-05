@@ -262,7 +262,18 @@ public class AssetRepositoryAdapter implements AssetRepository {
 
     @Override
     public Asset findAssetById(String itmNo, String orgCd){
-        return jpaRepository.findAssetById(itmNo, orgCd);
+        QItemAssetDetailEntity d = QItemAssetDetailEntity.itemAssetDetailEntity;
+
+        ItemAssetDetailEntity entity = queryFactory
+                .selectFrom(d)
+                .where(
+                        d.itemId.itmNo.eq(itmNo),
+                        d.itemId.orgCd.eq(orgCd),
+                        d.delYn.eq("N")
+                )
+                .fetchOne();
+
+        return entity != null ? AssetMapper.toDomain(entity) : null;
     }
 
 
