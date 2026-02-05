@@ -18,6 +18,7 @@ import com.usto.api.common.exception.BusinessException;
 import com.usto.api.item.common.utils.QrLabelPdfGenerator;
 import com.usto.api.organization.infrastructure.repository.OrganizationJpaRepository;
 import com.usto.api.user.domain.repository.UserRepository;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.web.webauthn.management.ImmutableRelyingPartyRegistrationRequest;
@@ -197,4 +198,58 @@ public class AssetApplication {
         return s != null && !s.isBlank();
     }
 
+
+    /**
+     * 물품 QR 라벨 PDF 생성
+     * - 선택된 물품들의 정보를 조회하여 QR 코드가 포함된 라벨 PDF 생성
+     */
+    @Transactional
+    public byte[] generateQrLabelsPdf(List<String> itmNos, String orgCd) {
+        // 1. 물품 존재 확인 (삭제되거나 권한 없는 물품 필터링)
+        List<Asset> assets = assetRepository.findAllById(itmNos, orgCd);
+
+        if (assets.isEmpty()) {
+            throw new BusinessException("선택된 물품을 찾을 수 없습니다.");
+        }
+
+        String orgNm = organizationJpaRepository.findOrgNmByOrgCd(orgCd)
+                .orElse("조직명 없음");
+
+        // 2. 라벨 데이터 생성 (물품고유번호 + QR URL만)
+        List<QrLabelData> labelDataList = assets.stream()
+                .map(asset -> QrLabelData.builder()
+                        .itmNo(asset.getItmNo())
+                        .orgNm(orgNm)
+                        .qrContent(generateQrContentUrl(asset.getItmNo(),orgCd))
+                        .build())
+                .toList();
+
+        //완성된 애들 출력구분을 Y로 바꿔주기 !
+        for (Asset asset : assets) {
+            asset.printed();
+            assetRepository.save(asset);
+        }
+
+        byte[] result = qrLabelPdfGenerator.generate(labelDataList);
+
+        return result;
+    }
+
+    /**
+     * QR 코드 URL 생성
+     * - 물품고유번호+조직코드가 포함된 URL
+     * - 스캔 시 서버에서 최신 정보 조회
+     */
+    private String generateQrContentUrl(String itmNo,String orgCd) {
+        return String.format("%s/api/public/item/%s/%s", frontendBaseUrl, orgCd, itmNo);    }
+
+    /**
+     * 물품 공개 정보 조회 (QR 스캔용)
+     * - 인증 불필요
+     * - 실시간 최신 데이터 반환
+     */
+    @Transactional(readOnly = true)
+    public AssetPublicDetailResponse getAssetPublicDetail(String orgCd, String itmNo) {
+        return assetRepository.findPublicDetailByItmNoAndOrgCd(itmNo,orgCd);
+    }
 }
