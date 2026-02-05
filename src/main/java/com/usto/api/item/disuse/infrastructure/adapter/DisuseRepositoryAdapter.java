@@ -30,6 +30,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -254,6 +255,31 @@ public class DisuseRepositoryAdapter implements DisuseRepository {
         return entities.stream()
                 .map(DisuseMapper::toDetailDomain)
                 .toList();
+    }
+
+    /**
+     * 처분 신청을 위해 불용 마스터 정보(상태, 사유) 조회
+     */
+    @Override
+    public Map<String, DisuseMaster> findApprovedMastersByItmNos(List<String> itmNos, String orgCd) {
+        List<com.querydsl.core.Tuple> results = queryFactory
+                .select(itemDisuseDetailEntity.itmNo, itemDisuseMasterEntity)
+                .from(itemDisuseDetailEntity)
+                .join(itemDisuseMasterEntity).on(itemDisuseDetailEntity.dsuMId.eq(itemDisuseMasterEntity.dsuMId))
+                .where(
+                        itemDisuseDetailEntity.itmNo.in(itmNos),
+                        itemDisuseDetailEntity.orgCd.eq(orgCd),
+                        itemDisuseMasterEntity.apprSts.eq(ApprStatus.APPROVED),
+                        itemDisuseMasterEntity.delYn.eq("N")
+                )
+                .fetch();
+
+        return results.stream()
+                .collect(java.util.stream.Collectors.toMap(
+                        tuple -> tuple.get(itemDisuseDetailEntity.itmNo),
+                        tuple -> DisuseMapper.toMasterDomain(tuple.get(itemDisuseMasterEntity)),
+                        (existing, replacement) -> existing // 혹시 모를 중복 방지
+                ));
     }
 
 

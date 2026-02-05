@@ -203,19 +203,8 @@ public class DisposalApplication {
                 .map(Asset::getItmNo)
                 .toList();
 
-        // 각 물품의 불용 정보 조회 (최신 승인 완료 건)
-        Map<String, DisuseMaster> disuseMap = assets.stream()
-                .collect(Collectors.toMap(
-                        Asset::getItmNo,
-                        asset -> {
-                            // TODO: 해당 물품의 승인 완료된 불용 정보 조회
-                            // 현재는 임시로 예외 처리 (실제로는 DisuseRepository에 조회 메서드 추가 필요)
-                            throw new BusinessException(
-                                    "물품 " + asset.getItmNo() + "의 불용 정보를 찾을 수 없습니다. " +
-                                            "불용 승인이 완료된 물품만 처분 신청할 수 있습니다."
-                            );
-                        }
-                ));
+        // 리포지토리에서 승인된 불용 정보를 한 번에 가져옴 (N+1 방지)
+        Map<String, DisuseMaster> disuseMap = disuseRepository.findApprovedMastersByItmNos(assetItmNos, orgCd);
 
         // 검증 및 Detail 생성
         List<DisposalDetail> details = new ArrayList<>();
@@ -223,6 +212,11 @@ public class DisposalApplication {
             assetPolicy.validateUpdate(asset, orgCd);
 
             DisuseMaster disuseMaster = disuseMap.get(asset.getItmNo());
+            if (disuseMaster == null) {
+                throw new BusinessException(
+                        "물품 " + asset.getItmNo() + "의 승인된 불용 정보를 찾을 수 없습니다. "
+                );
+            }
 
             // 불용 테이블의 물품상태와 사유를 가져와서 처분 상세 생성
             details.add(DisposalMapper.toDetailDomain(
