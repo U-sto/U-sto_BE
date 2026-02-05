@@ -105,5 +105,8 @@ public class Acquisition {
 
 
     public void rejectApproval(String userId) {
+        this.apprUsrId = userId;
+        this.apprSts = ApprStatus.REJECTED;
+        this.apprAt = LocalDate.now(KOREA_ZONE);
     }
 }
