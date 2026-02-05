@@ -71,14 +71,10 @@ public class DisposalRepositoryAdapter implements DisposalRepository {
 
         QUserJpaEntity user = QUserJpaEntity.userJpaEntity;
 
-        // 1. Count 쿼리 (groupBy 없이)
+        // 1. Count 쿼리 최적화: 마스터 테이블만 사용하여 조인 제거
         Long total = queryFactory
-                .select(itemDisposalMasterEntity.dispMId.countDistinct())
+                .select(itemDisposalMasterEntity.count())
                 .from(itemDisposalMasterEntity)
-                .leftJoin(itemDisposalDetailEntity)
-                .on(itemDisposalMasterEntity.dispMId.eq(itemDisposalDetailEntity.dispMId))
-                .leftJoin(user)
-                .on(itemDisposalMasterEntity.aplyUsrId.eq(user.usrId))
                 .where(
                         itemDisposalMasterEntity.orgCd.eq(orgCd),
                         dispAtBetween(cond.getStartDispAt(), cond.getEndDispAt()),

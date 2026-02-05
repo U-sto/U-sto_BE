@@ -34,7 +34,6 @@ public class DisposalApplication {
     private final DisposalRepository disposalRepository;
     private final DisposalPolicy disposalPolicy;
     private final AssetRepository assetRepository;
-    private final AssetPolicy assetPolicy;
     private final DisuseRepository disuseRepository;  // 불용 정보 조회용
 
     /**
@@ -207,8 +206,6 @@ public class DisposalApplication {
         // 검증 및 Detail 생성
         List<DisposalDetail> details = new ArrayList<>();
         for (Asset asset : assets) {
-            assetPolicy.validateUpdate(asset, orgCd);
-
             DisuseMaster disuseMaster = disuseMap.get(asset.getItmNo());
             if (disuseMaster == null) {
                 throw new BusinessException(
