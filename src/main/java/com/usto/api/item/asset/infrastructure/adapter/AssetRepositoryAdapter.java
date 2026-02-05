@@ -4,6 +4,9 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.usto.api.common.exception.BusinessException;
+import com.usto.api.g2b.infrastructure.entity.QG2bItemCategoryJpaEntity;
+import com.usto.api.g2b.infrastructure.entity.QG2bItemJpaEntity;
 import com.usto.api.item.asset.domain.model.Asset;
 import com.usto.api.item.asset.domain.model.AssetMaster;
 import com.usto.api.item.asset.domain.model.AssetStatusHistory;
@@ -17,7 +20,10 @@ import com.usto.api.item.asset.presentation.dto.request.AssetSearchRequest;
 import com.usto.api.item.asset.presentation.dto.response.AssetAiItemDetailResponse;
 import com.usto.api.item.asset.presentation.dto.response.AssetDetailResponse;
 import com.usto.api.item.asset.presentation.dto.response.AssetListResponse;
+import com.usto.api.item.asset.presentation.dto.response.AssetPublicDetailResponse;
 import com.usto.api.item.common.model.OperStatus;
+import com.usto.api.organization.infrastructure.entity.QDepartmentJpaEntity;
+import com.usto.api.organization.infrastructure.entity.QOrganizationJpaEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -277,6 +283,8 @@ public class AssetRepositoryAdapter implements AssetRepository {
     }
 
 
+        return result;
+    }
 
     // ===== 동적 쿼리 헬퍼 =====
 
@@ -309,4 +317,5 @@ public class AssetRepositoryAdapter implements AssetRepository {
     private BooleanExpression itmNoEq(String itmNo) {
         return StringUtils.hasText(itmNo) ? itemAssetDetailEntity.itemId.itmNo.eq(itmNo) : null;
     }
+
 }

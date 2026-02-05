@@ -3,6 +3,7 @@ package com.usto.api.item.asset.application;
 import com.usto.api.item.acquisition.domain.model.Acquisition;
 import com.usto.api.item.asset.domain.model.Asset;
 import com.usto.api.item.asset.domain.model.AssetMaster;
+import com.usto.api.item.asset.domain.model.QrLabelData;
 import com.usto.api.item.asset.domain.repository.AssetRepository;
 import com.usto.api.item.asset.domain.service.AssetPolicy;
 import com.usto.api.item.asset.infrastructure.mapper.AssetMapper;
@@ -11,9 +12,15 @@ import com.usto.api.item.asset.presentation.dto.request.AssetUpdateRequest;
 import com.usto.api.item.asset.presentation.dto.response.AssetAiItemDetailResponse;
 import com.usto.api.item.asset.presentation.dto.response.AssetDetailResponse;
 import com.usto.api.item.asset.presentation.dto.response.AssetListResponse;
+import com.usto.api.item.asset.presentation.dto.response.AssetPublicDetailResponse;
 import com.usto.api.item.common.utils.ItemNumberGenerator;
 import com.usto.api.common.exception.BusinessException;
+import com.usto.api.item.common.utils.QrLabelPdfGenerator;
+import com.usto.api.organization.infrastructure.repository.OrganizationJpaRepository;
+import com.usto.api.user.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.web.webauthn.management.ImmutableRelyingPartyRegistrationRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,6 +38,10 @@ public class AssetApplication {
     private final AssetRepository assetRepository;
     private final AssetPolicy assetPolicy;
     private final ItemNumberGenerator itemNumberGenerator;
+    private final QrLabelPdfGenerator qrLabelPdfGenerator;
+    @Value("${app.frontend.base-url:http://localhost:8080}")  // 임시(프론트엔드 연동시 바꿔야함)
+    private String frontendBaseUrl;
+    private final OrganizationJpaRepository organizationJpaRepository;
 
     /**
      * 운용대장 목록 조회
