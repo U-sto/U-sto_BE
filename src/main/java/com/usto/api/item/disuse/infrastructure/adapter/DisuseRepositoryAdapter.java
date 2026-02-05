@@ -3,7 +3,6 @@ package com.usto.api.item.disuse.infrastructure.adapter;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
-import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.usto.api.item.common.model.ApprStatus;
 import com.usto.api.item.disuse.domain.model.DisuseDetail;
@@ -17,10 +16,6 @@ import com.usto.api.item.disuse.infrastructure.repository.DisuseMasterJpaReposit
 import com.usto.api.item.disuse.presentation.dto.request.DisuseSearchRequest;
 import com.usto.api.item.disuse.presentation.dto.response.DisuseItemListResponse;
 import com.usto.api.item.disuse.presentation.dto.response.DisuseListResponse;
-import com.usto.api.item.returning.domain.model.ReturningDetail;
-import com.usto.api.item.returning.infrastructure.entity.ItemReturningDetailEntity;
-import com.usto.api.item.returning.infrastructure.entity.QItemReturningDetailEntity;
-import com.usto.api.item.returning.infrastructure.mapper.ReturningMapper;
 import com.usto.api.user.infrastructure.entity.QUserJpaEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
