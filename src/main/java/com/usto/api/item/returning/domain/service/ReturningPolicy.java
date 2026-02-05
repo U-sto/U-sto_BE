@@ -70,7 +70,7 @@ public class ReturningPolicy {
 
     public void validateConfirm(ReturningMaster master) {
         if (master.getApprSts() != ApprStatus.REQUEST) {
-            throw new BusinessException("승인요청 중인 상태만 취소할 수 있습니다.");
+            throw new BusinessException("승인요청 중인 상태만 확정/반려할 수 있습니다.");
         }
     }
 }

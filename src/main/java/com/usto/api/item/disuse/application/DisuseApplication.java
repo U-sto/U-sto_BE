@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -214,7 +215,7 @@ public class DisuseApplication {
     public void approvalDisuse(UUID dsuMId, String userId, String orgCd) {
 
         DisuseMaster master = disuseRepository.findMasterById(dsuMId, orgCd)
-                .orElseThrow(() -> new BusinessException("존재하지 않는 반납 신청입니다."));
+                .orElseThrow(() -> new BusinessException("존재하지 않는 불용 신청입니다."));
 
         disusePolicy.validateOwnership(master,orgCd);
         disusePolicy.validateConfirm(master);
@@ -248,7 +249,7 @@ public class DisuseApplication {
                     .reqUsrId(master.getAplyUsrId())
                     .reqAt(master.getAplyAt())
                     .apprUsrId(userId)
-                    .apprAt(LocalDate.now())
+                    .apprAt(LocalDate.now(ZoneId.of("Asia/Seoul")))
                     .orgCd(orgCd)
                     .delAt(asset.getDelAt())
                     .delYn(asset.getDelYn())
@@ -270,7 +271,7 @@ public class DisuseApplication {
     public void rejectDisuse(UUID dsuMId, String userId, String orgCd) {
 
         DisuseMaster master = disuseRepository.findMasterById(dsuMId, orgCd)
-                .orElseThrow(() -> new BusinessException("존재하지 않는 반납 신청입니다."));
+                .orElseThrow(() -> new BusinessException("존재하지 않는 불용 신청입니다."));
         //정책 확인
         disusePolicy.validateConfirm(master);
 

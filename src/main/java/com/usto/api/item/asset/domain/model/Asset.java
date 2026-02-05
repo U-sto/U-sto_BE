@@ -66,9 +66,6 @@ public class Asset {
         return "Y".equals(this.delYn);
     }
 
-    public void changeStatus(OperStatus operStatus) {
-    }
-
     public void disuseAsset() {
         this.operSts = OperStatus.DSU;
     }

@@ -69,7 +69,7 @@ public class AssetPolicy {
     //불용 가능 여부 검증
     public void validateDisuse(Asset asset) {
         if (asset.isDeleted()) {
-            throw new BusinessException("삭제된 물품은 반납할 수 없습니다.");
+            throw new BusinessException("삭제된 물품은 불용 처리할 수 없습니다.");
         }
 
         if (asset.getOperSts() != OperStatus.RTN) {

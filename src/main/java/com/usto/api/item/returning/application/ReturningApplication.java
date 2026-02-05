@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -246,7 +247,7 @@ public class ReturningApplication {
                     .reqAt(master.getAplyAt())
                     .apprUsrId(userId)
                     .orgCd(orgCd)
-                    .apprAt(LocalDate.now())
+                    .apprAt(LocalDate.now(ZoneId.of("Asia/Seoul")))
                     .delAt(asset.getDelAt())
                     .delYn(asset.getDelYn())
                     .build());
