@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>물품 정보 - [[${item.g2bDNm}]]</title>
+    <style>
+        /* U-sto Design System Variables */
+        :root {
+            --primary: #18434F;
+            --secondary: #58828E;
+            --bg-main: #DBE6E7;
+            --bg-card: #FAFBFB;
+            --alert: #D52E2E;
+            --success: #2E7D32;
+            --warning: #EF6C00;
+            --text-main: #191919;
+            --border-light: #C1D8DC;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', Arial, sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 500px;
+            width: 100%;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border-radius: 14px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            animation: slideUp 0.5s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card-header {
+            /* U-sto Brand Gradient */
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: #FAFBFB;
+            padding: 32px 40px;
+            text-align: center;
+        }
+
+        /* [수정됨] 로고 컨테이너: 배경 투명, 그림자 제거 */
+        .logo {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 16px;
+            background: transparent; /* 흰색 배경 제거 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        /* [수정됨] 로고 이미지: 비율 유지하며 꽉 차게 */
+        .logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .card-header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .card-header .subtitle {
+            font-size: 14px;
+            opacity: 0.9;
+            font-weight: 400;
+        }
+
+        .card-body {
+            padding: 32px 40px;
+        }
+
+        .info-section {
+            margin-bottom: 32px;
+        }
+
+        .info-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .info-section-title {
+            font-size: 13px;
+            color: var(--secondary);
+            text-transform: uppercase;
+            font-weight: 700;
+            margin-bottom: 12px;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid var(--border-light);
+            padding-bottom: 8px;
+        }
+
+        .info-row {
+            display: flex;
+            padding: 12px 0;
+            align-items: flex-start;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #595959;
+            min-width: 100px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .info-value {
+            flex: 1;
+            color: var(--text-main);
+            font-size: 15px;
+            font-weight: 500;
+            line-height: 1.5;
+            word-break: break-all;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 700;
+            line-height: 1.4;
+        }
+
+        .status-use {
+            background: rgba(46, 125, 50, 0.1);
+            color: var(--success);
+            border: 1px solid var(--success);
+        }
+
+        .status-idle {
+            background: rgba(239, 108, 0, 0.1);
+            color: var(--warning);
+            border: 1px solid var(--warning);
+        }
+
+        .status-dispose {
+            background: rgba(213, 46, 46, 0.1);
+            color: var(--alert);
+            border: 1px solid var(--alert);
+        }
+
+        /* [수정됨] 폰트 통일 (monospace 제거) */
+        .price {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--primary);
+            letter-spacing: -0.5px;
+        }
+
+        .card-footer {
+            background: var(--bg-main);
+            padding: 24px 40px;
+            text-align: center;
+            color: #888C8D;
+            font-size: 12px;
+            border-top: 1px solid #BEC3C3;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="card">
+        <div class="card-header">
+            <div class="logo">
+                <img th:src="@{/images/hanyang_logo.png}" alt="한양대 로고">
+            </div>
+
+            <h1 th:text="${item.g2bDNm}">물품명</h1>
+            <div class="subtitle" th:text="${item.orgNm}">조직명</div>
+        </div>
+
+        <div class="card-body">
+            <div class="info-section">
+                <div class="info-section-title">기본 정보</div>
+
+                <div class="info-row">
+                    <div class="info-label">물품번호</div>
+                    <div class="info-value" th:text="${item.itmNo}">M202600001</div>
+                </div>
+
+                <div class="info-row">
+                    <div class="info-label">G2B번호</div>
+                    <div class="info-value" th:text="${item.g2bItemNo}">12345678-87654321</div>
+                </div>
+
+                <div class="info-row">
+                    <div class="info-label">운용상태</div>
+                    <div class="info-value">
+                        <span class="status-badge"
+                              th:classappend="${item.operSts.name() == 'USE'} ? 'status-use' :
+                                             (${item.operSts.name() == 'IDLE'} ? 'status-idle' : 'status-dispose')"
+                              th:text="${item.operSts.name() == 'USE'} ? '운용중' :
+                                       (${item.operSts.name() == 'IDLE'} ? '대기' : '폐기')">
+                            운용중
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-section">
+                <div class="info-section-title">취득 정보</div>
+
+                <div class="info-row">
+                    <div class="info-label">취득금액</div>
+                    <div class="info-value">
+                        <span class="price" th:text="${#numbers.formatInteger(item.acqUpr, 0, 'COMMA')} + '원'">
+                            2,014,000원
+                        </span>
+                    </div>
+                </div>
+
+                <div class="info-row">
+                    <div class="info-label">취득일자</div>
+                    <div class="info-value" th:text="${#temporals.format(item.acqAt, 'yyyy-MM-dd')}">2026-01-01</div>
+                </div>
+
+                <div class="info-row" th:if="${item.arrgAt != null}">
+                    <div class="info-label">정리일자</div>
+                    <div class="info-value" th:text="${#temporals.format(item.arrgAt, 'yyyy-MM-dd')}">2026-01-15</div>
+                </div>
+
+                <div class="info-row">
+                    <div class="info-label">내용연수</div>
+                    <div class="info-value" th:text="${item.drbYr} + '년'">5년</div>
+                </div>
+            </div>
+
+            <div class="info-section">
+                <div class="info-section-title">운용 정보</div>
+
+                <div class="info-row" th:if="${item.deptNm != null}">
+                    <div class="info-label">운용부서</div>
+                    <div class="info-value" th:text="${item.deptNm}">총무과</div>
+                </div>
+
+                <div class="info-row">
+                    <div class="info-label">현재수량</div>
+                    <div class="info-value" th:text="${item.qty} + '개'">1개</div>
+                </div>
+
+                <div class="info-row" th:if="${item.rmk != null && !#strings.isEmpty(item.rmk)}">
+                    <div class="info-label">비고</div>
+                    <div class="info-value" th:text="${item.rmk}">-</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-footer">
+            <span th:text="${item.orgNm}">한양대학교ERICA캠퍼스</span> 물품관리시스템
+        </div>
+    </div>
+</div>
+</body>
+</html>
