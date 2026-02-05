@@ -2,8 +2,6 @@ package com.usto.api.item.disuse.presentation.controller;
 
 import com.usto.api.common.utils.ApiResponse;
 import com.usto.api.item.disuse.application.DisuseApplication;
-import com.usto.api.item.disuse.presentation.dto.request.DisuseRejectBulkRequest;
-import com.usto.api.item.disuse.presentation.dto.request.DisuseApprovalBulkRequest;
 import com.usto.api.item.disuse.presentation.dto.request.DisuseRegisterRequest;
 import com.usto.api.item.disuse.presentation.dto.request.DisuseSearchRequest;
 import com.usto.api.item.disuse.presentation.dto.response.DisuseItemListResponse;
@@ -146,13 +144,13 @@ public class DisuseController {
             summary = "불용 승인 확정 (ADMIN)",
             description = "승인 요청(REQUEST) 건을 승인하여 승인(APPROVED) 상태로 만듭니다."
     )
-    @PutMapping("/admin/approval")
+    @PutMapping("/admin/{dsuMId}/approval")
     @PreAuthorize("hasRole('ADMIN')")
     public ApiResponse<Void> approvalRequest(
-            @RequestBody @Valid DisuseApprovalBulkRequest request,
+            @PathVariable UUID dsuMId,
             @AuthenticationPrincipal UserPrincipal principal) {
         disuseApplication.approvalDisuse(
-                request.getDsuMIds(),
+                dsuMId,
                 principal.getUsername(),
                 principal.getOrgCd()
         );
@@ -163,13 +161,13 @@ public class DisuseController {
             summary = "불용 요청 반려 (ADMIN)",
             description = "승인 요청(REQUEST) 건을 반려하여 반려(REJECTED) 상태로 만듭니다."
     )
-    @DeleteMapping("/admin/reject")
+    @DeleteMapping("/admin/{dsuMId}/reject")
     @PreAuthorize("hasRole('ADMIN')")
-    public ApiResponse<Void> approvalRequest(
-            @RequestBody @Valid DisuseRejectBulkRequest request,
+    public ApiResponse<Void> approvalReject(
+            @PathVariable UUID dsuMId,
             @AuthenticationPrincipal UserPrincipal principal) {
         disuseApplication.rejectDisuse(
-                request.getDsuMIds(),
+                dsuMId,
                 principal.getUsername(),
                 principal.getOrgCd()
         );

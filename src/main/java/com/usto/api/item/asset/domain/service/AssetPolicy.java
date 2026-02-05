@@ -75,10 +75,6 @@ public class AssetPolicy {
         if (asset.getOperSts() != OperStatus.RTN) {
             throw new BusinessException("반납 신청이 완료된 물품에 한해서만 불용 신청할 수 있습니다");
         }
-
-        if (!StringUtils.hasText(asset.getDeptCd()) || "NONE".equals(asset.getDeptCd())) {
-            throw new BusinessException("배정된 부서가 없습니다.");
-        }
     }
 
     /**

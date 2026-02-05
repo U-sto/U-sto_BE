@@ -15,6 +15,8 @@ import com.usto.api.item.disuse.presentation.dto.request.DisuseRegisterRequest;
 import com.usto.api.item.disuse.presentation.dto.request.DisuseSearchRequest;
 import com.usto.api.item.disuse.presentation.dto.response.DisuseItemListResponse;
 import com.usto.api.item.disuse.presentation.dto.response.DisuseListResponse;
+import com.usto.api.item.returning.domain.model.ReturningDetail;
+import com.usto.api.item.returning.domain.model.ReturningMaster;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -188,12 +190,7 @@ public class DisuseApplication {
         List<DisuseDetail> details = new ArrayList<>();
         for (Asset asset : assets) {
             assetPolicy.validateUpdate(asset, orgCd);
-            assetPolicy.validateDisuse(asset); //같은 이유입니다.
-            if (asset.getOperSts() != OperStatus.RTN) {
-                throw new BusinessException(
-                        "반납(RTN) 상태의 물품만 불용 신청할 수 있습니다: " + asset.getItmNo()
-                );
-            }
+            assetPolicy.validateDisuse(asset);
 
             details.add(DisuseMapper.toDetailDomain(
                     dsuMId, asset.getItmNo(), asset.getDeptCd(), orgCd
@@ -212,75 +209,68 @@ public class DisuseApplication {
      * - 상태 이력 테이블에 기록
      */
     @Transactional
-    public void approvalDisuse(List<UUID> dsuMIds, String userId, String orgCd) {
+    public void approvalDisuse(UUID dsuMId, String userId, String orgCd) {
 
-        List<DisuseMaster> disuses = dsuMIds.stream()
-                .map(id -> disuseRepository.findMasterById(id, orgCd)
-                        .orElseThrow(() -> new BusinessException("존재하지 않는 불용 신청입니다.")))
-                .toList();
+        DisuseMaster master = disuseRepository.findMasterById(dsuMId, orgCd)
+                .orElseThrow(() -> new BusinessException("존재하지 않는 반납 신청입니다."));
 
+        disusePolicy.validateOwnership(master,orgCd);
+        disusePolicy.validateConfirm(master);
 
-        for (DisuseMaster disuse : disuses) {
-            // 정책 검증
-            disusePolicy.validateOwnership(disuse, orgCd);
-            disusePolicy.validateApprovable(disuse);
+        List<DisuseDetail> details = disuseRepository.findDetailsByMasterId(dsuMId, orgCd);
+        if (details.isEmpty()) {
+            throw new BusinessException("반납 상세 정보가 없습니다.");
+        }
 
-            // 도메인 로직 실행
-            disuse.confirmApproval(userId);
+        for (DisuseDetail detail : details) {
+            String itemNo = detail.getItmNo();
+            Asset asset = assetRepository.findAssetById(itemNo, orgCd);
+            if (asset == null) {
+                throw new BusinessException("해당 물품 정보를 대장에서 찾을 수 없습니다: " + itemNo);
+            }
 
-            // 불용된 물품들의 상태 변경 (RTN → DSU)
-            List<String> itemNos = disuseRepository.findItemNosByMasterId(disuse.getDsuMId(), orgCd);
-            for (String itemNo : itemNos) {
-                Asset asset = assetRepository.findAssetById(itemNo, orgCd);
-                if(asset == null){
-                    throw new BusinessException("해당 물품 정보를 대장에서 찾을 수 없습니다.");
-                }
-
-                OperStatus prevStatus = asset.getOperSts();
-
+            OperStatus prevStatus = asset.getOperSts();
                 asset.disuseAsset();
                 assetRepository.save(asset);
-
                 //물품 히스토리 저장 로직 실행
                 assetRepository.saveStatusHistory(AssetStatusHistory.builder()
+                        .itemHisId(UUID.randomUUID())
                         .itmNo(itemNo)
                         .prevSts(prevStatus) //이전 상태
                         .newSts(asset.getOperSts()) //현재 상태 = 반납
-                        .chgRsn("반납 신청 승인") //별도로 enum 관리를 하고싶다면 변동 가능성 있음.
-                        .reqUsrId(disuse.getAplyUsrId())
-                        .reqAt(disuse.getAplyAt())
+                        .chgRsn("불용 신청 승인") //별도로 enum 관리를 하고싶다면 변동 가능성 있음.
+                        .reqUsrId(master.getAplyUsrId())
+                        .reqAt(master.getAplyAt())
                         .apprUsrId(userId)
                         .apprAt(LocalDate.now())
                         .orgCd(orgCd)
+                        .delAt(asset.getDelAt())
+                        .delYn(asset.getDelYn())
                         .build());
             }
-
-            // 마스터 저장
-            disuseRepository.saveMaster(disuse);
-        }
+        master.confirmApproval(userId);
+        // 마스터 저장
+        disuseRepository.saveMaster(master);
     }
+
 
     /**
      * TODO: 불용 반려 (ADMIN 권한)
      * 다른 신청들과 비슷하게 소프트 삭제 진행
      */
     @Transactional
-    public void rejectDisuse(List<UUID> dsuMIds, String userId, String orgCd) {
-        List<DisuseMaster> disuses = dsuMIds.stream()
-                .map(id -> disuseRepository.findMasterById(id, orgCd)
-                        .orElseThrow(() -> new BusinessException("존재하지 않는 불용 신청입니다.")))
-                .toList();
+    public void rejectDisuse(UUID dsuMId, String userId, String orgCd) {
 
-        //소프트 삭제 전 상태 변경
-        for (DisuseMaster disuse : disuses) {
-            // 도메인 로직 실행(반납 신청 반려처리 -> 저장)
-            disuse.rejectApproval(userId);
-            disuseRepository.saveMaster(disuse);
-        }
+        DisuseMaster master = disuseRepository.findMasterById(dsuMId, orgCd)
+                .orElseThrow(() -> new BusinessException("존재하지 않는 반납 신청입니다."));
+        //정책 확인
+        disusePolicy.validateConfirm(master);
+
+        //소프트 삭제 전 상태 변경(반납 신청 반려처리 -> 저장)
+        master.rejectApproval(userId);
+        disuseRepository.saveMaster(master);
+
         // 소프트 삭제 진행
-        for (UUID rtrnMId : dsuMIds) {
-            disuseRepository.deleteMaster(rtrnMId);
-        }
+        disuseRepository.deleteMaster(dsuMId);
     }
-
 }
