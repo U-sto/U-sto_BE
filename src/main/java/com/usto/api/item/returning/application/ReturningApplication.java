@@ -213,6 +213,7 @@ public class ReturningApplication {
                 .orElseThrow(() -> new BusinessException("존재하지 않는 반납 신청입니다."));
 
         returningPolicy.validateOwnership(master, orgCd);
+        returningPolicy.validateConfirm(master);
 
         List<ReturningDetail> details = returningRepository.findDetailsByMasterId(rtrnMId, orgCd);
         if (details.isEmpty()) {
@@ -263,6 +264,8 @@ public class ReturningApplication {
 
         ReturningMaster master = returningRepository.findMasterById(rtrnMId, orgCd)
                 .orElseThrow(() -> new BusinessException("존재하지 않는 반납 신청입니다."));
+        //정책 확인
+        returningPolicy.validateConfirm(master);
 
         //소프트 삭제 전 상태 변경(반납 신청 반려처리 -> 저장)
         master.rejectApproval(userId);

@@ -67,4 +67,10 @@ public class ReturningPolicy {
             throw new BusinessException("반납일자는 미래 날짜를 선택할 수 없습니다.");
         }
     }
+
+    public void validateConfirm(ReturningMaster master) {
+        if (master.getApprSts() != ApprStatus.REQUEST) {
+            throw new BusinessException("승인요청 중인 상태만 취소할 수 있습니다.");
+        }
+    }
 }
