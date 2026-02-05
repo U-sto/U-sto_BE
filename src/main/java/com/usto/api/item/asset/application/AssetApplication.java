@@ -201,7 +201,7 @@ public class AssetApplication {
      * 물품 QR 라벨 PDF 생성
      * - 선택된 물품들의 정보를 조회하여 QR 코드가 포함된 라벨 PDF 생성
      */
-    @Transactional(readOnly = true)
+    @Transactional
     public byte[] generateQrLabelsPdf(List<String> itmNos, String orgCd) {
         // 1. 물품 존재 확인 (삭제되거나 권한 없는 물품 필터링)
         List<Asset> assets = assetRepository.findAllById(itmNos, orgCd);
