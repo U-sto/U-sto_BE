@@ -2,6 +2,7 @@ package com.usto.api.item.asset.presentation.controller;
 
 import com.usto.api.common.utils.ApiResponse;
 import com.usto.api.item.asset.application.AssetApplication;
+import com.usto.api.item.asset.presentation.dto.request.AssetListForPrintRequest;
 import com.usto.api.item.asset.presentation.dto.request.AssetPrintRequest;
 import com.usto.api.item.asset.presentation.dto.request.AssetSearchRequest;
 import com.usto.api.item.asset.presentation.dto.request.AssetUpdateRequest;
@@ -115,7 +116,7 @@ public class AssetController {
     )
     @GetMapping("/print")
     public ApiResponse<List<AssetListForPrintResponse>> getPrintList(
-            @Valid AssetSearchRequest searchRequest,
+            @Valid AssetListForPrintRequest searchRequest,
             @AuthenticationPrincipal UserPrincipal principal) {
 
         return ApiResponse.ok("조회 성공",

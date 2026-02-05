@@ -2,7 +2,6 @@ package com.usto.api.item.asset.presentation.dto.request;
 
 import com.usto.api.item.common.model.OperStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,7 +10,7 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @Schema(description = "운용대장 검색 조건")
-public class AssetSearchRequest {
+public class AssetListForPrintRequest {
 
     @Schema(description = "G2B 식별코드")
     private String g2bDCd;
@@ -36,4 +35,8 @@ public class AssetSearchRequest {
 
     @Schema(description = "물품고유번호")
     private String itmNo;
+
+    //printYn이 null : 운용대장조회 , 출력물관리 이런 식으로
+    @Schema(description = "출력상태 (Y: 출력됨, N: 미출력, null: 전체)", example = "Y", allowableValues = {"Y", "N"})
+    private String printYn;  // 선택 파라미터
 }

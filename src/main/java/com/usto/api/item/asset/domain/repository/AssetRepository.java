@@ -3,6 +3,7 @@ package com.usto.api.item.asset.domain.repository;
 import com.usto.api.item.asset.domain.model.Asset;
 import com.usto.api.item.asset.domain.model.AssetMaster;
 import com.usto.api.item.asset.domain.model.AssetStatusHistory;
+import com.usto.api.item.asset.presentation.dto.request.AssetListForPrintRequest;
 import com.usto.api.item.asset.presentation.dto.request.AssetSearchRequest;
 import com.usto.api.item.asset.presentation.dto.response.*;
 import jakarta.validation.Valid;
@@ -53,7 +54,7 @@ public interface AssetRepository {
 
     Optional<AssetPublicDetailResponse> findPublicDetailByItmNoAndOrgCd(String itmNo, String orgCd);
 
-    List<AssetListForPrintResponse> findAllForPrint(@Valid AssetSearchRequest searchRequest, String orgCd);
+    List<AssetListForPrintResponse> findAllForPrint(@Valid AssetListForPrintRequest searchRequest, String orgCd);
 
-    List<AssetListForPrintResponse> findAllByFilterForPrint(@Valid AssetSearchRequest searchRequest, String orgCd);
+    List<AssetListForPrintResponse> findAllByFilterForPrint(@Valid AssetListForPrintRequest searchRequest, String orgCd);
 }

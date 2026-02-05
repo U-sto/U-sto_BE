@@ -7,6 +7,7 @@ import com.usto.api.item.asset.domain.model.QrLabelData;
 import com.usto.api.item.asset.domain.repository.AssetRepository;
 import com.usto.api.item.asset.domain.service.AssetPolicy;
 import com.usto.api.item.asset.infrastructure.mapper.AssetMapper;
+import com.usto.api.item.asset.presentation.dto.request.AssetListForPrintRequest;
 import com.usto.api.item.asset.presentation.dto.request.AssetSearchRequest;
 import com.usto.api.item.asset.presentation.dto.request.AssetUpdateRequest;
 import com.usto.api.item.asset.presentation.dto.response.*;
@@ -251,7 +252,7 @@ public class AssetApplication {
     }
 
     @Transactional(readOnly = true)
-    public List<AssetListForPrintResponse> getAssetListForPrint(@Valid AssetSearchRequest searchRequest, String orgCd) {
+    public List<AssetListForPrintResponse> getAssetListForPrint(@Valid AssetListForPrintRequest searchRequest, String orgCd) {
         if(searchRequest.getPrintYn() == null){ //전체
             return assetRepository.findAllForPrint(searchRequest,orgCd);
 

@@ -15,6 +15,7 @@ import com.usto.api.item.asset.infrastructure.mapper.AssetMapper;
 import com.usto.api.item.asset.infrastructure.repository.AssetJpaRepository;
 import com.usto.api.item.asset.infrastructure.repository.AssetMasterJpaRepository;
 import com.usto.api.item.asset.infrastructure.repository.AssetStatusHistoryJpaRepository;
+import com.usto.api.item.asset.presentation.dto.request.AssetListForPrintRequest;
 import com.usto.api.item.asset.presentation.dto.request.AssetSearchRequest;
 import com.usto.api.item.asset.presentation.dto.response.*;
 import com.usto.api.item.common.model.OperStatus;
@@ -334,7 +335,7 @@ public class AssetRepositoryAdapter implements AssetRepository {
     }
 
     @Override
-    public List<AssetListForPrintResponse> findAllForPrint(AssetSearchRequest searchRequest, String orgCd) {
+    public List<AssetListForPrintResponse> findAllForPrint(AssetListForPrintRequest searchRequest, String orgCd) {
         return queryFactory
                 .select(Projections.fields(AssetListForPrintResponse.class,
                         itemAssetDetailEntity.itemId.itmNo,
@@ -375,7 +376,7 @@ public class AssetRepositoryAdapter implements AssetRepository {
     }
 
     @Override
-    public List<AssetListForPrintResponse> findAllByFilterForPrint(AssetSearchRequest searchRequest, String orgCd) {
+    public List<AssetListForPrintResponse> findAllByFilterForPrint(AssetListForPrintRequest searchRequest, String orgCd) {
         return queryFactory
                 .select(Projections.fields(AssetListForPrintResponse.class,
                         itemAssetDetailEntity.itemId.itmNo,
