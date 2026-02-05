@@ -69,4 +69,9 @@ public class Asset {
     public void disuseAsset() {
         this.operSts = OperStatus.DSU;
     }
+
+    //출력 상태 변경
+    public void markAsPrinted(){
+        this.printYn = "Y";
+    }
 }

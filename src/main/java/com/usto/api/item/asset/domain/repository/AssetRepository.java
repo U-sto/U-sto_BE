@@ -52,4 +52,6 @@ public interface AssetRepository {
     Asset findAssetById(String itmNo, String orgCd);
 
     void saveAll(List<Asset> assetsToUpdate);
+
+    Optional<AssetPublicDetailResponse> findPublicDetailByItmNoAndOrgCd(String itmNo, String orgCd);
 }

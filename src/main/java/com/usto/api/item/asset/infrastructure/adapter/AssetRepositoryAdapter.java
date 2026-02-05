@@ -291,6 +291,49 @@ public class AssetRepositoryAdapter implements AssetRepository {
         jpaRepository.saveAll(entities);
     }
 
+    @Override
+    public Optional<AssetPublicDetailResponse>  findPublicDetailByItmNoAndOrgCd(String itmNo, String orgCd) {
+        QItemAssetDetailEntity d = QItemAssetDetailEntity.itemAssetDetailEntity;
+        QItemAssetMasterEntity m = QItemAssetMasterEntity.itemAssetMasterEntity;
+        QG2bItemJpaEntity g = QG2bItemJpaEntity.g2bItemJpaEntity;
+        QG2bItemCategoryJpaEntity c = QG2bItemCategoryJpaEntity.g2bItemCategoryJpaEntity;
+        QDepartmentJpaEntity dept = QDepartmentJpaEntity.departmentJpaEntity;
+        QOrganizationJpaEntity org = QOrganizationJpaEntity.organizationJpaEntity;
+
+        Optional<AssetPublicDetailResponse> result =
+                Optional.ofNullable(queryFactory
+                .select(Projections.fields(
+                        AssetPublicDetailResponse.class,
+                        d.itemId.itmNo.as("itmNo"),
+                        org.orgNm.as("orgNm"),
+                        g.g2bDNm.as("g2bDNm"),
+                        Expressions.stringTemplate(
+                                "CONCAT({0}, '-', {1})",
+                                c.g2bMCd, g.g2bDCd
+                        ).as("g2bItemNo"),
+                        d.acqUpr.as("acqUpr"),
+                        m.acqAt.as("acqAt"),
+                        m.arrgAt.as("arrgAt"),
+                        d.operSts.as("operSts"),
+                        d.drbYr.as("drbYr"),
+                        dept.deptNm.as("deptNm"),
+                        m.qty.as("qty"),
+                        d.rmk.as("rmk")
+                ))
+                .from(d)
+                .leftJoin(m).on(m.acqId.eq(d.acqId).and(m.delYn.eq("N")))
+                .leftJoin(g).on(g.g2bDCd.eq(d.g2bDCd))
+                .leftJoin(c).on(c.g2bMCd.eq(g.g2bMCd))
+                .leftJoin(dept).on(dept.id.deptCd.eq(d.deptCd).and(dept.id.orgCd.eq(d.itemId.orgCd)))
+                .leftJoin(org).on(org.orgCd.eq(d.itemId.orgCd))
+                .where(
+                        d.itemId.itmNo.eq(itmNo),
+                        d.itemId.orgCd.eq(orgCd),
+                        d.delYn.eq("N")
+                )
+                .fetchOne()
+                );
+
         return result;
     }
 
