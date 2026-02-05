@@ -8,6 +8,8 @@ import com.usto.api.item.common.model.ApprStatus;
 import com.usto.api.item.returning.domain.model.ReturningDetail;
 import com.usto.api.item.returning.domain.model.ReturningMaster;
 import com.usto.api.item.returning.domain.repository.ReturningRepository;
+import com.usto.api.item.returning.infrastructure.entity.ItemReturningDetailEntity;
+import com.usto.api.item.returning.infrastructure.entity.QItemReturningDetailEntity;
 import com.usto.api.item.returning.infrastructure.mapper.ReturningMapper;
 import com.usto.api.item.returning.infrastructure.repository.ReturningDetailJpaRepository;
 import com.usto.api.item.returning.infrastructure.repository.ReturningMasterJpaRepository;
@@ -177,6 +179,23 @@ public class ReturningRepositoryAdapter implements ReturningRepository {
                         itemReturningMasterEntity.apprSts.in(ApprStatus.REQUEST, ApprStatus.APPROVED)
                 )
                 .fetchFirst() != null;
+    }
+
+    @Override
+    public List<ReturningDetail> findDetailsByMasterId(UUID rtrnMId, String orgCd) {
+        QItemReturningDetailEntity d = QItemReturningDetailEntity.itemReturningDetailEntity;
+
+        List<ItemReturningDetailEntity> entities = queryFactory
+                .selectFrom(d)
+                .where(
+                        d.rtrnMId.eq(rtrnMId),
+                        d.orgCd.eq(orgCd)
+                )
+                .fetch();
+
+        return entities.stream()
+                .map(ReturningMapper::toDetailDomain)
+                .toList();
     }
 
     /**

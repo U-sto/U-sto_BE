@@ -102,4 +102,11 @@ public class Acquisition {
     public boolean isDeleted() {
         return "Y".equals(this.delYn);
     }
+
+
+    public void rejectApproval(String userId) {
+        this.apprUsrId = userId;
+        this.apprSts = ApprStatus.REJECTED;
+        this.apprAt = LocalDate.now(KOREA_ZONE);
+    }
 }

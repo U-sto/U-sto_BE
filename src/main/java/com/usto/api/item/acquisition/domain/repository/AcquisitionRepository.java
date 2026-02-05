@@ -20,4 +20,9 @@ public interface AcquisitionRepository {
     List<Acquisition> findAllById(List<UUID> acqIds);
 
     void saveAll(List<Acquisition> acquisitions);
+
+    Optional<Acquisition> findMasterById(UUID id, String orgCd);
+
+    Acquisition saveMaster(Acquisition acquisition);
+
 }
