@@ -9,11 +9,9 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum ReturningReason {
-    USAGE_PERIOD_EXPIRED("사용연한경과"),
-    BROKEN("고장/파손"),
-    DISUSE_DECISION("불용결정"),
     PROJECT_ENDED("사업종료"),
-    SURPLUS("잉여물품");
+    SURPLUS("잉여물품"),
+    COMMON_CONVERSION("공용전환");
 
     private final String description;
 }
