@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * 자산(Asset) 관리 서비스
@@ -226,9 +227,10 @@ public class AssetApplication {
 
         //완성된 애들 출력구분을 Y로 바꿔주기 !
         for (Asset asset : assets) {
-            asset.printed();
-            assetRepository.save(asset);
+            asset.markAsPrinted();
         }
+
+        assetRepository.saveAll(assets);
 
         byte[] result = qrLabelPdfGenerator.generate(labelDataList);
 
@@ -249,7 +251,7 @@ public class AssetApplication {
      * - 실시간 최신 데이터 반환
      */
     @Transactional(readOnly = true)
-    public AssetPublicDetailResponse getAssetPublicDetail(String orgCd, String itmNo) {
+    public Optional<AssetPublicDetailResponse> getAssetPublicDetail(String orgCd, String itmNo) {
         return assetRepository.findPublicDetailByItmNoAndOrgCd(itmNo,orgCd);
     }
 }

@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.util.Optional;
+
 @Tag(name = "public-asset-controller", description = "물품 공개 조회 API (인증 불필요)")
 @Controller
 @RequestMapping("/api/public/item")
@@ -35,7 +37,7 @@ public class PublicAssetController {
             Model model
             ) {
 
-        AssetPublicDetailResponse item = assetApplication.getAssetPublicDetail(orgCd,itmNo);
+        Optional<AssetPublicDetailResponse> item = assetApplication.getAssetPublicDetail(orgCd,itmNo);
 
         model.addAttribute("item", item);
 

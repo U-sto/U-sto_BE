@@ -71,7 +71,7 @@ public class Asset {
     }
 
     //출력 상태 변경
-    public void printed(){
+    public void markAsPrinted(){
         this.printYn = "Y";
     }
 }
