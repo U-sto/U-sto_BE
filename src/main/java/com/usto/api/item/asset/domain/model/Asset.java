@@ -65,4 +65,9 @@ public class Asset {
     public boolean isDeleted() {
         return "Y".equals(this.delYn);
     }
+
+    //출력 상태 변경
+    public void printed(){
+        this.printYn = "Y";
+    }
 }

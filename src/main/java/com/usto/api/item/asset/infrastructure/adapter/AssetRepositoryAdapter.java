@@ -4,6 +4,9 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.usto.api.common.exception.BusinessException;
+import com.usto.api.g2b.infrastructure.entity.QG2bItemCategoryJpaEntity;
+import com.usto.api.g2b.infrastructure.entity.QG2bItemJpaEntity;
 import com.usto.api.item.asset.domain.model.Asset;
 import com.usto.api.item.asset.domain.model.AssetMaster;
 import com.usto.api.item.asset.domain.model.AssetStatusHistory;
@@ -17,7 +20,10 @@ import com.usto.api.item.asset.presentation.dto.request.AssetSearchRequest;
 import com.usto.api.item.asset.presentation.dto.response.AssetAiItemDetailResponse;
 import com.usto.api.item.asset.presentation.dto.response.AssetDetailResponse;
 import com.usto.api.item.asset.presentation.dto.response.AssetListResponse;
+import com.usto.api.item.asset.presentation.dto.response.AssetPublicDetailResponse;
 import com.usto.api.item.common.model.OperStatus;
+import com.usto.api.organization.infrastructure.entity.QDepartmentJpaEntity;
+import com.usto.api.organization.infrastructure.entity.QOrganizationJpaEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -260,7 +266,49 @@ public class AssetRepositoryAdapter implements AssetRepository {
         return jpaRepository.findOneByItmNo(itmNo, orgCd);
     }
 
+    @Override
+    public AssetPublicDetailResponse findPublicDetailByItmNoAndOrgCd(String itmNo, String orgCd) {
+        QItemAssetDetailEntity d = QItemAssetDetailEntity.itemAssetDetailEntity;
+        QItemAssetMasterEntity m = QItemAssetMasterEntity.itemAssetMasterEntity;
+        QG2bItemJpaEntity g = QG2bItemJpaEntity.g2bItemJpaEntity;
+        QG2bItemCategoryJpaEntity c = QG2bItemCategoryJpaEntity.g2bItemCategoryJpaEntity;
+        QDepartmentJpaEntity dept = QDepartmentJpaEntity.departmentJpaEntity;
+        QOrganizationJpaEntity org = QOrganizationJpaEntity.organizationJpaEntity;
 
+        AssetPublicDetailResponse result = queryFactory
+                .select(Projections.fields(
+                        AssetPublicDetailResponse.class,
+                        d.itemId.itmNo.as("itmNo"),
+                        org.orgNm.as("orgNm"),
+                        g.g2bDNm.as("g2bDNm"),
+                        Expressions.stringTemplate(
+                                "CONCAT({0}, '-', {1})",
+                                c.g2bMCd, g.g2bDCd
+                        ).as("g2bItemNo"),
+                        d.acqUpr.as("acqUpr"),
+                        m.acqAt.as("acqAt"),
+                        m.arrgAt.as("arrgAt"),
+                        d.operSts.as("operSts"),
+                        d.drbYr.as("drbYr"),
+                        dept.deptNm.as("deptNm"),
+                        m.qty.as("qty"),
+                        d.rmk.as("rmk")
+                ))
+                .from(d)
+                .leftJoin(m).on(m.acqId.eq(d.acqId).and(m.delYn.eq("N")))
+                .leftJoin(g).on(g.g2bDCd.eq(d.g2bDCd))
+                .leftJoin(c).on(c.g2bMCd.eq(g.g2bMCd))
+                .leftJoin(dept).on(dept.id.deptCd.eq(d.deptCd).and(dept.id.orgCd.eq(d.itemId.orgCd)))
+                .leftJoin(org).on(org.orgCd.eq(d.itemId.orgCd))
+                .where(
+                        d.itemId.itmNo.eq(itmNo),
+                        d.itemId.orgCd.eq(orgCd),
+                        d.delYn.eq("N")
+                )
+                .fetchOne();
+
+        return result;
+    }
 
     // ===== 동적 쿼리 헬퍼 =====
 
@@ -293,4 +341,5 @@ public class AssetRepositoryAdapter implements AssetRepository {
     private BooleanExpression itmNoEq(String itmNo) {
         return StringUtils.hasText(itmNo) ? itemAssetDetailEntity.itemId.itmNo.eq(itmNo) : null;
     }
+
 }
