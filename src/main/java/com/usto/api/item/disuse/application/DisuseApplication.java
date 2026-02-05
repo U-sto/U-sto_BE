@@ -188,7 +188,7 @@ public class DisuseApplication {
         List<DisuseDetail> details = new ArrayList<>();
         for (Asset asset : assets) {
             assetPolicy.validateUpdate(asset, orgCd);
-
+            assetPolicy.validateDisuse(asset); //같은 이유입니다.
             if (asset.getOperSts() != OperStatus.RTN) {
                 throw new BusinessException(
                         "반납(RTN) 상태의 물품만 불용 신청할 수 있습니다: " + asset.getItmNo()

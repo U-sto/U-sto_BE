@@ -62,6 +62,7 @@ public class ReturningApplication {
                     .orElseThrow(() -> new BusinessException("물품을 찾을 수 없습니다: " + itmNo));
 
             assetPolicy.validateUpdate(asset, orgCd);
+            assetPolicy.validateReturn(asset); //있는거 아까워서 그냥 넣었어요
 
             // 중복 체크
             if (returningRepository.existsInOtherReturning(itmNo, null, orgCd)) {
@@ -206,18 +207,17 @@ public class ReturningApplication {
      * - 상태 이력 테이블에 기록 생성
      */
     @Transactional
-    public void approvalReturning(List<UUID> rtrnMIds, String userId, String orgCd) {
-
-        List<ReturningMaster> returnings = rtrnMIds.stream()
+    public void approvalReturning(UUID rtrnMId, String userId, String orgCd) {
+        List<ReturningDetail> details = rtrnMIds.stream()
                 .map(id -> returningRepository.findMasterById(id, orgCd)
                         .orElseThrow(() -> new BusinessException("존재하지 않는 반납 신청입니다.")))
                 .toList();
 
 
-        for (ReturningMaster returning : returnings) {
+        for (ReturningDetail detail : details) {
             // 정책 검증
-            returningPolicy.validateOwnership(returning, orgCd);
-            returningPolicy.validateApprovable(returning);
+            returningPolicy.validateOwnership(detail, orgCd);
+            assetPolicy.validateReturn(detail);
 
             // 마스터 도메인 로직 실행
             returning.confirmApproval(userId);
@@ -249,6 +249,8 @@ public class ReturningApplication {
                         .orgCd(orgCd)
                         .build());
             }
+
+            returning.confirmApproval(userId);
 
             // 마스터 저장
             returningRepository.saveMaster(returning);

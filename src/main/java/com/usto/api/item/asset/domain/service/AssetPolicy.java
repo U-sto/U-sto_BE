@@ -57,6 +57,25 @@ public class AssetPolicy {
             throw new BusinessException("불용 처리된 물품은 반납할 수 없습니다.");
         }
 
+        if (asset.getOperSts() == OperStatus.RTN) {
+            throw new BusinessException("이미 반납된 물품은 반납할 수 없습니다.");
+        }
+
+        if (!StringUtils.hasText(asset.getDeptCd()) || "NONE".equals(asset.getDeptCd())) {
+            throw new BusinessException("배정된 부서가 없습니다.");
+        }
+    }
+
+    //불용 가능 여부 검증
+    public void validateDisuse(Asset asset) {
+        if (asset.isDeleted()) {
+            throw new BusinessException("삭제된 물품은 반납할 수 없습니다.");
+        }
+
+        if (asset.getOperSts() != OperStatus.RTN) {
+            throw new BusinessException("반납 신청이 완료된 물품에 한해서만 불용 신청할 수 있습니다");
+        }
+
         if (!StringUtils.hasText(asset.getDeptCd()) || "NONE".equals(asset.getDeptCd())) {
             throw new BusinessException("배정된 부서가 없습니다.");
         }

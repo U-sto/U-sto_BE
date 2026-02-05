@@ -2,6 +2,7 @@ package com.usto.api.item.returning.domain.service;
 
 import com.usto.api.common.exception.BusinessException;
 import com.usto.api.item.common.model.ApprStatus;
+import com.usto.api.item.returning.domain.model.ReturningDetail;
 import com.usto.api.item.returning.domain.model.ReturningMaster;
 import org.springframework.stereotype.Component;
 
@@ -21,6 +22,12 @@ public class ReturningPolicy {
      */
     public void validateOwnership(ReturningMaster master, String requestOrgCd) {
         if (!master.getOrgCd().equals(requestOrgCd)) {
+            throw new BusinessException("해당 조직의 데이터가 아닙니다.");
+        }
+    }
+
+    public void validateOwnership(ReturningDetail detail, String requestOrgCd) {
+        if (!detail.getOrgCd().equals(requestOrgCd)) {
             throw new BusinessException("해당 조직의 데이터가 아닙니다.");
         }
     }
@@ -58,13 +65,6 @@ public class ReturningPolicy {
     public void validateAplyAt(LocalDate aplyAt) {
         if (aplyAt == null || aplyAt.isAfter(LocalDate.now(KOREA_ZONE))) {
             throw new BusinessException("반납일자는 미래 날짜를 선택할 수 없습니다.");
-        }
-    }
-
-    // 반납 확정 가능 여부 검증
-    public void validateApprovable(ReturningMaster master) {
-        if (master.getApprSts() != ApprStatus.REQUEST) {
-            throw new BusinessException("승인요청 중인 상태만 확정할 수 있습니다.");
         }
     }
 }

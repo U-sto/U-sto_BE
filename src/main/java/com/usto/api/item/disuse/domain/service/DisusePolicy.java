@@ -2,6 +2,7 @@ package com.usto.api.item.disuse.domain.service;
 
 import com.usto.api.common.exception.BusinessException;
 import com.usto.api.item.common.model.ApprStatus;
+import com.usto.api.item.common.model.OperStatus;
 import com.usto.api.item.disuse.domain.model.DisuseMaster;
 import org.springframework.stereotype.Component;
 

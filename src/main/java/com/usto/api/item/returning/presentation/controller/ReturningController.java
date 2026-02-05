@@ -2,9 +2,7 @@ package com.usto.api.item.returning.presentation.controller;
 
 import com.usto.api.common.utils.ApiResponse;
 import com.usto.api.item.returning.application.ReturningApplication;
-import com.usto.api.item.returning.presentation.dto.request.ReturningApprovalBulkRequest;
 import com.usto.api.item.returning.presentation.dto.request.ReturningRegisterRequest;
-import com.usto.api.item.returning.presentation.dto.request.ReturningRejectBulkRequest;
 import com.usto.api.item.returning.presentation.dto.request.ReturningSearchRequest;
 import com.usto.api.item.returning.presentation.dto.response.ReturningItemListResponse;
 import com.usto.api.item.returning.presentation.dto.response.ReturningListResponse;
@@ -131,10 +129,10 @@ public class ReturningController {
     @PutMapping("/admin/approval")
     @PreAuthorize("hasRole('ADMIN')")
     public ApiResponse<Void> approvalRequest(
-            @RequestBody @Valid ReturningApprovalBulkRequest request,
+            @PathVariable UUID rtrnMId,
             @AuthenticationPrincipal UserPrincipal principal) {
         returningApplication.approvalReturning(
-                request.getRtrnMIds(),
+                rtrnMId,
                 principal.getUsername(),
                 principal.getOrgCd());
         return ApiResponse.ok("반납 승인 확정 성공");
@@ -147,10 +145,10 @@ public class ReturningController {
     @DeleteMapping("/admin/reject")
     @PreAuthorize("hasRole('ADMIN')")
     public ApiResponse<Void> approvalReject(
-            @RequestBody @Valid ReturningRejectBulkRequest request,
+            @PathVariable UUID rtrnMId,
             @AuthenticationPrincipal UserPrincipal principal) {
         returningApplication.rejectReturning(
-                request.getRtrnMIds(),
+                rtrnMId,
                 principal.getUsername(),
                 principal.getOrgCd());
         return ApiResponse.ok("반납 요청 반려 성공");
