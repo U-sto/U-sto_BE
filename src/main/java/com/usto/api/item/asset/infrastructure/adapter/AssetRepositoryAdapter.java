@@ -282,6 +282,14 @@ public class AssetRepositoryAdapter implements AssetRepository {
         return entity != null ? AssetMapper.toDomain(entity) : null;
     }
 
+    @Override
+    public void saveAll(List<Asset> assetsToUpdate) {
+        List<ItemAssetDetailEntity> entities = assetsToUpdate
+                .stream()
+                .map(AssetMapper :: toEntity) // 매핑 메서드 필요
+                .toList();
+        jpaRepository.saveAll(entities);
+    }
 
         return result;
     }

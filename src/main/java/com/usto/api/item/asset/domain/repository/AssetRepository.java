@@ -51,4 +51,5 @@ public interface AssetRepository {
 
     Asset findAssetById(String itmNo, String orgCd);
 
+    void saveAll(List<Asset> assetsToUpdate);
 }

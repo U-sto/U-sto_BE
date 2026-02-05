@@ -4,6 +4,7 @@ import com.usto.api.common.exception.BusinessException;
 import com.usto.api.item.asset.domain.model.Asset;
 import com.usto.api.item.asset.domain.model.AssetStatusHistory;
 import com.usto.api.item.asset.domain.repository.AssetRepository;
+import com.usto.api.item.asset.domain.repository.AssetStatusHistoryRepository;
 import com.usto.api.item.asset.domain.service.AssetPolicy;
 import com.usto.api.item.common.model.OperStatus;
 import com.usto.api.item.returning.domain.model.ReturningDetail;
@@ -15,13 +16,12 @@ import com.usto.api.item.returning.presentation.dto.request.ReturningRegisterReq
 import com.usto.api.item.returning.presentation.dto.request.ReturningSearchRequest;
 import com.usto.api.item.returning.presentation.dto.response.ReturningItemListResponse;
 import com.usto.api.item.returning.presentation.dto.response.ReturningListResponse;
-import jakarta.validation.constraints.NotEmpty;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -33,6 +33,7 @@ public class ReturningApplication {
     private final ReturningPolicy returningPolicy;
     private final AssetRepository assetRepository;
     private final AssetPolicy assetPolicy;
+    private AssetStatusHistoryRepository historyRepository;
 
     /**
      * 반납 신청 등록
@@ -220,6 +221,9 @@ public class ReturningApplication {
             throw new BusinessException("반납 상세 정보가 없습니다.");
         }
 
+        List<Asset> assetsToUpdate = new ArrayList<>(details.size());
+        List<AssetStatusHistory> histories = new ArrayList<>(details.size());
+
         for (ReturningDetail detail : details) {
 
             String itemNo = detail.getItmNo();
@@ -227,13 +231,12 @@ public class ReturningApplication {
             if (asset == null) {
                 throw new BusinessException("해당 물품 정보를 대장에서 찾을 수 없습니다: " + itemNo);
             }
-
             // 반납된 물품들의 상태 변경 (OPER → RTN)
             //이전 상태 저장
             OperStatus prevStatus = asset.getOperSts();
             asset.returnAsset(); //반납처리 + 부서초기화 후
-            assetRepository.save(asset); //물품세부정보저장
-            assetRepository.saveStatusHistory(AssetStatusHistory.builder()
+            assetsToUpdate.add(asset);
+            histories.add(AssetStatusHistory.builder()
                     .itemHisId(UUID.randomUUID())
                     .itmNo(itemNo)
                     .prevSts(prevStatus) //이전 상태
@@ -248,9 +251,11 @@ public class ReturningApplication {
                     .delYn(asset.getDelYn())
                     .build());
         }
+        assetRepository.saveAll(assetsToUpdate);
+        historyRepository.saveAll(histories);
 
-            master.confirmApproval(userId);
-            returningRepository.saveMaster(master);
+        master.confirmApproval(userId);
+        returningRepository.saveMaster(master);
     }
 
 

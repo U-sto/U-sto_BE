@@ -4,6 +4,7 @@ import com.usto.api.common.exception.BusinessException;
 import com.usto.api.item.asset.domain.model.Asset;
 import com.usto.api.item.asset.domain.model.AssetStatusHistory;
 import com.usto.api.item.asset.domain.repository.AssetRepository;
+import com.usto.api.item.asset.domain.repository.AssetStatusHistoryRepository;
 import com.usto.api.item.asset.domain.service.AssetPolicy;
 import com.usto.api.item.common.model.OperStatus;
 import com.usto.api.item.disuse.domain.model.DisuseDetail;
@@ -36,6 +37,7 @@ public class DisuseApplication {
     private final DisusePolicy disusePolicy;
     private final AssetRepository assetRepository;
     private final AssetPolicy assetPolicy;
+    final AssetStatusHistoryRepository historyRepository;
 
     /**
      * 불용 신청 등록
@@ -222,6 +224,9 @@ public class DisuseApplication {
             throw new BusinessException("반납 상세 정보가 없습니다.");
         }
 
+        List<Asset> assetsToUpdate = new ArrayList<>(details.size());
+        List<AssetStatusHistory> histories = new ArrayList<>(details.size());
+
         for (DisuseDetail detail : details) {
             String itemNo = detail.getItmNo();
             Asset asset = assetRepository.findAssetById(itemNo, orgCd);
@@ -230,24 +235,27 @@ public class DisuseApplication {
             }
 
             OperStatus prevStatus = asset.getOperSts();
-                asset.disuseAsset();
-                assetRepository.save(asset);
+            asset.disuseAsset();
+            assetsToUpdate.add(asset);
                 //물품 히스토리 저장 로직 실행
-                assetRepository.saveStatusHistory(AssetStatusHistory.builder()
-                        .itemHisId(UUID.randomUUID())
-                        .itmNo(itemNo)
-                        .prevSts(prevStatus) //이전 상태
-                        .newSts(asset.getOperSts()) //현재 상태 = 반납
-                        .chgRsn("불용 신청 승인") //별도로 enum 관리를 하고싶다면 변동 가능성 있음.
-                        .reqUsrId(master.getAplyUsrId())
-                        .reqAt(master.getAplyAt())
-                        .apprUsrId(userId)
-                        .apprAt(LocalDate.now())
-                        .orgCd(orgCd)
-                        .delAt(asset.getDelAt())
-                        .delYn(asset.getDelYn())
-                        .build());
-            }
+            histories.add(
+                    AssetStatusHistory.builder()
+                    .itemHisId(UUID.randomUUID())
+                    .itmNo(itemNo)
+                    .prevSts(prevStatus) //이전 상태
+                    .newSts(asset.getOperSts()) //현재 상태 = 반납
+                    .chgRsn("불용 신청 승인") //별도로 enum 관리를 하고싶다면 변동 가능성 있음.
+                    .reqUsrId(master.getAplyUsrId())
+                    .reqAt(master.getAplyAt())
+                    .apprUsrId(userId)
+                    .apprAt(LocalDate.now())
+                    .orgCd(orgCd)
+                    .delAt(asset.getDelAt())
+                    .delYn(asset.getDelYn())
+                    .build());
+        }
+        assetRepository.saveAll(assetsToUpdate);
+        historyRepository.saveAll(histories);
         master.confirmApproval(userId);
         // 마스터 저장
         disuseRepository.saveMaster(master);
