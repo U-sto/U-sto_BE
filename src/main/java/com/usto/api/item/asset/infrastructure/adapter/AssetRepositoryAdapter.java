@@ -307,10 +307,6 @@ public class AssetRepositoryAdapter implements AssetRepository {
                 )
                 .fetchOne();
 
-        if(result == null){
-            throw new BusinessException("해당 물품을 찾을 수 없습니다.");
-        }
-
         return result;
     }
 

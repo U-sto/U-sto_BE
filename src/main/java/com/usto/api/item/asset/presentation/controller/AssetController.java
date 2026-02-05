@@ -96,10 +96,6 @@ public class AssetController {
                 principal.getOrgCd()
         );
 
-        if(pdfBytes == null){
-            throw new BusinessException("PDF 생성 실패");
-        }
-
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_PDF);
         headers.setContentDisposition(

@@ -11,6 +11,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
@@ -32,6 +33,7 @@ import java.util.List;
  * QR 라벨 PDF 생성기
  * 라벨 구성: QR 코드 + 물품고유번호
  */
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class QrLabelPdfGenerator {
@@ -99,8 +101,7 @@ public class QrLabelPdfGenerator {
             return pdfBytes;
 
         } catch (Exception e) {
-            System.err.println("PDF 생성 실패: " + e.getMessage());
-            e.printStackTrace();
+            log.error("PDF 생성 실패: {}", e.getMessage(), e);
             throw new RuntimeException("PDF 생성 실패: " + e.getMessage(), e);
         }
     }
@@ -180,7 +181,6 @@ public class QrLabelPdfGenerator {
      */
     private PDType0Font loadKoreanFont(PDDocument document) {
         try {
-            // 방법 1: resources/fonts/NanumGothic.ttf 사용
             InputStream fontStream = new ClassPathResource("fonts/Pretendard-Light.ttf").getInputStream();
             return PDType0Font.load(document, fontStream);
         } catch (Exception e) {

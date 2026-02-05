@@ -231,9 +231,7 @@ public class AssetApplication {
      * - 스캔 시 서버에서 최신 정보 조회
      */
     private String generateQrContentUrl(String itmNo,String orgCd) {
-        // 옵션 1: 단순 URL (추천)
-        return String.format("%s/item/%s/%s", frontendBaseUrl, orgCd, itmNo);
-    }
+        return String.format("%s/api/public/item/%s/%s", frontendBaseUrl, orgCd, itmNo);    }
 
     /**
      * 물품 공개 정보 조회 (QR 스캔용)
@@ -242,11 +240,6 @@ public class AssetApplication {
      */
     @Transactional(readOnly = true)
     public AssetPublicDetailResponse getAssetPublicDetail(String orgCd, String itmNo) {
-
-        AssetPublicDetailResponse response = assetRepository.findPublicDetailByItmNoAndOrgCd(itmNo,orgCd);
-        if(response == null){
-            throw new BusinessException("해당 물품을 찾을 수 없습니다.");
-        }
-        return response;
+        return assetRepository.findPublicDetailByItmNoAndOrgCd(itmNo,orgCd);
     }
 }

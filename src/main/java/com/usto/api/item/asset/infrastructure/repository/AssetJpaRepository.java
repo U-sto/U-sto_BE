@@ -202,39 +202,4 @@ public interface AssetJpaRepository extends JpaRepository<ItemAssetDetailEntity,
       AND ORG_CD = :orgCd
     """, nativeQuery = true)
     int findMaxSequenceByYear(@Param("year") String year, @Param("orgCd") String orgCd);
-
-    @Query(value = """
-        SELECT 
-            d.ITM_NO as itmNo,
-            d.ORG_CD as orgCd,
-            g.G2B_D_NM as g2bDNm,
-            CONCAT(c.G2B_M_CD, '-', g.G2B_D_CD) as g2bItemNo,
-            d.ACQ_UPR as acqUpr,
-            m.ACQ_AT as acqAt,
-            m.ARRG_AT as arrgAt,
-            d.OPER_STS as operSts,
-            d.DRB_YR as drbYr,
-            dept.DEPT_NM as deptNm,
-            m.QTY as qty,
-            d.RMK as rmk
-        FROM TB_ITEM002D d
-        INNER JOIN TB_ITEM002M m 
-            ON m.ACQ_ID = d.ACQ_ID 
-            AND m.DEL_YN = 'N'
-        INNER JOIN TB_G2B001D g 
-            ON g.G2B_D_CD = d.G2B_D_CD
-        INNER JOIN TB_G2B001M c 
-            ON c.G2B_M_CD = g.G2B_M_CD
-        INNER JOIN TB_ORG002M dept 
-            ON dept.DEPT_CD = d.DEPT_CD 
-            AND dept.ORG_CD = d.ORG_CD
-        WHERE d.ITM_NO = :itmNo
-          AND d.ORG_CD = :orgCd
-          AND d.DEL_YN = 'N'
-          AND m.DEL_YN = 'N'
-        """, nativeQuery = true)
-    AssetPublicDetailResponse findPublicDetailByItmNoAndOrgCd(
-            @Param("itmNo") String itmNo,
-            @Param("orgCd") String orgCd
-    );
 }
