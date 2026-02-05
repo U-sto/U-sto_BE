@@ -1,6 +1,5 @@
 package com.usto.api.item.asset.presentation.controller;
 
-import com.usto.api.common.exception.BusinessException;
 import com.usto.api.common.utils.ApiResponse;
 import com.usto.api.item.asset.application.AssetApplication;
 import com.usto.api.item.asset.presentation.dto.request.AssetPrintRequest;

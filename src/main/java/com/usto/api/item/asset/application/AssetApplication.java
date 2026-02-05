@@ -20,6 +20,7 @@ import com.usto.api.organization.infrastructure.repository.OrganizationJpaReposi
 import com.usto.api.user.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.web.webauthn.management.ImmutableRelyingPartyRegistrationRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -221,8 +222,15 @@ public class AssetApplication {
                         .build())
                 .toList();
 
-        // 3. PDF 생성
-        return qrLabelPdfGenerator.generate(labelDataList);
+        //완성된 애들 출력구분을 Y로 바꿔주기 !
+        for (Asset asset : assets) {
+            asset.printed();
+            assetRepository.save(asset);
+        }
+
+        byte[] result = qrLabelPdfGenerator.generate(labelDataList);
+
+        return result;
     }
 
     /**
