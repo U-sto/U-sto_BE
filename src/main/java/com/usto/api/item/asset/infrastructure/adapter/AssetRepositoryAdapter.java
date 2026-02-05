@@ -4,7 +4,6 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.usto.api.common.exception.BusinessException;
 import com.usto.api.g2b.infrastructure.entity.QG2bItemCategoryJpaEntity;
 import com.usto.api.g2b.infrastructure.entity.QG2bItemJpaEntity;
 import com.usto.api.item.asset.domain.model.Asset;
@@ -17,10 +16,7 @@ import com.usto.api.item.asset.infrastructure.repository.AssetJpaRepository;
 import com.usto.api.item.asset.infrastructure.repository.AssetMasterJpaRepository;
 import com.usto.api.item.asset.infrastructure.repository.AssetStatusHistoryJpaRepository;
 import com.usto.api.item.asset.presentation.dto.request.AssetSearchRequest;
-import com.usto.api.item.asset.presentation.dto.response.AssetAiItemDetailResponse;
-import com.usto.api.item.asset.presentation.dto.response.AssetDetailResponse;
-import com.usto.api.item.asset.presentation.dto.response.AssetListResponse;
-import com.usto.api.item.asset.presentation.dto.response.AssetPublicDetailResponse;
+import com.usto.api.item.asset.presentation.dto.response.*;
 import com.usto.api.item.common.model.OperStatus;
 import com.usto.api.organization.infrastructure.entity.QDepartmentJpaEntity;
 import com.usto.api.organization.infrastructure.entity.QOrganizationJpaEntity;
@@ -337,6 +333,89 @@ public class AssetRepositoryAdapter implements AssetRepository {
         return result;
     }
 
+    @Override
+    public List<AssetListForPrintResponse> findAllForPrint(AssetSearchRequest searchRequest, String orgCd) {
+        return queryFactory
+                .select(Projections.fields(AssetListForPrintResponse.class,
+                        itemAssetDetailEntity.itemId.itmNo,
+                        Expressions.stringTemplate("CONCAT({0}, '-', {1})",
+                                g2bItemJpaEntity.g2bMCd,
+                                itemAssetDetailEntity.g2bDCd).as("g2bItemNo"),
+                        g2bItemJpaEntity.g2bDNm.as("g2bItemNm"),
+                        itemAssetMasterEntity.acqAt,
+                        itemAssetDetailEntity.acqUpr,
+                        itemAssetMasterEntity.arrgAt,
+                        departmentJpaEntity.deptNm.as("deptNm"),
+                        itemAssetDetailEntity.operSts.stringValue().as("operSts"),
+                        itemAssetDetailEntity.drbYr,
+                        itemAssetDetailEntity.printYn.as("printYn")
+                ))
+                .from(itemAssetDetailEntity)
+                .leftJoin(itemAssetMasterEntity).on(
+                        itemAssetDetailEntity.acqId.eq(itemAssetMasterEntity.acqId)
+                )
+                .leftJoin(g2bItemJpaEntity).on(
+                        itemAssetDetailEntity.g2bDCd.eq(g2bItemJpaEntity.g2bDCd)
+                )
+                .leftJoin(departmentJpaEntity).on(
+                        itemAssetDetailEntity.itemId.orgCd.eq(departmentJpaEntity.id.orgCd),
+                        itemAssetDetailEntity.deptCd.eq(departmentJpaEntity.id.deptCd)
+                )
+                .where(
+                        itemAssetDetailEntity.itemId.orgCd.eq(orgCd),
+                        g2bDCdEq(searchRequest.getG2bDCd()),
+                        acqAtBetween(searchRequest.getStartAcqAt(), searchRequest.getEndAcqAt()),
+                        arrgAtBetween(searchRequest.getStartArrgAt(), searchRequest.getEndArrgAt()),
+                        deptCdEq(searchRequest.getDeptCd()),
+                        operStsEq(searchRequest.getOperSts()),
+                        itmNoEq(searchRequest.getItmNo())
+                )
+                .orderBy(itemAssetDetailEntity.itemId.itmNo.desc())
+                .fetch();
+    }
+
+    @Override
+    public List<AssetListForPrintResponse> findAllByFilterForPrint(AssetSearchRequest searchRequest, String orgCd) {
+        return queryFactory
+                .select(Projections.fields(AssetListForPrintResponse.class,
+                        itemAssetDetailEntity.itemId.itmNo,
+                        Expressions.stringTemplate("CONCAT({0}, '-', {1})",
+                                g2bItemJpaEntity.g2bMCd,
+                                itemAssetDetailEntity.g2bDCd).as("g2bItemNo"),
+                        g2bItemJpaEntity.g2bDNm.as("g2bItemNm"),
+                        itemAssetMasterEntity.acqAt,
+                        itemAssetDetailEntity.acqUpr,
+                        itemAssetMasterEntity.arrgAt,
+                        departmentJpaEntity.deptNm.as("deptNm"),
+                        itemAssetDetailEntity.operSts.stringValue().as("operSts"),
+                        itemAssetDetailEntity.drbYr,
+                        itemAssetDetailEntity.printYn.as("printYn")
+                ))
+                .from(itemAssetDetailEntity)
+                .leftJoin(itemAssetMasterEntity).on(
+                        itemAssetDetailEntity.acqId.eq(itemAssetMasterEntity.acqId)
+                )
+                .leftJoin(g2bItemJpaEntity).on(
+                        itemAssetDetailEntity.g2bDCd.eq(g2bItemJpaEntity.g2bDCd)
+                )
+                .leftJoin(departmentJpaEntity).on(
+                        itemAssetDetailEntity.itemId.orgCd.eq(departmentJpaEntity.id.orgCd),
+                        itemAssetDetailEntity.deptCd.eq(departmentJpaEntity.id.deptCd)
+                )
+                .where(
+                        itemAssetDetailEntity.itemId.orgCd.eq(orgCd),
+                        g2bDCdEq(searchRequest.getG2bDCd()),
+                        acqAtBetween(searchRequest.getStartAcqAt(), searchRequest.getEndAcqAt()),
+                        arrgAtBetween(searchRequest.getStartArrgAt(), searchRequest.getEndArrgAt()),
+                        deptCdEq(searchRequest.getDeptCd()),
+                        operStsEq(searchRequest.getOperSts()),
+                        itmNoEq(searchRequest.getItmNo()),
+                        printYnEq(searchRequest.getPrintYn())
+                )
+                .orderBy(itemAssetDetailEntity.itemId.itmNo.desc())
+                .fetch();
+    }
+
     // ===== 동적 쿼리 헬퍼 =====
 
     private BooleanExpression g2bDCdEq(String cd) {
@@ -367,6 +446,12 @@ public class AssetRepositoryAdapter implements AssetRepository {
 
     private BooleanExpression itmNoEq(String itmNo) {
         return StringUtils.hasText(itmNo) ? itemAssetDetailEntity.itemId.itmNo.eq(itmNo) : null;
+    }
+
+    private BooleanExpression printYnEq(String printYn) {
+        return (printYn == null || printYn.isBlank())
+                ? null
+                : itemAssetDetailEntity.printYn.eq(printYn);
     }
 
 }
