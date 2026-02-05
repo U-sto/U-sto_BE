@@ -1,10 +1,11 @@
 package com.usto.api.item.asset.infrastructure.repository;
 
+import com.usto.api.item.asset.domain.model.Asset;
 import com.usto.api.item.asset.infrastructure.entity.ItemAssetDetailEntity;
 import com.usto.api.item.asset.infrastructure.entity.ItemAssetDetailId;
+import com.usto.api.item.asset.infrastructure.entity.ItemAssetMasterEntity;
 import com.usto.api.item.asset.presentation.dto.response.AssetAiItemDetailResponse;
-import com.usto.api.item.asset.presentation.dto.response.AssetListResponse;
-import com.usto.api.item.asset.presentation.dto.response.AssetPublicDetailResponse;
+import com.usto.api.item.asset.presentation.dto.response.AssetDetailResponse;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

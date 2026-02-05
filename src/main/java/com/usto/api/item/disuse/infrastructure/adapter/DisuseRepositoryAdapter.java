@@ -10,12 +10,17 @@ import com.usto.api.item.disuse.domain.model.DisuseDetail;
 import com.usto.api.item.disuse.domain.model.DisuseMaster;
 import com.usto.api.item.disuse.domain.repository.DisuseRepository;
 import com.usto.api.item.disuse.infrastructure.entity.ItemDisuseDetailEntity;
+import com.usto.api.item.disuse.infrastructure.entity.QItemDisuseDetailEntity;
 import com.usto.api.item.disuse.infrastructure.mapper.DisuseMapper;
 import com.usto.api.item.disuse.infrastructure.repository.DisuseDetailJpaRepository;
 import com.usto.api.item.disuse.infrastructure.repository.DisuseMasterJpaRepository;
 import com.usto.api.item.disuse.presentation.dto.request.DisuseSearchRequest;
 import com.usto.api.item.disuse.presentation.dto.response.DisuseItemListResponse;
 import com.usto.api.item.disuse.presentation.dto.response.DisuseListResponse;
+import com.usto.api.item.returning.domain.model.ReturningDetail;
+import com.usto.api.item.returning.infrastructure.entity.ItemReturningDetailEntity;
+import com.usto.api.item.returning.infrastructure.entity.QItemReturningDetailEntity;
+import com.usto.api.item.returning.infrastructure.mapper.ReturningMapper;
 import com.usto.api.user.infrastructure.entity.QUserJpaEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -231,6 +236,24 @@ public class DisuseRepositoryAdapter implements DisuseRepository {
                 .map(DisuseMapper::toDetailEntity)
                 .toList();
         detailJpaRepository.saveAll(entities);  // Batch INSERT
+    }
+
+
+    @Override
+    public List<DisuseDetail> findDetailsByMasterId(UUID dsuMId, String orgCd) {
+        QItemDisuseDetailEntity d = QItemDisuseDetailEntity.itemDisuseDetailEntity;
+
+        List<ItemDisuseDetailEntity> entities = queryFactory
+                .selectFrom(d)
+                .where(
+                        d.dsuMId.eq(dsuMId),
+                        d.orgCd.eq(orgCd)
+                )
+                .fetch();
+
+        return entities.stream()
+                .map(DisuseMapper::toDetailDomain)
+                .toList();
     }
 
 

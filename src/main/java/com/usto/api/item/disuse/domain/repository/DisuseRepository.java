@@ -32,4 +32,6 @@ public interface DisuseRepository {
     List<String> findDuplicatedItems(List<String> itmNos, UUID excludeDsuMId, String orgCd);
     // Batch 저장
     void saveAllDetails(List<DisuseDetail> details);
+
+    List<DisuseDetail> findDetailsByMasterId(UUID dsuMId, String orgCd);
 }

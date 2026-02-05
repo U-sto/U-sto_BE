@@ -7,6 +7,7 @@ import com.usto.api.item.acquisition.domain.model.Acquisition;
 import com.usto.api.item.acquisition.domain.service.AcquisitionPolicy;
 import com.usto.api.item.acquisition.infrastructure.mapper.AcquisitionMapper;
 import com.usto.api.item.asset.application.AssetApplication;
+import com.usto.api.item.returning.domain.model.ReturningMaster;
 import com.usto.api.organization.infrastructure.repository.DepartmentJpaRepository;
 import com.usto.api.item.acquisition.domain.repository.AcquisitionRepository;
 import com.usto.api.item.acquisition.presentation.dto.request.AcqRegisterRequest;
@@ -148,12 +149,10 @@ public class AcquisitionApplication {
     @Transactional
     public void approvalAcquisition(List<UUID> acqIds, String userId, String orgCd) {
 
-        List<Acquisition> acquisitions = acquisitionRepository.findAllById(acqIds);
-
-        //갯수 안 맞다? 문제 있는거
-        if (acquisitions.size() != acqIds.size()) {
-            throw new BusinessException("요청한 항목 중 존재하지 않는 취득 정보가 포함되어 있습니다.");
-        }
+        List<Acquisition> acquisitions = acqIds.stream()
+                .map(id -> acquisitionRepository.findMasterById(id, orgCd)
+                        .orElseThrow(() -> new BusinessException("존재하지 않는 취득 신청입니다.")))
+                .toList();
 
         for (Acquisition acquisition : acquisitions) {
             // 정책 검증
@@ -167,6 +166,28 @@ public class AcquisitionApplication {
             assetApplication.registerAssetsFromAcquisition(acquisition);
         }
         acquisitionRepository.saveAll(acquisitions);
+    }
+
+    //취득 반려
+    @Transactional
+    public void rejectAcquisition(List<UUID> acqIds, String userId, String orgCd) {
+
+        List<Acquisition> acquisitions = acqIds.stream()
+                .map(id -> acquisitionRepository.findMasterById(id, orgCd)
+                        .orElseThrow(() -> new BusinessException("존재하지 않는 취득 신청입니다.")))
+                .toList();
+
+
+        //소프트 삭제 전 상태 변경
+        for (Acquisition acquisition : acquisitions) {
+            // 도메인 로직 실행(반납 신청 반려처리 -> 저장)
+            acquisition.rejectApproval(userId);
+            acquisitionRepository.saveMaster(acquisition);
+        }
+        // 소프트 삭제 진행
+        for (UUID acqId : acqIds) {
+            acquisitionRepository.delete(acqId);
+        }
     }
 
     /**

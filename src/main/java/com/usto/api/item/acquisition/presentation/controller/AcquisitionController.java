@@ -2,8 +2,9 @@ package com.usto.api.item.acquisition.presentation.controller;
 
 import com.usto.api.common.utils.ApiResponse;
 import com.usto.api.item.acquisition.application.AcquisitionApplication;
-import com.usto.api.item.acquisition.presentation.dto.request.AcqApprovalBulkRequestDto;
+import com.usto.api.item.acquisition.presentation.dto.request.AcqApprovalBulkRequest;
 import com.usto.api.item.acquisition.presentation.dto.request.AcqRegisterRequest;
+import com.usto.api.item.acquisition.presentation.dto.request.AcqRejectBulkRequest;
 import com.usto.api.item.acquisition.presentation.dto.request.AcqSearchRequest;
 import com.usto.api.item.acquisition.presentation.dto.response.AcqListResponse;
 import com.usto.api.item.acquisition.presentation.dto.response.AcqRegisterResponse;
@@ -36,7 +37,10 @@ public class AcquisitionController {
     public ApiResponse<List<AcqListResponse>> getList(
             @Valid AcqSearchRequest searchRequest,
             @AuthenticationPrincipal UserPrincipal principal) {
-        return ApiResponse.ok("조회 성공", acquisitionApplication.getAcquisitionList(searchRequest, principal.getOrgCd()));
+
+        List<AcqListResponse> result = acquisitionApplication.getAcquisitionList(searchRequest, principal.getOrgCd());
+
+        return ApiResponse.ok("조회 성공", result);
     }
 
     // 2. 등록
@@ -119,7 +123,7 @@ public class AcquisitionController {
     @PutMapping("/admin/approval")
     @PreAuthorize("hasRole('ADMIN')")
     public ApiResponse<?> approvalRequest(
-            @RequestBody @Valid AcqApprovalBulkRequestDto request, // DTO로 변경
+            @RequestBody @Valid AcqApprovalBulkRequest request, // DTO로 변경
             @AuthenticationPrincipal UserPrincipal principal) {
             acquisitionApplication.approvalAcquisition(
                     request.getAcqIds(),
@@ -127,5 +131,22 @@ public class AcquisitionController {
                     principal.getOrgCd());
 
         return ApiResponse.ok("취득 승인 확정 성공");
+    }
+
+    //요청 반려
+    @Operation(
+            summary = "취득 요청 반려 (ADMIN)",
+            description = "취득 요청(REQUEST) 건을 반려하여 반려(REJECTED) 상태로 만듭니다."
+    )
+    @DeleteMapping("/admin/reject")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ApiResponse<Void> approvalReject(
+            @RequestBody @Valid AcqRejectBulkRequest request,
+            @AuthenticationPrincipal UserPrincipal principal){
+        acquisitionApplication.rejectAcquisition(
+                request.getAcqIds(),
+                principal.getUsername(),
+                principal.getOrgCd());
+        return ApiResponse.ok("취득 요청 반려 성공");
     }
 }

@@ -5,7 +5,9 @@ import com.usto.api.common.exception.BusinessException;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 @SuperBuilder(toBuilder = true)
 @Getter
@@ -43,7 +45,7 @@ public class User extends BaseTime {
         return this.toBuilder()
                 .apprUsrId(apprUsrId)
                 .apprSts(ApprovalStatus.APPROVED)
-                .apprAt(LocalDateTime.now())
+                .apprAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
                 .roleId(assignedRole)
                 .build();
     }
@@ -59,7 +61,7 @@ public class User extends BaseTime {
         return this.toBuilder()
                 .apprUsrId(apprUsrId)
                 .apprSts(ApprovalStatus.REJECTED)
-                .apprAt(LocalDateTime.now())
+                .apprAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
                 .build();
     }
 

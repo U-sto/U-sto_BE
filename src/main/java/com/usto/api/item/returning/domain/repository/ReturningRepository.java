@@ -28,4 +28,6 @@ public interface ReturningRepository {
     List<String> findItemNosByMasterId(UUID rtrnMId, String orgCd);
 
     boolean existsInOtherReturning(String itmNo, UUID excludeRtrnMId, String orgCd);
+
+    List<ReturningDetail> findDetailsByMasterId(UUID rtrnMId, String orgCd);
 }

@@ -47,8 +47,8 @@ public class Asset {
      * 반납 처리 (부서코드 제거)
      */
     public void returnAsset() {
-        this.deptCd = "NONE";
         this.operSts = OperStatus.RTN;
+        this.deptCd = "NONE";
     }
 
     /**
@@ -66,8 +66,7 @@ public class Asset {
         return "Y".equals(this.delYn);
     }
 
-    //출력 상태 변경
-    public void printed(){
-        this.printYn = "Y";
+    public void disuseAsset() {
+        this.operSts = OperStatus.DSU;
     }
 }

@@ -2,7 +2,9 @@ package com.usto.api.item.returning.application;
 
 import com.usto.api.common.exception.BusinessException;
 import com.usto.api.item.asset.domain.model.Asset;
+import com.usto.api.item.asset.domain.model.AssetStatusHistory;
 import com.usto.api.item.asset.domain.repository.AssetRepository;
+import com.usto.api.item.asset.domain.repository.AssetStatusHistoryRepository;
 import com.usto.api.item.asset.domain.service.AssetPolicy;
 import com.usto.api.item.common.model.OperStatus;
 import com.usto.api.item.returning.domain.model.ReturningDetail;
@@ -18,6 +20,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -29,6 +34,7 @@ public class ReturningApplication {
     private final ReturningPolicy returningPolicy;
     private final AssetRepository assetRepository;
     private final AssetPolicy assetPolicy;
+    private AssetStatusHistoryRepository historyRepository;
 
     /**
      * 반납 신청 등록
@@ -58,6 +64,7 @@ public class ReturningApplication {
                     .orElseThrow(() -> new BusinessException("물품을 찾을 수 없습니다: " + itmNo));
 
             assetPolicy.validateUpdate(asset, orgCd);
+            assetPolicy.validateReturn(asset); //있는거 아까워서 그냥 넣었어요
 
             // 중복 체크
             if (returningRepository.existsInOtherReturning(itmNo, null, orgCd)) {
@@ -201,8 +208,77 @@ public class ReturningApplication {
      * - 부서코드 NONE 값으로 변경
      * - 상태 이력 테이블에 기록 생성
      */
+    @Transactional
+    public void approvalReturning(UUID rtrnMId, String userId, String orgCd) {
+
+        ReturningMaster master = returningRepository.findMasterById(rtrnMId, orgCd)
+                .orElseThrow(() -> new BusinessException("존재하지 않는 반납 신청입니다."));
+
+        returningPolicy.validateOwnership(master, orgCd);
+        returningPolicy.validateConfirm(master);
+
+        List<ReturningDetail> details = returningRepository.findDetailsByMasterId(rtrnMId, orgCd);
+        if (details.isEmpty()) {
+            throw new BusinessException("반납 상세 정보가 없습니다.");
+        }
+
+        List<Asset> assetsToUpdate = new ArrayList<>(details.size());
+        List<AssetStatusHistory> histories = new ArrayList<>(details.size());
+
+        for (ReturningDetail detail : details) {
+
+            String itemNo = detail.getItmNo();
+            Asset asset = assetRepository.findAssetById(itemNo, orgCd);
+            if (asset == null) {
+                throw new BusinessException("해당 물품 정보를 대장에서 찾을 수 없습니다: " + itemNo);
+            }
+            // 반납된 물품들의 상태 변경 (OPER → RTN)
+            //이전 상태 저장
+            OperStatus prevStatus = asset.getOperSts();
+            asset.returnAsset(); //반납처리 + 부서초기화 후
+            assetsToUpdate.add(asset);
+            histories.add(AssetStatusHistory.builder()
+                    .itemHisId(UUID.randomUUID())
+                    .itmNo(itemNo)
+                    .prevSts(prevStatus) //이전 상태
+                    .newSts(asset.getOperSts()) //현재 상태 = 반납
+                    .chgRsn("반납 신청 승인") //별도로 enum 관리를 하고싶다면 변동 가능성 있음.
+                    .reqUsrId(master.getAplyUsrId())
+                    .reqAt(master.getAplyAt())
+                    .apprUsrId(userId)
+                    .orgCd(orgCd)
+                    .apprAt(LocalDate.now(ZoneId.of("Asia/Seoul")))
+                    .delAt(asset.getDelAt())
+                    .delYn(asset.getDelYn())
+                    .build());
+        }
+        assetRepository.saveAll(assetsToUpdate);
+        historyRepository.saveAll(histories);
+
+        master.confirmApproval(userId);
+        returningRepository.saveMaster(master);
+    }
+
+
 
     /**
      * TODO: 반납 반려 (ADMIN 권한)
+     * 승인요청 취소와 비슷하게 진행
      */
+    @Transactional
+    public void rejectReturning(UUID rtrnMId, String userId, String orgCd) {
+
+        ReturningMaster master = returningRepository.findMasterById(rtrnMId, orgCd)
+                .orElseThrow(() -> new BusinessException("존재하지 않는 반납 신청입니다."));
+        //정책 확인
+        returningPolicy.validateConfirm(master);
+
+        //소프트 삭제 전 상태 변경(반납 신청 반려처리 -> 저장)
+        master.rejectApproval(userId);
+        returningRepository.saveMaster(master);
+
+        // 소프트 삭제 진행
+        returningRepository.deleteMaster(rtrnMId);
+
+    }
 }

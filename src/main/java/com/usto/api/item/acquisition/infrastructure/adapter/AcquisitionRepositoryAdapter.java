@@ -157,6 +157,12 @@ public class AcquisitionRepositoryAdapter implements AcquisitionRepository {
 
     }
 
+    @Override
+    public Optional<Acquisition> findMasterById(UUID id, String orgCd) {
+        return jpaRepository.findByAcqIdAndOrgCd(id,orgCd)
+                .map(AcquisitionMapper::toDomain);
+    }
+
     //야기서 보낸 도메인들
     @Override
     public List<Acquisition> findAllById(List<UUID> acqIds) {
@@ -167,5 +173,12 @@ public class AcquisitionRepositoryAdapter implements AcquisitionRepository {
         return entities.stream()
                 .map(AcquisitionMapper::toDomain)
                 .toList();
+    }
+
+    @Override
+    public Acquisition saveMaster(Acquisition acquisition) {
+        ItemAcquisitionEntity entity = AcquisitionMapper.toEntity(acquisition);
+        ItemAcquisitionEntity saved = jpaRepository.save(entity);
+        return AcquisitionMapper.toDomain(saved);
     }
 }

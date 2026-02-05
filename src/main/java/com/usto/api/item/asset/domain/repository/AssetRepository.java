@@ -49,5 +49,7 @@ public interface AssetRepository {
 
     List<AssetAiItemDetailResponse> findOneByItmNo(String itmNo, String orgCd);
 
-    AssetPublicDetailResponse findPublicDetailByItmNoAndOrgCd(String itmNo, String orgCd);
+    Asset findAssetById(String itmNo, String orgCd);
+
+    void saveAll(List<Asset> assetsToUpdate);
 }
