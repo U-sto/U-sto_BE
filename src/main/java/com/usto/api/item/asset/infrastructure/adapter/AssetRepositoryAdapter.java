@@ -335,47 +335,6 @@ public class AssetRepositoryAdapter implements AssetRepository {
     }
 
     @Override
-    public List<AssetListForPrintResponse> findAllForPrint(AssetListForPrintRequest searchRequest, String orgCd) {
-        return queryFactory
-                .select(Projections.fields(AssetListForPrintResponse.class,
-                        itemAssetDetailEntity.itemId.itmNo,
-                        Expressions.stringTemplate("CONCAT({0}, '-', {1})",
-                                g2bItemJpaEntity.g2bMCd,
-                                itemAssetDetailEntity.g2bDCd).as("g2bItemNo"),
-                        g2bItemJpaEntity.g2bDNm.as("g2bItemNm"),
-                        itemAssetMasterEntity.acqAt,
-                        itemAssetDetailEntity.acqUpr,
-                        itemAssetMasterEntity.arrgAt,
-                        departmentJpaEntity.deptNm.as("deptNm"),
-                        itemAssetDetailEntity.operSts.stringValue().as("operSts"),
-                        itemAssetDetailEntity.drbYr,
-                        itemAssetDetailEntity.printYn.as("printYn")
-                ))
-                .from(itemAssetDetailEntity)
-                .leftJoin(itemAssetMasterEntity).on(
-                        itemAssetDetailEntity.acqId.eq(itemAssetMasterEntity.acqId)
-                )
-                .leftJoin(g2bItemJpaEntity).on(
-                        itemAssetDetailEntity.g2bDCd.eq(g2bItemJpaEntity.g2bDCd)
-                )
-                .leftJoin(departmentJpaEntity).on(
-                        itemAssetDetailEntity.itemId.orgCd.eq(departmentJpaEntity.id.orgCd),
-                        itemAssetDetailEntity.deptCd.eq(departmentJpaEntity.id.deptCd)
-                )
-                .where(
-                        itemAssetDetailEntity.itemId.orgCd.eq(orgCd),
-                        g2bDCdEq(searchRequest.getG2bDCd()),
-                        acqAtBetween(searchRequest.getStartAcqAt(), searchRequest.getEndAcqAt()),
-                        arrgAtBetween(searchRequest.getStartArrgAt(), searchRequest.getEndArrgAt()),
-                        deptCdEq(searchRequest.getDeptCd()),
-                        operStsEq(searchRequest.getOperSts()),
-                        itmNoEq(searchRequest.getItmNo())
-                )
-                .orderBy(itemAssetDetailEntity.itemId.itmNo.desc())
-                .fetch();
-    }
-
-    @Override
     public List<AssetListForPrintResponse> findAllByFilterForPrint(AssetListForPrintRequest searchRequest, String orgCd) {
         return queryFactory
                 .select(Projections.fields(AssetListForPrintResponse.class,

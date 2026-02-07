@@ -253,11 +253,6 @@ public class AssetApplication {
 
     @Transactional(readOnly = true)
     public List<AssetListForPrintResponse> getAssetListForPrint(@Valid AssetListForPrintRequest searchRequest, String orgCd) {
-        if(searchRequest.getPrintYn() == null){ //전체
-            return assetRepository.findAllForPrint(searchRequest,orgCd);
-
-        }else { //Y or N
-            return assetRepository.findAllByFilterForPrint(searchRequest,orgCd);
-        }
+        return assetRepository.findAllByFilterForPrint(searchRequest,orgCd);
     }
 }

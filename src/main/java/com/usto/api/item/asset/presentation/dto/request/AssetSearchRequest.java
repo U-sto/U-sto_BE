@@ -2,7 +2,6 @@ package com.usto.api.item.asset.presentation.dto.request;
 
 import com.usto.api.item.common.model.OperStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.Setter;
 

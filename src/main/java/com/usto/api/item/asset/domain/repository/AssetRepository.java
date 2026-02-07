@@ -54,7 +54,5 @@ public interface AssetRepository {
 
     Optional<AssetPublicDetailResponse> findPublicDetailByItmNoAndOrgCd(String itmNo, String orgCd);
 
-    List<AssetListForPrintResponse> findAllForPrint(@Valid AssetListForPrintRequest searchRequest, String orgCd);
-
     List<AssetListForPrintResponse> findAllByFilterForPrint(@Valid AssetListForPrintRequest searchRequest, String orgCd);
 }
