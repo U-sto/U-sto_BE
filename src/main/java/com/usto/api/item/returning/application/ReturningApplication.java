@@ -34,7 +34,7 @@ public class ReturningApplication {
     private final ReturningPolicy returningPolicy;
     private final AssetRepository assetRepository;
     private final AssetPolicy assetPolicy;
-    private AssetStatusHistoryRepository historyRepository;
+    private final AssetStatusHistoryRepository historyRepository;
 
     /**
      * 반납 신청 등록
@@ -219,7 +219,7 @@ public class ReturningApplication {
 
         List<ReturningDetail> details = returningRepository.findDetailsByMasterId(rtrnMId, orgCd);
         if (details.isEmpty()) {
-            throw new BusinessException("반납 상세 정보가 없습니다.");
+            throw new BusinessException("불용 상세 정보가 없습니다.");
         }
 
         List<Asset> assetsToUpdate = new ArrayList<>(details.size());
