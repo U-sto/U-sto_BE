@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -34,4 +35,7 @@ public interface DisuseRepository {
     void saveAllDetails(List<DisuseDetail> details);
 
     List<DisuseDetail> findDetailsByMasterId(UUID dsuMId, String orgCd);
+
+    // 물품번호 리스트로 승인된 불용 마스터 정보(상태, 사유) 조회
+    Map<String, DisuseMaster> findApprovedMastersByItmNos(List<String> itmNos, String orgCd);
 }
