@@ -24,6 +24,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextHolderFilter;
 import org.springframework.security.web.context.SecurityContextRepository;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -60,9 +61,6 @@ public class SecurityConfig {
                 .sessionManagement(sm -> sm
                         .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED) //필요할 때만(남용x)
                         .sessionFixation().changeSessionId() // 로그인 시 세션 ID 변경
-                        .invalidSessionStrategy((request, response) -> {
-                            log.warn("⚠️ Invalid session detected, but preserving SecurityContext");
-                     })
                 )
                 .exceptionHandling(eh -> eh
                         .authenticationEntryPoint((request, response, authException) -> {
@@ -100,11 +98,10 @@ public class SecurityConfig {
                         })
                 )
 
-                // Swagger
+                // 역할별 경로 제한 로직
                 .authorizeHttpRequests(auth -> {
-                    // 기본 허용 경로 (언제든 접근 가능)
+                    // 기본 허용 경로 (언제든 접근 가능) - 아무 역할이 아니더라도
                     auth.requestMatchers(
-                            "/v3/api-docs/**",
                             "/api/users/sign-up", //회원가입
                             "/api/users/exists/**", //중복조회 when 회원가입
                             "/api/auth/find/**", //아이디/비밀번호 찾기
@@ -112,33 +109,22 @@ public class SecurityConfig {
                             "/api/auth/login", //로그인
                             "/api/auth/logout", //로그아웃
                             "/api/approval/**", //일단은 열어두는데 추후에 막아야한다.
-                            "/api/g2b/sync",
+                            "/api/g2b/sync", //일단 열어두는데 추후에 막아야한다.
                             "/api/g2b/test",//일단은 열어두는데 추후에 막아야한다.
                             "/api/g2b/add-drbYr", //일단은 열어두는데 추후에 막아야한다.
                             "/api/g2b/test/usefulLife", //일단은 열어두는데 추후에 막아야한다.
                             "/api/public/**",
                             "/public/**", //타임리프용
-                            "/images/**" //한양대 로고 보여주기 용
-                    ).permitAll();
-
-
-                    //역할별 접근 제한
-                    auth.requestMatchers("/api/item/acquisitions/admin/**").hasRole("ADMIN");
-                    auth.requestMatchers("/api/**").hasAnyRole("MANAGER", "ADMIN");
-
-                    if (isDev) {
-                        // 개발 환경(dev)일 때만 로그인 없이 스웨거 테스트하고 싶은 API 작성 가능
-
-                    }
-
-                    auth.requestMatchers(
+                            "/images/**", //한양대 로고 보여주기 용
                             "/v3/api-docs/**",
                             "/swagger-ui/**",
                             "/swagger-ui.html",
-                            "/swagger-resources/**"
+                            "/swagger-resources/**",
+                            "/error"
                     ).permitAll();
-
-                    auth.requestMatchers("/error").permitAll();
+                    //역할별 접근 제한
+                    auth.requestMatchers("/api/item/**/admin/**").hasRole("ADMIN");
+                    auth.requestMatchers("/api/**").hasAnyRole("MANAGER", "ADMIN");
 
                     auth.anyRequest().authenticated();
                 })
@@ -193,23 +179,5 @@ public class SecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
-    }
-
-    //아이디,비밀번호 로그인 실행기 (로그인 구현시에 사용할 예정)
-    /**
-     *\
-     * @param userDetailsService
-     * @param passwordEncoder
-     * @return
-     */
-    @Bean
-    public DaoAuthenticationProvider daoAuthenticationProvider(
-            CustomUserDetailsService userDetailsService,
-            PasswordEncoder passwordEncoder
-    ) {
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setUserDetailsService(userDetailsService); // 사용자 조회 전략
-        provider.setPasswordEncoder(passwordEncoder);       // 비밀번호 비교 전략(핵심)
-        return provider;
     }
 }
