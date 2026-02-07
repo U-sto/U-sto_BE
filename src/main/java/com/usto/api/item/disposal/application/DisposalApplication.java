@@ -2,7 +2,9 @@ package com.usto.api.item.disposal.application;
 
 import com.usto.api.common.exception.BusinessException;
 import com.usto.api.item.asset.domain.model.Asset;
+import com.usto.api.item.asset.domain.model.AssetStatusHistory;
 import com.usto.api.item.asset.domain.repository.AssetRepository;
+import com.usto.api.item.asset.domain.repository.AssetStatusHistoryRepository;
 import com.usto.api.item.asset.domain.service.AssetPolicy;
 import com.usto.api.item.common.model.OperStatus;
 import com.usto.api.item.disposal.domain.model.DisposalDetail;
@@ -14,6 +16,7 @@ import com.usto.api.item.disposal.presentation.dto.request.DisposalRegisterReque
 import com.usto.api.item.disposal.presentation.dto.request.DisposalSearchRequest;
 import com.usto.api.item.disposal.presentation.dto.response.DisposalItemListResponse;
 import com.usto.api.item.disposal.presentation.dto.response.DisposalListResponse;
+import com.usto.api.item.disuse.domain.model.DisuseDetail;
 import com.usto.api.item.disuse.domain.model.DisuseMaster;
 import com.usto.api.item.disuse.domain.repository.DisuseRepository;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +25,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -35,6 +40,7 @@ public class DisposalApplication {
     private final DisposalPolicy disposalPolicy;
     private final AssetRepository assetRepository;
     private final DisuseRepository disuseRepository;  // 불용 정보 조회용
+    private final AssetStatusHistoryRepository historyRepository;
 
     /**
      * 처분 신청 등록
@@ -44,13 +50,13 @@ public class DisposalApplication {
     @Transactional
     public UUID registerDisposal(DisposalRegisterRequest request, String userId, String orgCd) {
         // 처분일자 검증
-        disposalPolicy.validateDispAt(request.getDispAt());
+        disposalPolicy.validateAplyAt(request.getAplyAt());
 
         // 1. 처분 신청서(Master) 생성
         DisposalMaster master = DisposalMapper.toMasterDomain(
                 userId,
                 request.getDispType(),
-                request.getDispAt(),
+                request.getAplyAt(),
                 orgCd
         );
         DisposalMaster savedMaster = disposalRepository.saveMaster(master);
@@ -95,7 +101,7 @@ public class DisposalApplication {
         disposalPolicy.validateModifiable(master);
 
         // 3. 마스터 정보 업데이트
-        master.updateInfo(request.getDispType(), request.getDispAt());
+        master.updateInfo(request.getDispType(), request.getAplyAt());
         disposalRepository.saveMaster(master);
 
         // 4. 기존 상세 삭제
@@ -227,13 +233,75 @@ public class DisposalApplication {
         disposalRepository.saveAllDetails(details);
     }
 
+
     /**
      * TODO: 처분 승인 (ADMIN 권한)
      * - 승인 시 물품 소프트삭제
      * - 상태 이력 테이블에 기록
      */
+    public void approvalDisposal(UUID dispMId, String userId, String orgCd) {
+        DisposalMaster master = disposalRepository.findMasterById(dispMId, orgCd)
+                .orElseThrow(() -> new BusinessException("존재하지 않는 불용 신청입니다."));
+
+        disposalPolicy.validateOwnership(master,orgCd);
+        disposalPolicy.validateConfirm(master);
+
+        List<DisposalDetail> details = disposalRepository.findDetailsByMasterId(dispMId, orgCd);
+        if (details.isEmpty()) {
+            throw new BusinessException("처분 상세 정보가 없습니다.");
+        }
+
+        List<Asset> assetsToUpdate = new ArrayList<>(details.size());
+        List<AssetStatusHistory> histories = new ArrayList<>(details.size());
+
+        for (DisposalDetail detail : details) {
+            String itemNo = detail.getItmNo();
+            Asset asset = assetRepository.findAssetById(itemNo, orgCd);
+            if (asset == null) {
+                throw new BusinessException("해당 물품 정보를 대장에서 찾을 수 없습니다: " + itemNo);
+            }
+
+            OperStatus prevStatus = asset.getOperSts();
+            asset.disuseAsset();
+            assetsToUpdate.add(asset);
+            //물품 히스토리 저장 로직 실행
+            histories.add(
+                    AssetStatusHistory.builder()
+                            .itemHisId(UUID.randomUUID())
+                            .itmNo(itemNo)
+                            .prevSts(prevStatus) //이전 상태
+                            .newSts(asset.getOperSts()) //현재 상태 = 반납
+                            .chgRsn("처분 신청 승인") //별도로 enum 관리를 하고싶다면 변동 가능성 있음.
+                            .reqUsrId(master.getAplyUsrId())
+                            .reqAt(master.getAplyAt())
+                            .apprUsrId(userId)
+                            .apprAt(LocalDate.now(ZoneId.of("Asia/Seoul")))
+                            .orgCd(orgCd)
+                            .delAt(asset.getDelAt())
+                            .delYn(asset.getDelYn())
+                            .build());
+        }
+        assetRepository.saveAll(assetsToUpdate);
+        historyRepository.saveAll(histories);
+        master.confirmApproval(userId);
+        // 마스터 저장
+        disposalRepository.saveMaster(master);
+    }
 
     /**
      * TODO: 처분 반려 (ADMIN 권한)
      */
+    public void rejectDisposal(UUID dispMId, String userId, String orgCd) {
+        DisposalMaster master = disposalRepository.findMasterById(dispMId, orgCd)
+                .orElseThrow(() -> new BusinessException("존재하지 않는 불용 신청입니다."));
+        //정책 확인
+        disposalPolicy.validateConfirm(master);
+
+        //소프트 삭제 전 상태 변경(반납 신청 반려처리 -> 저장)
+        master.rejectApproval(userId);
+        disposalRepository.saveMaster(master);
+
+        // 소프트 삭제 진행
+        disposalRepository.deleteMaster(dispMId);
+    }
 }
