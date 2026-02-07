@@ -14,10 +14,10 @@ import java.time.LocalDate;
 public class DisposalSearchRequest {
 
     @Schema(description = "처분일자 시작")
-    private LocalDate startDispAt;
+    private LocalDate startAplyAt;
 
     @Schema(description = "처분일자 종료")
-    private LocalDate endDispAt;
+    private LocalDate endAplyAt;
 
     @Schema(description = "처분정리구분 (SALE/DONATION/DISCARD/TRANSFER)")
     private DisposalArrangementType dispType;
