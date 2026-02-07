@@ -3,6 +3,7 @@ package com.usto.api.item.disposal.domain.service;
 import com.usto.api.common.exception.BusinessException;
 import com.usto.api.item.common.model.ApprStatus;
 import com.usto.api.item.disposal.domain.model.DisposalMaster;
+import com.usto.api.item.disuse.domain.model.DisuseMaster;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
@@ -55,9 +56,15 @@ public class DisposalPolicy {
     /**
      * 처분일자 검증
      */
-    public void validateDispAt(LocalDate dispAt) {
-        if (dispAt == null || dispAt.isAfter(LocalDate.now(KOREA_ZONE))) {
+    public void validateAplyAt(LocalDate aplyAt) {
+        if (aplyAt == null || aplyAt.isAfter(LocalDate.now(KOREA_ZONE))) {
             throw new BusinessException("처분일자는 미래 날짜를 선택할 수 없습니다.");
+        }
+    }
+
+    public void validateConfirm(DisposalMaster master) {
+        if (master.getApprSts() != ApprStatus.REQUEST) {
+            throw new BusinessException("승인요청 중인 상태만 확정/반려할 수 있습니다.");
         }
     }
 }
