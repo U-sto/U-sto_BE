@@ -278,8 +278,5 @@ public class DisuseApplication {
         //소프트 삭제 전 상태 변경(반납 신청 반려처리 -> 저장)
         master.rejectApproval(userId);
         disuseRepository.saveMaster(master);
-
-        // 소프트 삭제 진행
-        disuseRepository.deleteMaster(dsuMId);
     }
 }

@@ -184,10 +184,6 @@ public class AcquisitionApplication {
             acquisition.rejectApproval(userId);
             acquisitionRepository.saveMaster(acquisition);
         }
-        // 소프트 삭제 진행
-        for (UUID acqId : acqIds) {
-            acquisitionRepository.delete(acqId);
-        }
     }
 
     /**

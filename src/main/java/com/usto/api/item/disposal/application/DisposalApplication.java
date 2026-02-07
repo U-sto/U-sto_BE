@@ -300,8 +300,5 @@ public class DisposalApplication {
         //소프트 삭제 전 상태 변경(반납 신청 반려처리 -> 저장)
         master.rejectApproval(userId);
         disposalRepository.saveMaster(master);
-
-        // 소프트 삭제 진행
-        disposalRepository.deleteMaster(dispMId);
     }
 }
