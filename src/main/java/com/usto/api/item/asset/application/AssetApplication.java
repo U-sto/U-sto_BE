@@ -7,21 +7,17 @@ import com.usto.api.item.asset.domain.model.QrLabelData;
 import com.usto.api.item.asset.domain.repository.AssetRepository;
 import com.usto.api.item.asset.domain.service.AssetPolicy;
 import com.usto.api.item.asset.infrastructure.mapper.AssetMapper;
+import com.usto.api.item.asset.presentation.dto.request.AssetListForPrintRequest;
 import com.usto.api.item.asset.presentation.dto.request.AssetSearchRequest;
 import com.usto.api.item.asset.presentation.dto.request.AssetUpdateRequest;
-import com.usto.api.item.asset.presentation.dto.response.AssetAiItemDetailResponse;
-import com.usto.api.item.asset.presentation.dto.response.AssetDetailResponse;
-import com.usto.api.item.asset.presentation.dto.response.AssetListResponse;
-import com.usto.api.item.asset.presentation.dto.response.AssetPublicDetailResponse;
+import com.usto.api.item.asset.presentation.dto.response.*;
 import com.usto.api.item.common.utils.ItemNumberGenerator;
 import com.usto.api.common.exception.BusinessException;
 import com.usto.api.item.common.utils.QrLabelPdfGenerator;
 import com.usto.api.organization.infrastructure.repository.OrganizationJpaRepository;
-import com.usto.api.user.domain.repository.UserRepository;
-import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.web.webauthn.management.ImmutableRelyingPartyRegistrationRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -253,5 +249,10 @@ public class AssetApplication {
     @Transactional(readOnly = true)
     public Optional<AssetPublicDetailResponse> getAssetPublicDetail(String orgCd, String itmNo) {
         return assetRepository.findPublicDetailByItmNoAndOrgCd(itmNo,orgCd);
+    }
+
+    @Transactional(readOnly = true)
+    public List<AssetListForPrintResponse> getAssetListForPrint(@Valid AssetListForPrintRequest searchRequest, String orgCd) {
+        return assetRepository.findAllByFilterForPrint(searchRequest,orgCd);
     }
 }

@@ -2,10 +2,12 @@ package com.usto.api.item.asset.presentation.controller;
 
 import com.usto.api.common.utils.ApiResponse;
 import com.usto.api.item.asset.application.AssetApplication;
+import com.usto.api.item.asset.presentation.dto.request.AssetListForPrintRequest;
 import com.usto.api.item.asset.presentation.dto.request.AssetPrintRequest;
 import com.usto.api.item.asset.presentation.dto.request.AssetSearchRequest;
 import com.usto.api.item.asset.presentation.dto.request.AssetUpdateRequest;
 import com.usto.api.item.asset.presentation.dto.response.AssetDetailResponse;
+import com.usto.api.item.asset.presentation.dto.response.AssetListForPrintResponse;
 import com.usto.api.item.asset.presentation.dto.response.AssetListResponse;
 import com.usto.api.user.domain.model.UserPrincipal;
 import io.swagger.v3.oas.annotations.Operation;
@@ -106,5 +108,18 @@ public class AssetController {
         return ResponseEntity.ok()
                 .headers(headers)
                 .body(pdfBytes);
+    }
+
+    @Operation(
+            summary = "출력물관리 목록 조회",
+            description = "필터 조건(G2B, 취득일자, 정리일자, 부서, 운용상태, 물품번호 + 출력상태)에 따라 운용대장을 조회합니다. 논리삭제된 물품은 제외됩니다."
+    )
+    @GetMapping("/print")
+    public ApiResponse<List<AssetListForPrintResponse>> getPrintList(
+            @Valid AssetListForPrintRequest searchRequest,
+            @AuthenticationPrincipal UserPrincipal principal) {
+
+        return ApiResponse.ok("조회 성공",
+                assetApplication.getAssetListForPrint(searchRequest, principal.getOrgCd()));
     }
 }

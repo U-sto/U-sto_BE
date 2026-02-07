@@ -3,11 +3,10 @@ package com.usto.api.item.asset.domain.repository;
 import com.usto.api.item.asset.domain.model.Asset;
 import com.usto.api.item.asset.domain.model.AssetMaster;
 import com.usto.api.item.asset.domain.model.AssetStatusHistory;
+import com.usto.api.item.asset.presentation.dto.request.AssetListForPrintRequest;
 import com.usto.api.item.asset.presentation.dto.request.AssetSearchRequest;
-import com.usto.api.item.asset.presentation.dto.response.AssetAiItemDetailResponse;
-import com.usto.api.item.asset.presentation.dto.response.AssetDetailResponse;
-import com.usto.api.item.asset.presentation.dto.response.AssetListResponse;
-import com.usto.api.item.asset.presentation.dto.response.AssetPublicDetailResponse;
+import com.usto.api.item.asset.presentation.dto.response.*;
+import jakarta.validation.Valid;
 
 import java.util.List;
 import java.util.Optional;
@@ -54,4 +53,6 @@ public interface AssetRepository {
     void saveAll(List<Asset> assetsToUpdate);
 
     Optional<AssetPublicDetailResponse> findPublicDetailByItmNoAndOrgCd(String itmNo, String orgCd);
+
+    List<AssetListForPrintResponse> findAllByFilterForPrint(@Valid AssetListForPrintRequest searchRequest, String orgCd);
 }
