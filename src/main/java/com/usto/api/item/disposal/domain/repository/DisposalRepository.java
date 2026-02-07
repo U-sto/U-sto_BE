@@ -34,4 +34,6 @@ public interface DisposalRepository {
 
     // Batch 저장
     void saveAllDetails(List<DisposalDetail> details);
+
+    List<DisposalDetail> findDetailsByMasterId(UUID dispMId, String orgCd);
 }

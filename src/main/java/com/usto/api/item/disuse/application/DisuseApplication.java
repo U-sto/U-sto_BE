@@ -38,7 +38,7 @@ public class DisuseApplication {
     private final DisusePolicy disusePolicy;
     private final AssetRepository assetRepository;
     private final AssetPolicy assetPolicy;
-    final AssetStatusHistoryRepository historyRepository;
+    private final AssetStatusHistoryRepository historyRepository;
 
     /**
      * 불용 신청 등록
