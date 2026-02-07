@@ -1,8 +1,11 @@
 package com.usto.api.common.config;
 
+import com.usto.api.common.utils.SecurityContextPreservationFilter;
 import com.usto.api.user.application.CustomUserDetailsService;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
@@ -17,7 +20,9 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import org.springframework.security.web.context.SecurityContextHolderFilter;
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -26,6 +31,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.Arrays;
 import java.util.List;
 
+@Slf4j
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor // 생성자 주입용
@@ -41,22 +47,56 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                //세션 자동 저장
+                .securityContext(securityContext -> securityContext
+                        .requireExplicitSave(false)
+                        .securityContextRepository(securityContextRepository())
+                )
+                .addFilterAfter(
+                        new SecurityContextPreservationFilter(securityContextRepository()),
+                        UsernamePasswordAuthenticationFilter.class
+                )
                 // 세션 기반 인증 구조
-                .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)) //필요할 때만(남용x)
-
-                // 인증/인가에 대한 실패 응답을 API스럽게
+                .sessionManagement(sm -> sm
+                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED) //필요할 때만(남용x)
+                        .sessionFixation().changeSessionId() // 로그인 시 세션 ID 변경
+                        .invalidSessionStrategy((request, response) -> {
+                            log.warn("⚠️ Invalid session detected, but preserving SecurityContext");
+                     })
+                )
                 .exceptionHandling(eh -> eh
                         .authenticationEntryPoint((request, response, authException) -> {
+                            String uri = request.getRequestURI();
+                            String method = request.getMethod();
+                            String cookie = request.getHeader("Cookie");
+                            HttpSession session = request.getSession(false);
+
+                            //상세 로그 추가
+                            log.error("┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+                            log.error("┃  인증 실패: {} {}", method, uri);
+                            log.error("┃  원인: {}", authException.getMessage());
+                            log.error("┃  쿠키: {}", cookie != null ? "있음" : "없음");
+                            if (cookie != null) {
+                                log.error("┃    └─ {}", cookie);
+                            }
+                            log.error("┃  세션: {}", session != null ? "있음 (ID: " + session.getId() + ")" : "없음");
+                            if (session != null) {
+                                Object securityContext = session.getAttribute("SPRING_SECURITY_CONTEXT");
+                                log.error("┃    └─ SecurityContext in session: {}", securityContext != null ? "있음" : "없음");
+                            }
+                            log.error("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+
                             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-                            response.setCharacterEncoding("UTF-8"); // 한글 깨짐 방지 추가
-                            response.getWriter().write("{\"message\":\"로그인이 필요합니다.\"}"); //로그인이 필요합니다(프론트)
+                            response.setCharacterEncoding("UTF-8");
+                            response.getWriter().write("{\"message\":\"로그인이 필요합니다.\"}");
                         })
                         .accessDeniedHandler((request, response, accessDeniedException) -> {
+                            log.error(" 권한 부족: {} {}", request.getMethod(), request.getRequestURI());
                             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-                            response.setCharacterEncoding("UTF-8"); // 한글 깨짐 방지 추가
-                            response.getWriter().write("{\"message\":\"접근권한이 없습니다.\"}"); //접근 권한이 없습니다(프론트)
+                            response.setCharacterEncoding("UTF-8");
+                            response.getWriter().write("{\"message\":\"접근권한이 없습니다.\"}");
                         })
                 )
 
@@ -103,19 +143,11 @@ public class SecurityConfig {
                     auth.anyRequest().authenticated();
                 })
 
-                .formLogin(AbstractHttpConfigurer::disable) // no login for swagger , we need comfort
+                .formLogin(AbstractHttpConfigurer::disable) // no login we made it
                 .httpBasic(AbstractHttpConfigurer::disable)
-                //로그아웃
-                .logout(logout -> logout
-                        .logoutUrl("/api/auth/logout")
-                        .logoutSuccessHandler((request, response, authentication) -> {
-                            response.setStatus(HttpServletResponse.SC_OK);
-                            response.setContentType("application/json;charset=UTF-8");
-                            response.getWriter().write("{\"success\":true,\"message\":\"로그아웃 성공\",\"data\":null}");
-                        })
-                        .invalidateHttpSession(true)
-                        .deleteCookies("JSESSIONID")
-                );
+                .logout(AbstractHttpConfigurer::disable)// no login we made it
+        ;
+
 
         return http.build();
     }
