@@ -9,7 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.context.SecurityContextRepository;
-import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
@@ -18,13 +17,15 @@ import java.io.IOException;
  */
 @Slf4j
 @RequiredArgsConstructor
-public class SecurityContextPreservationFilter implements Filter {
+public class SecurityContextPersistenceFilter implements Filter {
 
     private final SecurityContextRepository securityContextRepository;
 
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
-            throws IOException, ServletException {
+    public void doFilter(
+            ServletRequest request,
+            ServletResponse response,
+            FilterChain chain) throws IOException, ServletException {
 
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse res = (HttpServletResponse) response;
