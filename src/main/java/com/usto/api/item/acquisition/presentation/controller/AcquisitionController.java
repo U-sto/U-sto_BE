@@ -63,7 +63,7 @@ public class AcquisitionController {
             summary = "물품 취득 수정 (MANAGER)",
             description = "작성중(WAIT) 상태인 취득 정보를 수정합니다. 승인 요청 중이거나 확정 및 반려된 데이터는 수정할 수 없습니다."
     )
-    @PutMapping("/{acqId}")
+    @PatchMapping("/{acqId}")
     @PreAuthorize("hasRole('MANAGER')")
     public ApiResponse<Void> update(
             @PathVariable UUID acqId,
@@ -138,7 +138,7 @@ public class AcquisitionController {
             summary = "취득 요청 반려 (ADMIN)",
             description = "취득 요청(REQUEST) 건을 반려하여 반려(REJECTED) 상태로 만듭니다."
     )
-    @DeleteMapping("/admin/reject")
+    @PutMapping("/admin/reject")
     @PreAuthorize("hasRole('ADMIN')")
     public ApiResponse<Void> approvalReject(
             @RequestBody @Valid AcqRejectBulkRequest request,

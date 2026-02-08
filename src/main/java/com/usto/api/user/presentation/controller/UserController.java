@@ -80,7 +80,7 @@ public class UserController {
             );
     }
 
-    @PutMapping("/update/password")
+    @PatchMapping("/update/password")
     @Operation(summary = "회원수정 - 비밀번호 변경")
     public ApiResponse<UserPwdUpdateResponse> updatePwd(
             @Valid @RequestBody PasswordResetRequestForInfo request,
@@ -98,7 +98,7 @@ public class UserController {
         );
     }
 
-    @PutMapping("/update/sms")
+    @PatchMapping("/update/sms")
     @Operation(summary = "휴대폰 번호 변경")
     public ApiResponse<UserSmsUpdateResponse> updateSms(
             @AuthenticationPrincipal UserPrincipal userPrincipal,

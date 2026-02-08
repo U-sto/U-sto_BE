@@ -72,7 +72,7 @@ public class ReturningController {
             summary = "반납 신청 수정 (MANAGER)",
             description = "작성중(WAIT) 상태의 반납 신청을 수정합니다."
     )
-    @PutMapping("/{rtrnMId}")
+    @PatchMapping("/{rtrnMId}")
     @PreAuthorize("hasRole('MANAGER')")
     public ApiResponse<Void> update(
             @PathVariable UUID rtrnMId,
@@ -142,7 +142,7 @@ public class ReturningController {
             summary = "반납 요청 반려 (ADMIN)",
             description = "승인 요청(REQUEST) 건을 반려하여 반려(REJECTED) 상태로 만듭니다."
     )
-    @DeleteMapping("/admin/{rtrnMId}/reject")
+    @PutMapping("/admin/{rtrnMId}/reject")
     @PreAuthorize("hasRole('ADMIN')")
     public ApiResponse<Void> approvalReject(
             @PathVariable UUID rtrnMId,

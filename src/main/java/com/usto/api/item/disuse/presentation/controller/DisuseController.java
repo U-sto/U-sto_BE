@@ -90,7 +90,7 @@ public class DisuseController {
             summary = "불용 신청 수정 (MANAGER)",
             description = "작성중(WAIT) 상태의 불용 신청을 수정합니다."
     )
-    @PutMapping("/{dsuMId}")
+    @PatchMapping("/{dsuMId}")
     @PreAuthorize("hasRole('MANAGER')")
     public ApiResponse<Void> update(
             @PathVariable UUID dsuMId,
@@ -161,7 +161,7 @@ public class DisuseController {
             summary = "불용 요청 반려 (ADMIN)",
             description = "승인 요청(REQUEST) 건을 반려하여 반려(REJECTED) 상태로 만듭니다."
     )
-    @DeleteMapping("/admin/{dsuMId}/reject")
+    @PutMapping("/admin/{dsuMId}/reject")
     @PreAuthorize("hasRole('ADMIN')")
     public ApiResponse<Void> approvalReject(
             @PathVariable UUID dsuMId,
