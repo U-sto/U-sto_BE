@@ -52,8 +52,8 @@ public class ExistsController {
                     new EmailExistsResponse(true));
         }
 
-        session.setAttribute(SessionKeys.EXISTS_EMAIL,exists);
-        session.setAttribute("exists.auth.email.target",fullEmail);
+        session.setAttribute(SessionKeys.EXISTS_EMAIL_CHECKED, exists);
+        session.setAttribute(SessionKeys.EXISTS_EMAIL_TARGET, fullEmail);
 
         return ApiResponse.ok("이용 가능한 이메일입니다",
                 new EmailExistsResponse(false));
@@ -81,8 +81,8 @@ public class ExistsController {
                     new SmsExistsResponse(true));
         }
 
-        session.setAttribute("exists.auth.sms.exists",exists);
-        session.setAttribute("exists.auth.sms.target",sms);
+        session.setAttribute(SessionKeys.EXISTS_SMS_CHECKED, exists);
+        session.setAttribute(SessionKeys.EXISTS_SMS_TARGET, sms);
 
         return ApiResponse.ok("이용 가능한 전화번호입니다",
                 new SmsExistsResponse(false));
@@ -109,8 +109,8 @@ public class ExistsController {
                     new UsrIdExistsResponse(true));
         }
 
-        session.setAttribute("exists.auth.usrId.exists",exists);
-        session.setAttribute("exists.auth.usrId.target",usrId);
+        session.setAttribute(SessionKeys.EXISTS_USER_ID_CHECKED, exists);
+        session.setAttribute(SessionKeys.EXISTS_USER_ID_TARGET, usrId);
 
         return ApiResponse.ok("이용 가능한 아이디입니다",
                 new UsrIdExistsResponse(false));
