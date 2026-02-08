@@ -29,13 +29,17 @@ public interface UserJpaRepository extends JpaRepository<UserJpaEntity, String> 
 
     Optional<UserJpaEntity> findByUsrIdAndDelYnFalse(String usrId);
 
+    //소프트 삭제 + 익명화
     @Modifying
     @Query("""
         update UserJpaEntity u
            set u.delYn = true,
-               u.delAt = CURRENT_TIMESTAMP
+               u.delAt = CURRENT_TIMESTAMP,
+               u.sms = CONCAT('000', SUBSTRING(u.sms, 4)),
+               u.email = CONCAT(u.email,"_DEL")
          where u.usrId = :usrId
-           and u.delYn = false
+               and u.delYn = false
+               and u.delAt = null
     """)
     int softDeleteByUsrId(@Param("usrId") String usrId);
 

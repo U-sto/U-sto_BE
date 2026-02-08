@@ -6,6 +6,7 @@ import com.usto.api.organization.infrastructure.entity.OrganizationJpaEntity;
 import com.usto.api.user.domain.model.ApprovalStatus;
 import com.usto.api.user.domain.model.Role;
 import com.usto.api.user.domain.model.User;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -17,7 +18,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "TB_USER001M")
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED) // JPA가 사용할 기본 생성자 만들기
+@NoArgsConstructor(access = AccessLevel.PROTECTED) // JPA 사용할 기본 생성자 만들기
 @SuperBuilder
 @AllArgsConstructor //builder랑 슈퍼세트
 @SQLRestriction("del_yn = 'N'") // 조회 시 삭제된 회원은 조회하지 않는다 (이중 잠금) - 왜냐면 조회를 하려고 두는 게 아닌 데이터라서
@@ -35,6 +36,7 @@ public class UserJpaEntity extends BaseTimeEntity {
     // 비밀번호
     // 암호화된 문자열이 저장
     @Column(name = "PW_HASH",length = 255, nullable = false)
+    @Schema(example = "*123qwe!")
     private String pwHash;
 
     // 이메일
