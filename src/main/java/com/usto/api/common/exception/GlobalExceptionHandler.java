@@ -94,4 +94,24 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.badRequest().body(body);
     }
+
+    /**
+     * RuntimeException 핸들러
+     */
+    @ExceptionHandler(RuntimeException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ApiResponse<?> handleRuntimeException(RuntimeException e) {
+        log.error("💥 런타임 예외 발생: {}", e.getMessage(), e);
+        return ApiResponse.fail("런타임 오류: " + e.getMessage());
+    }
+
+    /**
+     * 모든 예외를 잡는 핸들러 (가장 마지막에 위치)
+     */
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ApiResponse<?> handleGeneralException(Exception e) {
+        log.error("⚠️ 예상치 못한 예외 발생: {}", e.getMessage(), e);
+        return ApiResponse.fail("서버 오류가 발생했습니다: " + e.getMessage());
+    }
 }
