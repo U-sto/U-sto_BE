@@ -281,6 +281,11 @@ public class DisposalApplication {
                             .delYn(asset.getDelYn())
                             .build());
         }
+        for (DisposalDetail detail : details) {
+            String itemNo = detail.getItmNo();
+            assetRepository.delete(itemNo, orgCd);
+        }
+
         assetRepository.saveAll(assetsToUpdate);
         historyRepository.saveAll(histories);
         master.confirmApproval(userId);
@@ -298,7 +303,7 @@ public class DisposalApplication {
         disposalPolicy.validateConfirm(master);
         disposalPolicy.validateOwnership(master, orgCd);
 
-        //소프트 삭제 전 상태 변경(반납 신청 반려처리 -> 저장)
+        //상태 변경(반납 신청 반려처리 -> 저장)
         master.rejectApproval(userId);
         disposalRepository.saveMaster(master);
     }
