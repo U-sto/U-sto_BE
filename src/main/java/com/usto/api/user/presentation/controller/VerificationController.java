@@ -10,6 +10,7 @@ import com.usto.api.user.presentation.dto.request.EmailVerifyRequest;
 import com.usto.api.user.presentation.dto.request.SmsSendRequest;
 import com.usto.api.user.presentation.dto.request.SmsVerifyRequest;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -85,7 +86,8 @@ public class VerificationController {
     @GetMapping("/email/check")
     @Operation(summary = "이메일 인증번호 확인")
     public ApiResponse<?> verifyEmail(
-            @Valid @RequestBody EmailVerifyRequest request,
+            @Parameter(description = "인증번호 ", example = "123456")
+            @RequestParam(name = "code") String code,
             HttpSession session
 
     ) {
@@ -101,7 +103,7 @@ public class VerificationController {
             throw new BusinessException("인증번호 발송 내역이 없습니다. no_target");
         }
 
-        emailVerifyApplication.verifyCode(request.getCode(),target,purpose);
+        emailVerifyApplication.verifyCode(code,target,purpose);
 
         session.removeAttribute(SessionKeys.EMAIL_PENDING_PURPOSE);
         session.removeAttribute(SessionKeys.EMAIL_PENDING_TARGET);
@@ -167,8 +169,8 @@ public class VerificationController {
     @GetMapping("/sms/check")
     @Operation(summary = "휴대폰 인증번호 확인")
     public ApiResponse<?> verifyCode(
-            @Valid @RequestBody
-            SmsVerifyRequest request,
+            @Parameter(description = "인증번호 ", example = "123456")
+            @RequestParam(name = "code") String code,
             HttpSession session
     )
     {
@@ -176,7 +178,7 @@ public class VerificationController {
         VerificationPurpose purpose = (VerificationPurpose) session.getAttribute(SessionKeys.SMS_PENDING_PURPOSE);
         String target = (String) session.getAttribute(SessionKeys.SMS_PENDING_TARGET);
 
-        smsVerifyApplication.verifyCode(request.getCode(),target,purpose);
+        smsVerifyApplication.verifyCode(code,target,purpose);
 
         session.removeAttribute(SessionKeys.SMS_PENDING_PURPOSE);
         session.removeAttribute(SessionKeys.SMS_PENDING_TARGET);
