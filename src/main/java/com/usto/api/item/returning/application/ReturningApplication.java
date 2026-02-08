@@ -274,7 +274,7 @@ public class ReturningApplication {
         returningPolicy.validateOwnership(master, orgCd);
         returningPolicy.validateConfirm(master);
 
-        //소프트 삭제 전 상태 변경(반납 신청 반려처리 -> 저장)
+        //상태 변경(반납 신청 반려처리 -> 저장)
         master.rejectApproval(userId);
         returningRepository.saveMaster(master);
     }

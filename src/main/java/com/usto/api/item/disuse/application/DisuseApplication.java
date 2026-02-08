@@ -265,7 +265,7 @@ public class DisuseApplication {
 
     /**
      * TODO: 불용 반려 (ADMIN 권한)
-     * 다른 신청들과 비슷하게 소프트 삭제 진행
+     * 다른 신청들과 비슷하게  진행
      */
     @Transactional
     public void rejectDisuse(UUID dsuMId, String userId, String orgCd) {
@@ -276,7 +276,7 @@ public class DisuseApplication {
         disusePolicy.validateConfirm(master);
         disusePolicy.validateOwnership(master,orgCd);
 
-        //소프트 삭제 전 상태 변경(반납 신청 반려처리 -> 저장)
+        //상태 변경(반납 신청 반려처리 -> 저장)
         master.rejectApproval(userId);
         disuseRepository.saveMaster(master);
     }
