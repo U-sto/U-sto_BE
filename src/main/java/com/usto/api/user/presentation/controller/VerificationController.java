@@ -82,7 +82,7 @@ public class VerificationController {
     }
 
 
-    @PostMapping("/email/check")
+    @GetMapping("/email/check")
     @Operation(summary = "이메일 인증번호 확인")
     public ApiResponse<?> verifyEmail(
             @Valid @RequestBody EmailVerifyRequest request,
@@ -164,7 +164,7 @@ public class VerificationController {
         return ApiResponse.ok("인증번호가 문자로 발송되었습니다.");
     }
 
-    @PostMapping("/sms/check")
+    @GetMapping("/sms/check")
     @Operation(summary = "휴대폰 인증번호 확인")
     public ApiResponse<?> verifyCode(
             @Valid @RequestBody
