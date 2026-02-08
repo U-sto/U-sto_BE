@@ -37,7 +37,7 @@ public class SessionDebugFilter implements Filter {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
         String sessionStatus = session != null ?
-                String.format("세션O(ID:%s)", session.getId().substring(0, 8)) : "세션X";
+                String.format("세션O(ID:%s)", session.getId().length() > 8 ? session.getId().substring(0, 8) : session.getId()) : "세션X";
 
         String authStatus = (auth != null && auth.isAuthenticated() &&
                 !"anonymousUser".equals(auth.getPrincipal())) ?

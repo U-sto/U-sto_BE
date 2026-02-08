@@ -296,6 +296,7 @@ public class DisposalApplication {
                 .orElseThrow(() -> new BusinessException("존재하지 않는 불용 신청입니다."));
         //정책 확인
         disposalPolicy.validateConfirm(master);
+        disposalPolicy.validateOwnership(master, orgCd);
 
         //소프트 삭제 전 상태 변경(반납 신청 반려처리 -> 저장)
         master.rejectApproval(userId);

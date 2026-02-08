@@ -45,7 +45,7 @@ public class SecurityContextPreservationFilter implements Filter {
 
         } catch (Exception e) {
             // 3️⃣ 에러 발생! → SecurityContext 복원
-            log.error("┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━���━━━━━━━━━");
+            log.error("┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
             log.error("┃ ⚠️ 에러 발생했지만 SecurityContext 보호 중...");
             log.error("┃ 📋 에러: {}", e.getMessage());
 
@@ -80,7 +80,7 @@ public class SecurityContextPreservationFilter implements Filter {
                 log.info("┃ ✅ SecurityContext 유지됨");
             }
 
-            log.error("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+            log.error("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
 
             // 에러는 그대로 전파 (GlobalExceptionHandler가 처리)
             throw e;

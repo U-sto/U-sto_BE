@@ -222,7 +222,7 @@ public class DisuseApplication {
 
         List<DisuseDetail> details = disuseRepository.findDetailsByMasterId(dsuMId, orgCd);
         if (details.isEmpty()) {
-            throw new BusinessException("반납 상세 정보가 없습니다.");
+            throw new BusinessException("불용 상세 정보가 없습니다.");
         }
 
         List<Asset> assetsToUpdate = new ArrayList<>(details.size());
@@ -274,6 +274,7 @@ public class DisuseApplication {
                 .orElseThrow(() -> new BusinessException("존재하지 않는 불용 신청입니다."));
         //정책 확인
         disusePolicy.validateConfirm(master);
+        disusePolicy.validateOwnership(master,orgCd);
 
         //소프트 삭제 전 상태 변경(반납 신청 반려처리 -> 저장)
         master.rejectApproval(userId);

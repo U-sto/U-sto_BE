@@ -57,10 +57,12 @@ public class DisuseMaster {
     public void confirmApproval(String userId) {
         this.apprSts = ApprStatus.APPROVED; //불용 확정 처라
         this.apprUsrId = userId;
+        this.dsuApprAt = LocalDate.now();
     }
 
     public void rejectApproval(String userId) {
         this.apprSts = ApprStatus.REJECTED; //불용 반려 처라
         this.apprUsrId = userId;
+        this.dsuApprAt = LocalDate.now();
     }
 }

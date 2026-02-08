@@ -61,4 +61,4 @@ WHERE d.ITM_NO = 'M202600001'
   AND m.DEL_YN = 'N'
 ;
 
-select * from TB_ITEM002D;
+select * from TB_ITEM005M;

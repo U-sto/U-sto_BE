@@ -1,16 +1,19 @@
 package com.usto.api.common.exception;
 
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.usto.api.common.utils.ApiResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.FieldError;
+import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -18,6 +21,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * @class GlobalExceptionHandler
@@ -26,22 +30,6 @@ import java.util.Map;
 @Slf4j
 @RestControllerAdvice(basePackages = "com.usto.api")
 public class GlobalExceptionHandler {
-
-    /**
-     * 에러 처리 전 SecurityContext 보존
-     */
-    private void preserveSecurityContext(HttpServletRequest request) {
-        SecurityContext context = SecurityContextHolder.getContext();
-        if (context != null && context.getAuthentication() != null) {
-            HttpSession session = request.getSession(false);
-            if (session != null) {
-                // 세션에 강제 저장
-                session.setAttribute("SPRING_SECURITY_CONTEXT", context);
-                log.debug("🔒 에러 처리 중 SecurityContext 보존: {}",
-                        context.getAuthentication().getName());
-            }
-        }
-    }
     /**
      * BusinessException 클래스를 상속받은 모든 비즈니스 예외 처리
      */
@@ -90,15 +78,26 @@ public class GlobalExceptionHandler {
         return ApiResponse.fail("입력값 검증에 실패했습니다.", errors);
     }
 
-    private String extractEnumValue(String message) {
-        // "No enum constant com.usto...DisuseReason.내용연수 경과에 따른 불용"
-        // → "내용연수 경과에 따른 불용"
-        int lastDot = message.lastIndexOf('.');
-        if (lastDot != -1 && lastDot < message.length() - 1) {
-            return message.substring(lastDot + 1);
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ApiResponse<Void>> handleHttpMessageNotReadableException(
+            HttpMessageNotReadableException ex) {
+
+        String message = "잘못된 요청 형식입니다.";
+
+        Throwable cause = ex.getCause();
+        if (cause instanceof InvalidFormatException ife && ife.getTargetType().isEnum()) {
+
+            String fieldName = ife.getPath().stream()
+                    .map(ref -> ref.getFieldName())
+                    .filter(Objects::nonNull)
+                    .findFirst()
+                    .orElse("unknown");
+
+            message = String.format("'%s' 값이 올바르지 않습니다. 허용된 값을 확인하세요.", fieldName);
         }
-        return message;
+
+        ApiResponse<Void> body = ApiResponse.fail(message);
+
+        return ResponseEntity.badRequest().body(body);
     }
-
-
 }
