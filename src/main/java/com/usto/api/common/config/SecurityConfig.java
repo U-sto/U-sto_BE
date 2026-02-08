@@ -1,7 +1,6 @@
 package com.usto.api.common.config;
 
-import com.usto.api.common.utils.SecurityContextPreservationFilter;
-import com.usto.api.user.application.CustomUserDetailsService;
+import com.usto.api.common.utils.SecurityContextPersistenceFilter;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -11,7 +10,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -22,9 +20,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
-import org.springframework.security.web.context.SecurityContextHolderFilter;
 import org.springframework.security.web.context.SecurityContextRepository;
-import org.springframework.util.AntPathMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -54,7 +50,7 @@ public class SecurityConfig {
                         .securityContextRepository(securityContextRepository())
                 )
                 .addFilterAfter(
-                        new SecurityContextPreservationFilter(securityContextRepository()),
+                        new SecurityContextPersistenceFilter(securityContextRepository()),
                         UsernamePasswordAuthenticationFilter.class
                 )
                 // 세션 기반 인증 구조
@@ -123,7 +119,11 @@ public class SecurityConfig {
                             "/error"
                     ).permitAll();
                     //역할별 접근 제한
-                    auth.requestMatchers("/api/item/**/admin/**").hasRole("ADMIN");
+                    auth.requestMatchers("/api/item/returnings/admin/**").hasRole("ADMIN");
+                    auth.requestMatchers("/api/item/acquisitions/admin/**").hasRole("ADMIN");
+                    auth.requestMatchers("/api/item/disuses/admin/**").hasRole("ADMIN");
+                    auth.requestMatchers("/api/item/disposals/admin/**").hasRole("ADMIN");
+                    auth.requestMatchers("/api/item/assets/admin/**").hasRole("ADMIN");
                     auth.requestMatchers("/api/**").hasAnyRole("MANAGER", "ADMIN");
 
                     auth.anyRequest().authenticated();
