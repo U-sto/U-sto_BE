@@ -55,4 +55,12 @@ public interface AssetRepository {
     Optional<AssetPublicDetailResponse> findPublicDetailByItmNoAndOrgCd(String itmNo, String orgCd);
 
     List<AssetListForPrintResponse> findAllByFilterForPrint(@Valid AssetListForPrintRequest searchRequest, String orgCd);
+
+    void bulkDisposal(List<Asset> assets, String userId, String orgCd);
+
+    void bulkSoftDelete(List<Asset> assets, String userId, String orgCd);
+
+    void bulkDisuse(List<Asset> assets, String userId, String orgCd);
+
+    void bulkReturning(List<Asset> assets,String userId,String orgCd);
 }

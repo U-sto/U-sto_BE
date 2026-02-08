@@ -251,20 +251,18 @@ public class DisposalApplication {
             throw new BusinessException("처분 상세 정보가 없습니다.");
         }
 
-        List<Asset> assetsToUpdate = new ArrayList<>(details.size());
+        List<Asset> assets = new ArrayList<>(details.size());
         List<AssetStatusHistory> histories = new ArrayList<>(details.size());
 
+        //히스토리 저장
         for (DisposalDetail detail : details) {
             String itemNo = detail.getItmNo();
             Asset asset = assetRepository.findAssetById(itemNo, orgCd);
             if (asset == null) {
                 throw new BusinessException("해당 물품 정보를 대장에서 찾을 수 없습니다: " + itemNo);
             }
-
+            assets.add(asset);
             OperStatus prevStatus = asset.getOperSts();
-            asset.disuseAsset();
-            assetsToUpdate.add(asset);
-            //물품 히스토리 저장 로직 실행
             histories.add(
                     AssetStatusHistory.builder()
                             .itemHisId(UUID.randomUUID())
@@ -281,15 +279,15 @@ public class DisposalApplication {
                             .delYn(asset.getDelYn())
                             .build());
         }
-        for (DisposalDetail detail : details) {
-            String itemNo = detail.getItmNo();
-            assetRepository.delete(itemNo, orgCd);
-        }
 
-        assetRepository.saveAll(assetsToUpdate);
+        //운용상태 -> 처분(이력 구분을 위해)
+        assetRepository.bulkDisposal(assets,userId,orgCd);
+        //바로 소프트 삭제
+        assetRepository.bulkSoftDelete(assets,userId,orgCd);
+
         historyRepository.saveAll(histories);
+
         master.confirmApproval(userId);
-        // 마스터 저장
         disposalRepository.saveMaster(master);
     }
 

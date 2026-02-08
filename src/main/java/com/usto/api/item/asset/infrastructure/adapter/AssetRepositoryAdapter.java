@@ -22,7 +22,9 @@ import com.usto.api.item.common.model.OperStatus;
 import com.usto.api.organization.infrastructure.entity.QDepartmentJpaEntity;
 import com.usto.api.organization.infrastructure.entity.QOrganizationJpaEntity;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDate;
@@ -42,6 +44,7 @@ import static com.usto.api.organization.infrastructure.entity.QDepartmentJpaEnti
  */
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class AssetRepositoryAdapter implements AssetRepository {
 
     private final AssetJpaRepository jpaRepository;
@@ -374,6 +377,49 @@ public class AssetRepositoryAdapter implements AssetRepository {
                 )
                 .orderBy(itemAssetDetailEntity.itemId.itmNo.desc())
                 .fetch();
+    }
+
+    @Override
+    @Transactional
+    public void bulkDisposal(List<Asset> assets, String userId, String orgCd) {
+        List<String> itemNos = assets.stream()
+                .map(Asset::getItmNo)   // 실제 메서드명에 맞게
+                .distinct()
+                .toList();
+        OperStatus newOperSts = OperStatus.DISP;
+        jpaRepository.bulkDisposal(itemNos, userId, orgCd,newOperSts);
+    }
+
+    @Override
+    @Transactional
+    public void bulkDisuse(List<Asset> assets, String userId, String orgCd) {
+        List<String> itemNos = assets.stream()
+                .map(Asset::getItmNo)   // 실제 메서드명에 맞게
+                .distinct()
+                .toList();
+        OperStatus newOperSts = OperStatus.DSU;
+        jpaRepository.bulkDisuse(itemNos, userId, orgCd,newOperSts);
+    }
+
+    @Override
+    @Transactional
+    public void bulkReturning(List<Asset> assets, String userId, String orgCd) {
+        List<String> itemNos = assets.stream()
+                .map(Asset::getItmNo)   // 실제 메서드명에 맞게
+                .distinct()
+                .toList();
+        OperStatus newOperSts = OperStatus.RTN;
+        jpaRepository.bulkReturning(itemNos, userId, orgCd, newOperSts);
+    }
+
+    @Override
+    @Transactional
+    public void bulkSoftDelete(List<Asset> assets, String userId, String orgCd) {
+        List<String> itemNos = assets.stream()
+                .map(Asset::getItmNo)   // 실제 메서드명에 맞게
+                .distinct()
+                .toList();
+        jpaRepository.bulkSoftDelete(itemNos, userId, orgCd);
     }
 
     // ===== 동적 쿼리 헬퍼 =====

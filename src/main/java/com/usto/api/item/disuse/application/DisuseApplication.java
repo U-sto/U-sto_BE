@@ -225,7 +225,7 @@ public class DisuseApplication {
             throw new BusinessException("불용 상세 정보가 없습니다.");
         }
 
-        List<Asset> assetsToUpdate = new ArrayList<>(details.size());
+        List<Asset> assets = new ArrayList<>(details.size());
         List<AssetStatusHistory> histories = new ArrayList<>(details.size());
 
         for (DisuseDetail detail : details) {
@@ -236,8 +236,7 @@ public class DisuseApplication {
             }
 
             OperStatus prevStatus = asset.getOperSts();
-            asset.disuseAsset();
-            assetsToUpdate.add(asset);
+            assets.add(asset);
                 //물품 히스토리 저장 로직 실행
             histories.add(
                     AssetStatusHistory.builder()
@@ -255,7 +254,7 @@ public class DisuseApplication {
                     .delYn(asset.getDelYn())
                     .build());
         }
-        assetRepository.saveAll(assetsToUpdate);
+        assetRepository.bulkDisuse(assets,userId,orgCd);
         historyRepository.saveAll(histories);
         master.confirmApproval(userId);
         // 마스터 저장

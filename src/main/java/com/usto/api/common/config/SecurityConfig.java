@@ -49,7 +49,7 @@ public class SecurityConfig {
                         .requireExplicitSave(false)
                         .securityContextRepository(securityContextRepository())
                 )
-                .addFilterAfter(
+                .addFilterBefore(
                         new SecurityContextPersistenceFilter(securityContextRepository()),
                         UsernamePasswordAuthenticationFilter.class
                 )

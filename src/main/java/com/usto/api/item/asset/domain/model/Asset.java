@@ -44,14 +44,6 @@ public class Asset {
     }
 
     /**
-     * 반납 처리 (부서코드 제거)
-     */
-    public void returnAsset() {
-        this.operSts = OperStatus.RTN;
-        this.deptCd = "NONE";
-    }
-
-    /**
      * 운용부서 배정
      */
     public void assignDepartment(String deptCd) {
@@ -64,10 +56,6 @@ public class Asset {
      */
     public boolean isDeleted() {
         return "Y".equals(this.delYn);
-    }
-
-    public void disuseAsset() {
-        this.operSts = OperStatus.DSU;
     }
 
     //출력 상태 변경
