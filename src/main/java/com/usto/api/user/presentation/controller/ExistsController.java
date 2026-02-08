@@ -1,6 +1,7 @@
 package com.usto.api.user.presentation.controller;
 
 import com.usto.api.common.utils.ApiResponse;
+import com.usto.api.common.utils.SessionKeys;
 import com.usto.api.user.application.EmailExistsApplication;
 import com.usto.api.user.application.SmsExistsApplication;
 import com.usto.api.user.application.UserIdExistsApplication;
@@ -42,10 +43,6 @@ public class ExistsController {
 
             HttpSession session
     ) {
-        if (emailId == null || emailId.trim().isEmpty()) {
-            return ApiResponse.fail("이메일을 써주세요");
-        }
-
         String fullEmail = emailId.trim() + "@" + FIXED_DOMAIN;
 
         boolean exists = emailExistsApplication.existsByEmail(fullEmail.trim());
@@ -55,7 +52,7 @@ public class ExistsController {
                     new EmailExistsResponse(true));
         }
 
-        session.setAttribute("exists.auth.email.exists",exists);
+        session.setAttribute(SessionKeys.EXISTS_EMAIL,exists);
         session.setAttribute("exists.auth.email.target",fullEmail);
 
         return ApiResponse.ok("이용 가능한 이메일입니다",
