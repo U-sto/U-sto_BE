@@ -1,6 +1,5 @@
 package com.usto.api.common.config;
 
-import com.usto.api.common.utils.SecurityContextPersistenceFilter;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +17,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.web.cors.CorsConfiguration;
@@ -46,12 +44,8 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 //세션 자동 저장
                 .securityContext(securityContext -> securityContext
-                        .requireExplicitSave(false)
+                        .requireExplicitSave(true)
                         .securityContextRepository(securityContextRepository())
-                )
-                .addFilterBefore(
-                        new SecurityContextPersistenceFilter(securityContextRepository()),
-                        UsernamePasswordAuthenticationFilter.class
                 )
                 // 세션 기반 인증 구조
                 .sessionManagement(sm -> sm
@@ -125,6 +119,8 @@ public class SecurityConfig {
                     auth.requestMatchers("/api/item/disposals/admin/**").hasRole("ADMIN");
                     auth.requestMatchers("/api/item/assets/admin/**").hasRole("ADMIN");
                     auth.requestMatchers("/api/**").hasAnyRole("MANAGER", "ADMIN");
+
+                    auth.requestMatchers("/api/test/**").hasAnyRole("MANAGER", "ADMIN");
 
                     auth.anyRequest().authenticated();
                 })
