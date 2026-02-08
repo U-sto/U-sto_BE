@@ -1,7 +1,9 @@
 package com.usto.api.item.acquisition.application;
 
 import com.usto.api.common.exception.BusinessException;
+import com.usto.api.g2b.infrastructure.entity.G2bItemCategoryJpaEntity;
 import com.usto.api.g2b.infrastructure.entity.G2bItemJpaEntity;
+import com.usto.api.g2b.infrastructure.repository.G2bItemCategoryJpaRepository;
 import com.usto.api.g2b.infrastructure.repository.G2bItemJpaRepository;
 import com.usto.api.item.acquisition.domain.model.Acquisition;
 import com.usto.api.item.acquisition.domain.service.AcquisitionPolicy;
@@ -28,6 +30,7 @@ public class AcquisitionApplication {
 
     private final AcquisitionRepository acquisitionRepository;
     private final G2bItemJpaRepository g2bItemJpaRepository;
+    private final G2bItemCategoryJpaRepository g2bItemCategoryJpaRepository;
     private final DepartmentJpaRepository departmentJpaRepository;
     private final AssetApplication assetApplication;
     private final AcquisitionPolicy acquisitionPolicy;
@@ -40,6 +43,7 @@ public class AcquisitionApplication {
     public UUID registerAcquisition(AcqRegisterRequest request, String userId, String orgCd) {
         // 검증
         G2bItemJpaEntity g2bItem = validateRequest(request, orgCd);
+        G2bItemCategoryJpaEntity g2bItemCategory = g2bItemCategoryJpaRepository.findDrbYrByG2bDCd(request.getG2bDCd());
 
         // Domain Model 생성
         Acquisition acquisition = AcquisitionMapper.toDomain(
@@ -47,7 +51,7 @@ public class AcquisitionApplication {
                 request.getAcqAt(),
                 g2bItem.getG2bUpr(),
                 request.getDeptCd(),
-                "5",  // TODO: 내용연수 로직
+                g2bItemCategory.getDrbYr(),
                 request.getAcqQty(),
                 request.getArrgTy(),
                 request.getRmk(),

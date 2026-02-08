@@ -2,6 +2,7 @@ package com.usto.api.g2b.infrastructure.repository;
 
 import com.usto.api.g2b.domain.model.G2bItemCategory;
 import com.usto.api.g2b.infrastructure.entity.G2bItemCategoryJpaEntity;
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -74,4 +75,11 @@ public interface G2bItemCategoryJpaRepository extends JpaRepository<G2bItemCateg
             String code
     );
 
+    @Query(value = """
+    SELECT M.DRB_YR
+    FROM TB_G2B001D D
+    JOIN TB_G2B001M M ON M.G2B_M_CD = D.G2B_M_CD
+    WHERE D.G2B_D_CD = :g2bDCd
+""", nativeQuery = true)
+    G2bItemCategoryJpaEntity findDrbYrByG2bDCd(@Param("g2bDCd") String g2bDCd);
 }
