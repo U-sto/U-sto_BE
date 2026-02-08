@@ -42,7 +42,7 @@ VALUES
 -- 5. 불용 승인 데이터 생성 (처분 신청 로직에서 조회하기 위함)
 -- 7~9번 물품에 대한 승인된 불용 신청서
 INSERT INTO `TB_ITEM004M` (DSU_M_ID, APLY_USR_ID, APLY_AT, ITEM_STS, CHG_RSN, DSU_APPR_AT, APPR_STS, ORG_CD, CRE_BY, CRE_AT)
-VALUES (@DSU_M_ID_TEST, 'dev-user', '2026-02-01', 'USED', '내용연수 경과에 따른 불용', '2026-02-02', 'APPROVED', @ORG_CD_ERICA, 'system', NOW());
+VALUES (@DSU_M_ID_TEST, 'dev-user', '2026-02-01', 'USED', 'LIFE_EXPIRED', '2026-02-02', 'APPROVED', @ORG_CD_ERICA, 'system', NOW());
 
 INSERT INTO `TB_ITEM004D` (DSU_D_ID, DSU_M_ID, ITM_NO, DEPT_CD, ORG_CD, CRE_BY, CRE_AT)
 VALUES

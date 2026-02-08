@@ -9,7 +9,8 @@ public enum OperStatus {
     ACQ("취득"),
     OPER("운용"),
     RTN("반납"),
-    DSU("불용");
+    DSU("불용"),
+    DISP("처분");
 
     private final String description;
 }

@@ -17,9 +17,10 @@ public class DisposalMaster {
 
     private UUID dispMId;                      // 처분ID
     private String aplyUsrId;                  // 등록자ID
+    private LocalDate aplyAt;                  // 처분등록일자
     private DisposalArrangementType dispType;  // 처분방식
-    private LocalDate dispAt;                  // 처분일자
     private String apprUsrId;                  // 확정자ID
+    private LocalDate dispApprAt;                  // 처분확정일자
     private ApprStatus apprSts;                // 승인상태
     private String orgCd;
     private String delYn;
@@ -32,9 +33,9 @@ public class DisposalMaster {
     /**
      * 처분 정보 수정
      */
-    public void updateInfo(DisposalArrangementType dispType, LocalDate dispAt) {
+    public void updateInfo(DisposalArrangementType dispType, LocalDate aplyAt) {
         this.dispType = dispType;
-        this.dispAt = dispAt;
+        this.aplyAt = aplyAt;
     }
 
     /**
@@ -49,5 +50,18 @@ public class DisposalMaster {
      */
     public boolean isDeleted() {
         return "Y".equals(this.delYn);
+    }
+
+    //승인
+    public void confirmApproval(String userId) {
+        this.apprSts = ApprStatus.APPROVED; //불용 확정 처라
+        this.apprUsrId = userId;
+        this.dispApprAt = LocalDate.now();
+    }
+    //반려
+    public void rejectApproval(String userId) {
+        this.apprSts = ApprStatus.REJECTED; //불용 반려 처라
+        this.apprUsrId = userId;
+        this.dispApprAt = LocalDate.now();
     }
 }

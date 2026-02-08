@@ -29,8 +29,6 @@ SELECT
     ACQ_AT
 FROM TB_ITEM001M;
 
-select * from TB_ITEM002D;
-
 SELECT
     d.ITM_NO,
     d.ORG_CD,
@@ -60,3 +58,5 @@ WHERE d.ITM_NO = 'M202600001'
   AND d.DEL_YN = 'N'
   AND m.DEL_YN = 'N'
 ;
+
+select * from TB_ITEM005M;

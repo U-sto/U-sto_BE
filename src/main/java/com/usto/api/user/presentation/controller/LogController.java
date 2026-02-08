@@ -7,8 +7,10 @@ import com.usto.api.user.presentation.dto.request.LoginRequest;
 import com.usto.api.user.presentation.dto.response.LoginResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -53,6 +55,12 @@ public class LogController {
 
         securityContextRepository.saveContext(context, httpRequest, httpResponse);
 
+        HttpSession session = httpRequest.getSession(false);
+        if (session != null) {
+            log.info(" 로그인 성공: {} (세션 ID: {})",
+                    authentication.getName(), session.getId());
+        }
+
         // 3) 응답용 사용자 정보 로딩 -> 승인 상태 확인
         User user = loginApplication.login(request.getUsrId());
 
@@ -90,7 +98,42 @@ public class LogController {
 
     @PostMapping("/logout")
     @Operation(summary = "로그아웃")
-    public void logoutDoc() {
-        // 실제 로직 없음 (SecurityConfig LogoutFilter가 처리)
+    public ApiResponse<?> logout(
+            HttpServletRequest request,
+            HttpServletResponse response
+            ) {
+        // 1️ 세션 정보 확인 (로깅용)
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            String sessionId = session.getId();
+            Object securityContext = session.getAttribute("SPRING_SECURITY_CONTEXT");
+
+            log.info("┃  세션 ID: {}", sessionId);
+            log.info("┃  SecurityContext: {}", securityContext != null ? "있음" : "없음");
+
+            // 2️⃣ 세션 무효화 (완전 삭제)
+            try {
+                session.invalidate();
+                log.info("┃  세션 무효화 완료");
+            } catch (IllegalStateException e) {
+                log.warn("┃ ️ 이미 무효화된 세션");
+            }
+        } else {
+            log.info("┃  세션 없음 (이미 로그아웃 상태)");
+        }
+
+        // 3️⃣ SecurityContext 제거
+        SecurityContextHolder.clearContext();
+        log.info("┃  SecurityContext 제거 완료");
+
+        // 4️⃣ 쿠키 삭제 (명시적)
+        Cookie cookie = new Cookie("JSESSIONID", null);
+        cookie.setPath("/");
+        cookie.setMaxAge(0); // 즉시 만료
+        cookie.setHttpOnly(true);
+        response.addCookie(cookie);
+        log.info("┃  JSESSIONID 쿠키 삭제 완료");
+
+        return ApiResponse.ok("로그아웃 성공");
     }
 }

@@ -58,11 +58,13 @@ public class ReturningMaster {
     public void confirmApproval(String userId) {
         this.apprSts = ApprStatus.APPROVED; //반납 확정 처라
         this.apprUsrId = userId;
+        this.rtrnApprAt = LocalDate.now();
     }
 
     //반납 신청 반려
     public void rejectApproval(String userId) {
         this.apprSts = ApprStatus.REJECTED; //반납 반려 처라
         this.apprUsrId = userId;
+        this.rtrnApprAt = LocalDate.now();
     }
 }

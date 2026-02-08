@@ -90,7 +90,7 @@ public class DisposalController {
             summary = "처분 신청 수정 (MANAGER)",
             description = "작성중(WAIT) 상태의 처분 신청을 수정합니다."
     )
-    @PutMapping("/{dispMId}")
+    @PatchMapping("/{dispMId}")
     @PreAuthorize("hasRole('MANAGER')")
     public ApiResponse<Void> update(
             @PathVariable UUID dispMId,
@@ -140,4 +140,37 @@ public class DisposalController {
     }
 
     // TODO: 처분 승인 및 반려 구현 (ADMIN)
+    @Operation(
+            summary = "처분 승인 확정 (ADMIN)",
+            description = "승인 요청(REQUEST) 건을 승인하여 승인(APPROVED) 상태로 만듭니다."
+    )
+    @PutMapping("/admin/{dispMId}/approval")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ApiResponse<Void> approvalRequest(
+            @PathVariable UUID dispMId,
+            @AuthenticationPrincipal UserPrincipal principal) {
+        disposalApplication.approvalDisposal(
+                dispMId,
+                principal.getUsername(),
+                principal.getOrgCd()
+        );
+        return ApiResponse.ok("처분 승인 확정 성공");
+    }
+
+    @Operation(
+            summary = "처분 요청 반려 (ADMIN)",
+            description = "승인 요청(REQUEST) 건을 반려하여 반려(REJECTED) 상태로 만듭니다."
+    )
+    @PutMapping("/admin/{dispMId}/reject")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ApiResponse<Void> approvalReject(
+            @PathVariable UUID dispMId,
+            @AuthenticationPrincipal UserPrincipal principal) {
+        disposalApplication.rejectDisposal(
+                dispMId,
+                principal.getUsername(),
+                principal.getOrgCd()
+        );
+        return ApiResponse.ok("처분 요청 반려 성공");
+    }
 }

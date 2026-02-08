@@ -36,11 +36,14 @@ public class ItemDisposalMasterEntity extends BaseTimeEntity {
     @Column(name = "DISP_TYPE", nullable = false, length = 30)
     private DisposalArrangementType dispType;
 
-    @Column(name = "DISP_AT", nullable = false)
-    private LocalDate dispAt;
+    @Column(name = "APLY_AT", nullable = false)
+    private LocalDate aplyAt;
 
     @Column(name = "APPR_USR_ID", length = 30)
     private String apprUsrId;
+
+    @Column(name = "DISP_APPR_AT")
+    private LocalDate dispApprAt;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "APPR_STS", nullable = false, length = 30)

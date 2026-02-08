@@ -1,10 +1,12 @@
 package com.usto.api.common.exception;
 
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.usto.api.common.utils.ApiResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -13,11 +15,13 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * @class GlobalExceptionHandler
  * @desc 프로젝트 전역 예외 처리기 - 모든 도메인의 예외를 ApiResponse 포맷으로 통일
  */
+@Slf4j
 @RestControllerAdvice(basePackages = "com.usto.api")
 public class GlobalExceptionHandler {
     /**
@@ -68,12 +72,26 @@ public class GlobalExceptionHandler {
         return ApiResponse.fail("입력값 검증에 실패했습니다.", errors);
     }
 
-    /**
-     * JSON 파싱 에러 및 Enum 바인딩 에러 처리
-     */
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ApiResponse<?> handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
-        return ApiResponse.fail("요청 데이터 형식이 잘못되었거나 허용되지 않는 상태값이 포함되어 있습니다.");
+    public ResponseEntity<ApiResponse<Void>> handleHttpMessageNotReadableException(
+            HttpMessageNotReadableException ex) {
+
+        String message = "잘못된 요청 형식입니다.";
+
+        Throwable cause = ex.getCause();
+        if (cause instanceof InvalidFormatException ife && ife.getTargetType().isEnum()) {
+
+            String fieldName = ife.getPath().stream()
+                    .map(ref -> ref.getFieldName())
+                    .filter(Objects::nonNull)
+                    .findFirst()
+                    .orElse("unknown");
+
+            message = String.format("'%s' 값이 올바르지 않습니다. 허용된 값을 확인하세요.", fieldName);
+        }
+
+        ApiResponse<Void> body = ApiResponse.fail(message);
+
+        return ResponseEntity.badRequest().body(body);
     }
 }

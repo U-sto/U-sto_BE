@@ -178,15 +178,11 @@ public class AcquisitionApplication {
                 .toList();
 
 
-        //소프트 삭제 전 상태 변경
+        //상태 변경
         for (Acquisition acquisition : acquisitions) {
             // 도메인 로직 실행(반납 신청 반려처리 -> 저장)
             acquisition.rejectApproval(userId);
             acquisitionRepository.saveMaster(acquisition);
-        }
-        // 소프트 삭제 진행
-        for (UUID acqId : acqIds) {
-            acquisitionRepository.delete(acqId);
         }
     }
 

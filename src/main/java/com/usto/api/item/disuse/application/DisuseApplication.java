@@ -38,7 +38,7 @@ public class DisuseApplication {
     private final DisusePolicy disusePolicy;
     private final AssetRepository assetRepository;
     private final AssetPolicy assetPolicy;
-    final AssetStatusHistoryRepository historyRepository;
+    private final AssetStatusHistoryRepository historyRepository;
 
     /**
      * 불용 신청 등록
@@ -222,10 +222,10 @@ public class DisuseApplication {
 
         List<DisuseDetail> details = disuseRepository.findDetailsByMasterId(dsuMId, orgCd);
         if (details.isEmpty()) {
-            throw new BusinessException("반납 상세 정보가 없습니다.");
+            throw new BusinessException("불용 상세 정보가 없습니다.");
         }
 
-        List<Asset> assetsToUpdate = new ArrayList<>(details.size());
+        List<Asset> assets = new ArrayList<>(details.size());
         List<AssetStatusHistory> histories = new ArrayList<>(details.size());
 
         for (DisuseDetail detail : details) {
@@ -236,8 +236,7 @@ public class DisuseApplication {
             }
 
             OperStatus prevStatus = asset.getOperSts();
-            asset.disuseAsset();
-            assetsToUpdate.add(asset);
+            assets.add(asset);
                 //물품 히스토리 저장 로직 실행
             histories.add(
                     AssetStatusHistory.builder()
@@ -255,7 +254,7 @@ public class DisuseApplication {
                     .delYn(asset.getDelYn())
                     .build());
         }
-        assetRepository.saveAll(assetsToUpdate);
+        assetRepository.bulkDisuse(assets,userId,orgCd);
         historyRepository.saveAll(histories);
         master.confirmApproval(userId);
         // 마스터 저장
@@ -265,7 +264,7 @@ public class DisuseApplication {
 
     /**
      * TODO: 불용 반려 (ADMIN 권한)
-     * 다른 신청들과 비슷하게 소프트 삭제 진행
+     * 다른 신청들과 비슷하게  진행
      */
     @Transactional
     public void rejectDisuse(UUID dsuMId, String userId, String orgCd) {
@@ -274,12 +273,10 @@ public class DisuseApplication {
                 .orElseThrow(() -> new BusinessException("존재하지 않는 불용 신청입니다."));
         //정책 확인
         disusePolicy.validateConfirm(master);
+        disusePolicy.validateOwnership(master,orgCd);
 
-        //소프트 삭제 전 상태 변경(반납 신청 반려처리 -> 저장)
+        //상태 변경(반납 신청 반려처리 -> 저장)
         master.rejectApproval(userId);
         disuseRepository.saveMaster(master);
-
-        // 소프트 삭제 진행
-        disuseRepository.deleteMaster(dsuMId);
     }
 }

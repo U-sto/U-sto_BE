@@ -1,14 +1,15 @@
 package com.usto.api.common.config;
 
-import com.usto.api.user.application.CustomUserDetailsService;
+import com.usto.api.common.utils.SecurityContextPersistenceFilter;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -17,6 +18,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.web.cors.CorsConfiguration;
@@ -26,6 +28,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.Arrays;
 import java.util.List;
 
+@Slf4j
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor // 생성자 주입용
@@ -41,30 +44,60 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                //세션 자동 저장
+                .securityContext(securityContext -> securityContext
+                        .requireExplicitSave(false)
+                        .securityContextRepository(securityContextRepository())
+                )
+                .addFilterBefore(
+                        new SecurityContextPersistenceFilter(securityContextRepository()),
+                        UsernamePasswordAuthenticationFilter.class
+                )
                 // 세션 기반 인증 구조
-                .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)) //필요할 때만(남용x)
-
-                // 인증/인가에 대한 실패 응답을 API스럽게
+                .sessionManagement(sm -> sm
+                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED) //필요할 때만(남용x)
+                        .sessionFixation().changeSessionId() // 로그인 시 세션 ID 변경
+                )
                 .exceptionHandling(eh -> eh
                         .authenticationEntryPoint((request, response, authException) -> {
+                            String uri = request.getRequestURI();
+                            String method = request.getMethod();
+                            String cookie = request.getHeader("Cookie");
+                            HttpSession session = request.getSession(false);
+
+                            //상세 로그 추가
+                            log.error("┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+                            log.error("┃  인증 실패: {} {}", method, uri);
+                            log.error("┃  원인: {}", authException.getMessage());
+                            log.error("┃  쿠키: {}", cookie != null ? "있음" : "없음");
+                            if (cookie != null) {
+                                log.error("┃    └─ {}", cookie);
+                            }
+                            log.error("┃  세션: {}", session != null ? "있음 (ID: " + session.getId() + ")" : "없음");
+                            if (session != null) {
+                                Object securityContext = session.getAttribute("SPRING_SECURITY_CONTEXT");
+                                log.error("┃    └─ SecurityContext in session: {}", securityContext != null ? "있음" : "없음");
+                            }
+                            log.error("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+
                             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-                            response.setCharacterEncoding("UTF-8"); // 한글 깨짐 방지 추가
-                            response.getWriter().write("{\"message\":\"로그인이 필요합니다.\"}"); //로그인이 필요합니다(프론트)
+                            response.setCharacterEncoding("UTF-8");
+                            response.getWriter().write("{\"message\":\"로그인이 필요합니다.\"}");
                         })
                         .accessDeniedHandler((request, response, accessDeniedException) -> {
+                            log.error(" 권한 부족: {} {}", request.getMethod(), request.getRequestURI());
                             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-                            response.setCharacterEncoding("UTF-8"); // 한글 깨짐 방지 추가
-                            response.getWriter().write("{\"message\":\"접근권한이 없습니다.\"}"); //접근 권한이 없습니다(프론트)
+                            response.setCharacterEncoding("UTF-8");
+                            response.getWriter().write("{\"message\":\"접근권한이 없습니다.\"}");
                         })
                 )
 
-                // Swagger
+                // 역할별 경로 제한 로직
                 .authorizeHttpRequests(auth -> {
-                    // 기본 허용 경로 (언제든 접근 가능)
+                    // 기본 허용 경로 (언제든 접근 가능) - 아무 역할이 아니더라도
                     auth.requestMatchers(
-                            "/v3/api-docs/**",
                             "/api/users/sign-up", //회원가입
                             "/api/users/exists/**", //중복조회 when 회원가입
                             "/api/auth/find/**", //아이디/비밀번호 찾기
@@ -72,50 +105,35 @@ public class SecurityConfig {
                             "/api/auth/login", //로그인
                             "/api/auth/logout", //로그아웃
                             "/api/approval/**", //일단은 열어두는데 추후에 막아야한다.
-                            "/api/g2b/sync",
+                            "/api/g2b/sync", //일단 열어두는데 추후에 막아야한다.
                             "/api/g2b/test",//일단은 열어두는데 추후에 막아야한다.
                             "/api/g2b/add-drbYr", //일단은 열어두는데 추후에 막아야한다.
                             "/api/g2b/test/usefulLife", //일단은 열어두는데 추후에 막아야한다.
                             "/api/public/**",
                             "/public/**", //타임리프용
-                            "/images/**" //한양대 로고 보여주기 용
-                    ).permitAll();
-
-
-                    //역할별 접근 제한
-                    auth.requestMatchers("/api/item/acquisitions/admin/**").hasRole("ADMIN");
-                    auth.requestMatchers("/api/**").hasAnyRole("MANAGER", "ADMIN");
-
-                    if (isDev) {
-                        // 개발 환경(dev)일 때만 로그인 없이 스웨거 테스트하고 싶은 API 작성 가능
-
-                    }
-
-                    auth.requestMatchers(
+                            "/images/**", //한양대 로고 보여주기 용
                             "/v3/api-docs/**",
                             "/swagger-ui/**",
                             "/swagger-ui.html",
-                            "/swagger-resources/**"
+                            "/swagger-resources/**",
+                            "/error"
                     ).permitAll();
-
-                    auth.requestMatchers("/error").permitAll();
+                    //역할별 접근 제한
+                    auth.requestMatchers("/api/item/returnings/admin/**").hasRole("ADMIN");
+                    auth.requestMatchers("/api/item/acquisitions/admin/**").hasRole("ADMIN");
+                    auth.requestMatchers("/api/item/disuses/admin/**").hasRole("ADMIN");
+                    auth.requestMatchers("/api/item/disposals/admin/**").hasRole("ADMIN");
+                    auth.requestMatchers("/api/item/assets/admin/**").hasRole("ADMIN");
+                    auth.requestMatchers("/api/**").hasAnyRole("MANAGER", "ADMIN");
 
                     auth.anyRequest().authenticated();
                 })
 
-                .formLogin(AbstractHttpConfigurer::disable) // no login for swagger , we need comfort
+                .formLogin(AbstractHttpConfigurer::disable) // no login we made it
                 .httpBasic(AbstractHttpConfigurer::disable)
-                //로그아웃
-                .logout(logout -> logout
-                        .logoutUrl("/api/auth/logout")
-                        .logoutSuccessHandler((request, response, authentication) -> {
-                            response.setStatus(HttpServletResponse.SC_OK);
-                            response.setContentType("application/json;charset=UTF-8");
-                            response.getWriter().write("{\"success\":true,\"message\":\"로그아웃 성공\",\"data\":null}");
-                        })
-                        .invalidateHttpSession(true)
-                        .deleteCookies("JSESSIONID")
-                );
+                .logout(AbstractHttpConfigurer::disable)// no login we made it
+        ;
+
 
         return http.build();
     }
@@ -161,23 +179,5 @@ public class SecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
-    }
-
-    //아이디,비밀번호 로그인 실행기 (로그인 구현시에 사용할 예정)
-    /**
-     *\
-     * @param userDetailsService
-     * @param passwordEncoder
-     * @return
-     */
-    @Bean
-    public DaoAuthenticationProvider daoAuthenticationProvider(
-            CustomUserDetailsService userDetailsService,
-            PasswordEncoder passwordEncoder
-    ) {
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setUserDetailsService(userDetailsService); // 사용자 조회 전략
-        provider.setPasswordEncoder(passwordEncoder);       // 비밀번호 비교 전략(핵심)
-        return provider;
     }
 }

@@ -65,7 +65,7 @@ public class AssetController {
             summary = "개별 물품 정보 수정",
             description = "취득단가, 내용연수, 비고를 수정합니다. 삭제되었거나 불용(DSU) 상태인 물품은 수정할 수 없습니다."
     )
-    @PutMapping("/{itmNo}")
+    @PatchMapping("/{itmNo}")
     public ApiResponse<Void> updateAsset(
             @Parameter(description = "물품고유번호", example = "M202600001")
             @PathVariable String itmNo,

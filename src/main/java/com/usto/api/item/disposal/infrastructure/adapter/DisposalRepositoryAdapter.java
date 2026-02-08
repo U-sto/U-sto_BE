@@ -10,12 +10,14 @@ import com.usto.api.item.disposal.domain.model.DisposalMaster;
 import com.usto.api.item.disposal.domain.model.DisposalArrangementType;
 import com.usto.api.item.disposal.domain.repository.DisposalRepository;
 import com.usto.api.item.disposal.infrastructure.entity.ItemDisposalDetailEntity;
+import com.usto.api.item.disposal.infrastructure.entity.QItemDisposalDetailEntity;
 import com.usto.api.item.disposal.infrastructure.mapper.DisposalMapper;
 import com.usto.api.item.disposal.infrastructure.repository.DisposalDetailJpaRepository;
 import com.usto.api.item.disposal.infrastructure.repository.DisposalMasterJpaRepository;
 import com.usto.api.item.disposal.presentation.dto.request.DisposalSearchRequest;
 import com.usto.api.item.disposal.presentation.dto.response.DisposalItemListResponse;
 import com.usto.api.item.disposal.presentation.dto.response.DisposalListResponse;
+import com.usto.api.item.disuse.infrastructure.entity.QItemDisuseDetailEntity;
 import com.usto.api.user.infrastructure.entity.QUserJpaEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -77,7 +79,7 @@ public class DisposalRepositoryAdapter implements DisposalRepository {
                 .from(itemDisposalMasterEntity)
                 .where(
                         itemDisposalMasterEntity.orgCd.eq(orgCd),
-                        dispAtBetween(cond.getStartDispAt(), cond.getEndDispAt()),
+                        AplyAtBetween(cond.getStartAplyAt(), cond.getEndAplyAt()),
                         dispTypeEq(cond.getDispType()),
                         apprStsEq(cond.getApprSts())
                 )
@@ -90,7 +92,7 @@ public class DisposalRepositoryAdapter implements DisposalRepository {
                 .select(Projections.fields(DisposalListResponse.class,
                         itemDisposalMasterEntity.dispMId.as("dispMId"),
                         itemDisposalMasterEntity.dispType.stringValue().as("dispType"),
-                        itemDisposalMasterEntity.dispAt,
+                        itemDisposalMasterEntity.aplyAt,
                         itemDisposalMasterEntity.aplyUsrId,
                         user.usrNm.as("aplyUsrNm"),
                         itemDisposalMasterEntity.apprSts.stringValue().as("apprSts"),
@@ -103,7 +105,7 @@ public class DisposalRepositoryAdapter implements DisposalRepository {
                 .on(itemDisposalMasterEntity.aplyUsrId.eq(user.usrId))
                 .where(
                         itemDisposalMasterEntity.orgCd.eq(orgCd),
-                        dispAtBetween(cond.getStartDispAt(), cond.getEndDispAt()),
+                        AplyAtBetween(cond.getStartAplyAt(), cond.getEndAplyAt()),
                         dispTypeEq(cond.getDispType()),
                         apprStsEq(cond.getApprSts())
                 )
@@ -231,12 +233,29 @@ public class DisposalRepositoryAdapter implements DisposalRepository {
         detailJpaRepository.saveAll(entities);
     }
 
+    @Override
+    public List<DisposalDetail> findDetailsByMasterId(UUID dispMId, String orgCd) {
+        QItemDisposalDetailEntity d = QItemDisposalDetailEntity.itemDisposalDetailEntity;
+
+        List<ItemDisposalDetailEntity> entities = queryFactory
+                .selectFrom(d)
+                .where(
+                        d.dispMId.eq(dispMId),
+                        d.orgCd.eq(orgCd)
+                )
+                .fetch();
+
+        return entities.stream()
+                .map(DisposalMapper::toDetailDomain)
+                .toList();
+    }
+
     // 동적 쿼리 헬퍼 메서드
-    private BooleanExpression dispAtBetween(LocalDate s, LocalDate e) {
+    private BooleanExpression AplyAtBetween(LocalDate s, LocalDate e) {
         if (s == null && e == null) return null;
-        if (s != null && e == null) return itemDisposalMasterEntity.dispAt.goe(s);
-        if (s == null) return itemDisposalMasterEntity.dispAt.loe(e);
-        return itemDisposalMasterEntity.dispAt.between(s, e);
+        if (s != null && e == null) return itemDisposalMasterEntity.aplyAt.goe(s);
+        if (s == null) return itemDisposalMasterEntity.aplyAt.loe(e);
+        return itemDisposalMasterEntity.aplyAt.between(s, e);
     }
 
     private BooleanExpression dispTypeEq(DisposalArrangementType type) {

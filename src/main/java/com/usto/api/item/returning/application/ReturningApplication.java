@@ -34,7 +34,7 @@ public class ReturningApplication {
     private final ReturningPolicy returningPolicy;
     private final AssetRepository assetRepository;
     private final AssetPolicy assetPolicy;
-    private AssetStatusHistoryRepository historyRepository;
+    private final AssetStatusHistoryRepository historyRepository;
 
     /**
      * 반납 신청 등록
@@ -222,7 +222,7 @@ public class ReturningApplication {
             throw new BusinessException("반납 상세 정보가 없습니다.");
         }
 
-        List<Asset> assetsToUpdate = new ArrayList<>(details.size());
+        List<Asset> assets = new ArrayList<>(details.size());
         List<AssetStatusHistory> histories = new ArrayList<>(details.size());
 
         for (ReturningDetail detail : details) {
@@ -235,8 +235,7 @@ public class ReturningApplication {
             // 반납된 물품들의 상태 변경 (OPER → RTN)
             //이전 상태 저장
             OperStatus prevStatus = asset.getOperSts();
-            asset.returnAsset(); //반납처리 + 부서초기화 후
-            assetsToUpdate.add(asset);
+            assets.add(asset);
             histories.add(AssetStatusHistory.builder()
                     .itemHisId(UUID.randomUUID())
                     .itmNo(itemNo)
@@ -252,7 +251,7 @@ public class ReturningApplication {
                     .delYn(asset.getDelYn())
                     .build());
         }
-        assetRepository.saveAll(assetsToUpdate);
+        assetRepository.bulkReturning(assets,userId,orgCd);
         historyRepository.saveAll(histories);
 
         master.confirmApproval(userId);
@@ -271,14 +270,11 @@ public class ReturningApplication {
         ReturningMaster master = returningRepository.findMasterById(rtrnMId, orgCd)
                 .orElseThrow(() -> new BusinessException("존재하지 않는 반납 신청입니다."));
         //정책 확인
+        returningPolicy.validateOwnership(master, orgCd);
         returningPolicy.validateConfirm(master);
 
-        //소프트 삭제 전 상태 변경(반납 신청 반려처리 -> 저장)
+        //상태 변경(반납 신청 반려처리 -> 저장)
         master.rejectApproval(userId);
         returningRepository.saveMaster(master);
-
-        // 소프트 삭제 진행
-        returningRepository.deleteMaster(rtrnMId);
-
     }
 }

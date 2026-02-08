@@ -23,14 +23,14 @@ public final class DisposalMapper {
     public static DisposalMaster toMasterDomain(
             String aplyUsrId,
             DisposalArrangementType dispType,
-            LocalDate dispAt,
+            LocalDate aplyAt,
             String orgCd
     ) {
         return DisposalMaster.builder()
                 .dispMId(UUID.randomUUID())
                 .aplyUsrId(aplyUsrId)
                 .dispType(dispType)
-                .dispAt(dispAt)
+                .aplyAt(aplyAt)
                 .apprSts(ApprStatus.WAIT)
                 .orgCd(orgCd)
                 .delYn("N")
@@ -45,7 +45,7 @@ public final class DisposalMapper {
                 .dispMId(entity.getDispMId())
                 .aplyUsrId(entity.getAplyUsrId())
                 .dispType(entity.getDispType())
-                .dispAt(entity.getDispAt())
+                .aplyAt(entity.getAplyAt())
                 .apprUsrId(entity.getApprUsrId())
                 .apprSts(entity.getApprSts())
                 .orgCd(entity.getOrgCd())
@@ -66,7 +66,7 @@ public final class DisposalMapper {
                 .dispMId(domain.getDispMId())
                 .aplyUsrId(domain.getAplyUsrId())
                 .dispType(domain.getDispType())
-                .dispAt(domain.getDispAt())
+                .aplyAt(domain.getAplyAt())
                 .apprUsrId(domain.getApprUsrId())
                 .apprSts(domain.getApprSts())
                 .orgCd(domain.getOrgCd())

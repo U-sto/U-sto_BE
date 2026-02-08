@@ -1,17 +1,15 @@
 package com.usto.api.item.asset.infrastructure.repository;
 
-import com.usto.api.item.asset.domain.model.Asset;
 import com.usto.api.item.asset.infrastructure.entity.ItemAssetDetailEntity;
 import com.usto.api.item.asset.infrastructure.entity.ItemAssetDetailId;
-import com.usto.api.item.asset.infrastructure.entity.ItemAssetMasterEntity;
 import com.usto.api.item.asset.presentation.dto.response.AssetAiItemDetailResponse;
-import com.usto.api.item.asset.presentation.dto.response.AssetDetailResponse;
+import com.usto.api.item.common.model.OperStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
-import java.util.Optional;
 
 
 public interface AssetJpaRepository extends JpaRepository<ItemAssetDetailEntity, ItemAssetDetailId> {
@@ -203,4 +201,70 @@ public interface AssetJpaRepository extends JpaRepository<ItemAssetDetailEntity,
       AND ORG_CD = :orgCd
     """, nativeQuery = true)
     int findMaxSequenceByYear(@Param("year") String year, @Param("orgCd") String orgCd);
+
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("""
+        update ItemAssetDetailEntity a
+           set a.operSts = :newSts,
+               a.updBy   = :updBy
+         where a.itemId.itmNo in :itemNos
+           and a.itemId.orgCd = :orgCd
+           and a.delYn = 'N'
+    """)
+    void bulkDisposal(
+            @Param("itemNos") List<String> itemNos,
+            @Param("updBy") String updBy,
+            @Param("orgCd") String orgCd,
+            @Param("newSts") OperStatus newSts
+    );
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("""
+        update ItemAssetDetailEntity a
+           set a.delYn = 'Y',
+               a.updBy = :updBy,
+               a.delAt = NOW()
+         where a.itemId.itmNo in :itemNos
+           and a.itemId.orgCd = :orgCd
+           and a.delYn = 'N'
+    """)
+    void bulkSoftDelete(
+            @Param("itemNos") List<String> itemNos,
+            @Param("updBy") String updBy,
+            @Param("orgCd") String orgCd
+    );
+
+    @Modifying
+    @Query("""
+        update ItemAssetDetailEntity a
+           set a.operSts = :newSts,
+               a.updBy   = :updBy
+         where a.itemId.itmNo in :itemNos
+           and a.itemId.orgCd = :orgCd
+           and a.delYn = 'N'
+    """)
+    void bulkDisuse(
+            @Param("itemNos") List<String> itemNos,
+            @Param("updBy") String updBy,
+            @Param("orgCd") String orgCd,
+            @Param("newSts") OperStatus newSts
+    );
+
+    @Modifying
+    @Query("""
+        update ItemAssetDetailEntity a
+           set a.operSts = :newSts,
+               a.updBy   = :updBy,
+               a.deptCd = "NONE"
+         where a.itemId.itmNo in :itemNos
+           and a.itemId.orgCd = :orgCd
+           and a.delYn = 'N'
+    """)
+    void bulkReturning(
+            @Param("itemNos") List<String> itemNos,
+            @Param("updBy") String updBy,
+            @Param("orgCd") String orgCd,
+            @Param("newSts") OperStatus newSts
+    );
 }
