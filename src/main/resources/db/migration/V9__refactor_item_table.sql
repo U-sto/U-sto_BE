@@ -273,18 +273,3 @@ CREATE TABLE `TB_ITEM007` (
 
   PRIMARY KEY (`ITEM_HIS_ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='물품상태이력';
-
-
--- ============================================
--- 3. 마이그레이션 완료 확인
--- ============================================
-SELECT
-    TABLE_NAME,
-    TABLE_COMMENT
-FROM
-    INFORMATION_SCHEMA.TABLES
-WHERE
-    TABLE_SCHEMA = 'usto'
-  AND TABLE_NAME LIKE 'TB_ITEM%'
-ORDER BY
-    TABLE_NAME;

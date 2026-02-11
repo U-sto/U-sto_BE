@@ -35,7 +35,6 @@ public final class AcquisitionMapper {
                 .acqAt(acqAt)
                 .acqUpr(acqUpr)
                 .deptCd(deptCd)
-                .operSts(OperStatus.ACQ)  // 초기 운용상태
                 .drbYr(drbYr)
                 .acqQty(acqQty)
                 .arrgTy(arrgTy)
@@ -57,7 +56,6 @@ public final class AcquisitionMapper {
                 .acqAt(entity.getAcqAt())
                 .acqUpr(entity.getAcqUpr())
                 .deptCd(entity.getDeptCd())
-                .operSts(entity.getOperSts())
                 .drbYr(entity.getDrbYr())
                 .acqQty(entity.getAcqQty())
                 .arrgTy(entity.getArrgTy())
@@ -86,7 +84,6 @@ public final class AcquisitionMapper {
                 .acqAt(domain.getAcqAt())
                 .acqUpr(domain.getAcqUpr())
                 .deptCd(domain.getDeptCd())
-                .operSts(domain.getOperSts())
                 .drbYr(domain.getDrbYr())
                 .acqQty(domain.getAcqQty())
                 .arrgTy(domain.getArrgTy())
