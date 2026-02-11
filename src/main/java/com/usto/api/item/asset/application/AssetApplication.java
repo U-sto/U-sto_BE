@@ -2,7 +2,6 @@ package com.usto.api.item.asset.application;
 
 import com.usto.api.item.acquisition.domain.model.Acquisition;
 import com.usto.api.item.asset.domain.model.Asset;
-import com.usto.api.item.asset.domain.model.AssetMaster;
 import com.usto.api.item.asset.domain.model.QrLabelData;
 import com.usto.api.item.asset.domain.repository.AssetRepository;
 import com.usto.api.item.asset.domain.service.AssetPolicy;
@@ -37,9 +36,10 @@ public class AssetApplication {
     private final AssetPolicy assetPolicy;
     private final ItemNumberGenerator itemNumberGenerator;
     private final QrLabelPdfGenerator qrLabelPdfGenerator;
+    private final OrganizationJpaRepository organizationJpaRepository;
+
     @Value("${app.frontend.base-url:http://localhost:8080}")  // 임시(프론트엔드 연동시 바꿔야함)
     private String frontendBaseUrl;
-    private final OrganizationJpaRepository organizationJpaRepository;
 
     /**
      * 운용대장 목록 조회
@@ -103,28 +103,17 @@ public class AssetApplication {
     }
 
     /**
-     * 취득 승인 건을 운용대장(002M/D)으로 정식 등록
-     * - 하나의 취득 ID에 대해 1개의 마스터와 N개의 상세 데이터를 생성함
+     * 취득 승인 건을 자산으로 정식 등록
+     * - 하나의 취득 ID에 대해 N개의 대장 데이터를 생성함
+     *
      * @param acq 승인 완료된 취득 도메인 모델
      */
     @Transactional
     public void registerAssetsFromAcquisition(Acquisition acq) {
-
-        if (assetRepository.existsMasterByAcqId(acq.getAcqId())) {
+        // 1. 중복 등록 검증
+        if (assetRepository.existsAssetByAcqId(acq.getAcqId())) {
             throw new BusinessException("이미 자산으로 등록된 취득 건(ID: " + acq.getAcqId() + ")입니다.");
         }
-
-        // 1. 대장 기본(Master) 생성: 1건
-        AssetMaster master = AssetMapper.toMasterDomain(
-                acq.getAcqId(),
-                acq.getG2bDCd(),
-                acq.getAcqQty(),
-                acq.getAcqAt(),
-                acq.getApprAt(),
-                acq.getArrgTy(),
-                acq.getOrgCd()
-        );
-        assetRepository.saveMaster(master); //002M에 저장
 
         // 2. 현재 연도 + 다음 순번 조회
         int currentYear = LocalDate.now().getYear();
