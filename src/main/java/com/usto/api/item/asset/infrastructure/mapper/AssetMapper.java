@@ -27,7 +27,7 @@ public final class AssetMapper {
                 .acqId(acqId)
                 .g2bDCd(g2bDCd)
                 .deptCd(deptCd)
-                .operSts(OperStatus.OPER)
+                .operSts(OperStatus.ACQ)
                 .acqUpr(acqUpr)
                 .drbYr(drbYr)
                 .orgCd(orgCd)
