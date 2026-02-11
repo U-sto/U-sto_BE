@@ -13,12 +13,12 @@ import java.util.UUID;
  * TB_ITEM003D - 물품반납상세
  */
 @Entity
-@Table(name = "TB_ITEM003D")
+@Table(name = "TB_ITEM004D")
 @Getter
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@SQLDelete(sql = "UPDATE TB_ITEM003D SET del_yn = 'Y', del_at = NOW() WHERE rtrn_d_id = ?")
+@SQLDelete(sql = "UPDATE TB_ITEM004D SET del_yn = 'Y', del_at = NOW() WHERE rtrn_d_id = ?")
 @Where(clause = "DEL_YN = 'N'")
 public class ItemReturningDetailEntity extends BaseTimeEntity {
 

@@ -16,12 +16,12 @@ import java.util.UUID;
  * TB_ITEM005M - 물품처분기본
  */
 @Entity
-@Table(name = "TB_ITEM005M")
+@Table(name = "TB_ITEM006M")
 @Getter
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@SQLDelete(sql = "UPDATE TB_ITEM005M SET del_yn = 'Y', del_at = NOW() WHERE disp_m_id = ?")
+@SQLDelete(sql = "UPDATE TB_ITEM006M SET del_yn = 'Y', del_at = NOW() WHERE disp_m_id = ?")
 @Where(clause = "DEL_YN = 'N'")
 public class ItemDisposalMasterEntity extends BaseTimeEntity {
 
@@ -33,7 +33,7 @@ public class ItemDisposalMasterEntity extends BaseTimeEntity {
     private String aplyUsrId;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "DISP_TYPE", nullable = false, length = 30)
+    @Column(name = "DISP_ARRG_TY", nullable = false, length = 30)
     private DisposalArrangementType dispType;
 
     @Column(name = "APLY_AT", nullable = false)
