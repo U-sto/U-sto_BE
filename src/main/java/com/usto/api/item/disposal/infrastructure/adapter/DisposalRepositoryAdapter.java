@@ -17,7 +17,6 @@ import com.usto.api.item.disposal.infrastructure.repository.DisposalMasterJpaRep
 import com.usto.api.item.disposal.presentation.dto.request.DisposalSearchRequest;
 import com.usto.api.item.disposal.presentation.dto.response.DisposalItemListResponse;
 import com.usto.api.item.disposal.presentation.dto.response.DisposalListResponse;
-import com.usto.api.item.disuse.infrastructure.entity.QItemDisuseDetailEntity;
 import com.usto.api.user.infrastructure.entity.QUserJpaEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -30,10 +29,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.usto.api.item.acquisition.infrastructure.entity.QItemAcquisitionEntity.itemAcquisitionEntity;
 import static com.usto.api.item.disposal.infrastructure.entity.QItemDisposalMasterEntity.itemDisposalMasterEntity;
 import static com.usto.api.item.disposal.infrastructure.entity.QItemDisposalDetailEntity.itemDisposalDetailEntity;
-import static com.usto.api.item.asset.infrastructure.entity.QItemAssetDetailEntity.itemAssetDetailEntity;
-import static com.usto.api.item.asset.infrastructure.entity.QItemAssetMasterEntity.itemAssetMasterEntity;
+import static com.usto.api.item.asset.infrastructure.entity.QItemAssetEntity.itemAssetEntity;
 import static com.usto.api.g2b.infrastructure.entity.QG2bItemJpaEntity.g2bItemJpaEntity;
 import static com.usto.api.g2b.infrastructure.entity.QG2bItemCategoryJpaEntity.g2bItemCategoryJpaEntity;
 
@@ -143,15 +142,15 @@ public class DisposalRepositoryAdapter implements DisposalRepository {
                         // G2B 목록번호
                         Expressions.stringTemplate("CONCAT({0}, '-', {1})",
                                 g2bItemCategoryJpaEntity.g2bMCd,
-                                itemAssetDetailEntity.g2bDCd).as("g2bItemNo"),
+                                itemAssetEntity.g2bDCd).as("g2bItemNo"),
                         // G2B 목록명
                         g2bItemJpaEntity.g2bDNm,
                         // 물품고유번호
                         itemDisposalDetailEntity.itmNo,
                         // 취득일자
-                        itemAssetMasterEntity.acqAt,
+                        itemAcquisitionEntity.acqAt,
                         // 취득금액
-                        itemAssetDetailEntity.acqUpr,
+                        itemAssetEntity.acqUpr,
                         // 물품상태 (처분상세 테이블에서)
                         itemDisposalDetailEntity.itemSts.stringValue().as("itemSts"),
                         // 불용사유 (처분상세 테이블에서)
@@ -164,15 +163,15 @@ public class DisposalRepositoryAdapter implements DisposalRepository {
                 .join(itemDisposalMasterEntity)
                 .on(itemDisposalDetailEntity.dispMId.eq(itemDisposalMasterEntity.dispMId))
                 // 대장상세 조인
-                .join(itemAssetDetailEntity)
-                .on(itemDisposalDetailEntity.itmNo.eq(itemAssetDetailEntity.itemId.itmNo),
-                        itemDisposalDetailEntity.orgCd.eq(itemAssetDetailEntity.itemId.orgCd))
-                // 대장기본 조인
-                .join(itemAssetMasterEntity)
-                .on(itemAssetDetailEntity.acqId.eq(itemAssetMasterEntity.acqId))
+                .join(itemAssetEntity)
+                .on(itemDisposalDetailEntity.itmNo.eq(itemAssetEntity.itemId.itmNo),
+                        itemDisposalDetailEntity.orgCd.eq(itemAssetEntity.itemId.orgCd))
+                // 취득기본 조인
+                .join(itemAcquisitionEntity)
+                .on(itemAssetEntity.acqId.eq(itemAcquisitionEntity.acqId))
                 // G2B 품목 조인
                 .leftJoin(g2bItemJpaEntity)
-                .on(itemAssetDetailEntity.g2bDCd.eq(g2bItemJpaEntity.g2bDCd))
+                .on(itemAssetEntity.g2bDCd.eq(g2bItemJpaEntity.g2bDCd))
                 // G2B 분류 조인
                 .leftJoin(g2bItemCategoryJpaEntity)
                 .on(g2bItemJpaEntity.g2bMCd.eq(g2bItemCategoryJpaEntity.g2bMCd))
