@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 /**
- * TB_ITEM005D - 물품처분상세
+ * TB_ITEM006D - 물품처분상세
  * - 불용기본 테이블의 물품상태와 사유를 가져옴
  */
 @Entity

@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 /**
- * TB_ITEM004D - 물품불용상세
+ * TB_ITEM005D - 물품불용상세
  */
 @Entity
 @Table(name = "TB_ITEM005D")

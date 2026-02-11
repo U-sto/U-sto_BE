@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 /**
- * TB_ITEM004M - 물품불용기본
+ * TB_ITEM005M - 물품불용기본
  */
 @Entity
 @Table(name = "TB_ITEM005M")
