@@ -3,7 +3,6 @@ package com.usto.api.item.acquisition.infrastructure.entity;
 import com.usto.api.common.BaseTimeEntity;
 import com.usto.api.item.acquisition.domain.model.AcqArrangementType;
 import com.usto.api.item.common.model.ApprStatus;
-import com.usto.api.item.common.model.OperStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;

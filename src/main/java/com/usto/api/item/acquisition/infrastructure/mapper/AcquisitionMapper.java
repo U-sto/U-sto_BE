@@ -4,7 +4,6 @@ import com.usto.api.item.acquisition.domain.model.AcqArrangementType;
 import com.usto.api.item.acquisition.domain.model.Acquisition;
 import com.usto.api.item.acquisition.infrastructure.entity.ItemAcquisitionEntity;
 import com.usto.api.item.common.model.ApprStatus;
-import com.usto.api.item.common.model.OperStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
