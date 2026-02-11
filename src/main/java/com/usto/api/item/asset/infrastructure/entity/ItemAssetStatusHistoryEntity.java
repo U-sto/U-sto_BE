@@ -15,12 +15,12 @@ import java.util.UUID;
  * TB_ITEM006M - 물품상태이력
  */
 @Entity
-@Table(name = "TB_ITEM006M")
+@Table(name = "TB_ITEM007")
 @Getter
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@SQLDelete(sql = "UPDATE TB_ITEM006M SET del_yn = 'Y', del_at = NOW() WHERE item_his_id = ?")
+@SQLDelete(sql = "UPDATE TB_ITEM007 SET del_yn = 'Y', del_at = NOW() WHERE item_his_id = ?")
 @Where(clause = "DEL_YN = 'N'")
 public class ItemAssetStatusHistoryEntity extends BaseTimeEntity {
 
