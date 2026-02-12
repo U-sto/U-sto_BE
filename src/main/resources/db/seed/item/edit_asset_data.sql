@@ -1,34 +1,24 @@
 Use usto;
 
-SELECT *
-FROM TB_ITEM001M;
+-- 취득 기본 조회
+SELECT * FROM TB_ITEM001M;
 
-SELECT *
-FROM TB_ITEM001M
-WHERE ACQ_ID = '3c745568-f9cc-11f0-ae8f-8c554a43c9a1';
+-- 특정 취득 ID 조회 (바이너리 타입 고려)
+SELECT * FROM TB_ITEM001M WHERE ACQ_ID = UNHEX(REPLACE('3c745568-f9cc-11f0-ae8f-8c554a43c9a1', '-', ''));
 
-SELECT *
-FROM TB_G2B001D
-WHERE G2B_D_CD = '24120278';
+-- G2B 식별코드 조회
+SELECT * FROM TB_G2B001D WHERE G2B_D_CD = '24120278';
 
+-- [수정] 통합된 물품대장 조회
+SELECT * FROM TB_ITEM002;
 
+-- [수정] 물품대장 삭제 (002D -> 002)
+DELETE FROM TB_ITEM002 WHERE DEPT_CD = 'B103' ;
 
-SELECT *
-FROM TB_ITEM002M;
+-- 취득 ID 확인용
+SELECT HEX(ACQ_ID) AS ACQ_ID_HEX, G2B_D_CD, APPR_STS, ACQ_AT FROM TB_ITEM001M;
 
-SELECT *
-FROM TB_ITEM002D;
-
-DELETE FROM TB_ITEM002D
-WHERE DEPT_CD = 'B103' ;
-
-SELECT
-    HEX(ACQ_ID) AS ACQ_ID_HEX,  -- 바이너리를 문자열로 변환하여 확인
-    G2B_D_CD,
-    APPR_STS,
-    ACQ_AT
-FROM TB_ITEM001M;
-
+-- [수정] 물품 상세 정보 조회 (001M + 002 조인)
 SELECT
     d.ITM_NO,
     d.ORG_CD,
@@ -36,14 +26,14 @@ SELECT
     CONCAT(c.G2B_M_CD, '-', g.G2B_D_CD) AS g2bItemNo,
     d.ACQ_UPR,
     m.ACQ_AT,
-    m.ARRG_AT,
+    m.APPR_AT AS ARRG_AT, -- 확정일자가 정리일자 역할
     d.OPER_STS,
     d.DRB_YR,
     dept.DEPT_NM,
-    m.QTY,
+    m.ACQ_QTY AS QTY,     -- 수량은 001M에서 가져옴
     d.RMK
-FROM TB_ITEM002D d
-         INNER JOIN TB_ITEM002M m
+FROM TB_ITEM002 d
+         INNER JOIN TB_ITEM001M m
                     ON m.ACQ_ID = d.ACQ_ID
                         AND m.DEL_YN = 'N'
          INNER JOIN TB_G2B001D g
@@ -56,7 +46,7 @@ FROM TB_ITEM002D d
 WHERE d.ITM_NO = 'M202600001'
   AND d.ORG_CD = '7008277'
   AND d.DEL_YN = 'N'
-  AND m.DEL_YN = 'N'
-;
+  AND m.DEL_YN = 'N';
 
+-- [수정] 불용 기본 조회 (005M)
 select * from TB_ITEM005M;
