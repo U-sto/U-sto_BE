@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 /**
- * 반납 상세 도메인 모델 (TB_ITEM003D)
+ * 반납 상세 도메인 모델 (TB_ITEM004D)
  */
 @Getter
 @Builder

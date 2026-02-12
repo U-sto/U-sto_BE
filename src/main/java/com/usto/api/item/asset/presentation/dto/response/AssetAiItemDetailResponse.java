@@ -62,7 +62,7 @@ public class AssetAiItemDetailResponse {
     private String drbYr;
 
     //최신 정보
-    @Schema(description = "현재수량(TB_ITEM002M.QTY). 단건 조회시 1로 고정할 수도 있음")
+    @Schema(description = "현재수량. 단건 조회시 1로 고정할 수도 있음")
     private Integer currentQty;
 
     //최초 정보
