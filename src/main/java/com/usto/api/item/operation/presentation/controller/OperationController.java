@@ -71,7 +71,7 @@ public class OperationController {
 
     @Operation(
             summary = "운용 신청 등록 (MANAGER)",
-            description = "반납(RTN) 상태의 물품을 운용 신청합니다. 여러 물품을 한 번에 신청할 수 있습니다."
+            description = "취득 또는 반납 상태의 물품을 운용 신청합니다. 여러 물품을 한 번에 신청할 수 있습니다."
     )
     @PostMapping
     @PreAuthorize("hasRole('MANAGER')")
