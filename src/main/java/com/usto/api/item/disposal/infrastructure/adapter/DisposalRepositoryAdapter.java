@@ -219,7 +219,7 @@ public class DisposalRepositoryAdapter implements DisposalRepository {
                         itemDisposalDetailEntity.orgCd.eq(orgCd),
                         excludeDispMId != null ?
                                 itemDisposalMasterEntity.dispMId.ne(excludeDispMId) : null,
-                        itemDisposalMasterEntity.apprSts.in(ApprStatus.REQUEST, ApprStatus.APPROVED)
+                        itemDisposalMasterEntity.apprSts.in(ApprStatus.WAIT, ApprStatus.REQUEST, ApprStatus.APPROVED)
                 )
                 .fetch();
     }

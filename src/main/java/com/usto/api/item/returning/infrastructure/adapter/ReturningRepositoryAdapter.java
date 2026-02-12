@@ -175,8 +175,8 @@ public class ReturningRepositoryAdapter implements ReturningRepository {
                         itemReturningDetailEntity.itmNo.eq(itmNo),
                         itemReturningDetailEntity.orgCd.eq(orgCd),
                         excludeRtrnMId != null ? itemReturningMasterEntity.rtrnMId.ne(excludeRtrnMId) : null,  // 현재 신청서는 제외
-                        // 승인완료 또는 요청중인 건만 중복 체크
-                        itemReturningMasterEntity.apprSts.in(ApprStatus.REQUEST, ApprStatus.APPROVED)
+                        // 작성중 또는 요청중인 건만 중복 체크
+                        itemReturningMasterEntity.apprSts.in(ApprStatus.WAIT, ApprStatus.REQUEST)
                 )
                 .fetchFirst() != null;
     }

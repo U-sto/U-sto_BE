@@ -221,7 +221,7 @@ public class DisuseRepositoryAdapter implements DisuseRepository {
                         itemDisuseDetailEntity.orgCd.eq(orgCd),
                         excludeDsuMId != null ?
                                 itemDisuseMasterEntity.dsuMId.ne(excludeDsuMId) : null,
-                        itemDisuseMasterEntity.apprSts.in(ApprStatus.REQUEST, ApprStatus.APPROVED)
+                        itemDisuseMasterEntity.apprSts.in(ApprStatus.WAIT, ApprStatus.REQUEST, ApprStatus.APPROVED)
                 )
                 .fetch();
     }
