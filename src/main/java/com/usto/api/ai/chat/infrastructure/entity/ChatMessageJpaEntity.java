@@ -21,7 +21,7 @@ public class ChatMessageJpaEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "CHAT_D_ID")
-    private Long massageId;
+    private Long messageId;
 
     @Column(name = "CHAT_M_ID", columnDefinition = "BINARY(16)")
     private UUID threadId;

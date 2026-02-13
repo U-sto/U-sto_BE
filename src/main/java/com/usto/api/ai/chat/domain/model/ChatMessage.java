@@ -10,7 +10,7 @@ import java.util.UUID;
 @Builder
 @AllArgsConstructor
 public class ChatMessage {
-    private final Long massageId;
+    private final Long messageId;
     private final UUID threadId;
     private final String content;
     private final SenderType sender; // USER, AI_BOT

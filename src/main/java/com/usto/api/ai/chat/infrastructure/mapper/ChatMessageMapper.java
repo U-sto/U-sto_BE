@@ -21,7 +21,7 @@ public class ChatMessageMapper {
     // Overload : Entity -> Domain (For reading from DB)
     public static ChatMessage toDomain(ChatMessageJpaEntity entity) {
         return ChatMessage.builder()
-                .massageId(entity.getMassageId())
+                .messageId(entity.getMessageId())
                 .threadId(entity.getThreadId())
                 .content(entity.getContent())
                 .sender(entity.getSender())
