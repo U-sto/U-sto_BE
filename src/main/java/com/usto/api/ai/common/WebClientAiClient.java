@@ -1,7 +1,7 @@
 package com.usto.api.ai.common;
 
 import com.usto.api.ai.chat.presentation.dto.request.AiChatRequest;
-import com.usto.api.ai.chat.presentation.dto.response.AiChatResult;
+import com.usto.api.ai.chat.presentation.dto.response.AiChatResponse;
 import com.usto.api.ai.chat.presentation.dto.response.VendorChatResponse;
 import com.usto.api.ai.forecast.presentation.dto.request.AiForecastRequest;
 import com.usto.api.ai.forecast.presentation.dto.response.AiForecastResult;
@@ -26,12 +26,12 @@ public class WebClientAiClient implements AiClient {
     private String forecastPath;
 
     @Override
-    public AiChatResult chat(AiChatRequest request) {
+    public AiChatResponse chat(AiChatRequest request) {
         VendorChatResponse res = post(chatPath, request, VendorChatResponse.class);
         if (res == null || res.reply() == null || res.reply().isBlank()) {
             throw new AiCallException("AI_INVALID_RESPONSE", "챗봇 응답이 비었습니다.");
         }
-        return new AiChatResult(res.reply());
+        return new AiChatResponse(res.reply());
     }
 
     @Override

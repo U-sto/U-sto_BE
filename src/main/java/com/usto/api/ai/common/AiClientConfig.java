@@ -15,19 +15,18 @@ public class AiClientConfig {
 
     @Bean
     public WebClient aiWebClient(
-            @Value("${ai.base-url}") String baseUrl,
-            @Value("${ai.api-key:}") String apiKey,
+            //@Value("${ai.base-url}") String baseUrl,
+            @Value("$${AI_API_KEY}") String apiKey,
             @Value("${ai.timeout-ms}") int timeoutMs
     ) {
         HttpClient httpClient = HttpClient.create()
                 .responseTimeout(Duration.ofMillis(timeoutMs));
 
         WebClient.Builder b = WebClient.builder()
-                .baseUrl(baseUrl)
+                //.baseUrl(baseUrl)
                 .clientConnector(new ReactorClientHttpConnector(httpClient))
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
 
-        // AI팀이 API Key 방식이라면(헤더명은 팀 합의대로)
         if (apiKey != null && !apiKey.isBlank()) {
             b.defaultHeader("X-API-KEY", apiKey);
         }
