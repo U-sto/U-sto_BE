@@ -3,7 +3,6 @@ package com.usto.api.item.acquisition.infrastructure.entity;
 import com.usto.api.common.BaseTimeEntity;
 import com.usto.api.item.acquisition.domain.model.AcqArrangementType;
 import com.usto.api.item.common.model.ApprStatus;
-import com.usto.api.item.common.model.OperStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
@@ -34,14 +33,10 @@ public class  ItemAcquisitionEntity extends BaseTimeEntity {
     private LocalDate acqAt;      // 취득일자
 
     @Column(name = "ACQ_UPR", nullable = false, precision = 20)
-    private BigDecimal acqUpr;    // 취득금액
+    private BigDecimal acqUpr;    // 취득단가
 
     @Column(name = "DEPT_CD", nullable = false, length = 5, columnDefinition = "char(5)")
     private String deptCd;        // 운용부서코드
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "OPER_STS", nullable = false, length = 30)
-    private OperStatus operSts;   // 운용상태
 
     @Column(name = "DRB_YR", nullable = false, length = 20)
     private String drbYr;         // 내용연수
@@ -50,8 +45,8 @@ public class  ItemAcquisitionEntity extends BaseTimeEntity {
     private Integer acqQty;       // 취득수량
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "ARRG_TY", nullable = false, length = 20)
-    private AcqArrangementType arrgTy;  // 정리구분
+    @Column(name = "ACQ_ARRG_TY", nullable = false, length = 20)
+    private AcqArrangementType arrgTy;  // 취득정리구분
 
     @Enumerated(EnumType.STRING)
     @Column(name = "APPR_STS", nullable = false, length = 20)

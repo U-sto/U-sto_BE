@@ -12,16 +12,16 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 /**
- * TB_ITEM005D - 물품처분상세
+ * TB_ITEM006D - 물품처분상세
  * - 불용기본 테이블의 물품상태와 사유를 가져옴
  */
 @Entity
-@Table(name = "TB_ITEM005D")
+@Table(name = "TB_ITEM006D")
 @Getter
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@SQLDelete(sql = "UPDATE TB_ITEM005D SET del_yn = 'Y', del_at = NOW() WHERE disp_d_id = ?")
+@SQLDelete(sql = "UPDATE TB_ITEM006D SET del_yn = 'Y', del_at = NOW() WHERE disp_d_id = ?")
 @Where(clause = "DEL_YN = 'N'")
 public class ItemDisposalDetailEntity extends BaseTimeEntity {
 
@@ -40,7 +40,7 @@ public class ItemDisposalDetailEntity extends BaseTimeEntity {
     private ItemStatus itemSts;  // 불용기본 테이블에서 가져옴
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "CHG_RSN", nullable = false, length = 200)
+    @Column(name = "CHG_RSN", nullable = false, length = 30)
     private DisuseReason chgRsn;  // 불용기본 테이블에서 가져옴
 
     @Column(name = "ORG_CD", nullable = false, length = 7, columnDefinition = "char(7)")

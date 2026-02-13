@@ -12,20 +12,20 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 /**
- * TB_ITEM002D - 물품대장상세 (개별 물품 단위)
+ * TB_ITEM002 - 물품대장 (개별 물품 단위)
  */
 @Entity
-@Table(name = "TB_ITEM002D")
+@Table(name = "TB_ITEM002")
 @Getter
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@SQLDelete(sql = "UPDATE TB_ITEM002D SET del_yn = 'Y', del_at = NOW() WHERE itm_no = ? AND org_cd = ?")
+@SQLDelete(sql = "UPDATE TB_ITEM002 SET del_yn = 'Y', del_at = NOW() WHERE itm_no = ? AND org_cd = ?")
 @Where(clause = "DEL_YN = 'N'")
-public class ItemAssetDetailEntity extends BaseTimeEntity {
+public class ItemAssetEntity extends BaseTimeEntity {
 
     @EmbeddedId
-    private ItemAssetDetailId itemId; // PK = ITEM_NO + ORG_CD
+    private ItemAssetId itemId; // PK = ITEM_NO + ORG_CD
 
     @Column(name = "ACQ_ID", nullable = false, columnDefinition = "BINARY(16)")
     private UUID acqId;    // 취득ID

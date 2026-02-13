@@ -4,7 +4,6 @@ import com.usto.api.item.acquisition.domain.model.AcqArrangementType;
 import com.usto.api.item.acquisition.domain.model.Acquisition;
 import com.usto.api.item.acquisition.infrastructure.entity.ItemAcquisitionEntity;
 import com.usto.api.item.common.model.ApprStatus;
-import com.usto.api.item.common.model.OperStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -35,7 +34,6 @@ public final class AcquisitionMapper {
                 .acqAt(acqAt)
                 .acqUpr(acqUpr)
                 .deptCd(deptCd)
-                .operSts(OperStatus.ACQ)  // 초기 운용상태
                 .drbYr(drbYr)
                 .acqQty(acqQty)
                 .arrgTy(arrgTy)
@@ -57,7 +55,6 @@ public final class AcquisitionMapper {
                 .acqAt(entity.getAcqAt())
                 .acqUpr(entity.getAcqUpr())
                 .deptCd(entity.getDeptCd())
-                .operSts(entity.getOperSts())
                 .drbYr(entity.getDrbYr())
                 .acqQty(entity.getAcqQty())
                 .arrgTy(entity.getArrgTy())
@@ -86,7 +83,6 @@ public final class AcquisitionMapper {
                 .acqAt(domain.getAcqAt())
                 .acqUpr(domain.getAcqUpr())
                 .deptCd(domain.getDeptCd())
-                .operSts(domain.getOperSts())
                 .drbYr(domain.getDrbYr())
                 .acqQty(domain.getAcqQty())
                 .arrgTy(domain.getArrgTy())

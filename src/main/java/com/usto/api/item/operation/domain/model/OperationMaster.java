@@ -1,4 +1,4 @@
-package com.usto.api.item.returning.domain.model;
+package com.usto.api.item.operation.domain.model;
 
 import com.usto.api.item.common.model.ApprStatus;
 import com.usto.api.item.common.model.ItemStatus;
@@ -10,19 +10,19 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 /**
- * 반납 신청서 도메인 모델 (TB_ITEM004M)
+ * 운용 신청서 도메인 모델 (TB_ITEM003M)
  */
 @Getter
 @Builder
-public class ReturningMaster {
+public class OperationMaster {
 
-    private UUID rtrnMId;               // 반납ID
+    private UUID operMId;               // 운용ID
     private String aplyUsrId;           // 등록자ID
-    private LocalDate aplyAt;           // 반납(등록)일자
+    private LocalDate aplyAt;           // 운용(등록)일자
+    private String deptCd;              // 운용부서코드 (스냅샷)
     private ItemStatus itemSts;         // 물품상태 (NEW/USED/REPAIRABLE/SCRAP)
-    private ReturningReason rtrnRsn;    // 반납사유 (Enum)
     private String apprUsrId;           // 확정자ID
-    private LocalDate rtrnApprAt;       // 반납확정일자
+    private LocalDate operApprAt;       // 운용확정일자
     private ApprStatus apprSts;         // 승인상태
     private String orgCd;               // 조직코드
     private String delYn;
@@ -33,11 +33,11 @@ public class ReturningMaster {
     private LocalDateTime updAt;
 
     /**
-     * 반납 정보 수정
+     * 운용 정보 수정
      */
-    public void updateInfo(ItemStatus itemSts, ReturningReason rtrnRsn) {
+    public void updateInfo(String deptCd, ItemStatus itemSts) {
+        this.deptCd = deptCd;
         this.itemSts = itemSts;
-        this.rtrnRsn = rtrnRsn;
     }
 
     /**
@@ -54,17 +54,5 @@ public class ReturningMaster {
         return "Y".equals(this.delYn);
     }
 
-    //반납 확정
-    public void confirmApproval(String userId) {
-        this.apprSts = ApprStatus.APPROVED; //반납 확정 처라
-        this.apprUsrId = userId;
-        this.rtrnApprAt = LocalDate.now();
-    }
-
-    //반납 신청 반려
-    public void rejectApproval(String userId) {
-        this.apprSts = ApprStatus.REJECTED; //반납 반려 처라
-        this.apprUsrId = userId;
-        this.rtrnApprAt = LocalDate.now();
-    }
+    // TODO: 승인 및 반려
 }

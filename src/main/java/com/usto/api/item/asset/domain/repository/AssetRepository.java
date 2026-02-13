@@ -1,7 +1,6 @@
 package com.usto.api.item.asset.domain.repository;
 
 import com.usto.api.item.asset.domain.model.Asset;
-import com.usto.api.item.asset.domain.model.AssetMaster;
 import com.usto.api.item.asset.domain.model.AssetStatusHistory;
 import com.usto.api.item.asset.presentation.dto.request.AssetListForPrintRequest;
 import com.usto.api.item.asset.presentation.dto.request.AssetSearchRequest;
@@ -16,7 +15,6 @@ public interface AssetRepository {
 
     // Asset CRUD
     Asset save(Asset asset);
-    void saveMaster(AssetMaster master);
     Optional<Asset> findById(String itmNo, String orgCd);
     List<Asset> findAllById(List<String> itmNos, String orgCd);
     void delete(String itmNo, String orgCd);
@@ -30,14 +28,12 @@ public interface AssetRepository {
     List<AssetDetailResponse.StatusHistoryDto> findStatusHistoriesByItmNo(String itmNo, String orgCd);    // 상태 이력 저장
 
     // 중복 생성 방지용 존재 확인
-    boolean existsMasterByAcqId(UUID acqId);
+    boolean existsAssetByAcqId(UUID acqId);
 
     // 물품번호 순번 조회
     int getNextSequenceForYear(int year, String orgCd);
 
     // AI 조회용
-    List<AssetMaster> findAllById(List<UUID> acqIds);
-
     List<AssetAiItemDetailResponse> findAllByG2bCode(String g2bMCd, String g2bDCd, String orgCd);
 
     List<AssetAiItemDetailResponse> findAllByG2bName(String g2bDNm, String orgCd);
