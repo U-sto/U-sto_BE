@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
 public class AiChatApplication {
@@ -15,7 +17,7 @@ public class AiChatApplication {
     private final AiClient aiClient;
 
     @Transactional
-    public AiChatResponse send(String username, String message, Long threadId) {
+    public AiChatResponse send(String username, String message, UUID threadId) {
 
         /*
         // 1. Thread 조회 또는 생성

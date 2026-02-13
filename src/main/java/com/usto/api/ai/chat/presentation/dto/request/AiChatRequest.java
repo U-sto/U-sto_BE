@@ -2,7 +2,9 @@ package com.usto.api.ai.chat.presentation.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 
+import java.util.UUID;
+
 public record AiChatRequest(
-        Long threadId,          // nullable
+        UUID threadId,          // nullable
         @NotBlank  String message
 ) { }
