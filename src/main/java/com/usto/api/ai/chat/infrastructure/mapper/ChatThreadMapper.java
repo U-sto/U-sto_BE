@@ -6,14 +6,13 @@ import com.usto.api.ai.chat.infrastructure.entity.ChatThreadJpaEntity;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 public class ChatThreadMapper {
     public static ChatThread toDomain(String userId, String title, String orgCode) {
         return ChatThread.builder()
                 .threadId(UUID.randomUUID())
                 .userId(userId)
-                .title(title)
+                .title(title) //자바로 구현해서 기본값 만들어야함
                 .lastMessageAt(LocalDateTime.now())
                 .orgCode(orgCode)
                 .messages(new ArrayList<>())
@@ -28,9 +27,6 @@ public class ChatThreadMapper {
                 .title(entity.getTitle())
                 .lastMessageAt(entity.getLastMessageAt())
                 .orgCode(entity.getOrgCode())
-                .messages(entity.getMessages().stream()
-                        .map(ChatMessageMapper::toDomain)
-                        .collect(Collectors.toList()))
                 .build();
     }
 

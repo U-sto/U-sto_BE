@@ -6,8 +6,6 @@ import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -32,11 +30,13 @@ public class ChatThreadJpaEntity extends BaseTimeEntity {
     @Column(name = "LAST_MSG_AT", nullable = false)
     private LocalDateTime lastMessageAt;
 
-    @Column(name = "ORG_CD", length = 7, nullable = false)
+    @Column(name = "ORG_CD", length = 7, nullable = false,columnDefinition = "CHAR(7)")
     private String orgCode;
 
-    @OneToMany(mappedBy = "thread", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
-    private List<ChatMessageJpaEntity> messages = new ArrayList<>();
+    @Column(name = "DEL_YN", nullable = false, length = 1, columnDefinition = "char(1)")
+    private String delYn = "N";   // 삭제여부
 
+    @Column(name = "DEL_AT")
+    private LocalDateTime delAt;  // 삭제일시
 }

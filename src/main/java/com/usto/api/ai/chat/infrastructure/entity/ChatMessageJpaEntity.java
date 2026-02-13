@@ -1,12 +1,14 @@
 package com.usto.api.ai.chat.infrastructure.entity;
 
 import com.usto.api.ai.chat.domain.model.SenderType;
+import com.usto.api.common.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -16,7 +18,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 @EntityListeners(AuditingEntityListener.class)
-public class ChatMessageJpaEntity {
+public class ChatMessageJpaEntity extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,6 +35,13 @@ public class ChatMessageJpaEntity {
     @Column(name = "SENDER", length = 30, nullable = false)
     private SenderType sender; // USER, AI_BOT
 
-    @Column(name = "ORG_CD", length = 7, nullable = false)
+    @Column(name = "ORG_CD", length = 7, nullable = false,columnDefinition = "CHAR(7)")
     private String orgCode;
+
+    @Builder.Default
+    @Column(name = "DEL_YN", nullable = false, length = 1, columnDefinition = "char(1)")
+    private String delYn = "N";   // 삭제여부
+
+    @Column(name = "DEL_AT")
+    private LocalDateTime delAt;  // 삭제일시
 }
