@@ -22,6 +22,9 @@ configurations {
 
 repositories {
     mavenCentral()
+    gradlePluginPortal()
+    maven { url = 'https://repo.spring.io/milestone' }
+    maven { url = 'https://repo.spring.io/release' }
 }
 
 dependencies {
@@ -59,6 +62,22 @@ dependencies {
     implementation 'org.apache.pdfbox:pdfbox:2.0.29'
     //타임리프
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    //AI
+    implementation platform('org.springframework.ai:spring-ai-bom:1.0.0-M4')
+    implementation 'org.springframework.ai:spring-ai-openai-spring-boot-starter'
+
+
+}
+
+//스웨거 버전 강제로 맞추기(이게 2.8.5버전입니다) - SpringAi 다운로드하면서 스웨거 문서 버전 호환 문제 발생 가능
+allprojects {
+    configurations.all {
+        resolutionStrategy {
+            force 'io.swagger.core.v3:swagger-core:2.2.28'
+            force 'io.swagger.core.v3:swagger-models:2.2.28'
+            force 'io.swagger.core.v3:swagger-annotations:2.2.28'
+        }
+    }
 }
 
 tasks.named('test') {
