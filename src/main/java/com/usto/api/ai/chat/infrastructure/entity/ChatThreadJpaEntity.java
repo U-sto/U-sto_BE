@@ -21,7 +21,7 @@ public class ChatThreadJpaEntity extends BaseTimeEntity {
 
     @Id
     @Column(name = "CHAT_M_ID", columnDefinition = "BINARY(16)")
-    private UUID chatMId; // BINARY(16) PK
+    private UUID threadId;
 
     @Column(name = "USR_ID", length = 50, nullable = false)
     private String userId;

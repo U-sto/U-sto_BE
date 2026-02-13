@@ -18,7 +18,7 @@ public class ForecastJpaEntity {
 
     @Id
     @Column(name = "FC_M_ID", columnDefinition = "BINARY(16)")
-    private UUID id;
+    private UUID forecastId;
 
     @Column(name = "USR_ID", length = 50, nullable = false)
     private String userId;
@@ -56,8 +56,8 @@ public class ForecastJpaEntity {
 
     @PrePersist
     public void prePersist() {
-        if (this.id == null) {
-            this.id = UUID.randomUUID();
+        if (this.forecastId == null) {
+            this.forecastId = UUID.randomUUID();
         }
     }
 }
