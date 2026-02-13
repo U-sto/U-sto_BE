@@ -1,19 +1,21 @@
 package com.usto.api.item.asset.infrastructure.adapter;
 
+import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.jpa.JPAExpressions;
+import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.usto.api.g2b.infrastructure.entity.QG2bItemCategoryJpaEntity;
 import com.usto.api.g2b.infrastructure.entity.QG2bItemJpaEntity;
+import com.usto.api.item.acquisition.infrastructure.entity.QItemAcquisitionEntity;
 import com.usto.api.item.asset.domain.model.Asset;
-import com.usto.api.item.asset.domain.model.AssetMaster;
 import com.usto.api.item.asset.domain.model.AssetStatusHistory;
 import com.usto.api.item.asset.domain.repository.AssetRepository;
 import com.usto.api.item.asset.infrastructure.entity.*;
 import com.usto.api.item.asset.infrastructure.mapper.AssetMapper;
 import com.usto.api.item.asset.infrastructure.repository.AssetJpaRepository;
-import com.usto.api.item.asset.infrastructure.repository.AssetMasterJpaRepository;
 import com.usto.api.item.asset.infrastructure.repository.AssetStatusHistoryJpaRepository;
 import com.usto.api.item.asset.presentation.dto.request.AssetListForPrintRequest;
 import com.usto.api.item.asset.presentation.dto.request.AssetSearchRequest;
@@ -34,8 +36,8 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import static com.usto.api.item.asset.infrastructure.entity.QItemAssetDetailEntity.itemAssetDetailEntity;
-import static com.usto.api.item.asset.infrastructure.entity.QItemAssetMasterEntity.itemAssetMasterEntity;
+import static com.usto.api.item.acquisition.infrastructure.entity.QItemAcquisitionEntity.itemAcquisitionEntity;
+import static com.usto.api.item.asset.infrastructure.entity.QItemAssetEntity.itemAssetEntity;
 import static com.usto.api.g2b.infrastructure.entity.QG2bItemJpaEntity.g2bItemJpaEntity;
 import static com.usto.api.organization.infrastructure.entity.QDepartmentJpaEntity.departmentJpaEntity;
 
@@ -48,26 +50,19 @@ import static com.usto.api.organization.infrastructure.entity.QDepartmentJpaEnti
 public class AssetRepositoryAdapter implements AssetRepository {
 
     private final AssetJpaRepository jpaRepository;
-    private final AssetMasterJpaRepository jpaMasterRepository;
     private final AssetStatusHistoryJpaRepository statusHistoryJpaRepository;
     private final JPAQueryFactory queryFactory;
 
     @Override
     public Asset save(Asset asset) {
-        ItemAssetDetailEntity entity = AssetMapper.toEntity(asset);
-        ItemAssetDetailEntity saved = jpaRepository.save(entity);
+        ItemAssetEntity entity = AssetMapper.toEntity(asset);
+        ItemAssetEntity saved = jpaRepository.save(entity);
         return AssetMapper.toDomain(saved);
     }
 
     @Override
-    public void saveMaster(AssetMaster master) {
-        ItemAssetMasterEntity entity = AssetMapper.toMasterEntity(master);
-        jpaMasterRepository.save(entity);
-    }
-
-    @Override
     public Optional<Asset> findById(String itmNo, String orgCd) {
-        return jpaRepository.findById(new ItemAssetDetailId(itmNo, orgCd))
+        return jpaRepository.findById(new ItemAssetId(itmNo, orgCd))
                 .map(AssetMapper::toDomain);
     }
 
@@ -77,11 +72,11 @@ public class AssetRepositoryAdapter implements AssetRepository {
             return Collections.emptyList();
         }
 
-        List<ItemAssetDetailEntity> entities = queryFactory
-                .selectFrom(itemAssetDetailEntity)
+        List<ItemAssetEntity> entities = queryFactory
+                .selectFrom(itemAssetEntity)
                 .where(
-                        itemAssetDetailEntity.itemId.itmNo.in(itmNos),
-                        itemAssetDetailEntity.itemId.orgCd.eq(orgCd)
+                        itemAssetEntity.itemId.itmNo.in(itmNos),
+                        itemAssetEntity.itemId.orgCd.eq(orgCd)
                 )
                 .fetch();
 
@@ -92,7 +87,7 @@ public class AssetRepositoryAdapter implements AssetRepository {
 
     @Override
     public void delete(String itmNo, String orgCd) {
-        jpaRepository.deleteById(new ItemAssetDetailId(itmNo, orgCd));
+        jpaRepository.deleteById(new ItemAssetId(itmNo, orgCd));
     }
 
 
@@ -105,31 +100,31 @@ public class AssetRepositoryAdapter implements AssetRepository {
     public List<AssetListResponse> findAllByFilter(AssetSearchRequest cond, String orgCd) {
         return queryFactory
                 .select(Projections.fields(AssetListResponse.class,
-                        itemAssetDetailEntity.itemId.itmNo,
+                        itemAssetEntity.itemId.itmNo,
                         Expressions.stringTemplate("CONCAT({0}, '-', {1})",
                                 g2bItemJpaEntity.g2bMCd,
-                                itemAssetDetailEntity.g2bDCd).as("g2bItemNo"),
+                                itemAssetEntity.g2bDCd).as("g2bItemNo"),
                         g2bItemJpaEntity.g2bDNm.as("g2bItemNm"),
-                        itemAssetMasterEntity.acqAt,
-                        itemAssetDetailEntity.acqUpr,
-                        itemAssetMasterEntity.arrgAt,
+                        itemAcquisitionEntity.acqAt,
+                        itemAssetEntity.acqUpr,
+                        itemAcquisitionEntity.apprAt.as("arrgAt"), // 정리일자
                         departmentJpaEntity.deptNm.as("deptNm"),
-                        itemAssetDetailEntity.operSts.stringValue().as("operSts"),
-                        itemAssetDetailEntity.drbYr
+                        itemAssetEntity.operSts.stringValue().as("operSts"),
+                        itemAssetEntity.drbYr
                 ))
-                .from(itemAssetDetailEntity)
-                .leftJoin(itemAssetMasterEntity).on(
-                        itemAssetDetailEntity.acqId.eq(itemAssetMasterEntity.acqId)
+                .from(itemAssetEntity)
+                .leftJoin(itemAcquisitionEntity).on(
+                        itemAssetEntity.acqId.eq(itemAcquisitionEntity.acqId)
                 )
                 .leftJoin(g2bItemJpaEntity).on(
-                        itemAssetDetailEntity.g2bDCd.eq(g2bItemJpaEntity.g2bDCd)
+                        itemAssetEntity.g2bDCd.eq(g2bItemJpaEntity.g2bDCd)
                 )
                 .leftJoin(departmentJpaEntity).on(
-                        itemAssetDetailEntity.itemId.orgCd.eq(departmentJpaEntity.id.orgCd),
-                        itemAssetDetailEntity.deptCd.eq(departmentJpaEntity.id.deptCd)
+                        itemAssetEntity.itemId.orgCd.eq(departmentJpaEntity.id.orgCd),
+                        itemAssetEntity.deptCd.eq(departmentJpaEntity.id.deptCd)
                 )
                 .where(
-                        itemAssetDetailEntity.itemId.orgCd.eq(orgCd),
+                        itemAssetEntity.itemId.orgCd.eq(orgCd),
                         g2bDCdEq(cond.getG2bDCd()),
                         acqAtBetween(cond.getStartAcqAt(), cond.getEndAcqAt()),
                         arrgAtBetween(cond.getStartArrgAt(), cond.getEndArrgAt()),
@@ -137,7 +132,7 @@ public class AssetRepositoryAdapter implements AssetRepository {
                         operStsEq(cond.getOperSts()),
                         itmNoEq(cond.getItmNo())
                 )
-                .orderBy(itemAssetDetailEntity.itemId.itmNo.desc())
+                .orderBy(itemAssetEntity.itemId.itmNo.desc())
                 .fetch();
     }
 
@@ -145,36 +140,36 @@ public class AssetRepositoryAdapter implements AssetRepository {
     public Optional<AssetDetailResponse> findDetailById(String itmNo, String orgCd) {
         AssetDetailResponse detail = queryFactory
                 .select(Projections.fields(AssetDetailResponse.class,
-                        itemAssetDetailEntity.itemId.itmNo,
+                        itemAssetEntity.itemId.itmNo,
                         g2bItemJpaEntity.g2bDNm.as("g2bDNm"),
                         Expressions.stringTemplate("CONCAT({0}, '-', {1})",
                                 g2bItemJpaEntity.g2bMCd,
-                                itemAssetDetailEntity.g2bDCd).as("g2bItemNo"),
-                        itemAssetMasterEntity.acqAt,
-                        itemAssetMasterEntity.arrgAt,
-                        itemAssetDetailEntity.operSts.stringValue().as("operSts"),
-                        itemAssetDetailEntity.drbYr,
-                        itemAssetDetailEntity.acqUpr,
-                        itemAssetMasterEntity.qty,
-                        itemAssetMasterEntity.acqArrgTy.stringValue().as("acqArrgTy"),
+                                itemAssetEntity.g2bDCd).as("g2bItemNo"),
+                        itemAcquisitionEntity.acqAt,
+                        itemAcquisitionEntity.apprAt, // 정리일자
+                        itemAssetEntity.operSts.stringValue().as("operSts"),
+                        itemAssetEntity.drbYr,
+                        itemAssetEntity.acqUpr,
+                        ExpressionUtils.as(countQtySubQuery(), "qty"),
+                        itemAcquisitionEntity.arrgTy.stringValue().as("acqArrgTy"),
                         departmentJpaEntity.deptNm.as("deptNm"),
-                        itemAssetDetailEntity.deptCd,
-                        itemAssetDetailEntity.rmk
+                        itemAssetEntity.deptCd,
+                        itemAssetEntity.rmk
                 ))
-                .from(itemAssetDetailEntity)
-                .leftJoin(itemAssetMasterEntity).on(
-                        itemAssetDetailEntity.acqId.eq(itemAssetMasterEntity.acqId)
+                .from(itemAssetEntity)
+                .leftJoin(itemAcquisitionEntity).on(
+                        itemAssetEntity.acqId.eq(itemAcquisitionEntity.acqId)
                 )
                 .leftJoin(g2bItemJpaEntity).on(
-                        itemAssetDetailEntity.g2bDCd.eq(g2bItemJpaEntity.g2bDCd)
+                        itemAssetEntity.g2bDCd.eq(g2bItemJpaEntity.g2bDCd)
                 )
                 .leftJoin(departmentJpaEntity).on(
-                        itemAssetDetailEntity.itemId.orgCd.eq(departmentJpaEntity.id.orgCd),
-                        itemAssetDetailEntity.deptCd.eq(departmentJpaEntity.id.deptCd)
+                        itemAssetEntity.itemId.orgCd.eq(departmentJpaEntity.id.orgCd),
+                        itemAssetEntity.deptCd.eq(departmentJpaEntity.id.deptCd)
                 )
                 .where(
-                        itemAssetDetailEntity.itemId.itmNo.eq(itmNo),
-                        itemAssetDetailEntity.itemId.orgCd.eq(orgCd)
+                        itemAssetEntity.itemId.itmNo.eq(itmNo),
+                        itemAssetEntity.itemId.orgCd.eq(orgCd)
                 )
                 .fetchOne();
 
@@ -212,11 +207,11 @@ public class AssetRepositoryAdapter implements AssetRepository {
      * 자산 중복 생성 방지용 검사 메서드
      */
     @Override
-    public boolean existsMasterByAcqId(UUID acqId) {
+    public boolean existsAssetByAcqId(UUID acqId) {
         return queryFactory
                 .selectOne()
-                .from(itemAssetMasterEntity)
-                .where(itemAssetMasterEntity.acqId.eq(acqId))
+                .from(itemAssetEntity)
+                .where(itemAssetEntity.acqId.eq(acqId))
                 .fetchFirst() != null;
     }
 
@@ -227,18 +222,6 @@ public class AssetRepositoryAdapter implements AssetRepository {
     public int getNextSequenceForYear(int year, String orgCd) {
         int maxSequence = jpaRepository.findMaxSequenceByYear(String.valueOf(year), orgCd);
         return maxSequence + 1;
-    }
-
-
-    @Override
-    public List<AssetMaster> findAllById(List<UUID> acqIds) {
-        // 1. DB에서 엔티티 리스트 조회 (List<ItemAssetMasterEntity>)
-        List<ItemAssetMasterEntity> entities = jpaMasterRepository.findAllById(acqIds);
-
-        // 2. [필수] 엔티티 -> 도메인으로 변환하여 반환
-        return entities.stream()
-                .map(AssetMapper::toMasterDomain) // Entity를 Domain으로 바꾸는 매퍼 필요
-                .toList();
     }
 
     @Override
@@ -268,9 +251,9 @@ public class AssetRepositoryAdapter implements AssetRepository {
 
     @Override
     public Asset findAssetById(String itmNo, String orgCd){
-        QItemAssetDetailEntity d = QItemAssetDetailEntity.itemAssetDetailEntity;
+        QItemAssetEntity d = QItemAssetEntity.itemAssetEntity;
 
-        ItemAssetDetailEntity entity = queryFactory
+        ItemAssetEntity entity = queryFactory
                 .selectFrom(d)
                 .where(
                         d.itemId.itmNo.eq(itmNo),
@@ -284,7 +267,7 @@ public class AssetRepositoryAdapter implements AssetRepository {
 
     @Override
     public void saveAll(List<Asset> assetsToUpdate) {
-        List<ItemAssetDetailEntity> entities = assetsToUpdate
+        List<ItemAssetEntity> entities = assetsToUpdate
                 .stream()
                 .map(AssetMapper :: toEntity) // 매핑 메서드 필요
                 .toList();
@@ -293,8 +276,8 @@ public class AssetRepositoryAdapter implements AssetRepository {
 
     @Override
     public Optional<AssetPublicDetailResponse>  findPublicDetailByItmNoAndOrgCd(String itmNo, String orgCd) {
-        QItemAssetDetailEntity d = QItemAssetDetailEntity.itemAssetDetailEntity;
-        QItemAssetMasterEntity m = QItemAssetMasterEntity.itemAssetMasterEntity;
+        QItemAcquisitionEntity a = QItemAcquisitionEntity.itemAcquisitionEntity;
+        QItemAssetEntity d = QItemAssetEntity.itemAssetEntity;
         QG2bItemJpaEntity g = QG2bItemJpaEntity.g2bItemJpaEntity;
         QG2bItemCategoryJpaEntity c = QG2bItemCategoryJpaEntity.g2bItemCategoryJpaEntity;
         QDepartmentJpaEntity dept = QDepartmentJpaEntity.departmentJpaEntity;
@@ -312,16 +295,16 @@ public class AssetRepositoryAdapter implements AssetRepository {
                                 c.g2bMCd, g.g2bDCd
                         ).as("g2bItemNo"),
                         d.acqUpr.as("acqUpr"),
-                        m.acqAt.as("acqAt"),
-                        m.arrgAt.as("arrgAt"),
+                        a.acqAt.as("acqAt"),
+                        a.apprAt.as("arrgAt"),
                         d.operSts.as("operSts"),
                         d.drbYr.as("drbYr"),
                         dept.deptNm.as("deptNm"),
-                        m.qty.as("qty"),
+                        ExpressionUtils.as(countQtySubQuery(), "qty"),
                         d.rmk.as("rmk")
                 ))
                 .from(d)
-                .leftJoin(m).on(m.acqId.eq(d.acqId).and(m.delYn.eq("N")))
+                .leftJoin(a).on(a.acqId.eq(d.acqId).and(a.delYn.eq("N")))
                 .leftJoin(g).on(g.g2bDCd.eq(d.g2bDCd))
                 .leftJoin(c).on(c.g2bMCd.eq(g.g2bMCd))
                 .leftJoin(dept).on(dept.id.deptCd.eq(d.deptCd).and(dept.id.orgCd.eq(d.itemId.orgCd)))
@@ -341,32 +324,32 @@ public class AssetRepositoryAdapter implements AssetRepository {
     public List<AssetListForPrintResponse> findAllByFilterForPrint(AssetListForPrintRequest searchRequest, String orgCd) {
         return queryFactory
                 .select(Projections.fields(AssetListForPrintResponse.class,
-                        itemAssetDetailEntity.itemId.itmNo,
+                        itemAssetEntity.itemId.itmNo,
                         Expressions.stringTemplate("CONCAT({0}, '-', {1})",
                                 g2bItemJpaEntity.g2bMCd,
-                                itemAssetDetailEntity.g2bDCd).as("g2bItemNo"),
+                                itemAssetEntity.g2bDCd).as("g2bItemNo"),
                         g2bItemJpaEntity.g2bDNm.as("g2bItemNm"),
-                        itemAssetMasterEntity.acqAt,
-                        itemAssetDetailEntity.acqUpr,
-                        itemAssetMasterEntity.arrgAt,
+                        itemAcquisitionEntity.acqAt,
+                        itemAssetEntity.acqUpr,
+                        itemAcquisitionEntity.apprAt.as("arrgAt"),
                         departmentJpaEntity.deptNm.as("deptNm"),
-                        itemAssetDetailEntity.operSts.stringValue().as("operSts"),
-                        itemAssetDetailEntity.drbYr,
-                        itemAssetDetailEntity.printYn.as("printYn")
+                        itemAssetEntity.operSts.stringValue().as("operSts"),
+                        itemAssetEntity.drbYr,
+                        itemAssetEntity.printYn.as("printYn")
                 ))
-                .from(itemAssetDetailEntity)
-                .leftJoin(itemAssetMasterEntity).on(
-                        itemAssetDetailEntity.acqId.eq(itemAssetMasterEntity.acqId)
+                .from(itemAssetEntity)
+                .leftJoin(itemAcquisitionEntity).on(
+                        itemAssetEntity.acqId.eq(itemAcquisitionEntity.acqId)
                 )
                 .leftJoin(g2bItemJpaEntity).on(
-                        itemAssetDetailEntity.g2bDCd.eq(g2bItemJpaEntity.g2bDCd)
+                        itemAssetEntity.g2bDCd.eq(g2bItemJpaEntity.g2bDCd)
                 )
                 .leftJoin(departmentJpaEntity).on(
-                        itemAssetDetailEntity.itemId.orgCd.eq(departmentJpaEntity.id.orgCd),
-                        itemAssetDetailEntity.deptCd.eq(departmentJpaEntity.id.deptCd)
+                        itemAssetEntity.itemId.orgCd.eq(departmentJpaEntity.id.orgCd),
+                        itemAssetEntity.deptCd.eq(departmentJpaEntity.id.deptCd)
                 )
                 .where(
-                        itemAssetDetailEntity.itemId.orgCd.eq(orgCd),
+                        itemAssetEntity.itemId.orgCd.eq(orgCd),
                         g2bDCdEq(searchRequest.getG2bDCd()),
                         acqAtBetween(searchRequest.getStartAcqAt(), searchRequest.getEndAcqAt()),
                         arrgAtBetween(searchRequest.getStartArrgAt(), searchRequest.getEndArrgAt()),
@@ -375,7 +358,7 @@ public class AssetRepositoryAdapter implements AssetRepository {
                         itmNoEq(searchRequest.getItmNo()),
                         printYnEq(searchRequest.getPrintYn())
                 )
-                .orderBy(itemAssetDetailEntity.itemId.itmNo.desc())
+                .orderBy(itemAssetEntity.itemId.itmNo.desc())
                 .fetch();
     }
 
@@ -424,40 +407,51 @@ public class AssetRepositoryAdapter implements AssetRepository {
 
     // ===== 동적 쿼리 헬퍼 =====
 
+    /**
+     * 특정 취득ID에 속한 '현재' 자산 수량을 카운트하는 서브쿼리 표현식
+     */
+    private JPQLQuery<Long> countQtySubQuery() {
+        QItemAssetEntity subAsset = new QItemAssetEntity("subAsset");
+        return JPAExpressions.select(subAsset.count())
+                .from(subAsset)
+                .where(subAsset.acqId.eq(itemAssetEntity.acqId) // 메인 쿼리의 acqId와 연결
+                        .and(subAsset.delYn.eq("N")));
+    }
+
     private BooleanExpression g2bDCdEq(String cd) {
-        return StringUtils.hasText(cd) ? itemAssetDetailEntity.g2bDCd.eq(cd) : null;
+        return StringUtils.hasText(cd) ? itemAssetEntity.g2bDCd.eq(cd) : null;
     }
 
     private BooleanExpression acqAtBetween(LocalDate s, LocalDate e) {
         if (s == null && e == null) return null;
-        if (s != null && e == null) return itemAssetMasterEntity.acqAt.goe(s);
-        if (s == null) return itemAssetMasterEntity.acqAt.loe(e);
-        return itemAssetMasterEntity.acqAt.between(s, e);
+        if (s != null && e == null) return itemAcquisitionEntity.acqAt.goe(s);
+        if (s == null) return itemAcquisitionEntity.acqAt.loe(e);
+        return itemAcquisitionEntity.acqAt.between(s, e);
     }
 
     private BooleanExpression arrgAtBetween(LocalDate s, LocalDate e) {
         if (s == null && e == null) return null;
-        if (s != null && e == null) return itemAssetMasterEntity.arrgAt.goe(s);
-        if (s == null) return itemAssetMasterEntity.arrgAt.loe(e);
-        return itemAssetMasterEntity.arrgAt.between(s, e);
+        if (s != null && e == null) return itemAcquisitionEntity.apprAt.goe(s);
+        if (s == null) return itemAcquisitionEntity.apprAt.loe(e);
+        return itemAcquisitionEntity.apprAt.between(s, e);
     }
 
     private BooleanExpression deptCdEq(String dept) {
-        return StringUtils.hasText(dept) ? itemAssetDetailEntity.deptCd.eq(dept) : null;
+        return StringUtils.hasText(dept) ? itemAssetEntity.deptCd.eq(dept) : null;
     }
 
     private BooleanExpression operStsEq(OperStatus sts) {
-        return sts != null ? itemAssetDetailEntity.operSts.eq(sts) : null;
+        return sts != null ? itemAssetEntity.operSts.eq(sts) : null;
     }
 
     private BooleanExpression itmNoEq(String itmNo) {
-        return StringUtils.hasText(itmNo) ? itemAssetDetailEntity.itemId.itmNo.eq(itmNo) : null;
+        return StringUtils.hasText(itmNo) ? itemAssetEntity.itemId.itmNo.eq(itmNo) : null;
     }
 
     private BooleanExpression printYnEq(String printYn) {
         return (printYn == null || printYn.isBlank())
                 ? null
-                : itemAssetDetailEntity.printYn.eq(printYn);
+                : itemAssetEntity.printYn.eq(printYn);
     }
 
 }

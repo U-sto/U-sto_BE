@@ -12,7 +12,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @EqualsAndHashCode
 @ToString
-public class ItemAssetDetailId implements Serializable {
+public class ItemAssetId implements Serializable {
     @Column(name = "ITM_NO", length = 10, columnDefinition = "char(10)")
     private String itmNo;  // 물품고유번호 (M + 연도4자리 + 순번5자리)
 

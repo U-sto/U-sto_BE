@@ -14,15 +14,15 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 /**
- * TB_ITEM004M - 물품불용기본
+ * TB_ITEM005M - 물품불용기본
  */
 @Entity
-@Table(name = "TB_ITEM004M")
+@Table(name = "TB_ITEM005M")
 @Getter
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@SQLDelete(sql = "UPDATE TB_ITEM004M SET del_yn = 'Y', del_at = NOW() WHERE dsu_m_id = ?")
+@SQLDelete(sql = "UPDATE TB_ITEM005M SET del_yn = 'Y', del_at = NOW() WHERE dsu_m_id = ?")
 @Where(clause = "DEL_YN = 'N'")
 public class ItemDisuseMasterEntity extends BaseTimeEntity {
 
@@ -41,7 +41,7 @@ public class ItemDisuseMasterEntity extends BaseTimeEntity {
     private ItemStatus itemSts;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "CHG_RSN", nullable = false, length = 200)
+    @Column(name = "CHG_RSN", nullable = false, length = 30)
     private DisuseReason dsuRsn;
 
     @Column(name = "APPR_USR_ID", length = 30)

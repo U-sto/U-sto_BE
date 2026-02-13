@@ -29,10 +29,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.usto.api.item.acquisition.infrastructure.entity.QItemAcquisitionEntity.itemAcquisitionEntity;
 import static com.usto.api.item.disuse.infrastructure.entity.QItemDisuseMasterEntity.itemDisuseMasterEntity;
 import static com.usto.api.item.disuse.infrastructure.entity.QItemDisuseDetailEntity.itemDisuseDetailEntity;
-import static com.usto.api.item.asset.infrastructure.entity.QItemAssetDetailEntity.itemAssetDetailEntity;
-import static com.usto.api.item.asset.infrastructure.entity.QItemAssetMasterEntity.itemAssetMasterEntity;
+import static com.usto.api.item.asset.infrastructure.entity.QItemAssetEntity.itemAssetEntity;
 import static com.usto.api.g2b.infrastructure.entity.QG2bItemJpaEntity.g2bItemJpaEntity;
 import static com.usto.api.g2b.infrastructure.entity.QG2bItemCategoryJpaEntity.g2bItemCategoryJpaEntity;
 import static com.usto.api.organization.infrastructure.entity.QDepartmentJpaEntity.departmentJpaEntity;
@@ -143,15 +143,15 @@ public class DisuseRepositoryAdapter implements DisuseRepository {
                         // G2B 목록번호 (분류코드-식별코드)
                         Expressions.stringTemplate("CONCAT({0}, '-', {1})",
                                 g2bItemCategoryJpaEntity.g2bMCd,
-                                itemAssetDetailEntity.g2bDCd).as("g2bItemNo"),
+                                itemAssetEntity.g2bDCd).as("g2bItemNo"),
                         // G2B 목록명
                         g2bItemJpaEntity.g2bDNm,
                         // 물품고유번호
                         itemDisuseDetailEntity.itmNo,
-                        // 취득일자 (대장기본)
-                        itemAssetMasterEntity.acqAt,
+                        // 취득일자 (취득기본)
+                        itemAcquisitionEntity.acqAt,
                         // 취득금액 (대장상세)
-                        itemAssetDetailEntity.acqUpr,
+                        itemAssetEntity.acqUpr,
                         // 운용부서명
                         departmentJpaEntity.deptNm.as("deptNm"),
                         // 물품상태 (마스터)
@@ -164,15 +164,15 @@ public class DisuseRepositoryAdapter implements DisuseRepository {
                 .join(itemDisuseMasterEntity)
                 .on(itemDisuseDetailEntity.dsuMId.eq(itemDisuseMasterEntity.dsuMId))
                 // 대장상세 조인 (취득금액, G2B코드)
-                .join(itemAssetDetailEntity)
-                .on(itemDisuseDetailEntity.itmNo.eq(itemAssetDetailEntity.itemId.itmNo),
-                        itemDisuseDetailEntity.orgCd.eq(itemAssetDetailEntity.itemId.orgCd))
-                // 대장기본 조인 (취득일자)
-                .join(itemAssetMasterEntity)
-                .on(itemAssetDetailEntity.acqId.eq(itemAssetMasterEntity.acqId))
+                .join(itemAssetEntity)
+                .on(itemDisuseDetailEntity.itmNo.eq(itemAssetEntity.itemId.itmNo),
+                        itemDisuseDetailEntity.orgCd.eq(itemAssetEntity.itemId.orgCd))
+                // 취득기본 조인 (취득일자)
+                .join(itemAcquisitionEntity)
+                .on(itemAssetEntity.acqId.eq(itemAcquisitionEntity.acqId))
                 // G2B 품목 조인 (품목명)
                 .leftJoin(g2bItemJpaEntity)
-                .on(itemAssetDetailEntity.g2bDCd.eq(g2bItemJpaEntity.g2bDCd))
+                .on(itemAssetEntity.g2bDCd.eq(g2bItemJpaEntity.g2bDCd))
                 // G2B 분류 조인 (분류코드)
                 .leftJoin(g2bItemCategoryJpaEntity)
                 .on(g2bItemJpaEntity.g2bMCd.eq(g2bItemCategoryJpaEntity.g2bMCd))
@@ -221,7 +221,7 @@ public class DisuseRepositoryAdapter implements DisuseRepository {
                         itemDisuseDetailEntity.orgCd.eq(orgCd),
                         excludeDsuMId != null ?
                                 itemDisuseMasterEntity.dsuMId.ne(excludeDsuMId) : null,
-                        itemDisuseMasterEntity.apprSts.in(ApprStatus.REQUEST, ApprStatus.APPROVED)
+                        itemDisuseMasterEntity.apprSts.in(ApprStatus.WAIT, ApprStatus.REQUEST, ApprStatus.APPROVED)
                 )
                 .fetch();
     }

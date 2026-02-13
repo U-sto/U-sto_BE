@@ -27,8 +27,8 @@ import java.util.UUID;
 
 import static com.usto.api.item.returning.infrastructure.entity.QItemReturningMasterEntity.itemReturningMasterEntity;
 import static com.usto.api.item.returning.infrastructure.entity.QItemReturningDetailEntity.itemReturningDetailEntity;
-import static com.usto.api.item.asset.infrastructure.entity.QItemAssetDetailEntity.itemAssetDetailEntity;
-import static com.usto.api.item.asset.infrastructure.entity.QItemAssetMasterEntity.itemAssetMasterEntity;
+import static com.usto.api.item.acquisition.infrastructure.entity.QItemAcquisitionEntity.itemAcquisitionEntity;
+import static com.usto.api.item.asset.infrastructure.entity.QItemAssetEntity.itemAssetEntity;
 import static com.usto.api.g2b.infrastructure.entity.QG2bItemJpaEntity.g2bItemJpaEntity;
 import static com.usto.api.g2b.infrastructure.entity.QG2bItemCategoryJpaEntity.g2bItemCategoryJpaEntity;
 import static com.usto.api.organization.infrastructure.entity.QDepartmentJpaEntity.departmentJpaEntity;
@@ -102,15 +102,15 @@ public class ReturningRepositoryAdapter implements ReturningRepository {
                         // G2B 목록번호 (분류코드-식별코드)
                         Expressions.stringTemplate("CONCAT({0}, '-', {1})",
                                 g2bItemCategoryJpaEntity.g2bMCd,
-                                itemAssetDetailEntity.g2bDCd).as("g2bItemNo"),
+                                itemAssetEntity.g2bDCd).as("g2bItemNo"),
                         // G2B 목록명
                         g2bItemJpaEntity.g2bDNm,
                         // 물품고유번호
                         itemReturningDetailEntity.itmNo,
-                        // 취득일자 (대장기본)
-                        itemAssetMasterEntity.acqAt,
+                        // 취득일자 (취득기본)
+                        itemAcquisitionEntity.acqAt,
                         // 취득금액 (대장상세)
-                        itemAssetDetailEntity.acqUpr,
+                        itemAssetEntity.acqUpr,
                         // 운용부서명
                         departmentJpaEntity.deptNm.as("deptNm"),
                         // 물품상태 (마스터)
@@ -123,15 +123,15 @@ public class ReturningRepositoryAdapter implements ReturningRepository {
                 .join(itemReturningMasterEntity)
                 .on(itemReturningDetailEntity.rtrnMId.eq(itemReturningMasterEntity.rtrnMId))
                 // 대장상세 조인 (취득금액, G2B코드)
-                .join(itemAssetDetailEntity)
-                .on(itemReturningDetailEntity.itmNo.eq(itemAssetDetailEntity.itemId.itmNo),
-                        itemReturningDetailEntity.orgCd.eq(itemAssetDetailEntity.itemId.orgCd))
-                // 대장기본 조인 (취득일자)
-                .join(itemAssetMasterEntity)
-                .on(itemAssetDetailEntity.acqId.eq(itemAssetMasterEntity.acqId))
+                .join(itemAssetEntity)
+                .on(itemReturningDetailEntity.itmNo.eq(itemAssetEntity.itemId.itmNo),
+                        itemReturningDetailEntity.orgCd.eq(itemAssetEntity.itemId.orgCd))
+                // 취득기본 조인 (취득일자)
+                .join(itemAcquisitionEntity)
+                .on(itemAssetEntity.acqId.eq(itemAcquisitionEntity.acqId))
                 // G2B 품목 조인 (품목명)
                 .leftJoin(g2bItemJpaEntity)
-                .on(itemAssetDetailEntity.g2bDCd.eq(g2bItemJpaEntity.g2bDCd))
+                .on(itemAssetEntity.g2bDCd.eq(g2bItemJpaEntity.g2bDCd))
                 // G2B 분류 조인 (분류코드)
                 .leftJoin(g2bItemCategoryJpaEntity)
                 .on(g2bItemJpaEntity.g2bMCd.eq(g2bItemCategoryJpaEntity.g2bMCd))
@@ -175,8 +175,8 @@ public class ReturningRepositoryAdapter implements ReturningRepository {
                         itemReturningDetailEntity.itmNo.eq(itmNo),
                         itemReturningDetailEntity.orgCd.eq(orgCd),
                         excludeRtrnMId != null ? itemReturningMasterEntity.rtrnMId.ne(excludeRtrnMId) : null,  // 현재 신청서는 제외
-                        // 승인완료 또는 요청중인 건만 중복 체크
-                        itemReturningMasterEntity.apprSts.in(ApprStatus.REQUEST, ApprStatus.APPROVED)
+                        // 작성중 또는 요청중인 건만 중복 체크
+                        itemReturningMasterEntity.apprSts.in(ApprStatus.WAIT, ApprStatus.REQUEST)
                 )
                 .fetchFirst() != null;
     }
