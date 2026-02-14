@@ -17,7 +17,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 @EntityListeners(AuditingEntityListener.class)
-@SQLDelete(sql = "UPDATE TB_CHAT001M SET del_yn = 'Y', del_at = NOW() WHERE chat_m_id = ?")
+@SQLDelete(sql = "UPDATE TB_CHAT001M SET del_yn = 'Y', del_at = NOW() WHERE CHAT_M_ID = ?")
 @Where(clause = "DEL_YN = 'N'")
 public class ChatThreadJpaEntity extends BaseTimeEntity {
 
