@@ -1,15 +1,10 @@
 package com.usto.api.ai.chat.application;
 
 import com.usto.api.ai.chat.presentation.dto.response.AiChatResponse;
-import lombok.RequiredArgsConstructor;
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.UUID;
-
-import static org.springframework.ai.openai.api.OpenAiApi.*;
 
 @Service
 public class AiChatApplication {

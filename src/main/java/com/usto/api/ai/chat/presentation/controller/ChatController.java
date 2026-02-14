@@ -6,6 +6,7 @@ import com.usto.api.ai.chat.presentation.dto.response.AiChatResponse;
 import com.usto.api.ai.chat.presentation.dto.response.VendorChatResponse;
 import com.usto.api.common.utils.ApiResponse;
 import com.usto.api.user.domain.model.UserPrincipal;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -22,7 +23,11 @@ public class ChatController {
 
     private final AiChatApplication aiChatApplication;
 
-    @PostMapping("/chat")
+    @Operation(
+            summary = "Chat GPT와 대화하기 테스트(AI 연동 전)",
+            description = "별도의 연동 없이 그냥 지피티라 대화합니다."
+    )
+    @PostMapping("/chat/test")
     public ApiResponse<AiChatResponse> chat(
             @RequestBody AiChatRequest request,
             @Valid @AuthenticationPrincipal UserPrincipal userPrincipal

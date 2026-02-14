@@ -4,6 +4,7 @@ import com.usto.api.common.utils.ApiResponse;
 import com.usto.api.item.asset.application.AssetApplication;
 import com.usto.api.item.asset.presentation.dto.response.AssetListResponse;
 import com.usto.api.item.asset.presentation.dto.response.AssetPublicDetailResponse;
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -20,6 +21,7 @@ import java.util.Optional;
 @Controller
 @RequestMapping("/api/public/item")
 @RequiredArgsConstructor
+@Hidden
 public class PublicAssetController {
 
     private final AssetApplication assetApplication;
