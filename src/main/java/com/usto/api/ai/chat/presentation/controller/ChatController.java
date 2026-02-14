@@ -6,6 +6,7 @@ import com.usto.api.ai.chat.presentation.dto.response.AiChatResponse;
 import com.usto.api.ai.chat.presentation.dto.response.VendorChatResponse;
 import com.usto.api.common.utils.ApiResponse;
 import com.usto.api.user.domain.model.UserPrincipal;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 //연동 테스트
 @RestController
-@RequestMapping("api//ai")
+@RequestMapping("/api/ai")
 @RequiredArgsConstructor
 public class ChatController {
 
@@ -24,7 +25,7 @@ public class ChatController {
     @PostMapping("/chat")
     public ApiResponse<AiChatResponse> chat(
             @RequestBody AiChatRequest request,
-            @AuthenticationPrincipal UserPrincipal userPrincipal
+            @Valid @AuthenticationPrincipal UserPrincipal userPrincipal
     ) {
 
         AiChatResponse response = aiChatApplication.send(

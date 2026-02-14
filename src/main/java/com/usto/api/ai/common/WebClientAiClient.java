@@ -61,8 +61,6 @@ public class WebClientAiClient implements AiClient {
                     )
                     .bodyToMono(responseType)
                     .block();
-        } catch (AiCallException e) {
-            throw e;
         } catch (Exception e) {
             throw new AiCallException("AI_CALL_FAILED", "AI 호출 실패", e);
         }

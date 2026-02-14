@@ -4,6 +4,8 @@ import com.usto.api.ai.forecast.domain.model.RiskLevel;
 import com.usto.api.common.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
@@ -16,6 +18,8 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 @EntityListeners(AuditingEntityListener.class)
+@SQLDelete(sql = "UPDATE TB_FC001M SET del_yn = 'Y', del_at = NOW() WHERE chat_m_id = ?")
+@Where(clause = "DEL_YN = 'N'")
 public class ForecastJpaEntity extends BaseTimeEntity {
 
     @Id

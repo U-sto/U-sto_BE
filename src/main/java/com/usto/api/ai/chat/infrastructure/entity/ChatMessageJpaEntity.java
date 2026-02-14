@@ -4,10 +4,9 @@ import com.usto.api.ai.chat.domain.model.SenderType;
 import com.usto.api.common.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -18,6 +17,8 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 @EntityListeners(AuditingEntityListener.class)
+@SQLDelete(sql = "UPDATE TB_CHAT001D SET del_yn = 'Y', del_at = NOW() WHERE chat_m_id = ?")
+@Where(clause = "DEL_YN = 'N'")
 public class ChatMessageJpaEntity extends BaseTimeEntity {
 
     @Id

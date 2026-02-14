@@ -16,7 +16,7 @@ public class AiClientConfig {
     @Bean
     public WebClient aiWebClient(
             //@Value("${ai.base-url}") String baseUrl,
-            @Value("$${AI_API_KEY}") String apiKey,
+            @Value("${AI_API_KEY}") String apiKey,
             @Value("${ai.timeout-ms}") int timeoutMs
     ) {
         HttpClient httpClient = HttpClient.create()
