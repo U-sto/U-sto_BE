@@ -39,7 +39,7 @@ public class PublicAssetController {
             Model model
             ) {
 
-        Optional<AssetPublicDetailResponse> item = assetApplication.getAssetPublicDetail(orgCd,itmNo);
+        AssetPublicDetailResponse item = assetApplication.getAssetPublicDetail(orgCd,itmNo);
 
         model.addAttribute("item", item);
 

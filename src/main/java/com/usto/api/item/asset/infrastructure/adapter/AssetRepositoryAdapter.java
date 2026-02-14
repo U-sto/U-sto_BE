@@ -275,7 +275,7 @@ public class AssetRepositoryAdapter implements AssetRepository {
     }
 
     @Override
-    public Optional<AssetPublicDetailResponse>  findPublicDetailByItmNoAndOrgCd(String itmNo, String orgCd) {
+    public AssetPublicDetailResponse  findPublicDetailByItmNoAndOrgCd(String itmNo, String orgCd) {
         QItemAcquisitionEntity a = QItemAcquisitionEntity.itemAcquisitionEntity;
         QItemAssetEntity d = QItemAssetEntity.itemAssetEntity;
         QG2bItemJpaEntity g = QG2bItemJpaEntity.g2bItemJpaEntity;
@@ -283,8 +283,8 @@ public class AssetRepositoryAdapter implements AssetRepository {
         QDepartmentJpaEntity dept = QDepartmentJpaEntity.departmentJpaEntity;
         QOrganizationJpaEntity org = QOrganizationJpaEntity.organizationJpaEntity;
 
-        Optional<AssetPublicDetailResponse> result =
-                Optional.ofNullable(queryFactory
+        AssetPublicDetailResponse result =
+                (queryFactory
                 .select(Projections.fields(
                         AssetPublicDetailResponse.class,
                         d.itemId.itmNo.as("itmNo"),

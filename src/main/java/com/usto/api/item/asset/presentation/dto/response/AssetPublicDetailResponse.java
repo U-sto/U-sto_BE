@@ -54,7 +54,7 @@ public class AssetPublicDetailResponse {
     private String rmk;
 
     @Schema(description = "현재 수량")
-    private Integer qty;
+    private Long qty;
 
     // JPQL Constructor
     public AssetPublicDetailResponse(
@@ -68,7 +68,7 @@ public class AssetPublicDetailResponse {
             OperStatus operSts,
             String drbYr,
             String deptNm,
-            Integer qty,
+            Long qty,
             String rmk
     ) {
         this.itmNo = itmNo;
