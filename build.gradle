@@ -63,7 +63,7 @@ dependencies {
     //타임리프
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     //AI
-    implementation platform('org.springframework.ai:spring-ai-bom:1.0.0-M4')
+    implementation platform('org.springframework.ai:spring-ai-bom:1.0.0-M5')
     implementation 'org.springframework.ai:spring-ai-openai-spring-boot-starter'
 
 

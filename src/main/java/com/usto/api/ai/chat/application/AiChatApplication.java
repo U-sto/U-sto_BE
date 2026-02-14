@@ -1,20 +1,27 @@
 package com.usto.api.ai.chat.application;
 
 import com.usto.api.ai.chat.presentation.dto.response.AiChatResponse;
-import com.usto.api.ai.common.AiClient;
 import lombok.RequiredArgsConstructor;
+import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
+import static org.springframework.ai.openai.api.OpenAiApi.*;
+
 @Service
-@RequiredArgsConstructor
 public class AiChatApplication {
 
     //private final ChatThreadRepository threadRepository;
     //private final ChatMessageRepository messageRepository;
-    private final AiClient aiClient;
+    //private final AiClient aiClient;
+
+    private final ChatClient chatClient;
+    public AiChatApplication(ChatClient.Builder chatClientBuilder) {
+        this.chatClient = chatClientBuilder.build();
+    }
 
     @Transactional
     public AiChatResponse send(String username, String message, UUID threadId) {
@@ -28,16 +35,22 @@ public class AiChatApplication {
         // 2. 사용자 메시지 저장
         saveMessage(thread, "USER", message);
 
+*/
         // 3. AI 클라이언트 호출
-        AiChatRequest aiRequest = new AiChatRequest(thread.getId(), message);
-        AiChatResponse aiResponse = aiClient.chat(aiRequest);
+        String aiReply = chatClient.prompt()
+                .user(message)
+                .call()
+                .content();
 
+        /*
         // 4. AI 응답 저장
         saveMessage(thread, "BOT", aiResponse.replyMessage());
-
-        return aiResponse;
+*/
+        return AiChatResponse.builder()
+                .replyMessage(aiReply)
+                .build();
     }
-
+/*
     private ChatThread createNewThread(String username, String firstMessage) {
         String title = firstMessage.length() > 20 ? firstMessage.substring(0, 20) : firstMessage;
         return threadRepository.save(ChatThread.builder()
@@ -64,6 +77,5 @@ public class AiChatApplication {
                 .build());
 
          */
-        return null;
-    }
 }
+
