@@ -1,0 +1,46 @@
+package com.usto.api.ai.chat.infrastructure.entity;
+
+import com.usto.api.common.BaseTimeEntity;
+import jakarta.persistence.*;
+import lombok.*;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
+
+@Entity
+@Table(name = "TB_CHAT001M")
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+@Builder
+@EntityListeners(AuditingEntityListener.class)
+@SQLDelete(sql = "UPDATE TB_CHAT001M SET del_yn = 'Y', del_at = NOW() WHERE CHAT_M_ID = ?")
+@Where(clause = "DEL_YN = 'N'")
+public class ChatThreadJpaEntity extends BaseTimeEntity {
+
+    @Id
+    @Column(name = "CHAT_M_ID", columnDefinition = "BINARY(16)")
+    private UUID threadId;
+
+    @Column(name = "USR_ID", length = 50, nullable = false)
+    private String userId;
+
+    @Column(name = "TITLE", columnDefinition = "TEXT")
+    private String title;
+
+    @Column(name = "LAST_MSG_AT", nullable = false)
+    private LocalDateTime lastMessageAt;
+
+    @Column(name = "ORG_CD", length = 7, nullable = false,columnDefinition = "CHAR(7)")
+    private String orgCode;
+
+    @Builder.Default
+    @Column(name = "DEL_YN", nullable = false, length = 1, columnDefinition = "char(1)")
+    private String delYn = "N";   // 삭제여부
+
+    @Column(name = "DEL_AT")
+    private LocalDateTime delAt;  // 삭제일시
+}

@@ -236,7 +236,7 @@ public class AssetApplication {
      * - 실시간 최신 데이터 반환
      */
     @Transactional(readOnly = true)
-    public Optional<AssetPublicDetailResponse> getAssetPublicDetail(String orgCd, String itmNo) {
+    public AssetPublicDetailResponse getAssetPublicDetail(String orgCd, String itmNo) {
         return assetRepository.findPublicDetailByItmNoAndOrgCd(itmNo,orgCd);
     }
 

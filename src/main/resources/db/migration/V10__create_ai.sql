@@ -1,0 +1,56 @@
+CREATE TABLE `TB_FC001M` (
+            `FC_M_ID` BINARY(16) NOT NULL COMMENT 'Forecast ID',
+            `USR_ID` VARCHAR(50) NOT NULL COMMENT '사용자ID',
+            `ANALYSIS_YEAR` SMALLINT NOT NULL COMMENT '년도',
+            `SEMESTER` TINYINT NOT NULL COMMENT '학기',
+            `RISK_LEVEL` VARCHAR(10) NOT NULL COMMENT 'LOW/MEDIUM/HIGH',
+            `MESSAGE` TEXT NOT NULL COMMENT '메시지내용',
+            `DEPT_CD` CHAR(5) NULL COMMENT '운용부서코드',
+            `G2B_D_NM` VARCHAR(300) NULL COMMENT '물품명',
+            `TS_JSON` LONGTEXT NULL COMMENT '시계열예측JSON데이터',
+            `MATRIX_JSON` LONGTEXT NULL COMMENT '매트릭스JSON데이터',
+            `RECO_JSON` LONGTEXT NULL COMMENT '조달권고안JSON데이터',
+            `ORG_CD` CHAR(7) NOT NULL COMMENT '조직코드',
+    --
+            `CRE_BY` VARCHAR(100)    NOT NULL COMMENT '생성자ID',
+            `CRE_AT` DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '생성일자',
+            `UPD_BY` VARCHAR(100)    NULL COMMENT '수정자ID',
+            `UPD_AT` DATETIME        NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일자',
+    --
+            `DEL_YN` CHAR(1)         NOT NULL DEFAULT 'N' COMMENT '삭제여부(Y/N)',
+            `DEL_AT` DATETIME        NULL     COMMENT '삭제일시',
+            PRIMARY KEY (`FC_M_ID`)
+);
+CREATE TABLE `TB_CHAT001M` (
+            `CHAT_M_ID` BINARY(16) NOT NULL COMMENT '쓰레드ID',
+            `USR_ID` VARCHAR(50) NOT NULL COMMENT '사용자ID',
+            `TITLE` TEXT NOT NULL COMMENT '쓰레드이름',
+            `LAST_MSG_AT` DATETIME NOT NULL COMMENT '마지막메시지 시각',
+            `ORG_CD` CHAR(7) NOT NULL COMMENT '조직코드',
+    --
+            `CRE_BY` VARCHAR(100)    NOT NULL COMMENT '생성자ID',
+            `CRE_AT` DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '생성일자',
+            `UPD_BY` VARCHAR(100)    NULL COMMENT '수정자ID',
+            `UPD_AT` DATETIME        NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일자',
+    --
+            `DEL_YN`        CHAR(1)         NOT NULL DEFAULT 'N' COMMENT '삭제여부(Y/N)',
+            `DEL_AT`        DATETIME        NULL     COMMENT '삭제일시',
+            PRIMARY KEY (`CHAT_M_ID`)
+);
+
+CREATE TABLE `TB_CHAT001D` (
+            `CHAT_D_ID` BIGINT NOT NULL AUTO_INCREMENT COMMENT '메시지ID',
+            `CHAT_M_ID` BINARY(16) NOT NULL COMMENT '채팅ID',
+            `CONTENT` TEXT NOT NULL COMMENT '대화내용',
+            `SENDER` VARCHAR(30) NOT NULL COMMENT '화자(USER / AI_BOT)',
+            `ORG_CD` CHAR(7) NOT NULL COMMENT '조직코드',
+    --
+            `CRE_BY` VARCHAR(100)    NOT NULL COMMENT '생성자ID',
+            `CRE_AT` DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '생성일자',
+            `UPD_BY` VARCHAR(100)    NULL COMMENT '수정자ID',
+            `UPD_AT` DATETIME        NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일자',
+    --
+            `DEL_YN` CHAR(1)         NOT NULL DEFAULT 'N' COMMENT '삭제여부(Y/N)',
+            `DEL_AT` DATETIME        NULL     COMMENT '삭제일시',
+            PRIMARY KEY (`CHAT_D_ID`)
+);

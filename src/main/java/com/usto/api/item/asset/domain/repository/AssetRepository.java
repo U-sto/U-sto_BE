@@ -48,7 +48,7 @@ public interface AssetRepository {
 
     void saveAll(List<Asset> assetsToUpdate);
 
-    Optional<AssetPublicDetailResponse> findPublicDetailByItmNoAndOrgCd(String itmNo, String orgCd);
+    AssetPublicDetailResponse findPublicDetailByItmNoAndOrgCd(String itmNo, String orgCd);
 
     List<AssetListForPrintResponse> findAllByFilterForPrint(@Valid AssetListForPrintRequest searchRequest, String orgCd);
 

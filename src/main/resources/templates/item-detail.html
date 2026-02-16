@@ -220,10 +220,9 @@
                     <div class="info-label">운용상태</div>
                     <div class="info-value">
                         <span class="status-badge"
-                              th:classappend="${item.operSts.name() == 'USE'} ? 'status-use' :
-                                             (${item.operSts.name() == 'IDLE'} ? 'status-idle' : 'status-dispose')"
-                              th:text="${item.operSts.name() == 'USE'} ? '운용중' :
-                                       (${item.operSts.name() == 'IDLE'} ? '대기' : '폐기')">
+                              th:classappend="${item.operSts.name() == 'OPER'} ? 'status-use' :
+                                             (${item.operSts.name() == 'DISP'} ? 'status-dispose' : 'status-idle')"
+                              th:text="${item.operSts.description}">
                             운용중
                         </span>
                     </div>
