@@ -6,6 +6,8 @@ import com.usto.api.item.asset.presentation.dto.request.AssetListForPrintRequest
 import com.usto.api.item.asset.presentation.dto.request.AssetSearchRequest;
 import com.usto.api.item.asset.presentation.dto.response.*;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
@@ -20,7 +22,7 @@ public interface AssetRepository {
     void delete(String itmNo, String orgCd);
 
     // Asset 조회
-    List<AssetListResponse> findAllByFilter(AssetSearchRequest cond, String orgCd);
+    Page<AssetListResponse> findAllByFilter(AssetSearchRequest cond, String orgCd, Pageable pageable);
     Optional<AssetDetailResponse> findDetailById(String itmNo, String orgCd);
 
     // 상태 이력 조회
@@ -50,7 +52,7 @@ public interface AssetRepository {
 
     AssetPublicDetailResponse findPublicDetailByItmNoAndOrgCd(String itmNo, String orgCd);
 
-    List<AssetListForPrintResponse> findAllByFilterForPrint(@Valid AssetListForPrintRequest searchRequest, String orgCd);
+    Page<AssetListForPrintResponse> findAllByFilterForPrint(@Valid AssetListForPrintRequest searchRequest, String orgCd, Pageable pageable);
 
     void bulkDisposal(List<Asset> assets, String userId, String orgCd);
 

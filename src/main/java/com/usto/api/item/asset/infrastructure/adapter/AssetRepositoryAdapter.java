@@ -25,6 +25,9 @@ import com.usto.api.organization.infrastructure.entity.QDepartmentJpaEntity;
 import com.usto.api.organization.infrastructure.entity.QOrganizationJpaEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -97,8 +100,36 @@ public class AssetRepositoryAdapter implements AssetRepository {
      * @param orgCd 현재 로그인한 유저의 조직코드
      */
     @Override
-    public List<AssetListResponse> findAllByFilter(AssetSearchRequest cond, String orgCd) {
-        return queryFactory
+    public Page<AssetListResponse> findAllByFilter(AssetSearchRequest cond, String orgCd, Pageable pageable) {
+        // 1. Count 쿼리
+        Long total = queryFactory
+                .select(itemAssetEntity.count())
+                .from(itemAssetEntity)
+                .leftJoin(itemAcquisitionEntity).on(
+                        itemAssetEntity.acqId.eq(itemAcquisitionEntity.acqId)
+                )
+                .leftJoin(g2bItemJpaEntity).on(
+                        itemAssetEntity.g2bDCd.eq(g2bItemJpaEntity.g2bDCd)
+                )
+                .leftJoin(departmentJpaEntity).on(
+                        itemAssetEntity.itemId.orgCd.eq(departmentJpaEntity.id.orgCd),
+                        itemAssetEntity.deptCd.eq(departmentJpaEntity.id.deptCd)
+                )
+                .where(
+                        itemAssetEntity.itemId.orgCd.eq(orgCd),
+                        g2bDCdEq(cond.getG2bDCd()),
+                        acqAtBetween(cond.getStartAcqAt(), cond.getEndAcqAt()),
+                        arrgAtBetween(cond.getStartArrgAt(), cond.getEndArrgAt()),
+                        deptCdEq(cond.getDeptCd()),
+                        operStsEq(cond.getOperSts()),
+                        itmNoEq(cond.getItmNo())
+                )
+                .fetchOne();
+
+        long totalCount = (total != null) ? total : 0L;
+
+        // 2. Data 쿼리
+        List<AssetListResponse> content = queryFactory
                 .select(Projections.fields(AssetListResponse.class,
                         itemAssetEntity.itemId.itmNo,
                         Expressions.stringTemplate("CONCAT({0}, '-', {1})",
@@ -132,8 +163,12 @@ public class AssetRepositoryAdapter implements AssetRepository {
                         operStsEq(cond.getOperSts()),
                         itmNoEq(cond.getItmNo())
                 )
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
                 .orderBy(itemAssetEntity.itemId.itmNo.desc())
                 .fetch();
+
+        return new PageImpl<>(content, pageable, totalCount);
     }
 
     @Override
@@ -321,8 +356,37 @@ public class AssetRepositoryAdapter implements AssetRepository {
     }
 
     @Override
-    public List<AssetListForPrintResponse> findAllByFilterForPrint(AssetListForPrintRequest searchRequest, String orgCd) {
-        return queryFactory
+    public Page<AssetListForPrintResponse> findAllByFilterForPrint(AssetListForPrintRequest searchRequest, String orgCd, Pageable pageable) {
+        // 1. Count 쿼리
+        Long total = queryFactory
+                .select(itemAssetEntity.count())
+                .from(itemAssetEntity)
+                .leftJoin(itemAcquisitionEntity).on(
+                        itemAssetEntity.acqId.eq(itemAcquisitionEntity.acqId)
+                )
+                .leftJoin(g2bItemJpaEntity).on(
+                        itemAssetEntity.g2bDCd.eq(g2bItemJpaEntity.g2bDCd)
+                )
+                .leftJoin(departmentJpaEntity).on(
+                        itemAssetEntity.itemId.orgCd.eq(departmentJpaEntity.id.orgCd),
+                        itemAssetEntity.deptCd.eq(departmentJpaEntity.id.deptCd)
+                )
+                .where(
+                        itemAssetEntity.itemId.orgCd.eq(orgCd),
+                        g2bDCdEq(searchRequest.getG2bDCd()),
+                        acqAtBetween(searchRequest.getStartAcqAt(), searchRequest.getEndAcqAt()),
+                        arrgAtBetween(searchRequest.getStartArrgAt(), searchRequest.getEndArrgAt()),
+                        deptCdEq(searchRequest.getDeptCd()),
+                        operStsEq(searchRequest.getOperSts()),
+                        itmNoEq(searchRequest.getItmNo()),
+                        printYnEq(searchRequest.getPrintYn())
+                )
+                .fetchOne();
+
+        long totalCount = (total != null) ? total : 0L;
+
+        // 2. Data 쿼리
+        List<AssetListForPrintResponse> content = queryFactory
                 .select(Projections.fields(AssetListForPrintResponse.class,
                         itemAssetEntity.itemId.itmNo,
                         Expressions.stringTemplate("CONCAT({0}, '-', {1})",
@@ -358,8 +422,12 @@ public class AssetRepositoryAdapter implements AssetRepository {
                         itmNoEq(searchRequest.getItmNo()),
                         printYnEq(searchRequest.getPrintYn())
                 )
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
                 .orderBy(itemAssetEntity.itemId.itmNo.desc())
                 .fetch();
+
+        return new PageImpl<>(content, pageable, totalCount);
     }
 
     @Override

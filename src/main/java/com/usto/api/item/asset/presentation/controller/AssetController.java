@@ -17,6 +17,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -37,15 +41,22 @@ public class AssetController {
     private final AssetApplication assetApplication;
 
     @Operation(
-            summary = "운용대장 목록 조회",
+            summary = "운용대장 목록 조회 (페이징)",
             description = "필터 조건(G2B, 취득일자, 정리일자, 부서, 운용상태, 물품번호)에 따라 운용대장을 조회합니다. 논리삭제된 물품은 제외됩니다."
     )
     @GetMapping
-    public ApiResponse<List<AssetListResponse>> getList(
+    public ApiResponse<Page<AssetListResponse>> getList(
             @Valid AssetSearchRequest searchRequest,
+            @Parameter(description = "페이지 번호 (0부터 시작)", example = "0")
+            @RequestParam(defaultValue = "0") int page,
+            @Parameter(description = "페이지 크기", example = "30")
+            @RequestParam(defaultValue = "30") int size,
             @AuthenticationPrincipal UserPrincipal principal) {
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by("creAt").ascending());
+
         return ApiResponse.ok("조회 성공",
-                assetApplication.getAssetList(searchRequest, principal.getOrgCd()));
+                assetApplication.getAssetList(searchRequest, principal.getOrgCd(), pageable));
     }
 
     @Operation(
@@ -111,15 +122,21 @@ public class AssetController {
     }
 
     @Operation(
-            summary = "출력물관리 목록 조회",
+            summary = "출력물관리 목록 조회 (페이징)",
             description = "필터 조건(G2B, 취득일자, 정리일자, 부서, 운용상태, 물품번호 + 출력상태)에 따라 운용대장을 조회합니다. 논리삭제된 물품은 제외됩니다."
     )
     @GetMapping("/print")
-    public ApiResponse<List<AssetListForPrintResponse>> getPrintList(
+    public ApiResponse<Page<AssetListForPrintResponse>> getPrintList(
             @Valid AssetListForPrintRequest searchRequest,
+            @Parameter(description = "페이지 번호 (0부터 시작)", example = "0")
+            @RequestParam(defaultValue = "0") int page,
+            @Parameter(description = "페이지 크기", example = "30")
+            @RequestParam(defaultValue = "30") int size,
             @AuthenticationPrincipal UserPrincipal principal) {
 
+        Pageable pageable = PageRequest.of(page, size, Sort.by("creAt").ascending());
+
         return ApiResponse.ok("조회 성공",
-                assetApplication.getAssetListForPrint(searchRequest, principal.getOrgCd()));
+                assetApplication.getAssetListForPrint(searchRequest, principal.getOrgCd(), pageable));
     }
 }
