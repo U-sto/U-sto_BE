@@ -139,7 +139,7 @@ public class DisposalController {
         return ApiResponse.ok("승인 요청 취소 완료");
     }
 
-    // TODO: 처분 승인 및 반려 구현 (ADMIN)
+    // 처분 승인 및 반려 구현 (ADMIN)
     @Operation(
             summary = "처분 승인 확정 (ADMIN)",
             description = "승인 요청(REQUEST) 건을 승인하여 승인(APPROVED) 상태로 만듭니다."

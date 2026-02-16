@@ -205,7 +205,7 @@ public class ReturningApplication {
     }
 
     /**
-     * TODO: 반납 승인 (ADMIN 권한)
+     * 반납 승인 (ADMIN 권한)
      * - 승인 시 물품 상태를 RTN(반납)으로 변경
      * - 부서코드 NONE 값으로 변경
      * - 상태 이력 테이블에 기록 생성
@@ -263,7 +263,7 @@ public class ReturningApplication {
 
 
     /**
-     * TODO: 반납 반려 (ADMIN 권한)
+     * 반납 반려 (ADMIN 권한)
      * 승인요청 취소와 비슷하게 진행
      */
     @Transactional
