@@ -3,6 +3,8 @@ package com.usto.api.item.acquisition.domain.repository;
 import com.usto.api.item.acquisition.domain.model.Acquisition;
 import com.usto.api.item.acquisition.presentation.dto.request.AcqSearchRequest;
 import com.usto.api.item.acquisition.presentation.dto.response.AcqListResponse;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,8 +17,7 @@ public interface AcquisitionRepository {
     void delete(UUID acqId);
 
     // 조회는 Response DTO 직접 반환 (변경 없음)
-    List<AcqListResponse> findAllByFilter(AcqSearchRequest cond, String orgCd);
-
+    Page<AcqListResponse> findAllByFilter(AcqSearchRequest cond, String orgCd, Pageable pageable);
     List<Acquisition> findAllById(List<UUID> acqIds);
 
     void saveAll(List<Acquisition> acquisitions);
