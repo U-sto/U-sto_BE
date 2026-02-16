@@ -6,10 +6,12 @@ import com.usto.api.g2b.infrastructure.entity.G2bItemJpaEntity;
 import com.usto.api.g2b.infrastructure.repository.G2bItemCategoryJpaRepository;
 import com.usto.api.g2b.infrastructure.repository.G2bItemJpaRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.usto.api.common.exception.G2bBusinessException;
-import java.util.List;
 
 /**
  * @class G2bSearchServiceImpl
@@ -23,7 +25,7 @@ public class G2bSearchApplication implements G2bSearchRepository {
 
     @Override
     @Transactional(readOnly = true)
-    public List<G2bItemCategoryJpaEntity> findCategoryList(String code, String name) {
+    public Page<G2bItemCategoryJpaEntity> findCategoryList(String code, String name, int page, int size) {
         // null 체크 후 빈 문자열로 치환하여 LIKE '%%'가 모든 값을 포함하도록 유도
         String categoryCode = (code == null) ? "" : code.trim();
         String categoryName = (name == null) ? "" : name.trim();
@@ -43,12 +45,13 @@ public class G2bSearchApplication implements G2bSearchRepository {
             throw new G2bBusinessException("최소 2자 이상 입력해 주세요.");
         }
 
-        return categoryRepository.findByFilters(categoryCode, categoryName);
+        Pageable pageable = PageRequest.of(page, size);
+        return categoryRepository.findByFilters(categoryCode, categoryName, pageable);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<G2bItemJpaEntity> findItemList(String mCd, String dCd, String dNm) {
+    public Page<G2bItemJpaEntity> findItemList(String mCd, String dCd, String dNm, int page, int size) {
         // null 체크 및 공백 제거 처리
         String categoryCode = (mCd == null) ? "" : mCd.trim();
         String itemCode = (dCd == null) ? "" : dCd.trim();
@@ -75,6 +78,7 @@ public class G2bSearchApplication implements G2bSearchRepository {
         }
 
         // DB는 인덱스를 타고 명칭 필터를 추가로 수행함
-        return itemRepository.findByFilters(categoryCode, itemCode, itemName);
+        Pageable pageable = PageRequest.of(page, size);
+        return itemRepository.findByFilters(categoryCode, itemCode, itemName, pageable);
     }
 }
