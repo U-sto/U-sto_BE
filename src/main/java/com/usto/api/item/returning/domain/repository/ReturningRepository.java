@@ -5,6 +5,8 @@ import com.usto.api.item.returning.domain.model.ReturningMaster;
 import com.usto.api.item.returning.presentation.dto.request.ReturningSearchRequest;
 import com.usto.api.item.returning.presentation.dto.response.ReturningItemListResponse;
 import com.usto.api.item.returning.presentation.dto.response.ReturningListResponse;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,9 +17,9 @@ public interface ReturningRepository {
     void saveDetail(ReturningDetail detail);
     Optional<ReturningMaster> findMasterById(UUID rtrnMId, String orgCd);
     // 반납등록목록 조회
-    List<ReturningListResponse> findAllByFilter(ReturningSearchRequest cond, String orgCd);
+    Page<ReturningListResponse> findAllByFilter(ReturningSearchRequest cond, String orgCd, Pageable pageable);
     // 반납물품목록 조회
-    List<ReturningItemListResponse> findItemsByMasterId(UUID rtrnMId, String orgCd);
+    Page<ReturningItemListResponse> findItemsByMasterId(UUID rtrnMId, String orgCd, Pageable pageable);
 
     void deleteMaster(UUID rtrnMId);
 

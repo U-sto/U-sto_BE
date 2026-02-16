@@ -17,6 +17,8 @@ import com.usto.api.item.returning.presentation.dto.request.ReturningSearchReque
 import com.usto.api.item.returning.presentation.dto.response.ReturningItemListResponse;
 import com.usto.api.item.returning.presentation.dto.response.ReturningListResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -94,19 +96,19 @@ public class ReturningApplication {
      * 반납 목록 조회
      */
     @Transactional(readOnly = true)
-    public List<ReturningListResponse> getReturningList(ReturningSearchRequest searchRequest, String orgCd) {
-        return returningRepository.findAllByFilter(searchRequest, orgCd);
+    public Page<ReturningListResponse> getReturningList(ReturningSearchRequest searchRequest, String orgCd, Pageable pageable) {
+        return returningRepository.findAllByFilter(searchRequest, orgCd, pageable);
     }
 
     /**
      * 반납물품목록 조회
      */
     @Transactional(readOnly = true)
-    public List<ReturningItemListResponse> getReturningItems(UUID rtrnMId, String orgCd) {
+    public Page<ReturningItemListResponse> getReturningItems(UUID rtrnMId, String orgCd, Pageable pageable) {
         returningRepository.findMasterById(rtrnMId, orgCd)
                 .orElseThrow(() -> new BusinessException("존재하지 않는 반납 신청입니다."));
 
-        return returningRepository.findItemsByMasterId(rtrnMId, orgCd);
+        return returningRepository.findItemsByMasterId(rtrnMId, orgCd, pageable);
     }
 
     /**

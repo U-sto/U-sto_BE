@@ -9,9 +9,14 @@ import com.usto.api.item.returning.presentation.dto.response.ReturningListRespon
 import com.usto.api.item.returning.presentation.dto.response.ReturningRegisterResponse;
 import com.usto.api.user.domain.model.UserPrincipal;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -28,27 +33,41 @@ public class ReturningController {
     private final ReturningApplication returningApplication;
 
     @Operation(
-            summary = "반납등록목록 조회",
+            summary = "반납등록목록 조회 (페이징)",
             description = "반납 신청 마스터 목록을 조회합니다."
     )
     @GetMapping
-    public ApiResponse<List<ReturningListResponse>> getList(
+    public ApiResponse<Page<ReturningListResponse>> getList(
             @Valid ReturningSearchRequest searchRequest,
+            @Parameter(description = "페이지 번호 (0부터 시작)", example = "0")
+            @RequestParam(defaultValue = "0") int page,
+            @Parameter(description = "페이지 크기", example = "30")
+            @RequestParam(defaultValue = "30") int size,
             @AuthenticationPrincipal UserPrincipal principal) {
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by("creAt").ascending());
+
         return ApiResponse.ok("조회 성공",
-                returningApplication.getReturningList(searchRequest, principal.getOrgCd()));
+                returningApplication.getReturningList(searchRequest, principal.getOrgCd(), pageable));
     }
 
     @Operation(
-            summary = "반납물품목록 조회",
+            summary = "반납물품목록 조회 (페이징)",
             description = "특정 반납 신청의 상세 물품 목록을 조회합니다."
     )
     @GetMapping("/{rtrnMId}/items")
-    public ApiResponse<List<ReturningItemListResponse>> getItems(
+    public ApiResponse<Page<ReturningItemListResponse>> getItems(
             @PathVariable UUID rtrnMId,
+            @Parameter(description = "페이지 번호 (0부터 시작)", example = "0")
+            @RequestParam(defaultValue = "0") int page,
+            @Parameter(description = "페이지 크기", example = "30")
+            @RequestParam(defaultValue = "30") int size,
             @AuthenticationPrincipal UserPrincipal principal) {
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by("creAt").ascending());
+
         return ApiResponse.ok("조회 성공",
-                returningApplication.getReturningItems(rtrnMId, principal.getOrgCd()));
+                returningApplication.getReturningItems(rtrnMId, principal.getOrgCd(), pageable));
     }
 
     @Operation(
