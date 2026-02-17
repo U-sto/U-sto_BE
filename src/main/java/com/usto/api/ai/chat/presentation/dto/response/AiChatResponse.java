@@ -7,7 +7,7 @@ import java.util.List;
 @Builder
 public record AiChatResponse(
         @JsonProperty("reply")
-        String replyMessage,      // AI 답변 내용
+        String reply,      // AI 답변 내용
 
         @JsonProperty("references")
         List<String> references,  // AI가 참고한 문서 리스트 (["doc1.pdf", "doc2.json"])
