@@ -41,6 +41,7 @@ public class AiChatApplication {
 
         // 4. 진짜 AI 클라이언트 호출 (Adapter 사용)
         AiChatResponse aiResponse = aiClientAdapter.fetchChatResponse(request);
+        log.info("aiResponse:" + aiResponse);
 
         /*
         // 5. AI 응답 및 참고문헌(References) 저장

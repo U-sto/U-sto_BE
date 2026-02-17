@@ -55,21 +55,4 @@ public class ChatController {
 
         return ApiResponse.ok("채팅 성공",response);
     }
-
-    @Operation(
-            summary = "AI팀의 챗봇과 대화 테스트(AI 연동 후)",
-            description = "서비스로직 없이 연결 테스트만 진행합니다."
-    )
-    @PostMapping("/chat/test")
-    public ApiResponse<AiChatResponse> chatTest(
-            @RequestBody AiChatRequest request
-    ) {
-
-        AiChatResponse response = aiChatApplication.testSend(
-                request.message(),
-                request.threadId()
-        );
-
-        return ApiResponse.ok("채팅 성공",response);
-    }
 }
