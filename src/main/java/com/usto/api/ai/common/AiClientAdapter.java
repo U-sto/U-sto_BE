@@ -1,8 +1,10 @@
 package com.usto.api.ai.common;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.usto.api.ai.chat.presentation.dto.request.AiChatRequest;
 import com.usto.api.ai.chat.presentation.dto.response.AiChatResponse;
+import com.usto.api.common.utils.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatusCode;
@@ -35,9 +37,15 @@ public class AiClientAdapter {
 
         log.info("AI Server Raw Response: {}", rawResponse);
 
-        // 2. 받은 String을 객체로 변환합니다.
         try {
-            return objectMapper.readValue(rawResponse, AiChatResponse.class);
+            JsonNode rootNode = objectMapper.readTree(rawResponse);
+
+            // 2. "data" 키에 해당하는 자식 노드만 추출
+            JsonNode dataNode = rootNode.get("data");
+
+            if (dataNode != null && !dataNode.isNull()) {
+                return objectMapper.treeToValue(dataNode, AiChatResponse.class);
+            }
         } catch (Exception e) {
             log.error("JSON 매핑 실패: {}", e.getMessage());
             // 매핑 실패 시 빈 객체나 에러 처리를 진행합니다.
@@ -45,5 +53,6 @@ public class AiClientAdapter {
                     .replyMessage("데이터 매핑에 실패했습니다. 로그를 확인하세요.")
                     .build();
         }
+        return null;
     }
 }

@@ -1,5 +1,6 @@
 package com.usto.api.ai.chat.application;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.usto.api.ai.chat.presentation.dto.request.AiChatRequest;
 import com.usto.api.ai.chat.presentation.dto.response.AiChatResponse;
@@ -24,65 +25,28 @@ public class AiChatApplication {
 
     @Transactional
     public AiChatResponse send(String username, String message, UUID threadId) {
-
-        // 1. DTO 구성 (우리가 정의한 threadId -> session_id 매핑 활용)
+        // 1. 요청 생성
         AiChatRequest request = new AiChatRequest(threadId, message);
+        log.info("User {} asked: {}", username, message);
 
-        /*
-        // [비즈니스 로직 확장 가능성]
-        // 2. Thread 조회 또는 생성 (DB)
-        ChatThread thread = (threadId == null)
-                ? createNewThread(username, message)
-                : validateAndGetThread(username, threadId);
-
-        // 3. 사용자 메시지 선행 저장
-        saveMessage(thread, "USER", message, null);
-        */
-
-        // 4. 진짜 AI 클라이언트 호출 (Adapter 사용)
+        // 2. AI 서버 호출 (어댑터 사용)
         AiChatResponse aiResponse = aiClientAdapter.fetchChatResponse(request);
-        log.info("aiResponse:" + aiResponse);
 
-        /*
-        // 5. AI 응답 및 참고문헌(References) 저장
-        // 팀원 협의에 대비해 references 리스트를 JSON 문자열로 변환하여 저장
+        // 3. 이력 저장 로직 (AiChatApplicationService에 있던 로직을 이쪽으로 통합)
         try {
-            String refJson = objectMapper.writeValueAsString(aiResponse.references());
-            saveMessage(thread, "BOT", aiResponse.replyMessage(), refJson);
+            if (aiResponse.references() != null) {
+                String refJson = objectMapper.writeValueAsString(aiResponse.references());
+                log.info("AI Response References saved as JSON: {}", refJson);
+
+                // TODO: messageRepository.save(...) 를 통해 DB에 질문과 답변, 참고문헌(JSON)을 저장
+                // 이 단계가 '이력 테이블 자동 기록' 원칙을 실현하는 부분
+            }
         } catch (JsonProcessingException e) {
             log.error("참고문헌 데이터 변환 실패", e);
         }
-        */
 
         return aiResponse;
     }
-/*
-    private ChatThread createNewThread(String username, String firstMessage) {
-        String title = firstMessage.length() > 20 ? firstMessage.substring(0, 20) : firstMessage;
-        return threadRepository.save(ChatThread.builder()
-                .userId(username)
-                .title(title)
-                .build());
-    }
-
-    private ChatThread validateAndGetThread(String username, Long threadId) {
-        ChatThread thread = threadRepository.findById(threadId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 대화방입니다."));
-
-        if (!thread.getUserId().equals(username)) {
-            throw new SecurityException("접근 권한이 없습니다.");
-        }
-        return thread;
-    }
-
-    private void saveMessage(ChatThread thread, String senderType, String content) {
-        messageRepository.save(ChatMessage.builder()
-                .thread(thread)
-                .senderType(senderType)
-                .content(content)
-                .build());
-
-         */
 
     @Transactional
     public AiChatResponse testSend(String message, UUID threadId) {
