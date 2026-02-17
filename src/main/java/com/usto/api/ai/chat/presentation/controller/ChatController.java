@@ -24,20 +24,6 @@ public class ChatController {
     private final ChatGptTestApplication chatGptTestApplication;
 
     @Operation(
-            summary = "Chat GPT와 대화하기 테스트(AI 연동 전)",
-            description = "별도의 연동 없이 그냥 지피티라 대화합니다."
-    )
-    @PostMapping("/gpt-connect/test")
-    public ApiResponse<AiChatResponse> testChat(
-            @Parameter(description = "메시지")
-            @RequestParam(required = false) String message
-    ) {
-        AiChatResponse response = chatGptTestApplication.testSend(message);
-
-        return ApiResponse.ok("채팅 성공",response);
-    }
-
-    @Operation(
             summary = "AI팀의 챗봇과 대화(AI 연동 후)",
             description = "AI팀의 챗봇과 대화를 진행합니다."
     )
@@ -46,12 +32,29 @@ public class ChatController {
             @RequestBody AiChatRequest request,
             @Valid @AuthenticationPrincipal UserPrincipal userPrincipal
     ) {
-
         AiChatResponse response = aiChatApplication.send(
                 userPrincipal.getUsername(),
+                userPrincipal.getOrgCd(),
                 request.message(),
                 request.threadId()
         );
+
+        return ApiResponse.ok("채팅 성공",response);
+    }
+
+    //채팅방 조회 -> id랑 title
+    //대화 기록 조회
+
+    @Operation(
+            summary = "Chat GPT와 대화하기 테스트(AI 연동 전)",
+            description = "별도의 연동 없이 그냥 지피티라 대화합니다."
+    )
+    @PostMapping("/chat/gpt4-mini")
+    public ApiResponse<AiChatResponse> testChat(
+            @Parameter(description = "메시지")
+            @RequestParam(required = false) String message
+    ) {
+        AiChatResponse response = chatGptTestApplication.testSend(message);
 
         return ApiResponse.ok("채팅 성공",response);
     }

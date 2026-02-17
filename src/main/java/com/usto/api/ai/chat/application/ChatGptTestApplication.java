@@ -21,7 +21,7 @@ public class ChatGptTestApplication {
                 .content();
 
         return AiChatResponse.builder()
-                .replyMessage(aiReply)
+                .reply(aiReply)
                 .build();
     }
 }

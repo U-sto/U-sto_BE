@@ -1,4 +1,8 @@
 package com.usto.api.ai.chat.infrastructure.repository;
+import com.usto.api.ai.chat.infrastructure.entity.ChatMessageJpaEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-public class ChatMessageJpaRepository {
+
+public interface ChatMessageJpaRepository extends JpaRepository<ChatMessageJpaEntity, String> {
+    ChatMessageJpaEntity save(ChatMessageJpaEntity entity);
 }

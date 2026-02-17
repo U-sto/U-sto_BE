@@ -50,7 +50,7 @@ public class AiClientAdapter {
             log.error("JSON 매핑 실패: {}", e.getMessage());
             // 매핑 실패 시 빈 객체나 에러 처리를 진행합니다.
             return AiChatResponse.builder()
-                    .replyMessage("데이터 매핑에 실패했습니다. 로그를 확인하세요.")
+                    .reply("데이터 매핑에 실패했습니다. 로그를 확인하세요.")
                     .build();
         }
         return null;

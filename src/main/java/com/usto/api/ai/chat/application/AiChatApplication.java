@@ -2,13 +2,18 @@ package com.usto.api.ai.chat.application;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.usto.api.ai.chat.domain.model.ChatMessage;
+import com.usto.api.ai.chat.domain.model.ChatThread;
+import com.usto.api.ai.chat.domain.model.SenderType;
+import com.usto.api.ai.chat.domain.repository.ChatMessageRepository;
+import com.usto.api.ai.chat.infrastructure.entity.ChatMessageJpaEntity;
+import com.usto.api.ai.chat.infrastructure.mapper.ChatMessageMapper;
+import com.usto.api.ai.chat.infrastructure.mapper.ChatThreadMapper;
 import com.usto.api.ai.chat.presentation.dto.request.AiChatRequest;
 import com.usto.api.ai.chat.presentation.dto.response.AiChatResponse;
 import com.usto.api.ai.common.AiClientAdapter;
-import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.UUID;
@@ -18,35 +23,62 @@ import java.util.UUID;
 @Slf4j
 public class AiChatApplication {
 
-    //private final ChatThreadRepository threadRepository;
-    //private final ChatMessageRepository messageRepository;
-    private final AiClientAdapter aiClientAdapter; // 진짜 AI 서버와 통신하는 어댑터
+    private final AiClientAdapter aiClientAdapter;
     private final ObjectMapper objectMapper;
+    private final ChatMessageRepository chatMessageRepository;
 
     @Transactional
-    public AiChatResponse send(String username, String message, UUID threadId) {
+    public AiChatResponse send(String userid,String orgCd, String message, UUID threadId) {
 
-        // 1. AI 서버 요청 생성
+        if(threadId == null){
+            String title = sumMsg(message);
+            ChatThread master = ChatThreadMapper.toDomain(userid,title,orgCd);
+            UUID masterId = master.getThreadId();
+            threadId= masterId;
+        }
+
+        ChatMessage chatMessageByUser = ChatMessageMapper.toDomain(
+                threadId,
+                message,
+                SenderType.USER,
+                null,
+                orgCd
+        );
+        ChatMessageJpaEntity entityByUser = ChatMessageMapper.toEntity(chatMessageByUser);
+        chatMessageRepository.save(entityByUser);
+
         AiChatRequest request = new AiChatRequest(threadId, message);
-        log.info("User {} asked: {}", username, message);
-
-        // 2. AI 서버 호출 (어댑터 사용)
         AiChatResponse aiResponse = aiClientAdapter.fetchChatResponse(request);
         log.info("AI Response: {}", aiResponse);
 
-
-        // 3. 이력 저장 로직 (AiChatApplicationService에 있던 로직을 이쪽으로 통합)
         try {
             if (aiResponse.references() != null) {
                 String replyJson = objectMapper.writeValueAsString(aiResponse.reply());
                 String refJson = objectMapper.writeValueAsString(aiResponse.references());
-                log.info("AI Response Reply saved as JSON: {}", replyJson);
-                log.info("AI Response References saved as JSON: {}", refJson);
 
-                // TODO: messageRepository.save(...) 를 통해 DB에 질문과 답변, 참고문헌(JSON)을 저장
+                ChatMessage chatMessageByBot = ChatMessageMapper.toDomain(
+                        threadId,
+                        replyJson,
+                        SenderType.AI_BOT,
+                        refJson,
+                        orgCd
+                );
+                ChatMessageJpaEntity entityByBot = ChatMessageMapper.toEntity(chatMessageByBot);
+                chatMessageRepository.save(entityByBot);
+            }else {
+                String replyJson = objectMapper.writeValueAsString(aiResponse.reply());
 
+                ChatMessage chatMessageByBot = ChatMessageMapper.toDomain(
+                        threadId,
+                        replyJson,
+                        SenderType.AI_BOT,
+                        null,
+                        orgCd
+                );
+                ChatMessageJpaEntity entityByBot = ChatMessageMapper.toEntity(chatMessageByBot);
+                chatMessageRepository.save(entityByBot);
             }
-        } catch (JsonProcessingException e) {
+        }catch (JsonProcessingException e) {
             log.error("참고문헌 데이터 변환 실패", e);
         }
 
@@ -56,6 +88,22 @@ public class AiChatApplication {
     @Transactional
     public AiChatResponse testSend(String message, UUID threadId) {
         return aiClientAdapter.fetchChatResponse(new AiChatRequest(threadId, message));
+    }
+
+    private String sumMsg(String message) {
+        if (message == null || message.isBlank()) {
+            return "새로운 대화";
+        }
+
+        // 첫 번째 줄만 추출 (줄바꿈 제거)
+        String firstLine = message.split("\\n")[0].trim();
+
+        // 20자 제한 및 요약 처리
+        if (firstLine.length() <= 20) {
+            return firstLine;
+        }
+
+        return firstLine.substring(0, 20) + "...";
     }
 }
 
