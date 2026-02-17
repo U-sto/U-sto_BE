@@ -48,12 +48,19 @@ public class ForecastJpaEntity extends BaseTimeEntity {
     @Column(name = "G2B_D_NM", length = 300)
     private String g2bDNm;
 
+    @Lob
+    @Column(name = "SUM_JSON", columnDefinition = "LONGTEXT")
+    private String summaryJson;
+
+    @Lob
     @Column(name = "TS_JSON", columnDefinition = "LONGTEXT")
     private String timeSeriesJson;
 
+    @Lob
     @Column(name = "MATRIX_JSON", columnDefinition = "LONGTEXT")
     private String matrixJson;
 
+    @Lob
     @Column(name = "RECO_JSON", columnDefinition = "LONGTEXT")
     private String recommendationJson;
 
