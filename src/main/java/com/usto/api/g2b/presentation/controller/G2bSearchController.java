@@ -9,6 +9,8 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -37,12 +39,12 @@ public class G2bSearchController {
             @RequestParam(required = false) String code,
             @Parameter(description = "물품분류명")
             @RequestParam(required = false) String name,
-            @Parameter(description = "페이지 번호")
-            @RequestParam(defaultValue = "0") int page,
-            @Parameter(description = "페이지 크기")
-            @RequestParam(defaultValue = "30") int size) {
-        Page<G2bCategoryResponse> categories = g2bSearchRepository.findCategoryList(code, name, page, size)
+            @PageableDefault(size = 30) Pageable pageable) {
+
+        Page<G2bCategoryResponse> categories = g2bSearchRepository
+                .findCategoryList(code, name, pageable)
                 .map(e -> new G2bCategoryResponse(e.getG2bMCd(), e.getG2bMNm()));
+
         if (categories.isEmpty()) {
             return ApiResponse.ok("조회 결과가 없습니다.", categories);
         }
@@ -62,13 +64,12 @@ public class G2bSearchController {
             @RequestParam(required = false) String itemCode,
             @Parameter(description = "물품품목명")
             @RequestParam(required = false) String itemName,
-            @Parameter(description = "페이지 번호")
-            @RequestParam(defaultValue = "0") int page,
-            @Parameter(description = "페이지 크기")
-            @RequestParam(defaultValue = "30") int size) {
-        Page<G2bItemResponse> items = g2bSearchRepository.findItemList(
-                        categoryCode, itemCode, itemName, page, size)
+            @PageableDefault(size = 30) Pageable pageable) {
+
+        Page<G2bItemResponse> items = g2bSearchRepository
+                .findItemList(categoryCode, itemCode, itemName, pageable)
                 .map(e -> new G2bItemResponse(e.getG2bDCd(), e.getG2bDNm(), e.getG2bUpr()));
+
         if (items.isEmpty()) {
             return ApiResponse.ok("조회 결과가 없습니다.", items);
         }

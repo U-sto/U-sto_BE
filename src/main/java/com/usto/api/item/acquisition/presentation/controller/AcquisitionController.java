@@ -42,9 +42,8 @@ public class AcquisitionController {
             @PageableDefault(size = 30) Pageable pageable, // 기본/최대 30줄 설정
             @AuthenticationPrincipal UserPrincipal principal) {
 
-        Page<AcqListResponse> result = acquisitionApplication.getAcquisitionList(searchRequest, principal.getOrgCd(), pageable);
-
-        return ApiResponse.ok("조회 성공", result);
+        return ApiResponse.ok("조회 성공",
+                acquisitionApplication.getAcquisitionList(searchRequest, principal.getOrgCd(), pageable));
     }
 
     // 2. 등록

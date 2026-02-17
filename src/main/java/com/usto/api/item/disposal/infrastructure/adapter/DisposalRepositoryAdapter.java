@@ -111,7 +111,7 @@ public class DisposalRepositoryAdapter implements DisposalRepository {
                 .groupBy(itemDisposalMasterEntity.dispMId)
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
-                .orderBy(itemDisposalMasterEntity.creAt.asc())
+                .orderBy(itemDisposalMasterEntity.creAt.asc()) // 생성일자 정렬
                 .fetch();
 
         return new PageImpl<>(content, pageable, totalCount);
@@ -181,7 +181,7 @@ public class DisposalRepositoryAdapter implements DisposalRepository {
                 )
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
-                .orderBy(itemDisposalDetailEntity.itmNo.asc())
+                .orderBy(itemDisposalDetailEntity.itmNo.asc()) // 물품고유번호 정렬
                 .fetch();
 
         return new PageImpl<>(content, pageable, totalCount);

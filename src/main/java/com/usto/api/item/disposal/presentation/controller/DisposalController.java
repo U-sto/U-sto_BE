@@ -9,14 +9,12 @@ import com.usto.api.item.disposal.presentation.dto.response.DisposalListResponse
 import com.usto.api.item.disposal.presentation.dto.response.DisposalRegisterResponse;
 import com.usto.api.user.domain.model.UserPrincipal;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -38,13 +36,8 @@ public class DisposalController {
     @GetMapping
     public ApiResponse<Page<DisposalListResponse>> getList(
             @Valid DisposalSearchRequest searchRequest,
-            @Parameter(description = "페이지 번호 (0부터 시작)", example = "0")
-            @RequestParam(defaultValue = "0") int page,
-            @Parameter(description = "페이지 크기", example = "30")
-            @RequestParam(defaultValue = "30") int size,
+            @PageableDefault(size = 30) Pageable pageable,
             @AuthenticationPrincipal UserPrincipal principal) {
-
-        Pageable pageable = PageRequest.of(page, size, Sort.by("creAt").ascending());
 
         return ApiResponse.ok("조회 성공",
                 disposalApplication.getDisposalList(searchRequest, principal.getOrgCd(), pageable));
@@ -57,13 +50,8 @@ public class DisposalController {
     @GetMapping("/{dispMId}/items")
     public ApiResponse<Page<DisposalItemListResponse>> getItems(
             @PathVariable UUID dispMId,
-            @Parameter(description = "페이지 번호 (0부터 시작)", example = "0")
-            @RequestParam(defaultValue = "0") int page,
-            @Parameter(description = "페이지 크기", example = "30")
-            @RequestParam(defaultValue = "30") int size,
+            @PageableDefault(size = 30) Pageable pageable,
             @AuthenticationPrincipal UserPrincipal principal) {
-
-        Pageable pageable = PageRequest.of(page, size, Sort.by("itmNo").ascending());
 
         return ApiResponse.ok("조회 성공",
                 disposalApplication.getDisposalItems(dispMId, principal.getOrgCd(), pageable));

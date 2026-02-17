@@ -165,7 +165,7 @@ public class AssetRepositoryAdapter implements AssetRepository {
                 )
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
-                .orderBy(itemAssetEntity.itemId.itmNo.desc())
+                .orderBy(itemAssetEntity.itemId.itmNo.desc()) // 물품고유번호 정렬
                 .fetch();
 
         return new PageImpl<>(content, pageable, totalCount);
@@ -424,7 +424,7 @@ public class AssetRepositoryAdapter implements AssetRepository {
                 )
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
-                .orderBy(itemAssetEntity.itemId.itmNo.desc())
+                .orderBy(itemAssetEntity.itemId.itmNo.desc()) // 물품고유번호 정렬
                 .fetch();
 
         return new PageImpl<>(content, pageable, totalCount);

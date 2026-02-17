@@ -78,8 +78,6 @@ public class DisuseRepositoryAdapter implements DisuseRepository {
                 .from(itemDisuseMasterEntity)
                 .leftJoin(itemDisuseDetailEntity)
                 .on(itemDisuseMasterEntity.dsuMId.eq(itemDisuseDetailEntity.dsuMId))
-                .leftJoin(user)
-                .on(itemDisuseMasterEntity.aplyUsrId.eq(user.usrId))
                 .where(
                         itemDisuseMasterEntity.orgCd.eq(orgCd),
                         aplyAtBetween(cond.getStartAplyAt(), cond.getEndAplyAt()),
@@ -113,7 +111,7 @@ public class DisuseRepositoryAdapter implements DisuseRepository {
                 .groupBy(itemDisuseMasterEntity.dsuMId)
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
-                .orderBy(itemDisuseMasterEntity.creAt.asc())
+                .orderBy(itemDisuseMasterEntity.creAt.asc()) // 생성일자 정렬
                 .fetch();
 
         return new PageImpl<>(content, pageable, totalCount);
@@ -186,7 +184,7 @@ public class DisuseRepositoryAdapter implements DisuseRepository {
                 )
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
-                .orderBy(itemDisuseDetailEntity.itmNo.asc())
+                .orderBy(itemDisuseDetailEntity.itmNo.asc()) // 물품고유번호 정렬
                 .fetch();
 
         return new PageImpl<>(content, pageable, totalCount);

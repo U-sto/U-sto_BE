@@ -76,8 +76,6 @@ public class ReturningRepositoryAdapter implements ReturningRepository {
                 .from(itemReturningMasterEntity)
                 .leftJoin(itemReturningDetailEntity)
                 .on(itemReturningMasterEntity.rtrnMId.eq(itemReturningDetailEntity.rtrnMId))
-                .leftJoin(user)
-                .on(itemReturningMasterEntity.aplyUsrId.eq(user.usrId))
                 .where(
                         itemReturningMasterEntity.orgCd.eq(orgCd),
                         aplyAtBetween(cond.getStartAplyAt(), cond.getEndAplyAt()),
@@ -111,7 +109,7 @@ public class ReturningRepositoryAdapter implements ReturningRepository {
                 .groupBy(itemReturningMasterEntity.rtrnMId)
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
-                .orderBy(itemReturningMasterEntity.creAt.asc())
+                .orderBy(itemReturningMasterEntity.creAt.asc()) // 생성일자 정렬
                 .fetch();
 
         return new PageImpl<>(content, pageable, totalCount);
@@ -183,7 +181,7 @@ public class ReturningRepositoryAdapter implements ReturningRepository {
                 )
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
-                .orderBy(itemReturningDetailEntity.itmNo.asc())
+                .orderBy(itemReturningDetailEntity.itmNo.asc()) // 물품고유번호 정렬
                 .fetch();
 
         return new PageImpl<>(content, pageable, totalCount);

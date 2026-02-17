@@ -18,9 +18,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -30,7 +29,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 
 @Tag(name = "item-asset-controller", description = "물품 대장 관리 API")
 @RestController
@@ -47,13 +45,8 @@ public class AssetController {
     @GetMapping
     public ApiResponse<Page<AssetListResponse>> getList(
             @Valid AssetSearchRequest searchRequest,
-            @Parameter(description = "페이지 번호 (0부터 시작)", example = "0")
-            @RequestParam(defaultValue = "0") int page,
-            @Parameter(description = "페이지 크기", example = "30")
-            @RequestParam(defaultValue = "30") int size,
+            @PageableDefault(size = 30) Pageable pageable,
             @AuthenticationPrincipal UserPrincipal principal) {
-
-        Pageable pageable = PageRequest.of(page, size, Sort.by("creAt").ascending());
 
         return ApiResponse.ok("조회 성공",
                 assetApplication.getAssetList(searchRequest, principal.getOrgCd(), pageable));
@@ -128,13 +121,8 @@ public class AssetController {
     @GetMapping("/print")
     public ApiResponse<Page<AssetListForPrintResponse>> getPrintList(
             @Valid AssetListForPrintRequest searchRequest,
-            @Parameter(description = "페이지 번호 (0부터 시작)", example = "0")
-            @RequestParam(defaultValue = "0") int page,
-            @Parameter(description = "페이지 크기", example = "30")
-            @RequestParam(defaultValue = "30") int size,
+            @PageableDefault(size = 30) Pageable pageable,
             @AuthenticationPrincipal UserPrincipal principal) {
-
-        Pageable pageable = PageRequest.of(page, size, Sort.by("creAt").ascending());
 
         return ApiResponse.ok("조회 성공",
                 assetApplication.getAssetListForPrint(searchRequest, principal.getOrgCd(), pageable));

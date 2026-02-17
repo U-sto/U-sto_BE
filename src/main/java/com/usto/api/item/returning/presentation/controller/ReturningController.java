@@ -9,19 +9,16 @@ import com.usto.api.item.returning.presentation.dto.response.ReturningListRespon
 import com.usto.api.item.returning.presentation.dto.response.ReturningRegisterResponse;
 import com.usto.api.user.domain.model.UserPrincipal;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 @Tag(name = "item-returning-controller", description = "물품 반납 관리 API")
@@ -39,13 +36,8 @@ public class ReturningController {
     @GetMapping
     public ApiResponse<Page<ReturningListResponse>> getList(
             @Valid ReturningSearchRequest searchRequest,
-            @Parameter(description = "페이지 번호 (0부터 시작)", example = "0")
-            @RequestParam(defaultValue = "0") int page,
-            @Parameter(description = "페이지 크기", example = "30")
-            @RequestParam(defaultValue = "30") int size,
+            @PageableDefault(size = 30) Pageable pageable,
             @AuthenticationPrincipal UserPrincipal principal) {
-
-        Pageable pageable = PageRequest.of(page, size, Sort.by("creAt").ascending());
 
         return ApiResponse.ok("조회 성공",
                 returningApplication.getReturningList(searchRequest, principal.getOrgCd(), pageable));
@@ -58,13 +50,8 @@ public class ReturningController {
     @GetMapping("/{rtrnMId}/items")
     public ApiResponse<Page<ReturningItemListResponse>> getItems(
             @PathVariable UUID rtrnMId,
-            @Parameter(description = "페이지 번호 (0부터 시작)", example = "0")
-            @RequestParam(defaultValue = "0") int page,
-            @Parameter(description = "페이지 크기", example = "30")
-            @RequestParam(defaultValue = "30") int size,
+            @PageableDefault(size = 30) Pageable pageable,
             @AuthenticationPrincipal UserPrincipal principal) {
-
-        Pageable pageable = PageRequest.of(page, size, Sort.by("creAt").ascending());
 
         return ApiResponse.ok("조회 성공",
                 returningApplication.getReturningItems(rtrnMId, principal.getOrgCd(), pageable));
