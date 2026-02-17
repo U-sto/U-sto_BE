@@ -1,27 +1,26 @@
 package com.usto.api.item.acquisition.application;
 
 import com.usto.api.common.exception.BusinessException;
+import com.usto.api.g2b.domain.repository.G2bItemCategoryRepository;
 import com.usto.api.g2b.infrastructure.entity.G2bItemJpaEntity;
 import com.usto.api.g2b.infrastructure.repository.G2bItemJpaRepository;
 import com.usto.api.item.acquisition.domain.model.Acquisition;
 import com.usto.api.item.acquisition.domain.service.AcquisitionPolicy;
 import com.usto.api.item.acquisition.infrastructure.mapper.AcquisitionMapper;
 import com.usto.api.item.asset.application.AssetApplication;
-import com.usto.api.item.returning.domain.model.ReturningMaster;
 import com.usto.api.organization.infrastructure.repository.DepartmentJpaRepository;
 import com.usto.api.item.acquisition.domain.repository.AcquisitionRepository;
 import com.usto.api.item.acquisition.presentation.dto.request.AcqRegisterRequest;
 import com.usto.api.item.acquisition.presentation.dto.request.AcqSearchRequest;
 import com.usto.api.item.acquisition.presentation.dto.response.AcqListResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
 import java.util.UUID;
 
-
-
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AcquisitionApplication {
@@ -31,6 +30,7 @@ public class AcquisitionApplication {
     private final DepartmentJpaRepository departmentJpaRepository;
     private final AssetApplication assetApplication;
     private final AcquisitionPolicy acquisitionPolicy;
+    private final G2bItemCategoryRepository g2bItemCategoryRepository;
 
 
     /**
@@ -40,6 +40,9 @@ public class AcquisitionApplication {
     public UUID registerAcquisition(AcqRegisterRequest request, String userId, String orgCd) {
         // 검증
         G2bItemJpaEntity g2bItem = validateRequest(request, orgCd);
+        log.info("식별번호 확인 : " + g2bItem.getG2bDCd());
+        String drbYrByDetailCode = g2bItemCategoryRepository.findDrbYrByDetailCode(g2bItem.getG2bDCd());
+        log.info("내용연수 확인 : " + drbYrByDetailCode);
 
         // Domain Model 생성
         Acquisition acquisition = AcquisitionMapper.toDomain(
@@ -47,7 +50,7 @@ public class AcquisitionApplication {
                 request.getAcqAt(),
                 g2bItem.getG2bUpr(),
                 request.getDeptCd(),
-                "5",  // TODO: 내용연수 로직
+                drbYrByDetailCode,
                 request.getAcqQty(),
                 request.getArrgTy(),
                 request.getRmk(),
@@ -75,6 +78,8 @@ public class AcquisitionApplication {
 
         // 검증
         G2bItemJpaEntity g2bItem = validateRequest(request, orgCd);
+        String drbYrByDetailCode = g2bItemCategoryRepository.findDrbYrByDetailCode(g2bItem.getG2bDCd());
+
 
         // Domain 메서드 호출 (비즈니스 로직)
         acquisition.updateInfo(
@@ -82,7 +87,7 @@ public class AcquisitionApplication {
                 request.getAcqAt(),
                 g2bItem.getG2bUpr(),
                 request.getDeptCd(),
-                "5",
+                drbYrByDetailCode,
                 request.getAcqQty(),
                 request.getArrgTy(),
                 request.getRmk()
