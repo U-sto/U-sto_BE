@@ -14,6 +14,9 @@ import com.usto.api.item.acquisition.infrastructure.entity.ItemAcquisitionEntity
 import com.usto.api.item.acquisition.presentation.dto.request.AcqSearchRequest;
 import com.usto.api.item.acquisition.presentation.dto.response.AcqListResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -60,8 +63,9 @@ public class AcquisitionRepositoryAdapter implements AcquisitionRepository {
      * @param orgCd 현재 로그인한 유저의 조직코드
      */
     @Override
-    public List<AcqListResponse> findAllByFilter(AcqSearchRequest cond, String orgCd) {
-        return queryFactory
+    public Page<AcqListResponse> findAllByFilter(AcqSearchRequest cond, String orgCd, Pageable pageable) {
+        // 1. 데이터 조회 쿼리
+        List<AcqListResponse> content = queryFactory
                 .select(Projections.fields(AcqListResponse.class,
                         itemAcquisitionEntity.acqId,
                         Expressions.stringTemplate("CONCAT({0}, '-', {1})",
@@ -97,8 +101,27 @@ public class AcquisitionRepositoryAdapter implements AcquisitionRepository {
                         approvedOnlyIfApprDate(cond.getStartApprAt(), cond.getEndApprAt()),
                         apprStsEq(cond.getApprSts())
                 )
-                .orderBy(itemAcquisitionEntity.creAt.desc())  // 생성일시 기준 정렬
+                .orderBy(itemAcquisitionEntity.creAt.desc())
+                .offset(pageable.getOffset())   // 페이지 시작점
+                .limit(pageable.getPageSize())  // 페이지 사이즈
                 .fetch();
+
+        // 2. 전체 개수 조회 쿼리 (페이징 계산용)
+        Long total = queryFactory
+                .select(itemAcquisitionEntity.count())
+                .from(itemAcquisitionEntity)
+                .where(
+                        itemAcquisitionEntity.orgCd.eq(orgCd),
+                        g2bDCdEq(cond.getG2bDCd()),
+                        deptCdEq(cond.getDeptCd()),
+                        acqAtBetween(cond.getStartAcqAt(), cond.getEndAcqAt()),
+                        apprAtBetween(cond.getStartApprAt(), cond.getEndApprAt()),
+                        approvedOnlyIfApprDate(cond.getStartApprAt(), cond.getEndApprAt()),
+                        apprStsEq(cond.getApprSts())
+                )
+                .fetchOne();
+
+        return new PageImpl<>(content, pageable, total != null ? total : 0L);
     }
 
 

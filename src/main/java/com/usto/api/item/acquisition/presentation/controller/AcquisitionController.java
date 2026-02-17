@@ -13,6 +13,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -34,13 +37,13 @@ public class AcquisitionController {
             description = "필터 조건(G2B, 날짜, 부서, 상태)에 따라 취득 목록을 조회합니다. 본인 조직의 데이터만 조회됩니다."
     )
     @GetMapping
-    public ApiResponse<List<AcqListResponse>> getList(
+    public ApiResponse<Page<AcqListResponse>> getList(
             @Valid AcqSearchRequest searchRequest,
+            @PageableDefault(size = 30) Pageable pageable, // 기본/최대 30줄 설정
             @AuthenticationPrincipal UserPrincipal principal) {
 
-        List<AcqListResponse> result = acquisitionApplication.getAcquisitionList(searchRequest, principal.getOrgCd());
-
-        return ApiResponse.ok("조회 성공", result);
+        return ApiResponse.ok("조회 성공",
+                acquisitionApplication.getAcquisitionList(searchRequest, principal.getOrgCd(), pageable));
     }
 
     // 2. 등록

@@ -17,6 +17,8 @@ import com.usto.api.organization.infrastructure.repository.OrganizationJpaReposi
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -47,8 +49,8 @@ public class AssetApplication {
      * - 필터: G2B코드, 취득일자, 정리일자, 부서, 운용상태, 물품번호
      */
     @Transactional(readOnly = true)
-    public List<AssetListResponse> getAssetList(AssetSearchRequest searchRequest, String orgCd) {
-        return assetRepository.findAllByFilter(searchRequest, orgCd);
+    public Page<AssetListResponse> getAssetList(AssetSearchRequest searchRequest, String orgCd, Pageable pageable) {
+        return assetRepository.findAllByFilter(searchRequest, orgCd, pageable);
     }
 
     /**
@@ -241,7 +243,7 @@ public class AssetApplication {
     }
 
     @Transactional(readOnly = true)
-    public List<AssetListForPrintResponse> getAssetListForPrint(@Valid AssetListForPrintRequest searchRequest, String orgCd) {
-        return assetRepository.findAllByFilterForPrint(searchRequest,orgCd);
+    public Page<AssetListForPrintResponse> getAssetListForPrint(@Valid AssetListForPrintRequest searchRequest, String orgCd, Pageable pageable) {
+        return assetRepository.findAllByFilterForPrint(searchRequest,orgCd, pageable);
     }
 }

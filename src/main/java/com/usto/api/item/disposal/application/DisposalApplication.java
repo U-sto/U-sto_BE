@@ -235,7 +235,7 @@ public class DisposalApplication {
 
 
     /**
-     * TODO: 처분 승인 (ADMIN 권한)
+     * 처분 승인 (ADMIN)
      * - 승인 시 물품 소프트삭제
      * - 상태 이력 테이블에 기록
      */
@@ -292,7 +292,7 @@ public class DisposalApplication {
     }
 
     /**
-     * TODO: 처분 반려 (ADMIN 권한)
+     * 처분 반려 (ADMIN 권한)
      */
     public void rejectDisposal(UUID dispMId, String userId, String orgCd) {
         DisposalMaster master = disposalRepository.findMasterById(dispMId, orgCd)

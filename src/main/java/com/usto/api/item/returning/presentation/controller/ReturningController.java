@@ -12,11 +12,13 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 @Tag(name = "item-returning-controller", description = "물품 반납 관리 API")
@@ -28,27 +30,31 @@ public class ReturningController {
     private final ReturningApplication returningApplication;
 
     @Operation(
-            summary = "반납등록목록 조회",
+            summary = "반납등록목록 조회 (페이징)",
             description = "반납 신청 마스터 목록을 조회합니다."
     )
     @GetMapping
-    public ApiResponse<List<ReturningListResponse>> getList(
+    public ApiResponse<Page<ReturningListResponse>> getList(
             @Valid ReturningSearchRequest searchRequest,
+            @PageableDefault(size = 30) Pageable pageable,
             @AuthenticationPrincipal UserPrincipal principal) {
+
         return ApiResponse.ok("조회 성공",
-                returningApplication.getReturningList(searchRequest, principal.getOrgCd()));
+                returningApplication.getReturningList(searchRequest, principal.getOrgCd(), pageable));
     }
 
     @Operation(
-            summary = "반납물품목록 조회",
+            summary = "반납물품목록 조회 (페이징)",
             description = "특정 반납 신청의 상세 물품 목록을 조회합니다."
     )
     @GetMapping("/{rtrnMId}/items")
-    public ApiResponse<List<ReturningItemListResponse>> getItems(
+    public ApiResponse<Page<ReturningItemListResponse>> getItems(
             @PathVariable UUID rtrnMId,
+            @PageableDefault(size = 30) Pageable pageable,
             @AuthenticationPrincipal UserPrincipal principal) {
+
         return ApiResponse.ok("조회 성공",
-                returningApplication.getReturningItems(rtrnMId, principal.getOrgCd()));
+                returningApplication.getReturningItems(rtrnMId, principal.getOrgCd(), pageable));
     }
 
     @Operation(
@@ -121,7 +127,7 @@ public class ReturningController {
         return ApiResponse.ok("승인 요청 취소 완료");
     }
 
-    // TODO: 반납 승인 및 반려 구현 (ADMIN)
+    // 반납 승인 및 반려 구현 (ADMIN)
     @Operation(
             summary = "반납 승인 확정 (ADMIN)",
             description = "승인 요청(REQUEST) 건을 승인하여 승인(APPROVED) 상태로 만듭니다."

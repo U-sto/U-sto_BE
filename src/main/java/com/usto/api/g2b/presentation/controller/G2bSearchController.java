@@ -8,11 +8,13 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import java.util.List;
 
 /**
  * @class G2bSearchController
@@ -32,15 +34,17 @@ public class G2bSearchController {
                     "검색어 미입력 시 전체 목록을 반환합니다."
     )
     @GetMapping("/categories")
-    public ApiResponse<List<G2bCategoryResponse>> getCategoryList(
+    public ApiResponse<Page<G2bCategoryResponse>> getCategoryList(
             @Parameter(description = "물품분류코드")
             @RequestParam(required = false) String code,
             @Parameter(description = "물품분류명")
-            @RequestParam(required = false) String name) {
-        List<G2bCategoryResponse> categories = g2bSearchRepository.findCategoryList(code, name)
-                .stream()
-                .map(e -> new G2bCategoryResponse(e.getG2bMCd(), e.getG2bMNm()))
-                .toList();
+            @RequestParam(required = false) String name,
+            @PageableDefault(size = 30) Pageable pageable) {
+
+        Page<G2bCategoryResponse> categories = g2bSearchRepository
+                .findCategoryList(code, name, pageable)
+                .map(e -> new G2bCategoryResponse(e.getG2bMCd(), e.getG2bMNm()));
+
         if (categories.isEmpty()) {
             return ApiResponse.ok("조회 결과가 없습니다.", categories);
         }
@@ -53,18 +57,19 @@ public class G2bSearchController {
                     "검색어 미입력 시 빈 리스트를 반환합니다."
     )
     @GetMapping("/items")
-    public ApiResponse<List<G2bItemResponse>> getItemList(
+    public ApiResponse<Page<G2bItemResponse>> getItemList(
             @Parameter(description = "물품분류코드")
             @RequestParam(required = false) String categoryCode,
             @Parameter(description = "물품식별코드")
             @RequestParam(required = false) String itemCode,
             @Parameter(description = "물품품목명")
-            @RequestParam(required = false) String itemName) {
-        List<G2bItemResponse> items = g2bSearchRepository.findItemList(
-                        categoryCode, itemCode, itemName)
-                .stream()
-                .map(e -> new G2bItemResponse(e.getG2bDCd(), e.getG2bDNm(), e.getG2bUpr()))
-                .toList();
+            @RequestParam(required = false) String itemName,
+            @PageableDefault(size = 30) Pageable pageable) {
+
+        Page<G2bItemResponse> items = g2bSearchRepository
+                .findItemList(categoryCode, itemCode, itemName, pageable)
+                .map(e -> new G2bItemResponse(e.getG2bDCd(), e.getG2bDNm(), e.getG2bUpr()));
+
         if (items.isEmpty()) {
             return ApiResponse.ok("조회 결과가 없습니다.", items);
         }

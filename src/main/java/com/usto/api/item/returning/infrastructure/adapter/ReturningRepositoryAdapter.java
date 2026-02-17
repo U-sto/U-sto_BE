@@ -18,6 +18,9 @@ import com.usto.api.item.returning.presentation.dto.response.ReturningItemListRe
 import com.usto.api.item.returning.presentation.dto.response.ReturningListResponse;
 import com.usto.api.user.infrastructure.entity.QUserJpaEntity;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
@@ -64,16 +67,32 @@ public class ReturningRepositoryAdapter implements ReturningRepository {
      * 반납등록목록 조회 (마스터 + 등록자명 + 물품개수)
      */
     @Override
-    public List<ReturningListResponse> findAllByFilter(ReturningSearchRequest cond, String orgCd) {
+    public Page<ReturningListResponse> findAllByFilter(ReturningSearchRequest cond, String orgCd, Pageable pageable) {
         QUserJpaEntity user = QUserJpaEntity.userJpaEntity;
 
-        return queryFactory
+        // 1. Count 쿼리 (groupBy 없이)
+        Long total = queryFactory
+                .select(itemReturningMasterEntity.rtrnMId.countDistinct())
+                .from(itemReturningMasterEntity)
+                .leftJoin(itemReturningDetailEntity)
+                .on(itemReturningMasterEntity.rtrnMId.eq(itemReturningDetailEntity.rtrnMId))
+                .where(
+                        itemReturningMasterEntity.orgCd.eq(orgCd),
+                        aplyAtBetween(cond.getStartAplyAt(), cond.getEndAplyAt()),
+                        apprStsEq(cond.getApprSts())
+                )
+                .fetchOne();
+
+        long totalCount = (total != null) ? total : 0L;
+
+        // 2. Data 쿼리 (groupBy 포함)
+        List<ReturningListResponse> content = queryFactory
                 .select(Projections.fields(ReturningListResponse.class,
                         itemReturningMasterEntity.rtrnMId.as("rtrnMId"),
                         itemReturningMasterEntity.aplyAt,
                         itemReturningMasterEntity.rtrnApprAt,
                         itemReturningMasterEntity.aplyUsrId,
-                        user.usrNm.as("aplyUsrNm"),  // 등록자명
+                        user.usrNm.as("aplyUsrNm"),
                         itemReturningMasterEntity.apprSts.stringValue().as("apprSts"),
                         itemReturningDetailEntity.count().intValue().as("itemCount")
                 ))
@@ -88,16 +107,33 @@ public class ReturningRepositoryAdapter implements ReturningRepository {
                         apprStsEq(cond.getApprSts())
                 )
                 .groupBy(itemReturningMasterEntity.rtrnMId)
-                .orderBy(itemReturningMasterEntity.creAt.asc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .orderBy(itemReturningMasterEntity.creAt.asc()) // 생성일자 정렬
                 .fetch();
+
+        return new PageImpl<>(content, pageable, totalCount);
     }
 
     /**
      * 반납물품목록 조회 (상세 + 대장기본/상세 + G2B + 부서 조인)
      */
     @Override
-    public List<ReturningItemListResponse> findItemsByMasterId(UUID rtrnMId, String orgCd) {
-        return queryFactory
+    public Page<ReturningItemListResponse> findItemsByMasterId(UUID rtrnMId, String orgCd, Pageable pageable) {
+        // 1. 전체 개수 조회
+        Long total = queryFactory
+                .select(itemReturningDetailEntity.count())
+                .from(itemReturningDetailEntity)
+                .where(
+                        itemReturningDetailEntity.rtrnMId.eq(rtrnMId),
+                        itemReturningDetailEntity.orgCd.eq(orgCd)
+                )
+                .fetchOne();
+
+        long totalCount = (total != null) ? total : 0L;
+
+        // 2. 데이터 조회 쿼리
+        List<ReturningItemListResponse> content = queryFactory
                 .select(Projections.fields(ReturningItemListResponse.class,
                         // G2B 목록번호 (분류코드-식별코드)
                         Expressions.stringTemplate("CONCAT({0}, '-', {1})",
@@ -143,8 +179,12 @@ public class ReturningRepositoryAdapter implements ReturningRepository {
                         itemReturningDetailEntity.rtrnMId.eq(rtrnMId),
                         itemReturningDetailEntity.orgCd.eq(orgCd)
                 )
-                .orderBy(itemReturningDetailEntity.itmNo.asc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .orderBy(itemReturningDetailEntity.itmNo.asc()) // 물품고유번호 정렬
                 .fetch();
+
+        return new PageImpl<>(content, pageable, totalCount);
     }
 
     @Override
