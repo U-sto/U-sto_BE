@@ -92,7 +92,7 @@ public class AssetRepositoryAdapter implements AssetRepository {
 
 
     /**
-     * 필터 조건에 따른 운용대장목록 검색
+     * 필터 조건에 따른 물품대장 검색
      * @param cond  검색 조건 (DTO)
      * @param orgCd 현재 로그인한 유저의 조직코드
      */
