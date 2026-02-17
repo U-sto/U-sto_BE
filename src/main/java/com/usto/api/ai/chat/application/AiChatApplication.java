@@ -6,7 +6,9 @@ import com.usto.api.ai.chat.domain.model.ChatMessage;
 import com.usto.api.ai.chat.domain.model.ChatThread;
 import com.usto.api.ai.chat.domain.model.SenderType;
 import com.usto.api.ai.chat.domain.repository.ChatMessageRepository;
+import com.usto.api.ai.chat.domain.repository.ChatThreadRepository;
 import com.usto.api.ai.chat.infrastructure.entity.ChatMessageJpaEntity;
+import com.usto.api.ai.chat.infrastructure.entity.ChatThreadJpaEntity;
 import com.usto.api.ai.chat.infrastructure.mapper.ChatMessageMapper;
 import com.usto.api.ai.chat.infrastructure.mapper.ChatThreadMapper;
 import com.usto.api.ai.chat.presentation.dto.request.AiChatRequest;
@@ -26,6 +28,8 @@ public class AiChatApplication {
     private final AiClientAdapter aiClientAdapter;
     private final ObjectMapper objectMapper;
     private final ChatMessageRepository chatMessageRepository;
+    private final ChatThreadRepository chatThreadRepository;
+
 
     @Transactional
     public AiChatResponse send(String userid,String orgCd, String message, UUID threadId) {
@@ -33,6 +37,10 @@ public class AiChatApplication {
         if(threadId == null){
             String title = sumMsg(message);
             ChatThread master = ChatThreadMapper.toDomain(userid,title,orgCd);
+
+            ChatThreadJpaEntity maseterEntity = ChatThreadMapper.toEntity(master);
+            chatThreadRepository.save(maseterEntity);
+
             UUID masterId = master.getThreadId();
             threadId= masterId;
         }

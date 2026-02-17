@@ -1,10 +1,8 @@
 package com.usto.api.ai.chat.domain.repository;
 
-import com.usto.api.ai.chat.domain.model.ChatThread;
-
-import java.util.Optional;
-import java.util.UUID;
+import com.usto.api.ai.chat.infrastructure.entity.ChatThreadJpaEntity;
 
 public interface ChatThreadRepository {
-    ChatThread findById(UUID threadId);
+
+    void save(ChatThreadJpaEntity maseterEntity);
 }
