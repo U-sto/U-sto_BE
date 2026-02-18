@@ -45,14 +45,6 @@ public class Asset {
     }
 
     /**
-     * 운용부서 배정
-     */
-    public void assignDepartment(String deptCd) {
-        this.deptCd = deptCd;
-        this.operSts = OperStatus.OPER;
-    }
-
-    /**
      * 삭제 여부 확인
      */
     public boolean isDeleted() {

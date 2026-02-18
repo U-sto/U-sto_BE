@@ -60,8 +60,7 @@ public class OperationMaster {
     public void confirmApproval(String userId) {
         this.apprUsrId = userId;
         this.apprSts = ApprStatus.APPROVED;
-        this.operApprAt = LocalDate.now();
-    }
+        this.operApprAt = LocalDate.now(java.time.ZoneId.of("Asia/Seoul"));    }
 
     /**
      * 반려
@@ -69,6 +68,6 @@ public class OperationMaster {
     public void rejectApproval(String userId) {
         this.apprUsrId = userId;
         this.apprSts = ApprStatus.REJECTED;
-        this.operApprAt = LocalDate.now();
+        this.operApprAt = LocalDate.now(java.time.ZoneId.of("Asia/Seoul"));    }
     }
 }

@@ -464,6 +464,7 @@ public class AssetRepositoryAdapter implements AssetRepository {
     }
 
     @Override
+    @Transactional
     public void bulkUpdateForOperation(List<Asset> assets, String userId, String orgCd) {
         List<ItemAssetEntity> entities = assets.stream()
                 .map(asset -> {

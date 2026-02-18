@@ -221,38 +221,42 @@ public class OperationApplication {
             throw new BusinessException("운용 상세 정보가 없습니다.");
         }
 
-        List<Asset> assets = new ArrayList<>(details.size());
+        List<String> itemNos = details.stream()
+                .map(OperationDetail::getItmNo)
+                .toList();
+
+        List<Asset> assets = assetRepository.findAllById(itemNos, orgCd);
+
+        if (assets.size() != itemNos.size()) {
+            throw new BusinessException("일부 물품 정보를 대장에서 찾을 수 없습니다.");
+        }
+
         List<AssetStatusHistory> histories = new ArrayList<>(details.size());
 
-        for (OperationDetail detail : details) {
-            String itemNo = detail.getItmNo();
-            Asset asset = assetRepository.findAssetById(itemNo, orgCd);
-            if (asset == null) {
-                throw new BusinessException("해당 물품 정보를 대장에서 찾을 수 없습니다: " + itemNo);
+            for (Asset asset : assets) {
+                // 이전 상태 저장
+                OperStatus prevStatus = asset.getOperSts();
+
+                // 물품 상태를 OPER(운용)로 변경 + 부서코드 변경
+                asset.updateForOperation(master.getDeptCd());
+
+                assets.add(asset);
+                histories.add(AssetStatusHistory.builder()
+                        .itemHisId(UUID.randomUUID())
+                        .itmNo(asset.getItmNo())
+                        .prevSts(prevStatus)
+                        .newSts(OperStatus.OPER)
+                        .chgRsn("운용 신청 승인")
+                        .reqUsrId(master.getAplyUsrId())
+                        .reqAt(master.getAplyAt())
+                        .apprUsrId(userId)
+                        .orgCd(orgCd)
+                        .apprAt(LocalDate.now(ZoneId.of("Asia/Seoul")))
+                        .delYn(asset.getDelYn())
+                        .delAt(asset.getDelAt())
+                        .build());
             }
 
-            // 이전 상태 저장
-            OperStatus prevStatus = asset.getOperSts();
-
-            // 물품 상태를 OPER(운용)로 변경 + 부서코드 변경
-            asset.updateForOperation(master.getDeptCd());
-
-            assets.add(asset);
-            histories.add(AssetStatusHistory.builder()
-                    .itemHisId(UUID.randomUUID())
-                    .itmNo(itemNo)
-                    .prevSts(prevStatus)
-                    .newSts(OperStatus.OPER)
-                    .chgRsn("운용 신청 승인")
-                    .reqUsrId(master.getAplyUsrId())
-                    .reqAt(master.getAplyAt())
-                    .apprUsrId(userId)
-                    .orgCd(orgCd)
-                    .apprAt(LocalDate.now(ZoneId.of("Asia/Seoul")))
-                    .delYn(asset.getDelYn())
-                    .delAt(asset.getDelAt())
-                    .build());
-        }
 
         // 물품 대장 일괄 업데이트
         assetRepository.bulkUpdateForOperation(assets, userId, orgCd);
