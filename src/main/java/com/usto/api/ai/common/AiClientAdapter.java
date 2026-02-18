@@ -34,7 +34,9 @@ public class AiClientAdapter {
                                 clientResponse.bodyToMono(String.class)
                                         .flatMap(errorBody -> {
                                             log.error("AI API 서버 오류 (5xx): {}", errorBody);
-                                            return Mono.error(new BusinessException("AI 서비스 일시 중단 (서버 점검 중)"));
+                                            return Mono.error(
+                                                    new BusinessException("AI 서비스 일시 중단 (서버 점검 중)")
+                                            );
                                         })
                         )
                         // 2. 클라이언트 에러(4xx) 처리
@@ -42,7 +44,9 @@ public class AiClientAdapter {
                                 clientResponse.bodyToMono(String.class)
                                         .flatMap(errorBody -> {
                                             log.error("AI API 요청 오류 (4xx): {}", errorBody);
-                                            return Mono.error(new BusinessException("AI 요청 형식이 올바르지 않습니다."));
+                                            return Mono.error(
+                                                    new BusinessException("AI 요청 형식이 올바르지 않습니다.")
+                                            );
                                         })
                         )
                 .bodyToMono(String.class)
@@ -62,10 +66,8 @@ public class AiClientAdapter {
         } catch (Exception e) {
             log.error("JSON 매핑 실패: {}", e.getMessage());
             // 매핑 실패 시 빈 객체나 에러 처리를 진행합니다.
-            return AiChatResponse.builder()
-                    .reply("데이터 매핑에 실패했습니다. 로그를 확인하세요.")
-                    .build();
+            throw new RuntimeException("AI 서버 응답 파싱에 실패했습니다.", e);
         }
-        return null;
+        throw new RuntimeException("AI 서버 응답에서 'data' 필드를 찾을 수 없습니다.");
     }
 }

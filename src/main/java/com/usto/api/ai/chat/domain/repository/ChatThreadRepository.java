@@ -1,8 +1,8 @@
 package com.usto.api.ai.chat.domain.repository;
 
-import com.usto.api.ai.chat.infrastructure.entity.ChatThreadJpaEntity;
+import com.usto.api.ai.chat.domain.model.ChatThread;
 
 public interface ChatThreadRepository {
 
-    void save(ChatThreadJpaEntity masterEntity);
+    void save(ChatThread chatThread);
 }

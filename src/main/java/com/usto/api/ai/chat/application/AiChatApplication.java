@@ -38,8 +38,7 @@ public class AiChatApplication {
             String title = sumMsg(message);
             ChatThread master = ChatThreadMapper.toDomain(userid,title,orgCd);
 
-            ChatThreadJpaEntity maseterEntity = ChatThreadMapper.toEntity(master);
-            chatThreadRepository.save(maseterEntity);
+            chatThreadRepository.save(master);
 
             UUID masterId = master.getThreadId();
             threadId= masterId;
@@ -66,9 +65,10 @@ public class AiChatApplication {
         log.info("AI Response: {}", aiResponse);
 
         try {
+            String refJson = null;
             if (aiResponse.references() != null) {
                 String replyJson = aiResponse.reply();
-                String refJson = objectMapper.writeValueAsString(aiResponse.references());
+                refJson = objectMapper.writeValueAsString(aiResponse.references());
 
                 ChatMessage chatMessageByBot = ChatMessageMapper.toDomain(
                         threadId,
@@ -79,29 +79,13 @@ public class AiChatApplication {
                 );
                 ChatMessageJpaEntity entityByBot = ChatMessageMapper.toEntity(chatMessageByBot);
                 chatMessageRepository.save(entityByBot);
-            }else {
-                String replyJson = objectMapper.writeValueAsString(aiResponse.reply());
-
-                ChatMessage chatMessageByBot = ChatMessageMapper.toDomain(
-                        threadId,
-                        replyJson,
-                        SenderType.AI_BOT,
-                        null,
-                        orgCd
-                );
-                ChatMessageJpaEntity entityByBot = ChatMessageMapper.toEntity(chatMessageByBot);
-                chatMessageRepository.save(entityByBot);
             }
         }catch (JsonProcessingException e) {
             log.error("참고문헌 데이터 변환 실패", e);
+            throw new RuntimeException("AI 응답 데이터 처리 중 오류가 발생했습니다.", e);
         }
 
         return aiResponse;
-    }
-
-    @Transactional
-    public AiChatResponse testSend(String message, UUID threadId) {
-        return aiClientAdapter.fetchChatResponse(new AiChatRequest(threadId, message));
     }
 
     private String sumMsg(String message) {
