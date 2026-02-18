@@ -2,8 +2,11 @@ package com.usto.api.item.operation.application;
 
 import com.usto.api.common.exception.BusinessException;
 import com.usto.api.item.asset.domain.model.Asset;
+import com.usto.api.item.asset.domain.model.AssetStatusHistory;
 import com.usto.api.item.asset.domain.repository.AssetRepository;
+import com.usto.api.item.asset.domain.repository.AssetStatusHistoryRepository;
 import com.usto.api.item.asset.domain.service.AssetPolicy;
+import com.usto.api.item.common.model.OperStatus;
 import com.usto.api.item.operation.domain.model.OperationDetail;
 import com.usto.api.item.operation.domain.model.OperationMaster;
 import com.usto.api.item.operation.domain.repository.OperationRepository;
@@ -19,6 +22,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -31,6 +36,7 @@ public class OperationApplication {
     private final OperationPolicy operationPolicy;
     private final AssetRepository assetRepository;
     private final AssetPolicy assetPolicy;
+    private final AssetStatusHistoryRepository historyRepository;
 
     /**
      * 운용 신청 등록
@@ -195,9 +201,83 @@ public class OperationApplication {
     }
 
     /**
-     * TODO: 운용 승인 및 반려 (ADMIN 권한)
-     * - 승인 시 물품 상태를 OPER로 변경
-     * - 각 대장 상세의 운용부서코드 변경
-     * - 상태 이력 테이블에 기록
+     * 운용 승인 (ADMIN 권한)
+     * - 승인 시 물품 상태를 OPER(운용)로 변경
+     * - 부서코드를 운용 부서로 변경
+     * - 상태 이력 테이블에 기록 생성
      */
+    @Transactional
+    public void approveOperation(UUID operMId, String userId, String orgCd) {
+
+        OperationMaster master = operationRepository.findMasterById(operMId, orgCd)
+                .orElseThrow(() -> new BusinessException("존재하지 않는 운용 신청입니다."));
+
+        // 정책 검증
+        operationPolicy.validateOwnership(master, orgCd);
+        operationPolicy.validateConfirm(master);
+
+        List<OperationDetail> details = operationRepository.findDetailsByMasterId(operMId, orgCd);
+        if (details.isEmpty()) {
+            throw new BusinessException("운용 상세 정보가 없습니다.");
+        }
+
+        List<Asset> assets = new ArrayList<>(details.size());
+        List<AssetStatusHistory> histories = new ArrayList<>(details.size());
+
+        for (OperationDetail detail : details) {
+            String itemNo = detail.getItmNo();
+            Asset asset = assetRepository.findAssetById(itemNo, orgCd);
+            if (asset == null) {
+                throw new BusinessException("해당 물품 정보를 대장에서 찾을 수 없습니다: " + itemNo);
+            }
+
+            // 이전 상태 저장
+            OperStatus prevStatus = asset.getOperSts();
+
+            // 물품 상태를 OPER(운용)로 변경 + 부서코드 변경
+            asset.updateForOperation(master.getDeptCd());
+
+            assets.add(asset);
+            histories.add(AssetStatusHistory.builder()
+                    .itemHisId(UUID.randomUUID())
+                    .itmNo(itemNo)
+                    .prevSts(prevStatus)
+                    .newSts(OperStatus.OPER)
+                    .chgRsn("운용 신청 승인")
+                    .reqUsrId(master.getAplyUsrId())
+                    .reqAt(master.getAplyAt())
+                    .apprUsrId(userId)
+                    .orgCd(orgCd)
+                    .apprAt(LocalDate.now(ZoneId.of("Asia/Seoul")))
+                    .delYn(asset.getDelYn())
+                    .delAt(asset.getDelAt())
+                    .build());
+        }
+
+        // 물품 대장 일괄 업데이트
+        assetRepository.bulkUpdateForOperation(assets, userId, orgCd);
+        historyRepository.saveAll(histories);
+
+        // 운용 신청서 승인 상태 변경
+        master.confirmApproval(userId);
+        operationRepository.saveMaster(master);
+    }
+
+    /**
+     * 운용 반려 (ADMIN 권한)
+     */
+    @Transactional
+    public void rejectOperation(UUID operMId, String userId, String orgCd) {
+
+        OperationMaster master = operationRepository.findMasterById(operMId, orgCd)
+                .orElseThrow(() -> new BusinessException("존재하지 않는 운용 신청입니다."));
+
+        // 정책 확인
+        operationPolicy.validateOwnership(master, orgCd);
+        operationPolicy.validateConfirm(master);
+
+        // 상태 변경(운용 신청 반려처리 -> 저장)
+        master.rejectApproval(userId);
+        operationRepository.saveMaster(master);
+    }
 }
