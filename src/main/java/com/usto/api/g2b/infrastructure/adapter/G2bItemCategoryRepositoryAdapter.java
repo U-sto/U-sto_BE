@@ -97,5 +97,10 @@ public class G2bItemCategoryRepositoryAdapter implements G2bItemCategoryReposito
         });
         log.info("마스터 테이블(TB_G2B001M) {}건 강제 업데이트 완료", domains.size());
     }
+
+    @Override
+    public String findDrbYrByDetailCode(String g2bDCd) {
+        return g2bItemCategoryJpaRepository.findDrbYrByDetailCode(g2bDCd);
+    }
 }
 

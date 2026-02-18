@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 @Tag(name = "item-asset-controller", description = "물품 대장 관리 API")
 @RestController
@@ -39,7 +40,7 @@ public class AssetController {
     private final AssetApplication assetApplication;
 
     @Operation(
-            summary = "운용대장 목록 조회 (페이징)",
+            summary = "물품대장 조회",
             description = "필터 조건(G2B, 취득일자, 정리일자, 부서, 운용상태, 물품번호)에 따라 운용대장을 조회합니다. 논리삭제된 물품은 제외됩니다."
     )
     @GetMapping

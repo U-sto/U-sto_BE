@@ -13,6 +13,7 @@ public class ChatMessage {
     private final Long messageId;
     private final UUID threadId;
     private final String content;
-    private final SenderType sender; // USER, AI_BOT
+    private final SenderType sender; // USER,
+    private final String refer;
     private final String orgCode;
 }

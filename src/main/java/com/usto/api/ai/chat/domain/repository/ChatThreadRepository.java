@@ -1,4 +1,8 @@
 package com.usto.api.ai.chat.domain.repository;
 
-public class ChatThreadRepository {
+import com.usto.api.ai.chat.domain.model.ChatThread;
+
+public interface ChatThreadRepository {
+
+    void save(ChatThread chatThread);
 }

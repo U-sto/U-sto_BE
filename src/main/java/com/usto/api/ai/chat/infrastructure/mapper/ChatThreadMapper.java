@@ -12,10 +12,9 @@ public class ChatThreadMapper {
         return ChatThread.builder()
                 .threadId(UUID.randomUUID())
                 .userId(userId)
-                .title(title) //자바로 구현해서 기본값 만들어야함
+                .title(title)
                 .lastMessageAt(LocalDateTime.now())
                 .orgCode(orgCode)
-                .messages(new ArrayList<>())
                 .build();
     }
 

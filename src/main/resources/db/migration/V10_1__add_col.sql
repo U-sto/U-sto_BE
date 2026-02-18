@@ -1,0 +1,7 @@
+-- 1. 예측 마스터 테이블 (TB_FC001M) 요약 데이터 컬럼 추가
+ALTER TABLE `TB_FC001M`
+    ADD COLUMN `SUM_JSON` LONGTEXT NULL COMMENT '예측요약JSON데이터';
+
+-- 2. 채팅 상세 테이블 (TB_CHAT001D) 첨부파일 경로 컬럼 추가
+ALTER TABLE `TB_CHAT001D`
+    ADD COLUMN `REFER_FILE` TEXT NULL COMMENT '참고파일';

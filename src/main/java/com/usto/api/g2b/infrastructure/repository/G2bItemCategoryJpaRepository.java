@@ -76,4 +76,14 @@ public interface G2bItemCategoryJpaRepository extends JpaRepository<G2bItemCateg
             String code
     );
 
+    @Query(value =
+            """
+        SELECT M.DRB_YR FROM TB_G2B001M M
+        JOIN TB_G2B001D D ON M.G2B_M_CD = D.G2B_M_CD
+        AND D.G2B_D_CD = :g2bDCd
+        """, nativeQuery = true)
+    String findDrbYrByDetailCode(
+            @Param("g2bDCd")
+            String g2bDCd
+    );
 }

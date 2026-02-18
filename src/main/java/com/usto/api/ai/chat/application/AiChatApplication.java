@@ -1,76 +1,107 @@
 package com.usto.api.ai.chat.application;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.usto.api.ai.chat.domain.model.ChatMessage;
+import com.usto.api.ai.chat.domain.model.ChatThread;
+import com.usto.api.ai.chat.domain.model.SenderType;
+import com.usto.api.ai.chat.domain.repository.ChatMessageRepository;
+import com.usto.api.ai.chat.domain.repository.ChatThreadRepository;
+import com.usto.api.ai.chat.infrastructure.entity.ChatMessageJpaEntity;
+import com.usto.api.ai.chat.infrastructure.entity.ChatThreadJpaEntity;
+import com.usto.api.ai.chat.infrastructure.mapper.ChatMessageMapper;
+import com.usto.api.ai.chat.infrastructure.mapper.ChatThreadMapper;
+import com.usto.api.ai.chat.presentation.dto.request.AiChatRequest;
 import com.usto.api.ai.chat.presentation.dto.response.AiChatResponse;
-import org.springframework.ai.chat.client.ChatClient;
+import com.usto.api.ai.common.AiClientAdapter;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
+@Slf4j
 public class AiChatApplication {
 
-    //private final ChatThreadRepository threadRepository;
-    //private final ChatMessageRepository messageRepository;
-    //private final AiClient aiClient;
+    private final AiClientAdapter aiClientAdapter;
+    private final ObjectMapper objectMapper;
+    private final ChatMessageRepository chatMessageRepository;
+    private final ChatThreadRepository chatThreadRepository;
 
-    private final ChatClient chatClient;
-    public AiChatApplication(ChatClient.Builder chatClientBuilder) {
-        this.chatClient = chatClientBuilder.build();
-    }
 
     @Transactional
-    public AiChatResponse send(String username, String message, UUID threadId) {
+    public AiChatResponse send(String userid,String orgCd, String message, UUID threadId) {
 
-        /*
-        // 1. Thread 조회 또는 생성
-        ChatThread thread = (threadId == null)
-                ? createNewThread(username, message)
-                : validateAndGetThread(username, threadId);
+        if(threadId == null){
+            String title = sumMsg(message);
+            ChatThread master = ChatThreadMapper.toDomain(userid,title,orgCd);
 
-        // 2. 사용자 메시지 저장
-        saveMessage(thread, "USER", message);
+            chatThreadRepository.save(master);
 
-*/
-        // 3. AI 클라이언트 호출
-        String aiReply = chatClient.prompt()
-                .user(message)
-                .call()
-                .content();
-
-        /*
-        // 4. AI 응답 저장
-        saveMessage(thread, "BOT", aiResponse.replyMessage());
-*/
-        return AiChatResponse.builder()
-                .replyMessage(aiReply)
-                .build();
-    }
-/*
-    private ChatThread createNewThread(String username, String firstMessage) {
-        String title = firstMessage.length() > 20 ? firstMessage.substring(0, 20) : firstMessage;
-        return threadRepository.save(ChatThread.builder()
-                .userId(username)
-                .title(title)
-                .build());
-    }
-
-    private ChatThread validateAndGetThread(String username, Long threadId) {
-        ChatThread thread = threadRepository.findById(threadId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 대화방입니다."));
-
-        if (!thread.getUserId().equals(username)) {
-            throw new SecurityException("접근 권한이 없습니다.");
+            UUID masterId = master.getThreadId();
+            threadId= masterId;
         }
-        return thread;
+
+        ChatMessage chatMessageByUser = ChatMessageMapper.toDomain(
+                threadId,
+                message,
+                SenderType.USER,
+                null,
+                orgCd
+        );
+        ChatMessageJpaEntity entityByUser = ChatMessageMapper.toEntity(chatMessageByUser);
+        chatMessageRepository.save(entityByUser);
+
+        AiChatRequest request = new AiChatRequest(threadId, message);
+        AiChatResponse aiResponse = aiClientAdapter.fetchChatResponse(request);
+
+        if (aiResponse == null) {
+            log.error("챗봇에게서 답장을 받지 못함. 저장 스킵 threadId: {}", threadId);
+            return null;
+        }
+
+        log.info("AI Response: {}", aiResponse);
+
+        try {
+            String refJson = null;
+            if (aiResponse.references() != null) {
+                String replyJson = aiResponse.reply();
+                refJson = objectMapper.writeValueAsString(aiResponse.references());
+
+                ChatMessage chatMessageByBot = ChatMessageMapper.toDomain(
+                        threadId,
+                        replyJson,
+                        SenderType.AI_BOT,
+                        refJson,
+                        orgCd
+                );
+                ChatMessageJpaEntity entityByBot = ChatMessageMapper.toEntity(chatMessageByBot);
+                chatMessageRepository.save(entityByBot);
+            }
+        }catch (JsonProcessingException e) {
+            log.error("참고문헌 데이터 변환 실패", e);
+            throw new RuntimeException("AI 응답 데이터 처리 중 오류가 발생했습니다.", e);
+        }
+
+        return aiResponse;
     }
 
-    private void saveMessage(ChatThread thread, String senderType, String content) {
-        messageRepository.save(ChatMessage.builder()
-                .thread(thread)
-                .senderType(senderType)
-                .content(content)
-                .build());
+    private String sumMsg(String message) {
+        if (message == null || message.isBlank()) {
+            return "새로운 대화";
+        }
 
-         */
+        // 첫 번째 줄만 추출 (줄바꿈 제거)
+        String firstLine = message.split("\\n")[0].trim();
+
+        // 20자 제한 및 요약 처리
+        if (firstLine.length() <= 20) {
+            return firstLine;
+        }
+
+        return firstLine.substring(0, 20) + "...";
+    }
 }
 

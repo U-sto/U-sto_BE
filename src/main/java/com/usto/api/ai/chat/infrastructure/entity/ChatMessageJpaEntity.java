@@ -32,6 +32,9 @@ public class ChatMessageJpaEntity extends BaseTimeEntity {
     @Column(name = "CONTENT", columnDefinition = "TEXT", nullable = false)
     private String content;
 
+    @Column(name = "REFER_FILE", columnDefinition = "TEXT")
+    private String referFile;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "SENDER", length = 30, nullable = false)
     private SenderType sender; // USER, AI_BOT
