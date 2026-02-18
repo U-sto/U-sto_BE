@@ -14,7 +14,8 @@ import com.usto.api.item.acquisition.presentation.dto.request.AcqRegisterRequest
 import com.usto.api.item.acquisition.presentation.dto.request.AcqSearchRequest;
 import com.usto.api.item.acquisition.presentation.dto.response.AcqListResponse;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
@@ -195,8 +196,8 @@ public class AcquisitionApplication {
      * 목록 조회
      */
     @Transactional(readOnly = true)
-    public List<AcqListResponse> getAcquisitionList(AcqSearchRequest searchRequest, String orgCd) {
-        return acquisitionRepository.findAllByFilter(searchRequest, orgCd);
+    public Page<AcqListResponse> getAcquisitionList(AcqSearchRequest searchRequest, String orgCd, Pageable pageable) {
+        return acquisitionRepository.findAllByFilter(searchRequest, orgCd, pageable);
     }
 
     /**

@@ -1,7 +1,8 @@
 package com.usto.api.g2b.infrastructure.repository;
 
-import com.usto.api.g2b.domain.model.G2bItemCategory;
 import com.usto.api.g2b.infrastructure.entity.G2bItemCategoryJpaEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -18,9 +19,10 @@ public interface G2bItemCategoryJpaRepository extends JpaRepository<G2bItemCateg
     @Query("SELECT c FROM G2bItemCategoryJpaEntity c " +
             "WHERE (:code IS NULL OR :code = '' OR c.g2bMCd LIKE CONCAT(:code, '%')) " + // 코드 검색은 전방 일치
             "AND (:name IS NULL OR :name = '' OR c.g2bMNm LIKE CONCAT('%', :name, '%'))")
-    List<G2bItemCategoryJpaEntity> findByFilters(
+    Page<G2bItemCategoryJpaEntity> findByFilters(
             @Param("code") String code,
-            @Param("name") String name);
+            @Param("name") String name,
+            Pageable pageable);
 
 
     @Modifying(clearAutomatically = true, flushAutomatically = true)

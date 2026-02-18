@@ -1,12 +1,13 @@
+// G2bItemJpaRepository.java
 package com.usto.api.g2b.infrastructure.repository;
 
 import com.usto.api.g2b.infrastructure.entity.G2bItemJpaEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-
-import java.util.List;
 
 /**
  * @class G2bItemJpaRepository
@@ -19,10 +20,11 @@ public interface G2bItemJpaRepository extends JpaRepository<G2bItemJpaEntity, St
             "WHERE (:mCd IS NULL OR :mCd = '' OR i.g2bMCd = :mCd) " + // 품목 조회 시 물품분류코드는 사용자 입력이 아니므로 완전 일치 방식
             "AND (:dCd IS NULL OR :dCd = '' OR i.g2bDCd LIKE CONCAT(:dCd, '%')) " + // 코드 검색은 전방 일치
             "AND (:dNm IS NULL OR :dNm = '' OR i.g2bDNm LIKE CONCAT('%', :dNm, '%'))")
-    List<G2bItemJpaEntity> findByFilters(
+    Page<G2bItemJpaEntity> findByFilters(
             @Param("mCd") String mCd,
             @Param("dCd") String dCd,
-            @Param("dNm") String dNm);
+            @Param("dNm") String dNm,
+            Pageable pageable);
 
     //G2B정보 업데이트
     @Modifying(clearAutomatically = true, flushAutomatically = true)

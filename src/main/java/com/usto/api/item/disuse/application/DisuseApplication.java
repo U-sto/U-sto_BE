@@ -206,7 +206,7 @@ public class DisuseApplication {
 
 
     /**
-     * TODO: 불용 승인 (ADMIN 권한)
+     * 불용 승인 (ADMIN 권한)
      * - 승인 시 물품 상태를 RTN → DSU로 변경
      * - 이후 해당 자산은 수정 불가하도록 잠금
      * - 상태 이력 테이블에 기록
@@ -263,7 +263,7 @@ public class DisuseApplication {
 
 
     /**
-     * TODO: 불용 반려 (ADMIN 권한)
+     * 불용 반려 (ADMIN 권한)
      * 다른 신청들과 비슷하게  진행
      */
     @Transactional
