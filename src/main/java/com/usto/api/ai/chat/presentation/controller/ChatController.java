@@ -6,7 +6,6 @@ import com.usto.api.ai.chat.presentation.dto.request.AiChatRequest;
 import com.usto.api.ai.chat.presentation.dto.response.AiChatResponse;
 import com.usto.api.common.utils.ApiResponse;
 import com.usto.api.user.domain.model.UserPrincipal;
-import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.Valid;

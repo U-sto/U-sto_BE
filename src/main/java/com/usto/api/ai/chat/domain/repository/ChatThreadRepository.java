@@ -4,5 +4,5 @@ import com.usto.api.ai.chat.infrastructure.entity.ChatThreadJpaEntity;
 
 public interface ChatThreadRepository {
 
-    void save(ChatThreadJpaEntity maseterEntity);
+    void save(ChatThreadJpaEntity masterEntity);
 }

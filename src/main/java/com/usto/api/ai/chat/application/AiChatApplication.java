@@ -57,11 +57,17 @@ public class AiChatApplication {
 
         AiChatRequest request = new AiChatRequest(threadId, message);
         AiChatResponse aiResponse = aiClientAdapter.fetchChatResponse(request);
+
+        if (aiResponse == null) {
+            log.error("챗봇에게서 답장을 받지 못함. 저장 스킵 threadId: {}", threadId);
+            return null;
+        }
+
         log.info("AI Response: {}", aiResponse);
 
         try {
             if (aiResponse.references() != null) {
-                String replyJson = objectMapper.writeValueAsString(aiResponse.reply());
+                String replyJson = aiResponse.reply();
                 String refJson = objectMapper.writeValueAsString(aiResponse.references());
 
                 ChatMessage chatMessageByBot = ChatMessageMapper.toDomain(
