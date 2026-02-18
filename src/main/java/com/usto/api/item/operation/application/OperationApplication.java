@@ -240,7 +240,6 @@ public class OperationApplication {
                 // 물품 상태를 OPER(운용)로 변경 + 부서코드 변경
                 asset.updateForOperation(master.getDeptCd());
 
-                assets.add(asset);
                 histories.add(AssetStatusHistory.builder()
                         .itemHisId(UUID.randomUUID())
                         .itmNo(asset.getItmNo())
