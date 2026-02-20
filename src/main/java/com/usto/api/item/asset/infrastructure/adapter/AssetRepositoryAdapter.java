@@ -185,7 +185,6 @@ public class AssetRepositoryAdapter implements AssetRepository {
                         itemAssetEntity.operSts.stringValue().as("operSts"),
                         itemAssetEntity.drbYr,
                         itemAssetEntity.acqUpr,
-                        ExpressionUtils.as(countQtySubQuery(), "qty"),
                         itemAcquisitionEntity.arrgTy.stringValue().as("acqArrgTy"),
                         departmentJpaEntity.deptNm.as("deptNm"),
                         itemAssetEntity.deptCd,

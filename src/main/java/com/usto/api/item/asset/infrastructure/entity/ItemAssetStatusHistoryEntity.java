@@ -32,7 +32,7 @@ public class ItemAssetStatusHistoryEntity extends BaseTimeEntity {
     private String itmNo;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "PREV_STS", nullable = false, length = 30)
+    @Column(name = "PREV_STS", length = 30)
     private OperStatus prevSts;
 
     @Enumerated(EnumType.STRING)
