@@ -465,6 +465,20 @@ public class AssetRepositoryAdapter implements AssetRepository {
 
     @Override
     @Transactional
+    public void bulkUpdateForOperation(List<Asset> assets, String userId, String orgCd) {
+        List<ItemAssetEntity> entities = assets.stream()
+                .map(asset -> {
+                    ItemAssetEntity entity = AssetMapper.toEntity(asset);
+                    entity.setUpdBy(userId);
+                    return entity;
+                })
+                .toList();
+
+        jpaRepository.saveAll(entities);
+    }
+
+    @Override
+    @Transactional
     public void bulkSoftDelete(List<Asset> assets, String userId, String orgCd) {
         List<String> itemNos = assets.stream()
                 .map(Asset::getItmNo)   // 실제 메서드명에 맞게

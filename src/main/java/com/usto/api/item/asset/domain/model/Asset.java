@@ -1,5 +1,6 @@
 package com.usto.api.item.asset.domain.model;
 
+import com.usto.api.item.common.model.ItemStatus;
 import com.usto.api.item.common.model.OperStatus;
 import lombok.Builder;
 import lombok.Getter;
@@ -44,14 +45,6 @@ public class Asset {
     }
 
     /**
-     * 운용부서 배정
-     */
-    public void assignDepartment(String deptCd) {
-        this.deptCd = deptCd;
-        this.operSts = OperStatus.OPER;
-    }
-
-    /**
      * 삭제 여부 확인
      */
     public boolean isDeleted() {
@@ -61,5 +54,10 @@ public class Asset {
     //출력 상태 변경
     public void markAsPrinted(){
         this.printYn = "Y";
+    }
+
+    public void updateForOperation(String deptCd) {
+        this.deptCd = deptCd;
+        this.operSts = OperStatus.OPER;
     }
 }

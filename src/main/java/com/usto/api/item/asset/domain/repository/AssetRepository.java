@@ -61,4 +61,6 @@ public interface AssetRepository {
     void bulkDisuse(List<Asset> assets, String userId, String orgCd);
 
     void bulkReturning(List<Asset> assets,String userId,String orgCd);
+
+    void bulkUpdateForOperation(List<Asset> assets, String userId, String orgCd);
 }

@@ -81,8 +81,8 @@ public class AssetPolicy {
      * 운용 가능 여부 검증
      */
     public void validateOperation(Asset asset, String deptCd) {
-        if (asset.getOperSts() != OperStatus.RTN && asset.getOperSts() != OperStatus.ACQ) {
-            throw new BusinessException("취득 또는 반납 상태일 때만 부서 배정이 가능합니다.");
+        if (asset.getOperSts() != OperStatus.RTN) {
+            throw new BusinessException("반납 상태일 때만 부서 배정이 가능합니다.");
         }
 
         if (!StringUtils.hasText(deptCd) || "NONE".equals(deptCd)) {
