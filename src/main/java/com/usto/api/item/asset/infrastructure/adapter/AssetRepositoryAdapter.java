@@ -226,7 +226,7 @@ public class AssetRepositoryAdapter implements AssetRepository {
                 .map(entity -> AssetDetailResponse.StatusHistoryDto.builder()
                         .itemHisId(entity.getItemHisId().toString())
                         .itmNo(entity.getItmNo())
-                        .prevSts(entity.getPrevSts().name())
+                        .prevSts(entity.getPrevSts() != null ? entity.getPrevSts().name() : null)
                         .newSts(entity.getNewSts().name())
                         .chgRsn(entity.getChgRsn())
                         .reqUsrId(entity.getReqUsrId())
