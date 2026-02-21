@@ -243,7 +243,7 @@ public class ReturningApplication {
                     .itmNo(itemNo)
                     .prevSts(prevStatus) //이전 상태
                     .newSts(asset.getOperSts()) //현재 상태 = 반납
-                    .chgRsn("반납 신청 승인") //별도로 enum 관리를 하고싶다면 변동 가능성 있음.
+                    .chgRsn(master.getRtrnRsn().getDescription())
                     .reqUsrId(master.getAplyUsrId())
                     .reqAt(master.getAplyAt())
                     .apprUsrId(userId)
