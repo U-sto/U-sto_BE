@@ -245,7 +245,7 @@ public class OperationApplication {
                         .itmNo(asset.getItmNo())
                         .prevSts(prevStatus)
                         .newSts(OperStatus.OPER)
-                        .chgRsn("운용 신청 승인")
+                        .chgRsn("운용 전환 승인")
                         .reqUsrId(master.getAplyUsrId())
                         .reqAt(master.getAplyAt())
                         .apprUsrId(userId)
