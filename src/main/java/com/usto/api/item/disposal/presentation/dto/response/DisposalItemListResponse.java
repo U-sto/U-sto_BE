@@ -1,6 +1,9 @@
 package com.usto.api.item.disposal.presentation.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.usto.api.item.common.model.ItemStatus;
+import com.usto.api.item.disposal.domain.model.DisposalArrangementType;
+import com.usto.api.item.disuse.domain.model.DisuseReason;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -33,12 +36,12 @@ public class DisposalItemListResponse {
     @Schema(description = "취득금액")
     private BigDecimal acqUpr;
 
-    @Schema(description = "처분방식")
-    private String dispType;
+    @Schema(description = "처분정리구분")
+    private DisposalArrangementType dispType;
 
     @Schema(description = "물품상태 (불용 신청 당시)")
-    private String itemSts;
+    private ItemStatus itemSts;
 
     @Schema(description = "불용사유 (불용 신청 당시)")
-    private String chgRsn;
+    private DisuseReason chgRsn;
 }

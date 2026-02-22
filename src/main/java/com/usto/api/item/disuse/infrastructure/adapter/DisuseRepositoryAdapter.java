@@ -153,9 +153,9 @@ public class DisuseRepositoryAdapter implements DisuseRepository {
                         // 운용부서명
                         departmentJpaEntity.deptNm.as("deptNm"),
                         // 물품상태 (마스터)
-                        itemDisuseMasterEntity.itemSts.stringValue().as("itemSts"),
+                        itemDisuseMasterEntity.itemSts.as("itemSts"),
                         // 사유 (마스터)
-                        itemDisuseMasterEntity.dsuRsn.stringValue().as("dsuRsn")
+                        itemDisuseMasterEntity.dsuRsn.as("dsuRsn")
                 ))
                 .from(itemDisuseDetailEntity)
                 // 불용 마스터 조인

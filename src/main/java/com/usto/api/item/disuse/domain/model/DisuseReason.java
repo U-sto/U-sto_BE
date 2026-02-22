@@ -1,5 +1,6 @@
 package com.usto.api.item.disuse.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -14,5 +15,6 @@ public enum DisuseReason {
     NO_DEPT("활용부서부재"),
     HIGH_REPAIR("수리비용과다");
 
+    @JsonValue
     private final String description;
 }

@@ -154,7 +154,7 @@ public class OperationRepositoryAdapter implements OperationRepository {
                         // 운용부서명
                         departmentJpaEntity.deptNm.as("deptNm"),
                         // 물품상태 (마스터)
-                        itemOperationMasterEntity.itemSts.stringValue().as("itemSts")
+                        itemOperationMasterEntity.itemSts.as("itemSts")
                 ))
                 .from(itemOperationDetailEntity)
                 // 운용 마스터 조인

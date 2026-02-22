@@ -150,9 +150,9 @@ public class ReturningRepositoryAdapter implements ReturningRepository {
                         // 운용부서명
                         departmentJpaEntity.deptNm.as("deptNm"),
                         // 물품상태 (마스터)
-                        itemReturningMasterEntity.itemSts.stringValue().as("itemSts"),
+                        itemReturningMasterEntity.itemSts.as("itemSts"),
                         // 반납사유 (마스터)
-                        itemReturningMasterEntity.rtrnRsn.stringValue().as("rtrnRsn")
+                        itemReturningMasterEntity.rtrnRsn.as("rtrnRsn")
                 ))
                 .from(itemReturningDetailEntity)
                 // 반납 마스터 조인 (물품상태, 사유)

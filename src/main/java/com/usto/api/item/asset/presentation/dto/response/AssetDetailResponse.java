@@ -1,6 +1,7 @@
 package com.usto.api.item.asset.presentation.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.usto.api.item.acquisition.domain.model.AcqArrangementType;
 import com.usto.api.item.common.model.OperStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -49,7 +50,7 @@ public class AssetDetailResponse {
     private Integer qty;
 
     @Schema(description = "취득정리구분")
-    private String acqArrgTy;
+    private AcqArrangementType acqArrgTy;
 
     @Schema(description = "운용부서명")
     private String deptNm;
@@ -77,10 +78,10 @@ public class AssetDetailResponse {
         private String itmNo;
 
         @Schema(description = "이전상태")
-        private String prevSts;
+        private OperStatus prevSts;
 
         @Schema(description = "변경상태")
-        private String newSts;
+        private OperStatus newSts;
 
         @Schema(description = "변경사유")
         private String chgRsn;
