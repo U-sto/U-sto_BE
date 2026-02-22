@@ -140,7 +140,7 @@ public class AssetRepositoryAdapter implements AssetRepository {
                         itemAssetEntity.acqUpr,
                         itemAcquisitionEntity.apprAt.as("arrgAt"), // 정리일자
                         departmentJpaEntity.deptNm.as("deptNm"),
-                        itemAssetEntity.operSts.stringValue().as("operSts"),
+                        itemAssetEntity.operSts.as("operSts"),
                         itemAssetEntity.drbYr
                 ))
                 .from(itemAssetEntity)
@@ -182,7 +182,7 @@ public class AssetRepositoryAdapter implements AssetRepository {
                                 itemAssetEntity.g2bDCd).as("g2bItemNo"),
                         itemAcquisitionEntity.acqAt,
                         itemAcquisitionEntity.apprAt, // 정리일자
-                        itemAssetEntity.operSts.stringValue().as("operSts"),
+                        itemAssetEntity.operSts.as("operSts"),
                         itemAssetEntity.drbYr,
                         itemAssetEntity.acqUpr,
                         itemAcquisitionEntity.arrgTy.stringValue().as("acqArrgTy"),
@@ -396,7 +396,7 @@ public class AssetRepositoryAdapter implements AssetRepository {
                         itemAssetEntity.acqUpr,
                         itemAcquisitionEntity.apprAt.as("arrgAt"),
                         departmentJpaEntity.deptNm.as("deptNm"),
-                        itemAssetEntity.operSts.stringValue().as("operSts"),
+                        itemAssetEntity.operSts.as("operSts"),
                         itemAssetEntity.drbYr,
                         itemAssetEntity.printYn.as("printYn")
                 ))

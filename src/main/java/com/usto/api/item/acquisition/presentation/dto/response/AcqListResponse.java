@@ -34,7 +34,7 @@ public class AcqListResponse {
     @Schema(description = "운용부서명") // 조직 조인
     private String deptNm;
 
-    @Schema(description = "운용상태")
+    @Schema(description = "운용상태 (항상 null 값)")
     private String operSts;
 
     @Schema(description = "내용연수")

@@ -1,6 +1,7 @@
 package com.usto.api.item.asset.presentation.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.usto.api.item.common.model.OperStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -41,7 +42,7 @@ public class AssetListResponse {
     private String deptNm;
 
     @Schema(description = "운용상태")
-    private String operSts;
+    private OperStatus operSts;
 
     @Schema(description = "내용연수")
     private String drbYr;
