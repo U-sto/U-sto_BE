@@ -9,6 +9,7 @@ import com.usto.api.item.common.model.OperStatus;
 import com.usto.api.user.domain.model.UserPrincipal;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -54,7 +55,9 @@ public class AssetInventoryStatusController {
     public ApiResponse<AssetInventoryStatusDetailResponse> getInventoryStatusDetail(
             @Parameter(description = "취득ID") @RequestParam UUID acqId,
             @Parameter(description = "운용부서코드") @RequestParam String deptCd,
-            @Parameter(description = "운용상태") @RequestParam OperStatus operSts,
+            @Parameter(description = "운용상태",
+                    schema = @Schema(type = "string", allowableValues = {"OPER", "ACQ", "RTN"}, example = "OPER")
+            ) @RequestParam OperStatus operSts,
             @Parameter(description = "취득금액") @RequestParam BigDecimal acqUpr,
             @Parameter(description = "내용연수") @RequestParam String drbYr,
             @Parameter(description = "비고") @RequestParam(required = false) String rmk,

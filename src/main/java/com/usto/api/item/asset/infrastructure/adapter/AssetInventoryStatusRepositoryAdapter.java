@@ -53,7 +53,6 @@ public class AssetInventoryStatusRepositoryAdapter implements AssetInventoryStat
                         departmentJpaEntity.deptNm.as("deptNm"),
                         itemAssetEntity.operSts.as("operSts"),
                         itemAssetEntity.drbYr,
-                        itemAssetEntity.rmk,
                         itemAssetEntity.itemId.count().intValue().as("qty")
                 ))
                 .from(itemAcquisitionEntity)
@@ -85,7 +84,8 @@ public class AssetInventoryStatusRepositoryAdapter implements AssetInventoryStat
                         itemAssetEntity.deptCd,
                         itemAssetEntity.operSts,
                         itemAssetEntity.acqUpr,
-                        itemAssetEntity.drbYr
+                        itemAssetEntity.drbYr,
+                        itemAssetEntity.rmk
                 )
                 .orderBy(
                         itemAcquisitionEntity.acqAt.desc(),
