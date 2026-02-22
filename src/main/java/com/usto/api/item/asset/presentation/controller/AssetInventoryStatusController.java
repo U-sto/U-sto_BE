@@ -56,7 +56,7 @@ public class AssetInventoryStatusController {
             @Parameter(description = "취득ID") @RequestParam UUID acqId,
             @Parameter(description = "운용부서코드") @RequestParam String deptCd,
             @Parameter(description = "운용상태",
-                    schema = @Schema(type = "string", allowableValues = {"OPER", "ACQ", "RTN"}, example = "OPER")
+                    schema = @Schema(type = "string", allowableValues = {"OPER", "RTN", "DSU"}, example = "OPER")
             ) @RequestParam OperStatus operSts,
             @Parameter(description = "취득금액") @RequestParam BigDecimal acqUpr,
             @Parameter(description = "내용연수") @RequestParam String drbYr,

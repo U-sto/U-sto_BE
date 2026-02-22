@@ -51,9 +51,11 @@ public class AssetInventoryStatusRepositoryAdapter implements AssetInventoryStat
                         itemAssetEntity.acqUpr,  // 개별 물품의 취득단가 (수정 가능한 값)
                         itemAcquisitionEntity.apprAt.as("arrgAt"),
                         departmentJpaEntity.deptNm.as("deptNm"),
+                        itemAssetEntity.deptCd,
                         itemAssetEntity.operSts.as("operSts"),
                         itemAssetEntity.drbYr,
-                        itemAssetEntity.itemId.count().intValue().as("qty")
+                        itemAssetEntity.itemId.count().intValue().as("qty"),
+                        itemAssetEntity.rmk
                 ))
                 .from(itemAcquisitionEntity)
                 .innerJoin(itemAssetEntity).on(itemAssetEntity.acqId.eq(itemAcquisitionEntity.acqId))
@@ -68,6 +70,7 @@ public class AssetInventoryStatusRepositoryAdapter implements AssetInventoryStat
                         itemAcquisitionEntity.orgCd.eq(orgCd),
                         itemAcquisitionEntity.apprSts.eq(ApprStatus.APPROVED),  // 승인된 건만
                         itemAssetEntity.delYn.eq("N"),         // 삭제되지 않은 물품만 (처분 제외)
+                        itemAssetEntity.operSts.ne(OperStatus.DISP), // 처분된 물품 제외 명시
                         g2bDCdEq(cond.getG2bDCd()),
                         deptCdEq(cond.getDeptCd()),
                         acqAtBetween(cond.getStartAcqAt(), cond.getEndAcqAt()),

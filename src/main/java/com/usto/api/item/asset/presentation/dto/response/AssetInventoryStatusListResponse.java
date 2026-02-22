@@ -35,6 +35,9 @@ public class AssetInventoryStatusListResponse {
     @Schema(description = "운용부서명") // 조직 조인
     private String deptNm;
 
+    @Schema(description = "운용부서코드")
+    private String deptCd;
+
     @Schema(description = "운용상태")
     private OperStatus operSts;
 
@@ -43,4 +46,7 @@ public class AssetInventoryStatusListResponse {
 
     @Schema(description = "수량")
     private Integer qty;
+
+    @Schema(description = "비고")
+    private String rmk;
 }
