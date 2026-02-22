@@ -1,9 +1,11 @@
 package com.usto.api.ai.chat.infrastructure.repository;
 import com.usto.api.ai.chat.infrastructure.entity.ChatMessageJpaEntity;
+import com.usto.api.ai.chat.infrastructure.entity.ChatThreadJpaEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
+import java.util.UUID;
 
 
 public interface ChatMessageJpaRepository extends JpaRepository<ChatMessageJpaEntity, Long> {
@@ -17,4 +19,6 @@ public interface ChatMessageJpaRepository extends JpaRepository<ChatMessageJpaEn
       AND M.USR_ID = :username
     """, nativeQuery = true)
     List<String> findByContent(String content, String username);
+
+    List<ChatMessageJpaEntity> findByThreadId(UUID threadId);
 }

@@ -14,6 +14,7 @@ import com.usto.api.ai.chat.infrastructure.mapper.ChatMessageMapper;
 import com.usto.api.ai.chat.infrastructure.mapper.ChatThreadMapper;
 import com.usto.api.ai.chat.presentation.dto.request.AiChatRequest;
 import com.usto.api.ai.chat.presentation.dto.response.AiChatResponse;
+import com.usto.api.ai.chat.presentation.dto.response.ChatMessageResponse;
 import com.usto.api.ai.common.AiClientAdapter;
 import com.usto.api.common.exception.BusinessException;
 import com.usto.api.item.disposal.domain.model.DisposalMaster;
@@ -134,13 +135,37 @@ public class AiChatApplication {
         chatThreadRepository.deleteThread(threadId);
     }
 
-    public List<String> findMessage(String content, String username) {
+    public List<String> findContent(String content, String username) {
 
         List<String> messages = chatMessageRepository.findByContent(content,username);
         if(messages.isEmpty()){
             throw new BusinessException("존재하지 않는 대화기록입니다.");
         }
         return messages;
+    }
+
+    public List<ChatMessageResponse> findMessage(UUID threadId, String username) {
+
+        ChatThread thread = chatThreadRepository.findById(threadId);
+        if(thread == null){
+            throw new BusinessException("존재하지 않는 채팅방입니다.");
+        }
+        chatThreadPolicy.validateOwnership(thread,username);
+
+        List<ChatMessage> messages = chatMessageRepository.findByThreadId(threadId);
+
+        List<ChatMessageResponse> result = new ArrayList<>();
+        for (ChatMessage message : messages) {
+            result.add(
+                    new ChatMessageResponse(
+                            message.getMessageId(),
+                            message.getSender().name(),
+                            message.getContent()
+                    )
+            );
+        }
+
+        return result;
     }
 }
 
