@@ -245,14 +245,14 @@ public class AssetInventoryStatusRepositoryAdapter implements AssetInventoryStat
     private BooleanExpression acqAtBetween(LocalDate s, LocalDate e) {
         if (s == null && e == null) return null;
         if (s != null && e == null) return itemAcquisitionEntity.acqAt.goe(s);
-        if (s == null && e != null) return itemAcquisitionEntity.acqAt.loe(e);
+        if (s == null) return itemAcquisitionEntity.acqAt.loe(e);
         return itemAcquisitionEntity.acqAt.between(s, e);
     }
 
     private BooleanExpression apprAtBetween(LocalDate s, LocalDate e) {
         if (s == null && e == null) return null;
         if (s != null && e == null) return itemAcquisitionEntity.apprAt.goe(s);
-        if (s == null && e != null) return itemAcquisitionEntity.apprAt.loe(e);
+        if (s == null) return itemAcquisitionEntity.apprAt.loe(e);
         return itemAcquisitionEntity.apprAt.between(s, e);
     }
 }
