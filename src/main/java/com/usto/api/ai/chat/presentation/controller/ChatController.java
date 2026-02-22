@@ -45,7 +45,7 @@ public class ChatController {
     }
 
     @Operation(
-            summary = "쓰레드 조회(AI 연동 후)",
+            summary = "쓰레드 조회",
             description = "채팅방을 조회합니다."
     )
     @GetMapping("/chat/threads")
@@ -73,11 +73,24 @@ public class ChatController {
         );
         return ApiResponse.ok("삭제 성공");
     }
-    //대화 기록 조회
-
     @Operation(
-            summary = "Chat GPT와 대화하기 테스트(AI 연동 전)",
-            description = "별도의 연동 없이 그냥 지피티라 대화합니다."
+            summary = "대화내용 조회",
+            description = "대화내용을 조회합니다."
+    )
+    @GetMapping("/chat/threads/{content}")
+    public ApiResponse<List<String>> threads(
+            @PathVariable String content,
+            @Valid @AuthenticationPrincipal UserPrincipal userPrincipal
+    ) {
+        List<String> response = aiChatApplication.findMessage(
+                content,
+                userPrincipal.getUsername()
+        );
+        return ApiResponse.ok("조회 성공",response);
+    }
+    @Operation(
+            summary = "Chat GPT와 대화하기 테스트(AI팀 연동 X)",
+            description = "별도의 연동 없이 일반 지피티랑 대화합니다."
     )
     @PostMapping("/chat/gpt4-mini")
     public ApiResponse<AiChatResponse> testChat(

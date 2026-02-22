@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 
 
 @Component
@@ -20,5 +21,10 @@ public class ChatMessageRepositoryAdapter implements ChatMessageRepository {
     @Override
     public void save(ChatMessageJpaEntity entity) {
         jpaRepository.save(entity);
+    }
+
+    @Override
+    public List<String> findByContent(String comment, String username) {
+        return jpaRepository.findByContent(comment , username);
     }
 }
