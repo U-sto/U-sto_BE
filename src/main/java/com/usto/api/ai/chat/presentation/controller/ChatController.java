@@ -13,6 +13,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.UUID;
+
 //연동 테스트
 @RestController
 @RequestMapping("/api/ai")
@@ -41,7 +44,35 @@ public class ChatController {
         return ApiResponse.ok("채팅 성공",response);
     }
 
-    //채팅방 조회 -> id랑 title
+    @Operation(
+            summary = "쓰레드 조회(AI 연동 후)",
+            description = "채팅방을 조회합니다."
+    )
+    @GetMapping("/chat/threads")
+    public ApiResponse<List<UUID>> threads(
+            @Valid @AuthenticationPrincipal UserPrincipal userPrincipal
+    ) {
+        List<UUID> response = aiChatApplication.threads(
+                userPrincipal.getUsername()
+        );
+        return ApiResponse.ok("조회 성공",response);
+    }
+
+    @Operation(
+            summary = "쓰레드 삭제",
+            description = "채팅방을 삭제합니다."
+    )
+    @DeleteMapping("/chat/threads/{threadId}")
+    public ApiResponse<?> threads(
+            @PathVariable UUID threadId,
+            @Valid @AuthenticationPrincipal UserPrincipal userPrincipal
+    ) {
+        aiChatApplication.deleteThread(
+                threadId,
+                userPrincipal.getUsername()
+        );
+        return ApiResponse.ok("삭제 성공");
+    }
     //대화 기록 조회
 
     @Operation(

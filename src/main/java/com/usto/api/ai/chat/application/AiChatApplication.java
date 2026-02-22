@@ -7,6 +7,7 @@ import com.usto.api.ai.chat.domain.model.ChatThread;
 import com.usto.api.ai.chat.domain.model.SenderType;
 import com.usto.api.ai.chat.domain.repository.ChatMessageRepository;
 import com.usto.api.ai.chat.domain.repository.ChatThreadRepository;
+import com.usto.api.ai.chat.domain.service.ChatThreadPolicy;
 import com.usto.api.ai.chat.infrastructure.entity.ChatMessageJpaEntity;
 import com.usto.api.ai.chat.infrastructure.entity.ChatThreadJpaEntity;
 import com.usto.api.ai.chat.infrastructure.mapper.ChatMessageMapper;
@@ -14,10 +15,15 @@ import com.usto.api.ai.chat.infrastructure.mapper.ChatThreadMapper;
 import com.usto.api.ai.chat.presentation.dto.request.AiChatRequest;
 import com.usto.api.ai.chat.presentation.dto.response.AiChatResponse;
 import com.usto.api.ai.common.AiClientAdapter;
+import com.usto.api.common.exception.BusinessException;
+import com.usto.api.item.disposal.domain.model.DisposalMaster;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -29,6 +35,7 @@ public class AiChatApplication {
     private final ObjectMapper objectMapper;
     private final ChatMessageRepository chatMessageRepository;
     private final ChatThreadRepository chatThreadRepository;
+    private final ChatThreadPolicy chatThreadPolicy;
 
 
     @Transactional
@@ -102,6 +109,28 @@ public class AiChatApplication {
         }
 
         return firstLine.substring(0, 20) + "...";
+    }
+
+    public List<UUID> threads(String username) {
+
+        List<ChatThread> threads = chatThreadRepository.findByUsrId(username);
+
+        List<UUID> result = new ArrayList<>();
+        for (ChatThread thread : threads) {
+            result.add(thread.getThreadId());
+        }
+
+        return result;
+    }
+
+    public void deleteThread(UUID threadId, String username) {
+
+        ChatThread thread = chatThreadRepository.findById(threadId);
+        if(thread == null){
+            throw new BusinessException("존재하지 않는 채팅방입니다.");
+        }
+        chatThreadPolicy.validateOwnership(thread,username);
+        chatThreadRepository.deleteThread(threadId);
     }
 }
 
