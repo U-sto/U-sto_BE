@@ -55,5 +55,5 @@ VALUES
 
 INSERT INTO `TB_ITEM007` (ITEM_HIS_ID, ITM_NO, PREV_STS, NEW_STS, CHG_RSN, REQ_USR_ID, REQ_AT, APPR_USR_ID, APPR_AT, ORG_CD, CRE_BY)
 VALUES
-    (UNHEX(REPLACE(UUID(), '-', '')), 'M202600001', 'ACQ', 'OPER', '최초 취득 승인에 따른 자산 등록', 'dev-user', '2026-01-13', 'admin', '2026-01-13', '7008277', 'system'),
+    (UNHEX(REPLACE(UUID(), '-', '')), 'M202600001', NULL, 'OPER', '최초 취득 등록', 'dev-user', '2026-01-13', 'admin', '2026-01-13', '7008277', 'system'),
     (UNHEX(REPLACE(UUID(), '-', '')), 'M202600001', 'OPER', 'RTN', '프로젝트 종료로 인한 반납', 'dev-user', '2026-01-20', 'admin', '2026-01-21', '7008277', 'system');

@@ -185,7 +185,6 @@ public class AssetRepositoryAdapter implements AssetRepository {
                         itemAssetEntity.operSts.stringValue().as("operSts"),
                         itemAssetEntity.drbYr,
                         itemAssetEntity.acqUpr,
-                        ExpressionUtils.as(countQtySubQuery(), "qty"),
                         itemAcquisitionEntity.arrgTy.stringValue().as("acqArrgTy"),
                         departmentJpaEntity.deptNm.as("deptNm"),
                         itemAssetEntity.deptCd,
@@ -227,7 +226,7 @@ public class AssetRepositoryAdapter implements AssetRepository {
                 .map(entity -> AssetDetailResponse.StatusHistoryDto.builder()
                         .itemHisId(entity.getItemHisId().toString())
                         .itmNo(entity.getItmNo())
-                        .prevSts(entity.getPrevSts().name())
+                        .prevSts(entity.getPrevSts() != null ? entity.getPrevSts().name() : null)
                         .newSts(entity.getNewSts().name())
                         .chgRsn(entity.getChgRsn())
                         .reqUsrId(entity.getReqUsrId())

@@ -5,7 +5,6 @@ import com.usto.api.item.asset.domain.model.Asset;
 import com.usto.api.item.asset.domain.model.AssetStatusHistory;
 import com.usto.api.item.asset.domain.repository.AssetRepository;
 import com.usto.api.item.asset.domain.repository.AssetStatusHistoryRepository;
-import com.usto.api.item.asset.domain.service.AssetPolicy;
 import com.usto.api.item.common.model.OperStatus;
 import com.usto.api.item.disposal.domain.model.DisposalDetail;
 import com.usto.api.item.disposal.domain.model.DisposalMaster;
@@ -16,7 +15,6 @@ import com.usto.api.item.disposal.presentation.dto.request.DisposalRegisterReque
 import com.usto.api.item.disposal.presentation.dto.request.DisposalSearchRequest;
 import com.usto.api.item.disposal.presentation.dto.response.DisposalItemListResponse;
 import com.usto.api.item.disposal.presentation.dto.response.DisposalListResponse;
-import com.usto.api.item.disuse.domain.model.DisuseDetail;
 import com.usto.api.item.disuse.domain.model.DisuseMaster;
 import com.usto.api.item.disuse.domain.repository.DisuseRepository;
 import lombok.RequiredArgsConstructor;
@@ -269,7 +267,7 @@ public class DisposalApplication {
                             .itmNo(itemNo)
                             .prevSts(prevStatus) //이전 상태
                             .newSts(asset.getOperSts()) //현재 상태 = 반납
-                            .chgRsn("처분 신청 승인") //별도로 enum 관리를 하고싶다면 변동 가능성 있음.
+                            .chgRsn("처분 승인") //별도로 enum 관리를 하고싶다면 변동 가능성 있음.
                             .reqUsrId(master.getAplyUsrId())
                             .reqAt(master.getAplyAt())
                             .apprUsrId(userId)

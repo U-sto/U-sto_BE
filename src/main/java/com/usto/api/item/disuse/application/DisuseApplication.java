@@ -16,8 +16,6 @@ import com.usto.api.item.disuse.presentation.dto.request.DisuseRegisterRequest;
 import com.usto.api.item.disuse.presentation.dto.request.DisuseSearchRequest;
 import com.usto.api.item.disuse.presentation.dto.response.DisuseItemListResponse;
 import com.usto.api.item.disuse.presentation.dto.response.DisuseListResponse;
-import com.usto.api.item.returning.domain.model.ReturningDetail;
-import com.usto.api.item.returning.domain.model.ReturningMaster;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -244,7 +242,7 @@ public class DisuseApplication {
                     .itmNo(itemNo)
                     .prevSts(prevStatus) //이전 상태
                     .newSts(asset.getOperSts()) //현재 상태 = 반납
-                    .chgRsn("불용 신청 승인") //별도로 enum 관리를 하고싶다면 변동 가능성 있음.
+                    .chgRsn(master.getDsuRsn().getDescription())
                     .reqUsrId(master.getAplyUsrId())
                     .reqAt(master.getAplyAt())
                     .apprUsrId(userId)
