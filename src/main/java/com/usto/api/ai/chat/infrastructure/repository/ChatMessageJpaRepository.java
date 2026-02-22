@@ -20,5 +20,5 @@ public interface ChatMessageJpaRepository extends JpaRepository<ChatMessageJpaEn
     """, nativeQuery = true)
     List<String> findByContent(String content, String username);
 
-    List<ChatMessageJpaEntity> findByThreadId(UUID threadId);
+    List<ChatMessageJpaEntity> findByThreadIdOrderByCreAtAsc(UUID threadId);
 }

@@ -36,8 +36,8 @@ public class ChatMessageRepositoryAdapter implements ChatMessageRepository {
     }
 
     @Override
-    public List<ChatMessage> findByThreadId(UUID threadId) {
-        List<ChatMessageJpaEntity> entities = jpaRepository.findByThreadId(threadId);
+    public List<ChatMessage> findByThreadIdOrderByCreAtAsc(UUID threadId) {
+        List<ChatMessageJpaEntity> entities = jpaRepository.findByThreadIdOrderByCreAtAsc(threadId);
 
         List<ChatMessage> result = new ArrayList<>();
         for (ChatMessageJpaEntity entity : entities) {

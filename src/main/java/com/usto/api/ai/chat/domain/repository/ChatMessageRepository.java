@@ -14,5 +14,5 @@ public interface ChatMessageRepository {
 
     List<String> findByContent(String content, String username);
 
-    List<ChatMessage> findByThreadId(UUID threadId);
+    List<ChatMessage> findByThreadIdOrderByCreAtAsc(UUID threadId);
 }

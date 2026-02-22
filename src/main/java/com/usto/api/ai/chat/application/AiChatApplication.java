@@ -152,13 +152,14 @@ public class AiChatApplication {
         }
         chatThreadPolicy.validateOwnership(thread,username);
 
-        List<ChatMessage> messages = chatMessageRepository.findByThreadId(threadId);
+        List<ChatMessage> messages = chatMessageRepository.findByThreadIdOrderByCreAtAsc(threadId);
 
         List<ChatMessageResponse> result = new ArrayList<>();
-        for (ChatMessage message : messages) {
+        for (int i = 0; i < messages.size(); i++) {
+            ChatMessage message = messages.get(i);
             result.add(
                     new ChatMessageResponse(
-                            message.getMessageId(),
+                            i + 1,
                             message.getSender().name(),
                             message.getContent()
                     )

@@ -1,7 +1,7 @@
 package com.usto.api.ai.chat.presentation.dto.response;
 
 public record ChatMessageResponse (
-        Long messageId,
+        int order,
         String sender,
         String content
 ) {}
