@@ -95,7 +95,7 @@ public class DisuseRepositoryAdapter implements DisuseRepository {
                         itemDisuseMasterEntity.dsuApprAt,
                         itemDisuseMasterEntity.aplyUsrId,
                         user.usrNm.as("aplyUsrNm"),  // 등록자명
-                        itemDisuseMasterEntity.apprSts.stringValue().as("apprSts"),
+                        itemDisuseMasterEntity.apprSts.as("apprSts"),
                         itemDisuseDetailEntity.count().intValue().as("itemCount")
                 ))
                 .from(itemDisuseMasterEntity)

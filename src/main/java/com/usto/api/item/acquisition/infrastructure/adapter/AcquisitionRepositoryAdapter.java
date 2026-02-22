@@ -78,7 +78,7 @@ public class AcquisitionRepositoryAdapter implements AcquisitionRepository {
                         departmentJpaEntity.deptNm.as("deptNm"), // 조인한 부서 테이블에서 코드 대신 '부서명'을 가져옴
                         itemAcquisitionEntity.drbYr,
                         itemAcquisitionEntity.acqQty,
-                        itemAcquisitionEntity.apprSts.stringValue().as("apprSts")
+                        itemAcquisitionEntity.apprSts.as("apprSts")
                 ))
                 .from(itemAcquisitionEntity)
                 // G2B 품목 정보 조인 (품목명 등을 가져오기 위함)

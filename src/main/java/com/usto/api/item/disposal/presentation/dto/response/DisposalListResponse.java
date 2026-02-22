@@ -1,6 +1,7 @@
 package com.usto.api.item.disposal.presentation.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.usto.api.item.common.model.ApprStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -34,7 +35,7 @@ public class DisposalListResponse {
     private String aplyUsrNm;
 
     @Schema(description = "승인상태")
-    private String apprSts;
+    private ApprStatus apprSts;
 
     @Schema(description = "처분 물품 개수")
     private Integer itemCount;

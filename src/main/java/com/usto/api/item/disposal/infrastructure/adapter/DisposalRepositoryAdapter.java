@@ -94,7 +94,7 @@ public class DisposalRepositoryAdapter implements DisposalRepository {
                         itemDisposalMasterEntity.aplyAt,
                         itemDisposalMasterEntity.aplyUsrId,
                         user.usrNm.as("aplyUsrNm"),
-                        itemDisposalMasterEntity.apprSts.stringValue().as("apprSts"),
+                        itemDisposalMasterEntity.apprSts.as("apprSts"),
                         itemDisposalDetailEntity.count().intValue().as("itemCount")
                 ))
                 .from(itemDisposalMasterEntity)

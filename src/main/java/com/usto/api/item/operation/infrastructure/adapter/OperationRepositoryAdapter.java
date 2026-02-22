@@ -96,7 +96,7 @@ public class OperationRepositoryAdapter implements OperationRepository {
                         itemOperationMasterEntity.operApprAt,
                         itemOperationMasterEntity.aplyUsrId,
                         user.usrNm.as("aplyUsrNm"),  // 등록자명
-                        itemOperationMasterEntity.apprSts.stringValue().as("apprSts"),
+                        itemOperationMasterEntity.apprSts.as("apprSts"),
                         itemOperationDetailEntity.count().intValue().as("itemCount")
                 ))
                 .from(itemOperationMasterEntity)

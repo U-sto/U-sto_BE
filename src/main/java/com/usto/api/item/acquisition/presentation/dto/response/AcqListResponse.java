@@ -1,6 +1,7 @@
 package com.usto.api.item.acquisition.presentation.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.usto.api.item.common.model.ApprStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import java.math.BigDecimal;
@@ -44,5 +45,5 @@ public class AcqListResponse {
     private Integer acqQty;
 
     @Schema(description = "승인상태")
-    private String apprSts;
+    private ApprStatus apprSts;
 }

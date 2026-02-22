@@ -93,7 +93,7 @@ public class ReturningRepositoryAdapter implements ReturningRepository {
                         itemReturningMasterEntity.rtrnApprAt,
                         itemReturningMasterEntity.aplyUsrId,
                         user.usrNm.as("aplyUsrNm"),
-                        itemReturningMasterEntity.apprSts.stringValue().as("apprSts"),
+                        itemReturningMasterEntity.apprSts.as("apprSts"),
                         itemReturningDetailEntity.count().intValue().as("itemCount")
                 ))
                 .from(itemReturningMasterEntity)

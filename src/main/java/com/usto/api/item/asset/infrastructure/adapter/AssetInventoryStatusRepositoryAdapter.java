@@ -82,11 +82,10 @@ public class AssetInventoryStatusRepositoryAdapter implements AssetInventoryStat
                         itemAcquisitionEntity.acqAt,
                         itemAcquisitionEntity.apprAt,
                         departmentJpaEntity.deptNm,
-                        itemAssetEntity.deptCd,    // ① 운용부서
-                        itemAssetEntity.operSts,   // ② 운용상태
-                        itemAssetEntity.acqUpr,    // ③ 취득금액 (개별 물품 단위)
-                        itemAssetEntity.drbYr,     // ④ 내용연수
-                        itemAssetEntity.rmk        // ⑤ 비고
+                        itemAssetEntity.deptCd,
+                        itemAssetEntity.operSts,
+                        itemAssetEntity.acqUpr,
+                        itemAssetEntity.drbYr
                 )
                 .orderBy(
                         itemAcquisitionEntity.acqAt.desc(),
@@ -127,11 +126,11 @@ public class AssetInventoryStatusRepositoryAdapter implements AssetInventoryStat
                         itemAcquisitionEntity.acqAt,
                         itemAcquisitionEntity.apprAt,
                         departmentJpaEntity.deptNm,
-                        itemAssetEntity.deptCd,
-                        itemAssetEntity.operSts,
-                        itemAssetEntity.acqUpr,
-                        itemAssetEntity.drbYr,
-                        itemAssetEntity.rmk
+                        itemAssetEntity.deptCd,  // ① 운용부서
+                        itemAssetEntity.operSts, // ② 운용상태
+                        itemAssetEntity.acqUpr,  // ③ 취득금액
+                        itemAssetEntity.drbYr,   // ④ 내용연수
+                        itemAssetEntity.rmk      // ⑤ 비고
                 )
                 .fetch()
                 .size();
