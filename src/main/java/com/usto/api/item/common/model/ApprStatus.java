@@ -1,5 +1,6 @@
 package com.usto.api.item.common.model;
 
+import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -11,5 +12,6 @@ public enum ApprStatus {
     APPROVED("확정"),       // MANAGER가 승인했을 때 (수정/삭제/취소 불가)
     REJECTED("반려");        // MANAGER가 반려했을 때
 
+    @JsonValue
     private final String description;
 }

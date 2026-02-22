@@ -90,11 +90,11 @@ public class DisposalRepositoryAdapter implements DisposalRepository {
         List<DisposalListResponse> content = queryFactory
                 .select(Projections.fields(DisposalListResponse.class,
                         itemDisposalMasterEntity.dispMId.as("dispMId"),
-                        itemDisposalMasterEntity.dispType.stringValue().as("dispType"),
+                        itemDisposalMasterEntity.dispType.as("dispType"),
                         itemDisposalMasterEntity.aplyAt,
                         itemDisposalMasterEntity.aplyUsrId,
                         user.usrNm.as("aplyUsrNm"),
-                        itemDisposalMasterEntity.apprSts.stringValue().as("apprSts"),
+                        itemDisposalMasterEntity.apprSts.as("apprSts"),
                         itemDisposalDetailEntity.count().intValue().as("itemCount")
                 ))
                 .from(itemDisposalMasterEntity)
@@ -151,12 +151,12 @@ public class DisposalRepositoryAdapter implements DisposalRepository {
                         itemAcquisitionEntity.acqAt,
                         // 취득금액
                         itemAssetEntity.acqUpr,
+                        // 처분정리구분 (처분마스터에서)
+                        itemDisposalMasterEntity.dispType.as("dispType"),
                         // 물품상태 (처분상세 테이블에서)
-                        itemDisposalDetailEntity.itemSts.stringValue().as("itemSts"),
+                        itemDisposalDetailEntity.itemSts.as("itemSts"),
                         // 불용사유 (처분상세 테이블에서)
-                        itemDisposalDetailEntity.chgRsn.stringValue().as("chgRsn"),
-                        // 처분방식 (처분마스터에서)
-                        itemDisposalMasterEntity.dispType.stringValue().as("dispType")
+                        itemDisposalDetailEntity.chgRsn.as("chgRsn")
                 ))
                 .from(itemDisposalDetailEntity)
                 // 처분 마스터 조인

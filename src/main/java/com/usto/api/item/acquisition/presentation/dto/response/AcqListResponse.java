@@ -1,6 +1,7 @@
 package com.usto.api.item.acquisition.presentation.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.usto.api.item.common.model.ApprStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import java.math.BigDecimal;
@@ -34,7 +35,7 @@ public class AcqListResponse {
     @Schema(description = "운용부서명") // 조직 조인
     private String deptNm;
 
-    @Schema(description = "운용상태")
+    @Schema(description = "운용상태 (항상 null 값)")
     private String operSts;
 
     @Schema(description = "내용연수")
@@ -44,5 +45,5 @@ public class AcqListResponse {
     private Integer acqQty;
 
     @Schema(description = "승인상태")
-    private String apprSts;
+    private ApprStatus apprSts;
 }

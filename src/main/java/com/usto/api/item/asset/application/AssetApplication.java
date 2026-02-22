@@ -3,13 +3,16 @@ package com.usto.api.item.asset.application;
 import com.usto.api.item.acquisition.domain.model.Acquisition;
 import com.usto.api.item.asset.domain.model.Asset;
 import com.usto.api.item.asset.domain.model.QrLabelData;
+import com.usto.api.item.asset.domain.repository.AssetInventoryStatusRepository;
 import com.usto.api.item.asset.domain.repository.AssetRepository;
 import com.usto.api.item.asset.domain.service.AssetPolicy;
 import com.usto.api.item.asset.infrastructure.mapper.AssetMapper;
+import com.usto.api.item.asset.presentation.dto.request.AssetInventoryStatusSearchRequest;
 import com.usto.api.item.asset.presentation.dto.request.AssetListForPrintRequest;
 import com.usto.api.item.asset.presentation.dto.request.AssetSearchRequest;
 import com.usto.api.item.asset.presentation.dto.request.AssetUpdateRequest;
 import com.usto.api.item.asset.presentation.dto.response.*;
+import com.usto.api.item.common.model.OperStatus;
 import com.usto.api.item.common.utils.ItemNumberGenerator;
 import com.usto.api.common.exception.BusinessException;
 import com.usto.api.item.common.utils.QrLabelPdfGenerator;
@@ -22,9 +25,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
+import java.util.UUID;
 
 /**
  * 자산(Asset) 관리 서비스
@@ -36,6 +40,7 @@ public class AssetApplication {
 
     private final AssetRepository assetRepository;
     private final AssetPolicy assetPolicy;
+    private final AssetInventoryStatusRepository inventoryStatusRepository;
     private final ItemNumberGenerator itemNumberGenerator;
     private final QrLabelPdfGenerator qrLabelPdfGenerator;
     private final OrganizationJpaRepository organizationJpaRepository;
@@ -245,5 +250,45 @@ public class AssetApplication {
     @Transactional(readOnly = true)
     public Page<AssetListForPrintResponse> getAssetListForPrint(@Valid AssetListForPrintRequest searchRequest, String orgCd, Pageable pageable) {
         return assetRepository.findAllByFilterForPrint(searchRequest,orgCd, pageable);
+    }
+
+    /**
+     * 물품 보유현황 목록 조회
+     * - 승인된 취득 건만 조회
+     * - 처분되지 않은 물품만 조회
+     * - 같은 속성(운용부서, 운용상태, 취득금액, 내용연수, 비고)끼리 그룹핑하여 수량으로 표시
+     */
+    @Transactional(readOnly = true)
+    public Page<AssetInventoryStatusListResponse> getInventoryStatusList(
+            AssetInventoryStatusSearchRequest searchRequest,
+            String orgCd,
+            Pageable pageable) {
+
+        return inventoryStatusRepository.findAllByFilter(searchRequest, orgCd, pageable);
+    }
+
+    /**
+     * 물품 보유현황 상세 조회
+     * - 목록에서 클릭한 그룹의 상세 정보 조회
+     * - 해당 그룹에 속한 모든 물품고유번호 목록 포함
+     */
+    @Transactional(readOnly = true)
+    public AssetInventoryStatusDetailResponse getInventoryStatusDetail(
+            UUID acqId,
+            String deptCd,
+            OperStatus operSts,
+            BigDecimal acqUpr,
+            String drbYr,
+            String rmk,
+            String orgCd) {
+
+        AssetInventoryStatusDetailResponse detail = inventoryStatusRepository.findDetailByGroup(
+                acqId, deptCd, operSts, acqUpr, drbYr, rmk, orgCd);
+
+        if (detail == null) {
+            throw new BusinessException("해당 보유현황 정보를 찾을 수 없습니다.");
+        }
+
+        return detail;
     }
 }

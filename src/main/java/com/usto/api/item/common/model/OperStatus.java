@@ -1,5 +1,6 @@
 package com.usto.api.item.common.model;
 
+import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -11,5 +12,6 @@ public enum OperStatus {
     DSU("불용"),
     DISP("처분");
 
+    @JsonValue
     private final String description;
 }

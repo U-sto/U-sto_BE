@@ -95,7 +95,7 @@ public class DisuseRepositoryAdapter implements DisuseRepository {
                         itemDisuseMasterEntity.dsuApprAt,
                         itemDisuseMasterEntity.aplyUsrId,
                         user.usrNm.as("aplyUsrNm"),  // 등록자명
-                        itemDisuseMasterEntity.apprSts.stringValue().as("apprSts"),
+                        itemDisuseMasterEntity.apprSts.as("apprSts"),
                         itemDisuseDetailEntity.count().intValue().as("itemCount")
                 ))
                 .from(itemDisuseMasterEntity)
@@ -153,9 +153,9 @@ public class DisuseRepositoryAdapter implements DisuseRepository {
                         // 운용부서명
                         departmentJpaEntity.deptNm.as("deptNm"),
                         // 물품상태 (마스터)
-                        itemDisuseMasterEntity.itemSts.stringValue().as("itemSts"),
+                        itemDisuseMasterEntity.itemSts.as("itemSts"),
                         // 사유 (마스터)
-                        itemDisuseMasterEntity.dsuRsn.stringValue().as("dsuRsn")
+                        itemDisuseMasterEntity.dsuRsn.as("dsuRsn")
                 ))
                 .from(itemDisuseDetailEntity)
                 // 불용 마스터 조인

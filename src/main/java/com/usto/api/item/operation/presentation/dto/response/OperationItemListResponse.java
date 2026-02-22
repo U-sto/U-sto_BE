@@ -1,6 +1,7 @@
 package com.usto.api.item.operation.presentation.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.usto.api.item.common.model.ItemStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -37,5 +38,5 @@ public class OperationItemListResponse {
     private String deptNm;
 
     @Schema(description = "물품상태")
-    private String itemSts;
+    private ItemStatus itemSts;
 }

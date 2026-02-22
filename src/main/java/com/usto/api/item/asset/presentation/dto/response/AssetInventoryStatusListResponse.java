@@ -3,42 +3,40 @@ package com.usto.api.item.asset.presentation.dto.response;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.usto.api.item.common.model.OperStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-
+import lombok.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-@Getter
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-@Schema(description = "출력물 관리 목록 응답")
-public class AssetListForPrintResponse {
+import java.util.UUID;
 
-    @Schema(description = "물품고유번호", example = "M202600001")
-    private String itmNo;
+@Getter @Builder
+@NoArgsConstructor @AllArgsConstructor
+@Schema(description = "물품보유현황 목록 응답")
+public class AssetInventoryStatusListResponse {
+    @Schema(description = "취득ID")
+    private UUID acqId;
 
-    @Schema(description = "G2B 목록번호 (분류-식별)", example = "12345678-12345678")
+    @Schema(description = "물품번호 (분류-식별)", example = "12345678-12345678")
     private String g2bItemNo;
 
-    @Schema(description = "G2B 목록명")
+    @Schema(description = "물품명") // G2B 조인
     private String g2bItemNm;
 
     @Schema(description = "취득일자")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate acqAt;
 
-    @Schema(description = "취득금액")
+    @Schema(description = "취득단가")
     private BigDecimal acqUpr;
 
     @Schema(description = "정리일자")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate arrgAt;
 
-    @Schema(description = "운용부서명")
+    @Schema(description = "운용부서명") // 조직 조인
     private String deptNm;
+
+    @Schema(description = "운용부서코드")
+    private String deptCd;
 
     @Schema(description = "운용상태")
     private OperStatus operSts;
@@ -46,6 +44,9 @@ public class AssetListForPrintResponse {
     @Schema(description = "내용연수")
     private String drbYr;
 
-    @Schema(description = "출력상태", example = "Y")
-    private String printYn;
+    @Schema(description = "수량")
+    private Integer qty;
+
+    @Schema(description = "비고")
+    private String rmk;
 }

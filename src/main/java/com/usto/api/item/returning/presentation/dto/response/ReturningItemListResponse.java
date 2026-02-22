@@ -1,6 +1,8 @@
 package com.usto.api.item.returning.presentation.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.usto.api.item.common.model.ItemStatus;
+import com.usto.api.item.returning.domain.model.ReturningReason;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -37,8 +39,8 @@ public class ReturningItemListResponse {
     private String deptNm;
 
     @Schema(description = "물품상태")
-    private String itemSts;
+    private ItemStatus itemSts;
 
     @Schema(description = "반납사유")
-    private String rtrnRsn;
+    private ReturningReason rtrnRsn;
 }

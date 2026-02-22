@@ -17,11 +17,11 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(description = "개별 물품 상세 정보 응답")
-public class AssetDetailResponse {
+@Schema(description = "물품보유현황 상세정보 응답")
+public class AssetInventoryStatusDetailResponse {
 
-    @Schema(description = "물품고유번호", example = "M202600001")
-    private String itmNo;
+    @Schema(description = "물품고유번호 목록 (이 그룹에 속한 모든 물품)")
+    private List<String> itmNos;
 
     @Schema(description = "G2B 목록명")
     private String g2bDNm;
@@ -60,44 +60,4 @@ public class AssetDetailResponse {
 
     @Schema(description = "비고")
     private String rmk;
-
-    @Schema(description = "물품상태이력 목록")
-    private List<StatusHistoryDto> statusHistories;
-
-    @Getter
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @Schema(description = "물품 상태 이력")
-    public static class StatusHistoryDto {
-
-        @Schema(description = "상태이력ID")
-        private String itemHisId;
-
-        @Schema(description = "물품고유번호")
-        private String itmNo;
-
-        @Schema(description = "이전상태")
-        private OperStatus prevSts;
-
-        @Schema(description = "변경상태")
-        private OperStatus newSts;
-
-        @Schema(description = "변경사유")
-        private String chgRsn;
-
-        @Schema(description = "등록자ID")
-        private String reqUsrId;
-
-        @Schema(description = "등록일자")
-        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-        private LocalDate reqAt;
-
-        @Schema(description = "확정자ID")
-        private String apprUsrId;
-
-        @Schema(description = "확정일자(변경일자)")
-        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-        private LocalDate apprAt;
-    }
 }

@@ -140,7 +140,7 @@ public class AssetRepositoryAdapter implements AssetRepository {
                         itemAssetEntity.acqUpr,
                         itemAcquisitionEntity.apprAt.as("arrgAt"), // 정리일자
                         departmentJpaEntity.deptNm.as("deptNm"),
-                        itemAssetEntity.operSts.stringValue().as("operSts"),
+                        itemAssetEntity.operSts.as("operSts"),
                         itemAssetEntity.drbYr
                 ))
                 .from(itemAssetEntity)
@@ -182,10 +182,10 @@ public class AssetRepositoryAdapter implements AssetRepository {
                                 itemAssetEntity.g2bDCd).as("g2bItemNo"),
                         itemAcquisitionEntity.acqAt,
                         itemAcquisitionEntity.apprAt, // 정리일자
-                        itemAssetEntity.operSts.stringValue().as("operSts"),
+                        itemAssetEntity.operSts.as("operSts"),
                         itemAssetEntity.drbYr,
                         itemAssetEntity.acqUpr,
-                        itemAcquisitionEntity.arrgTy.stringValue().as("acqArrgTy"),
+                        itemAcquisitionEntity.arrgTy.as("acqArrgTy"),
                         departmentJpaEntity.deptNm.as("deptNm"),
                         itemAssetEntity.deptCd,
                         itemAssetEntity.rmk
@@ -226,8 +226,8 @@ public class AssetRepositoryAdapter implements AssetRepository {
                 .map(entity -> AssetDetailResponse.StatusHistoryDto.builder()
                         .itemHisId(entity.getItemHisId().toString())
                         .itmNo(entity.getItmNo())
-                        .prevSts(entity.getPrevSts() != null ? entity.getPrevSts().name() : null)
-                        .newSts(entity.getNewSts().name())
+                        .prevSts(entity.getPrevSts() != null ? entity.getPrevSts() : null)
+                        .newSts(entity.getNewSts())
                         .chgRsn(entity.getChgRsn())
                         .reqUsrId(entity.getReqUsrId())
                         .reqAt(entity.getReqAt())
@@ -396,7 +396,7 @@ public class AssetRepositoryAdapter implements AssetRepository {
                         itemAssetEntity.acqUpr,
                         itemAcquisitionEntity.apprAt.as("arrgAt"),
                         departmentJpaEntity.deptNm.as("deptNm"),
-                        itemAssetEntity.operSts.stringValue().as("operSts"),
+                        itemAssetEntity.operSts.as("operSts"),
                         itemAssetEntity.drbYr,
                         itemAssetEntity.printYn.as("printYn")
                 ))

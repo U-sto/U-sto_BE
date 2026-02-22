@@ -96,7 +96,7 @@ public class OperationRepositoryAdapter implements OperationRepository {
                         itemOperationMasterEntity.operApprAt,
                         itemOperationMasterEntity.aplyUsrId,
                         user.usrNm.as("aplyUsrNm"),  // 등록자명
-                        itemOperationMasterEntity.apprSts.stringValue().as("apprSts"),
+                        itemOperationMasterEntity.apprSts.as("apprSts"),
                         itemOperationDetailEntity.count().intValue().as("itemCount")
                 ))
                 .from(itemOperationMasterEntity)
@@ -154,7 +154,7 @@ public class OperationRepositoryAdapter implements OperationRepository {
                         // 운용부서명
                         departmentJpaEntity.deptNm.as("deptNm"),
                         // 물품상태 (마스터)
-                        itemOperationMasterEntity.itemSts.stringValue().as("itemSts")
+                        itemOperationMasterEntity.itemSts.as("itemSts")
                 ))
                 .from(itemOperationDetailEntity)
                 // 운용 마스터 조인
