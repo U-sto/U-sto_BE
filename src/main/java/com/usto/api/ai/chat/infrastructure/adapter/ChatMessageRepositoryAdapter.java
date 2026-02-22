@@ -1,12 +1,9 @@
 package com.usto.api.ai.chat.infrastructure.adapter;
 
 import com.usto.api.ai.chat.domain.model.ChatMessage;
-import com.usto.api.ai.chat.domain.model.ChatThread;
 import com.usto.api.ai.chat.domain.repository.ChatMessageRepository;
 import com.usto.api.ai.chat.infrastructure.entity.ChatMessageJpaEntity;
-import com.usto.api.ai.chat.infrastructure.entity.ChatThreadJpaEntity;
 import com.usto.api.ai.chat.infrastructure.mapper.ChatMessageMapper;
-import com.usto.api.ai.chat.infrastructure.mapper.ChatThreadMapper;
 import com.usto.api.ai.chat.infrastructure.repository.ChatMessageJpaRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

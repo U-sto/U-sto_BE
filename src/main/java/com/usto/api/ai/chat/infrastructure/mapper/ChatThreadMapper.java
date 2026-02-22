@@ -4,7 +4,6 @@ import com.usto.api.ai.chat.domain.model.ChatThread;
 import com.usto.api.ai.chat.infrastructure.entity.ChatThreadJpaEntity;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.UUID;
 
 public class ChatThreadMapper {

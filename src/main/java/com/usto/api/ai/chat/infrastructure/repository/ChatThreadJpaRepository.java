@@ -1,9 +1,7 @@
 package com.usto.api.ai.chat.infrastructure.repository;
 
-import com.usto.api.ai.chat.domain.model.ChatThread;
 import com.usto.api.ai.chat.infrastructure.entity.ChatThreadJpaEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 import java.util.UUID;

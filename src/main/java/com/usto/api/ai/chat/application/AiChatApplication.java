@@ -9,7 +9,6 @@ import com.usto.api.ai.chat.domain.repository.ChatMessageRepository;
 import com.usto.api.ai.chat.domain.repository.ChatThreadRepository;
 import com.usto.api.ai.chat.domain.service.ChatThreadPolicy;
 import com.usto.api.ai.chat.infrastructure.entity.ChatMessageJpaEntity;
-import com.usto.api.ai.chat.infrastructure.entity.ChatThreadJpaEntity;
 import com.usto.api.ai.chat.infrastructure.mapper.ChatMessageMapper;
 import com.usto.api.ai.chat.infrastructure.mapper.ChatThreadMapper;
 import com.usto.api.ai.chat.presentation.dto.request.AiChatRequest;
@@ -17,10 +16,8 @@ import com.usto.api.ai.chat.presentation.dto.response.AiChatResponse;
 import com.usto.api.ai.chat.presentation.dto.response.ChatMessageResponse;
 import com.usto.api.ai.common.AiClientAdapter;
 import com.usto.api.common.exception.BusinessException;
-import com.usto.api.item.disposal.domain.model.DisposalMaster;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -117,12 +114,9 @@ public class AiChatApplication {
 
         List<ChatThread> threads = chatThreadRepository.findByUsrId(username);
 
-        List<UUID> result = new ArrayList<>();
-        for (ChatThread thread : threads) {
-            result.add(thread.getThreadId());
-        }
-
-        return result;
+        return threads.stream()
+                .map(ChatThread::getThreadId)
+                .toList();
     }
 
     public void deleteThread(UUID threadId, String username) {
@@ -139,7 +133,7 @@ public class AiChatApplication {
 
         List<String> messages = chatMessageRepository.findByContent(content,username);
         if(messages.isEmpty()){
-            throw new BusinessException("존재하지 않는 대화기록입니다.");
+            return null;
         }
         return messages;
     }

@@ -79,7 +79,7 @@ public class ChatController {
             summary = "대화 맥락 조회",
             description = "채팅방 입장시 필요한 이전 대화 맥락을 조회합니다."
     )
-    @GetMapping("/chat/threads/{threadId}/message")
+    @GetMapping("/chat/messages/{threadId}/serch")
     public ApiResponse<List<ChatMessageResponse>> findForStart(
             @PathVariable UUID threadId,
             @Valid @AuthenticationPrincipal UserPrincipal userPrincipal
@@ -96,9 +96,9 @@ public class ChatController {
             summary = "전체 대화내용 조회",
             description = "전체에서 대화내용을 조회합니다."
     )
-    @GetMapping("/chat/threads/{content}")
+    @GetMapping("/chat/messages/search")
     public ApiResponse<List<String>> findContent(
-            @PathVariable String content,
+            @RequestParam String content,
             @Valid @AuthenticationPrincipal UserPrincipal userPrincipal
     ) {
         List<String> response = aiChatApplication.findContent(

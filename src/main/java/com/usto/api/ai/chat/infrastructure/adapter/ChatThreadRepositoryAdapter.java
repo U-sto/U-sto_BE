@@ -5,8 +5,8 @@ import com.usto.api.ai.chat.domain.repository.ChatThreadRepository;
 import com.usto.api.ai.chat.infrastructure.entity.ChatThreadJpaEntity;
 import com.usto.api.ai.chat.infrastructure.mapper.ChatThreadMapper;
 import com.usto.api.ai.chat.infrastructure.repository.ChatThreadJpaRepository;
+import com.usto.api.common.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -28,6 +28,9 @@ public class ChatThreadRepositoryAdapter implements ChatThreadRepository {
     @Override
     public List<ChatThread> findByUsrId(String userName) {
         List<ChatThreadJpaEntity> entities = jpaRepository.findAllByUserId(userName);
+        if(entities.isEmpty()){
+            return null;
+        }
         return entities.stream()
                 .map(ChatThreadMapper::toDomain)
                 .toList();
@@ -36,6 +39,9 @@ public class ChatThreadRepositoryAdapter implements ChatThreadRepository {
     @Override
     public ChatThread findById(UUID threadId) {
         ChatThreadJpaEntity entity = jpaRepository.findByThreadId(threadId);
+        if(entity == null){
+            return null;
+        }
         return ChatThreadMapper.toDomain(entity);
     }
 

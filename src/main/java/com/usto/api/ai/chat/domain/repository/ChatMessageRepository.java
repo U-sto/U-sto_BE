@@ -1,7 +1,6 @@
 package com.usto.api.ai.chat.domain.repository;
 
 import com.usto.api.ai.chat.domain.model.ChatMessage;
-import com.usto.api.ai.chat.domain.model.ChatThread;
 import com.usto.api.ai.chat.infrastructure.entity.ChatMessageJpaEntity;
 
 import java.util.List;
