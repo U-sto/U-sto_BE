@@ -41,6 +41,7 @@ public class ForecastMapper {
                 .matrixJson(entity.getMatrixJson())
                 .recoJson(entity.getRecommendationJson())
                 .orgCode(entity.getOrgCd())
+                .summaryJson(entity.getSummaryJson())
                 .build();
     }
 

@@ -104,8 +104,15 @@ public class ForecastApplication {
         try {
             return objectMapper.readTree(json);
         } catch (JsonProcessingException e) {
-            // 로그를 남기거나 필요에 따라 예외 전략 수정 가능
             return null;
         }
+    }
+
+
+    public List<UUID> findAll(String username, String orgCd) {
+
+        List<UUID> ids = forecastRepository.findByUsrId(username);
+
+        return ids;
     }
 }

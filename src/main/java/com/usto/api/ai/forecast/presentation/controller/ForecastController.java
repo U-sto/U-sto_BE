@@ -9,7 +9,11 @@ import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.UUID;
 
 
 @RestController
@@ -36,6 +40,39 @@ public class ForecastController {
 
         return ApiResponse.ok("예측 분석 성공", data);
     }
-    //기록 조회
-    //조회한 기록 내용 확인
+
+    @Operation(
+            summary = "기록 조회",
+            description = "이전 기록을 조회합니다"
+    )
+    @GetMapping()
+    public ApiResponse<List<UUID>> find(
+            @Valid @AuthenticationPrincipal UserPrincipal userPrincipal
+    ) {
+        List<UUID> response = forecastApplication.findAll(
+                userPrincipal.getUsername(),
+                userPrincipal.getOrgCd()
+        );
+
+        return ApiResponse.ok("조회 성공",response);
+    }
+
+    @Operation(
+            summary = "기록 내용 조회",
+            description = "이전 기록 내용을 조회합니다"
+    )
+    @GetMapping("contents")
+    public ApiResponse<AiForecastResponse> check(
+            @RequestParam @Valid UUID forecastId,
+            @Valid @AuthenticationPrincipal UserPrincipal userPrincipal
+    ) {
+        AiForecastResponse response = forecastApplication.check(
+                userPrincipal.getUsername(),
+                userPrincipal.getOrgCd(),
+                forecastId
+        );
+
+
+        return ApiResponse.ok("조회 성공",response);
+    }
 }

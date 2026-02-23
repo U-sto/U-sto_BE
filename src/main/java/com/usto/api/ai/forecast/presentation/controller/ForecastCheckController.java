@@ -32,13 +32,15 @@ public class ForecastCheckController {
             @Valid @AuthenticationPrincipal UserPrincipal userPrincipal,
             Model model
     ) {
-        AiForecastResponse data = forecastApplication.check(
+        AiForecastResponse response = forecastApplication.check(
                 userPrincipal.getUsername(),
                 userPrincipal.getOrgCd(),
                 forecastId
         );
 
-        model.addAttribute("data", data); // Thymeleaf에서 사용할 이름
+        System.out.println("Summary Data: " + response.summary());
+
+        model.addAttribute("data", response); // Thymeleaf에서 사용할 이름
 
         return "check";
     }

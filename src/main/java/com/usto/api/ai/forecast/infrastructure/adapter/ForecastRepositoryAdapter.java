@@ -5,10 +5,12 @@ import com.usto.api.ai.forecast.domain.repository.ForecastRepository;
 import com.usto.api.ai.forecast.infrastructure.entity.ForecastJpaEntity;
 import com.usto.api.ai.forecast.infrastructure.mapper.ForecastMapper;
 import com.usto.api.ai.forecast.infrastructure.repository.ForecastJpaRepository;
+import com.usto.api.ai.forecast.presentation.dto.response.AiForecastResponse;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.UUID;
 
 @Component
@@ -29,4 +31,8 @@ public class ForecastRepositoryAdapter implements ForecastRepository {
                 .orElseThrow(() -> new EntityNotFoundException("해당 예측 정보를 찾을 수 없습니다. id: " + forecastId));
         return ForecastMapper.toDomain(entity);
     }
+
+    @Override
+    public List<UUID> findByUsrId(String username) {
+        return jpaRepository.findIdsByUserId(username);    }
 }

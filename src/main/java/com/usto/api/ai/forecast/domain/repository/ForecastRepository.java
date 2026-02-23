@@ -2,12 +2,16 @@ package com.usto.api.ai.forecast.domain.repository;
 
 import com.usto.api.ai.forecast.domain.model.Forecast;
 import com.usto.api.ai.forecast.infrastructure.entity.ForecastJpaEntity;
+import com.usto.api.ai.forecast.presentation.dto.response.AiForecastResponse;
 import jakarta.validation.Valid;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface ForecastRepository {
     void save(Forecast forecast);
 
     Forecast findById(@Valid UUID forecastId);
+
+    List<UUID> findByUsrId(String username);
 }
