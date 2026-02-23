@@ -19,7 +19,7 @@ import java.util.UUID;
 
 //연동 테스트
 @RestController
-@RequestMapping("/api/ai")
+@RequestMapping("/api/ai/chat")
 @RequiredArgsConstructor
 public class ChatController {
 
@@ -30,7 +30,7 @@ public class ChatController {
             summary = "AI팀의 챗봇과 대화(AI 연동 후)",
             description = "AI팀의 챗봇과 대화를 진행합니다."
     )
-    @PostMapping("/chat")
+    @PostMapping
     public ApiResponse<AiChatResponse> chat(
             @RequestBody AiChatRequest request,
             @Valid @AuthenticationPrincipal UserPrincipal userPrincipal
@@ -49,7 +49,7 @@ public class ChatController {
             summary = "쓰레드 조회",
             description = "채팅방을 조회합니다."
     )
-    @GetMapping("/chat/threads")
+    @GetMapping("/threads")
     public ApiResponse<List<UUID>> threads(
             @Valid @AuthenticationPrincipal UserPrincipal userPrincipal
     ) {
@@ -63,7 +63,7 @@ public class ChatController {
             summary = "쓰레드 삭제",
             description = "채팅방을 삭제합니다."
     )
-    @DeleteMapping("/chat/threads/{threadId}")
+    @DeleteMapping("/threads/{threadId}")
     public ApiResponse<?> threads(
             @PathVariable UUID threadId,
             @Valid @AuthenticationPrincipal UserPrincipal userPrincipal
@@ -79,7 +79,7 @@ public class ChatController {
             summary = "대화 맥락 조회",
             description = "채팅방 입장시 필요한 이전 대화 맥락을 조회합니다."
     )
-    @GetMapping("/chat/messages/{threadId}/serch")
+    @GetMapping("/messages/{threadId}/serch")
     public ApiResponse<List<ChatMessageResponse>> findForStart(
             @PathVariable UUID threadId,
             @Valid @AuthenticationPrincipal UserPrincipal userPrincipal
@@ -96,7 +96,7 @@ public class ChatController {
             summary = "전체 대화내용 조회",
             description = "전체에서 대화내용을 조회합니다."
     )
-    @GetMapping("/chat/messages/search")
+    @GetMapping("/messages/search")
     public ApiResponse<List<String>> findContent(
             @RequestParam String content,
             @Valid @AuthenticationPrincipal UserPrincipal userPrincipal
@@ -112,7 +112,7 @@ public class ChatController {
             summary = "Chat GPT와 대화하기 테스트(AI팀 연동 X)",
             description = "별도의 연동 없이 일반 지피티랑 대화합니다."
     )
-    @PostMapping("/chat/gpt4-mini")
+    @PostMapping("/gpt4-mini")
     public ApiResponse<AiChatResponse> testChat(
             @Parameter(description = "메시지")
             @RequestParam(required = false) String message
