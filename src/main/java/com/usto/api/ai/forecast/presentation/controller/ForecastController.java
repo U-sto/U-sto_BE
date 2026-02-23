@@ -9,10 +9,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
 
 @RestController
 @RequestMapping("/api/ai/forecast")
@@ -38,5 +36,6 @@ public class ForecastController {
 
         return ApiResponse.ok("예측 분석 성공", data);
     }
-
+    //기록 조회
+    //조회한 기록 내용 확인
 }

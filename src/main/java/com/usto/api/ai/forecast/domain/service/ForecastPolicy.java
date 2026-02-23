@@ -75,4 +75,10 @@ public class ForecastPolicy {
             throw new BusinessException("요청 campus(org) 값이 로그인 조직코드와 일치하지 않습니다.");
         }
     }
+
+    public void valdateOwnerShip(String userId, String username) {
+        if(!userId.equals(username)){
+            throw new RuntimeException("자신의 기록만 열람할 수 있습니다.");
+        }
+    }
 }

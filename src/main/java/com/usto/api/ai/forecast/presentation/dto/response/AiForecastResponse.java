@@ -1,7 +1,10 @@
 package com.usto.api.ai.forecast.presentation.dto.response;
 
+import lombok.Builder;
+
 import java.util.List;
 
+@Builder
 public record AiForecastResponse(
         Summary summary,
         List<ChartForecastPoint> chart_forecast,

@@ -1,24 +1,25 @@
 package com.usto.api.ai.forecast.application;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.usto.api.ai.chat.domain.model.ChatMessage;
-import com.usto.api.ai.chat.domain.model.SenderType;
-import com.usto.api.ai.chat.infrastructure.entity.ChatMessageJpaEntity;
-import com.usto.api.ai.chat.infrastructure.mapper.ChatMessageMapper;
 import com.usto.api.ai.common.AiForecastAdapter;
 import com.usto.api.ai.forecast.domain.model.Forecast;
-import com.usto.api.ai.forecast.domain.model.RiskLevel;
 import com.usto.api.ai.forecast.domain.repository.ForecastRepository;
 import com.usto.api.ai.forecast.domain.service.ForecastPolicy;
 import com.usto.api.ai.forecast.infrastructure.mapper.ForecastMapper;
 import com.usto.api.ai.forecast.presentation.dto.request.AiForecastRequest;
 import com.usto.api.ai.forecast.presentation.dto.response.AiForecastResponse;
 import com.usto.api.common.exception.BusinessException;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -63,12 +64,48 @@ public class ForecastApplication {
         return aiResponse;
     }
 
+    public AiForecastResponse check(String username, String orgCd, @Valid UUID forecastId) {
+
+        Forecast forecast = forecastRepository.findById(forecastId);
+        if(forecast == null){
+            throw new BusinessException("존재하지 않는 예측입니다.");
+        }
+
+        forecastPolicy.validateOrganization(forecast.getOrgCode(),orgCd);
+        forecastPolicy.valdateOwnerShip(forecast.getUserId(),username);
+
+        JsonNode summaryNode = readTreeOrNull(forecast.getSummaryJson());
+        JsonNode tsNode = readTreeOrNull(forecast.getTsJson());
+        JsonNode matrixNode = readTreeOrNull(forecast.getMatrixJson());
+        JsonNode recoNode = readTreeOrNull(forecast.getRecoJson());
+
+        return AiForecastResponse
+                .builder()
+                .summary(objectMapper.convertValue(summaryNode, AiForecastResponse.Summary.class))
+                .chart_forecast(objectMapper.convertValue(tsNode, new TypeReference<>() {}))
+                .chart_portfolio(objectMapper.convertValue(matrixNode, new TypeReference<>() {}))
+                .recommendations(objectMapper.convertValue(recoNode, new TypeReference<>() {}))
+                .build();
+    }
+
     private String toJsonNullable(Object value) {
         if (value == null) return null;
         try {
             return objectMapper.writeValueAsString(value);
         } catch (JsonProcessingException e) {
             throw new BusinessException("Forecast 응답 JSON 직렬화에 실패했습니다.");
+        }
+    }
+
+    private JsonNode readTreeOrNull(String json) {
+        if (json == null || json.isBlank()) {
+            return null;
+        }
+        try {
+            return objectMapper.readTree(json);
+        } catch (JsonProcessingException e) {
+            // 로그를 남기거나 필요에 따라 예외 전략 수정 가능
+            return null;
         }
     }
 }
