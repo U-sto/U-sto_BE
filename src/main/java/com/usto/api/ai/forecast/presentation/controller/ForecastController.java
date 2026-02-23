@@ -77,8 +77,8 @@ public class ForecastController {
     }
 
     @Operation(
-            summary = "기록 조회",
-            description = "이전 기록을 조회합니다"
+            summary = "기록 삭제",
+            description = "이전 기록을 삭제합니다"
     )
     @DeleteMapping()
     public ApiResponse<?> delete(
