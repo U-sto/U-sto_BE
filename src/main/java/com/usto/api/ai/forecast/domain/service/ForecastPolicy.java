@@ -3,6 +3,7 @@ package com.usto.api.ai.forecast.domain.service;
 import com.usto.api.ai.chat.domain.model.ChatThread;
 import com.usto.api.ai.forecast.presentation.dto.request.AiForecastRequest;
 import com.usto.api.common.exception.BusinessException;
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -68,6 +69,12 @@ public class ForecastPolicy {
         // risk_level (enum)
         if (c.risk_level() == null) {
             throw new BusinessException("conditions.risk_level은 필수입니다.");
+        }
+    }
+
+    public void validateOrganization(String campus, String orgCd) {
+        if(!campus.equals(orgCd)){
+            throw new BusinessException("요청 campus(org) 값이 로그인 조직코드와 일치하지 않습니다.");
         }
     }
 }

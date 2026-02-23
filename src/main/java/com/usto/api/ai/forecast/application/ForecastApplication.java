@@ -19,9 +19,11 @@ public class ForecastApplication {
 
     @Transactional
     public AiForecastResponse analyze(String usrId, String orgCd, AiForecastRequest request) {
+        // 정책 검사
         forecastPolicy.validateRequest(request,orgCd);
+        forecastPolicy.validateOrganization(request.conditions().campus(),orgCd);
 
-        // 2) 외부 AI 호출
+        // AI 호출
         AiForecastResponse response = aiForecastAdapter.fetchForecastResponse(request);
 
         // 3) TODO: DB 저장 (조건 컬럼 + 결과 JSON 통 저장)
