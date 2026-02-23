@@ -45,8 +45,8 @@ public class ForecastApplication {
         //도메인 객체에 내용 담기
         Forecast forecast = ForecastMapper.toDomain(
                 usrId,
-                request.conditions().year(),
-                request.conditions().semester(),
+                request.conditions().year().shortValue(),
+                request.conditions().semester().byteValue(),
                 request.conditions().risk_level(),
                 request.prompt(),
                 orgCd,

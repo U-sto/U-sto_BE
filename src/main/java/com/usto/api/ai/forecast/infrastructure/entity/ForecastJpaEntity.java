@@ -30,10 +30,10 @@ public class ForecastJpaEntity extends BaseTimeEntity {
     private String userId;
 
     @Column(name = "ANALYSIS_YEAR", nullable = false)
-    private Integer analysisYear;
+    private Short analysisYear;
 
     @Column(name = "SEMESTER", nullable = false)
-    private Integer semester;
+    private Byte semester;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "RISK_LEVEL", length = 10, nullable = false)
