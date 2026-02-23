@@ -75,4 +75,23 @@ public class ForecastController {
 
         return ApiResponse.ok("조회 성공",response);
     }
+
+    @Operation(
+            summary = "기록 조회",
+            description = "이전 기록을 조회합니다"
+    )
+    @DeleteMapping()
+    public ApiResponse<?> delete(
+            @Valid @AuthenticationPrincipal UserPrincipal userPrincipal,
+            @RequestParam @Valid UUID forecastId
+
+            ) {
+        forecastApplication.delete(
+                userPrincipal.getUsername(),
+                userPrincipal.getOrgCd(),
+                forecastId
+        );
+
+        return ApiResponse.ok("삭제 성공");
+    }
 }

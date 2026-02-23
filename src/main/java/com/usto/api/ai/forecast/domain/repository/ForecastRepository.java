@@ -14,4 +14,6 @@ public interface ForecastRepository {
     Forecast findById(@Valid UUID forecastId);
 
     List<UUID> findByUsrId(String username);
+
+    void delete(@Valid UUID forecastId);
 }

@@ -115,4 +115,17 @@ public class ForecastApplication {
 
         return ids;
     }
+
+    public void delete(String username, String orgCd, @Valid UUID forecastId) {
+        Forecast forecast = forecastRepository.findById(forecastId);
+        if(forecast == null){
+            throw new BusinessException("존재하지 않는 예측입니다.");
+        }
+
+        forecastPolicy.validateOrganization(forecast.getOrgCode(),orgCd);
+        forecastPolicy.valdateOwnerShip(forecast.getUserId(),username);
+
+        forecastRepository.delete(forecastId);
+
+    }
 }

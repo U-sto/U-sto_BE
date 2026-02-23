@@ -35,4 +35,9 @@ public class ForecastRepositoryAdapter implements ForecastRepository {
     @Override
     public List<UUID> findByUsrId(String username) {
         return jpaRepository.findIdsByUserId(username);    }
+
+    @Override
+    public void delete(UUID forecastId) {
+        jpaRepository.deleteById(forecastId);
+    }
 }
