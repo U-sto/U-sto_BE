@@ -41,6 +41,7 @@ public class ForecastApplication {
         AiForecastResponse aiResponse = aiForecastAdapter.fetchForecastResponse(request);
 
         log.info("AI Response: {}", aiResponse);
+        log.info("summary : {}",aiResponse.summary());
 
         //도메인 객체에 내용 담기
         Forecast forecast = ForecastMapper.toDomain(
@@ -53,7 +54,8 @@ public class ForecastApplication {
                 toJsonNullable(aiResponse.summary()),
                 toJsonNullable(aiResponse.chart_forecast()),
                 toJsonNullable(aiResponse.chart_portfolio()),
-                toJsonNullable(aiResponse.recommendations())
+                toJsonNullable(aiResponse.recommendations()),
+                request.conditions().department()
         );
 
         forecastRepository.save(forecast);
