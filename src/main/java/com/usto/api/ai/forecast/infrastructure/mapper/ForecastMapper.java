@@ -8,7 +8,8 @@ import java.util.UUID;
 
 public class ForecastMapper {
     // Overload 1: Data(Inputs) -> Domain (For creating new forecast result)
-    public static Forecast toDomain(String userId, Short year, Byte semester, RiskLevel risk, String msg, String org) {
+    public static Forecast toDomain(String userId, Integer year, Integer semester, RiskLevel risk, String msg, String org
+                                    , String sumJson,String tsJson, String matrixJson, String recoJson) {
         return Forecast.builder()
                 .forecastId(UUID.randomUUID())
                 .userId(userId)
@@ -17,6 +18,10 @@ public class ForecastMapper {
                 .riskLevel(risk)
                 .message(msg)
                 .orgCode(org)
+                .summaryJson(sumJson)
+                .tsJson(tsJson)
+                .matrixJson(matrixJson)
+                .recoJson(recoJson)
                 .build();
     }
 

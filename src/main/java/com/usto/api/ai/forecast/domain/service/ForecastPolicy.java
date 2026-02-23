@@ -1,9 +1,7 @@
 package com.usto.api.ai.forecast.domain.service;
 
-import com.usto.api.ai.chat.domain.model.ChatThread;
 import com.usto.api.ai.forecast.presentation.dto.request.AiForecastRequest;
 import com.usto.api.common.exception.BusinessException;
-import jakarta.validation.constraints.NotBlank;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 

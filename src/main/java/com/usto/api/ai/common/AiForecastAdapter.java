@@ -32,11 +32,22 @@ public class AiForecastAdapter {
                         // 1. 서버 에러(5xx) 처리 - ngrok 장애 등 외부 API 불능 상태 대응
                         .onStatus(HttpStatusCode::is5xxServerError, clientResponse ->
                                 clientResponse.bodyToMono(String.class)
+                                        .defaultIfEmpty("")
                                         .flatMap(errorBody -> {
-                                            log.error("AI API 서버 오류 (5xx): {}", errorBody);
-                                            return Mono.error(
-                                                    new BusinessException("AI 서비스 일시 중단 (서버 점검 중)")
-                                            );
+                                            int code = clientResponse.statusCode().value();
+                                            log.error("AI API 5xx 응답. status={}, body={}", code, errorBody);
+
+                                            if (code == 502) {
+                                                return Mono.error(new BusinessException("AI 게이트웨이 오류(502). 프록시/ngrok 또는 업스트림 장애 가능성이 있습니다."));
+                                            }
+                                            if (code == 503) {
+                                                return Mono.error(new BusinessException("AI 서비스 이용 불가(503). 서버가 내려가 있거나 과부하 상태입니다."));
+                                            }
+                                            if (code == 504) {
+                                                return Mono.error(new BusinessException("AI 응답 지연(504). 요청 처리 시간이 초과되었습니다."));
+                                            }
+
+                                            return Mono.error(new BusinessException("AI 서버 오류(5xx). 잠시 후 다시 시도해주세요."));
                                         })
                         )
                         // 2. 클라이언트 에러(4xx) 처리

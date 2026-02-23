@@ -1,35 +1,72 @@
 package com.usto.api.ai.forecast.application;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.usto.api.ai.chat.domain.model.ChatMessage;
+import com.usto.api.ai.chat.domain.model.SenderType;
+import com.usto.api.ai.chat.infrastructure.entity.ChatMessageJpaEntity;
+import com.usto.api.ai.chat.infrastructure.mapper.ChatMessageMapper;
 import com.usto.api.ai.common.AiForecastAdapter;
+import com.usto.api.ai.forecast.domain.model.Forecast;
+import com.usto.api.ai.forecast.domain.model.RiskLevel;
+import com.usto.api.ai.forecast.domain.repository.ForecastRepository;
 import com.usto.api.ai.forecast.domain.service.ForecastPolicy;
+import com.usto.api.ai.forecast.infrastructure.mapper.ForecastMapper;
 import com.usto.api.ai.forecast.presentation.dto.request.AiForecastRequest;
 import com.usto.api.ai.forecast.presentation.dto.response.AiForecastResponse;
+import com.usto.api.common.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ForecastApplication {
 
     private final AiForecastAdapter aiForecastAdapter;
     private final ObjectMapper objectMapper;
     private final ForecastPolicy forecastPolicy;
+    private final ForecastRepository forecastRepository;
 
     @Transactional
     public AiForecastResponse analyze(String usrId, String orgCd, AiForecastRequest request) {
-        // 정책 검사
+
+        //정책 검사
         forecastPolicy.validateRequest(request,orgCd);
         forecastPolicy.validateOrganization(request.conditions().campus(),orgCd);
 
         // AI 호출
-        AiForecastResponse response = aiForecastAdapter.fetchForecastResponse(request);
+        AiForecastResponse aiResponse = aiForecastAdapter.fetchForecastResponse(request);
 
-        // 3) TODO: DB 저장 (조건 컬럼 + 결과 JSON 통 저장)
-        // - summary/ts/matrix/reco 를 String으로 저장하려면:
-        //   objectMapper.writeValueAsString(...) 사용
+        log.info("AI Response: {}", aiResponse);
 
-        return response;
+        //도메인 객체에 내용 담기
+        Forecast forecast = ForecastMapper.toDomain(
+                usrId,
+                request.conditions().year(),
+                request.conditions().semester(),
+                request.conditions().risk_level(),
+                request.prompt(),
+                orgCd,
+                toJsonNullable(aiResponse.summary()),
+                toJsonNullable(aiResponse.chart_forecast()),
+                toJsonNullable(aiResponse.chart_portfolio()),
+                toJsonNullable(aiResponse.recommendations())
+        );
+
+        forecastRepository.save(forecast);
+
+        return aiResponse;
+    }
+
+    private String toJsonNullable(Object value) {
+        if (value == null) return null;
+        try {
+            return objectMapper.writeValueAsString(value);
+        } catch (JsonProcessingException e) {
+            throw new BusinessException("Forecast 응답 JSON 직렬화에 실패했습니다.");
+        }
     }
 }
