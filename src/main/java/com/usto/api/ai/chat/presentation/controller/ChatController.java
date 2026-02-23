@@ -63,9 +63,9 @@ public class ChatController {
             summary = "쓰레드 삭제",
             description = "채팅방을 삭제합니다."
     )
-    @DeleteMapping("/threads/{threadId}")
+    @DeleteMapping("/threads")
     public ApiResponse<?> threads(
-            @PathVariable UUID threadId,
+            @RequestParam UUID threadId,
             @Valid @AuthenticationPrincipal UserPrincipal userPrincipal
     ) {
         aiChatApplication.deleteThread(
