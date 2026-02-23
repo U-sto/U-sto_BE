@@ -121,10 +121,8 @@ public class AiChatAdapter {
         if (body == null) return false;
         String b = body.toLowerCase();
         return b.contains("err_ngrok_3200")
-                || b.contains("ngrok")
-                || b.contains("<!doctype html")
                 || b.contains("ngrok-free.dev is offline")
-                || (b.contains("the endpoint") && b.contains("is offline"));
+                || (b.contains("the endpoint") && b.contains("is offline") && b.contains("ngrok"));
     }
 
     private static String abbreviate(String s) {
