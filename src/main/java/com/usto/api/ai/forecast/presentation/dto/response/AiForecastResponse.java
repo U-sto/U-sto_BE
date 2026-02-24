@@ -1,5 +1,6 @@
 package com.usto.api.ai.forecast.presentation.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 
 import java.util.List;
@@ -7,14 +8,19 @@ import java.util.List;
 @Builder
 public record AiForecastResponse(
         Summary summary,
-        List<ChartForecastPoint> chart_forecast,
-        List<ChartPortfolioPoint> chart_portfolio,
+        @JsonProperty("chart_forecast")
+        List<ChartForecastPoint> chartForecast,
+        @JsonProperty("chart_portfolio")
+        List<ChartPortfolioPoint> chartPortfolio,
         List<RecommendationRow> recommendations
 ) {
     public record Summary(
-            String target_text,
-            String risk_text,
-            String period_text
+            @JsonProperty("target_text")
+            String targetText,
+            @JsonProperty("risk_text")
+            String riskText,
+            @JsonProperty("period_text")
+            String periodText
     ) {}
 
     public record ChartForecastPoint(

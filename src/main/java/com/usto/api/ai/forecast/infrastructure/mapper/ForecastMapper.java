@@ -60,7 +60,6 @@ public class ForecastMapper {
                 .matrixJson(domain.getMatrixJson())
                 .recommendationJson(domain.getRecoJson())
                 .orgCd(domain.getOrgCode())
-                .deptCd(domain.getDeptCd())
                 .summaryJson(domain.getSummaryJson())
                 .build();
     }

@@ -36,6 +36,6 @@ public record AiForecastRequest(
             String category,          // 물품분류명 (입력 안 하면 null 또는 빈 값)
 
             @Schema(example = "LOW")
-            @NotNull RiskLevel risk_level //리스크 성향 (UI의 Low/Mid/High 선택값)
+            @NotNull RiskLevel riskLevel //리스크 성향 (UI의 Low/Mid/High 선택값)
     ) {}
 }

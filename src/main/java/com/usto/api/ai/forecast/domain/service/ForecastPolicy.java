@@ -65,7 +65,7 @@ public class ForecastPolicy {
         }
 
         // risk_level (enum)
-        if (c.risk_level() == null) {
+        if (c.riskLevel() == null) {
             throw new BusinessException("conditions.risk_level은 필수입니다.");
         }
     }
@@ -76,7 +76,7 @@ public class ForecastPolicy {
         }
     }
 
-    public void valdateOwnerShip(String userId, String username) {
+    public void valdateOwnership(String userId, String username) {
         if(!userId.equals(username)){
             throw new RuntimeException("자신의 기록만 열람할 수 있습니다.");
         }

@@ -49,12 +49,12 @@ public class ForecastApplication {
                 usrId,
                 request.conditions().year().shortValue(),
                 request.conditions().semester().byteValue(),
-                request.conditions().risk_level(),
+                request.conditions().riskLevel(),
                 request.prompt(),
                 orgCd,
                 toJsonNullable(aiResponse.summary()),
-                toJsonNullable(aiResponse.chart_forecast()),
-                toJsonNullable(aiResponse.chart_portfolio()),
+                toJsonNullable(aiResponse.chartForecast()),
+                toJsonNullable(aiResponse.chartPortfolio()),
                 toJsonNullable(aiResponse.recommendations()),
                 request.conditions().department()
         );
@@ -64,6 +64,7 @@ public class ForecastApplication {
         return aiResponse;
     }
 
+    @Transactional
     public AiForecastResponse check(String username, String orgCd, @Valid UUID forecastId) {
 
         Forecast forecast = forecastRepository.findById(forecastId);
@@ -72,7 +73,7 @@ public class ForecastApplication {
         }
 
         forecastPolicy.validateOrganization(forecast.getOrgCode(),orgCd);
-        forecastPolicy.valdateOwnerShip(forecast.getUserId(),username);
+        forecastPolicy.valdateOwnership(forecast.getUserId(),username);
 
         JsonNode summaryNode = readTreeOrNull(forecast.getSummaryJson());
         JsonNode tsNode = readTreeOrNull(forecast.getTsJson());
@@ -82,8 +83,8 @@ public class ForecastApplication {
         return AiForecastResponse
                 .builder()
                 .summary(objectMapper.convertValue(summaryNode, AiForecastResponse.Summary.class))
-                .chart_forecast(objectMapper.convertValue(tsNode, new TypeReference<>() {}))
-                .chart_portfolio(objectMapper.convertValue(matrixNode, new TypeReference<>() {}))
+                .chartForecast(objectMapper.convertValue(tsNode, new TypeReference<>() {}))
+                .chartPortfolio(objectMapper.convertValue(matrixNode, new TypeReference<>() {}))
                 .recommendations(objectMapper.convertValue(recoNode, new TypeReference<>() {}))
                 .build();
     }
@@ -108,7 +109,7 @@ public class ForecastApplication {
         }
     }
 
-
+    @Transactional
     public List<UUID> findAll(String username, String orgCd) {
 
         List<UUID> ids = forecastRepository.findByUsrId(username);
@@ -116,6 +117,7 @@ public class ForecastApplication {
         return ids;
     }
 
+    @Transactional
     public void delete(String username, String orgCd, @Valid UUID forecastId) {
         Forecast forecast = forecastRepository.findById(forecastId);
         if(forecast == null){
@@ -123,7 +125,7 @@ public class ForecastApplication {
         }
 
         forecastPolicy.validateOrganization(forecast.getOrgCode(),orgCd);
-        forecastPolicy.valdateOwnerShip(forecast.getUserId(),username);
+        forecastPolicy.valdateOwnership(forecast.getUserId(),username);
 
         forecastRepository.delete(forecastId);
 
