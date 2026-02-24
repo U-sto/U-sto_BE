@@ -14,7 +14,7 @@ import com.usto.api.ai.chat.infrastructure.mapper.ChatThreadMapper;
 import com.usto.api.ai.chat.presentation.dto.request.AiChatRequest;
 import com.usto.api.ai.chat.presentation.dto.response.AiChatResponse;
 import com.usto.api.ai.chat.presentation.dto.response.ChatMessageResponse;
-import com.usto.api.ai.common.AiClientAdapter;
+import com.usto.api.ai.common.AiChatAdapter;
 import com.usto.api.common.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +30,7 @@ import java.util.UUID;
 @Slf4j
 public class AiChatApplication {
 
-    private final AiClientAdapter aiClientAdapter;
+    private final AiChatAdapter aiClientAdapter;
     private final ObjectMapper objectMapper;
     private final ChatMessageRepository chatMessageRepository;
     private final ChatThreadRepository chatThreadRepository;
