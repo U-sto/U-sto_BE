@@ -1,7 +1,7 @@
 package com.usto.api.ai.chat.presentation.controller;
 
 import com.usto.api.ai.chat.application.AiChatApplication;
-import com.usto.api.ai.chat.application.ChatGptTestApplication;
+import com.usto.api.ai.chat.application.ChatGptApplication;
 import com.usto.api.ai.chat.presentation.dto.request.AiChatRequest;
 import com.usto.api.ai.chat.presentation.dto.response.AiChatResponse;
 import com.usto.api.ai.chat.presentation.dto.response.ChatMessageResponse;
@@ -24,7 +24,7 @@ import java.util.UUID;
 public class ChatController {
 
     private final AiChatApplication aiChatApplication;
-    private final ChatGptTestApplication chatGptTestApplication;
+    private final ChatGptApplication chatGptTestApplication;
 
     @Operation(
             summary = "AI팀의 챗봇과 대화(AI 연동 후)",

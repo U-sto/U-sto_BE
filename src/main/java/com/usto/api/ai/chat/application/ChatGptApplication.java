@@ -6,18 +6,12 @@ import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-
 @Service
-public class ChatGptTestApplication {
+public class ChatGptApplication {
 
     private final ChatClient chatClient;
 
-    public ChatGptTestApplication(ChatClient.Builder chatClientBuilder) {
+    public ChatGptApplication(ChatClient.Builder chatClientBuilder) {
         this.chatClient = chatClientBuilder.build();
     }
 

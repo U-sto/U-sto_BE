@@ -18,11 +18,9 @@ import com.usto.api.ai.common.AiChatAdapter;
 import com.usto.api.common.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -41,7 +39,7 @@ public class AiChatApplication {
     private final ChatMessageRepository chatMessageRepository;
     private final ChatThreadRepository chatThreadRepository;
     private final ChatThreadPolicy chatThreadPolicy;
-    private final ChatGptTestApplication chatGptTestApplication;
+    private final ChatGptApplication chatGptTestApplication;
 
 
     @Transactional
