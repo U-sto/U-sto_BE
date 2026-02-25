@@ -15,4 +15,6 @@ public interface ChatThreadJpaRepository extends JpaRepository<ChatThreadJpaEnti
     ChatThreadJpaEntity findByThreadId(UUID threadId);
 
     void deleteById(UUID threadId);
+
+    boolean existsByTitle(String title);
 }

@@ -16,6 +16,7 @@ public class ApiResponse<T> {
 
     private final boolean success;
     private final String message;
+    //private final String code <- 실패케이스에 코드를 추가해야, 프론트에서 수월하다.
     private final T data;
 
     public static <T> ApiResponse<T> ok(String message, T data) {
