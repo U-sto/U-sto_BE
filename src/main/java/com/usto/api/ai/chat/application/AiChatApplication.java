@@ -51,8 +51,7 @@ public class AiChatApplication {
 
             chatThreadRepository.save(master);
 
-            UUID masterId = master.getThreadId();
-            threadId= masterId;
+            threadId = master.getThreadId();
         }
 
         ChatMessage chatMessageByUser = ChatMessageMapper.toDomain(
@@ -76,10 +75,9 @@ public class AiChatApplication {
         log.info("AI Response: {}", aiResponse);
 
         try {
-            String refJson = null;
             if (aiResponse.references() != null) {
                 String replyJson = aiResponse.reply();
-                refJson = objectMapper.writeValueAsString(aiResponse.references());
+                String refJson = objectMapper.writeValueAsString(aiResponse.references());
 
                 ChatMessage chatMessageByBot = ChatMessageMapper.toDomain(
                         threadId,
@@ -171,7 +169,7 @@ public class AiChatApplication {
 
         List<String> candidates = Arrays.stream(gptResponse.split(","))
                 .map(String::trim)
-                .collect(Collectors.toList());
+                .toList();
 
         for (String candi : candidates) {
             if (!chatThreadRepository.existsByTitle(candi)) {
