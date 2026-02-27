@@ -1,6 +1,5 @@
 package com.usto.api.item.disposal.domain.model;
 
-import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -16,6 +15,5 @@ public enum DisposalArrangementType {
     LOSS("멸실"),
     THEFT("도난");
 
-    @JsonValue
     private final String description;
 }

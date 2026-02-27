@@ -1,6 +1,5 @@
 package com.usto.api.item.returning.domain.model;
 
-import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -15,6 +14,5 @@ public enum ReturningReason {
     COMMON_CONVERSION("공용전환"),
     BROKEN("파손");
 
-    @JsonValue
     private final String description;
 }

@@ -1,6 +1,5 @@
 package com.usto.api.item.acquisition.domain.model;
 
-import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -11,6 +10,5 @@ public enum AcqArrangementType {
     DONATE("기증"),
     MAKE("자체제작");
 
-    @JsonValue
     private final String description;
 }
