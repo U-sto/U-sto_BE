@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Tag(name = "log-controller", description = "로그인/아웃 관련 API")
+@Tag(name = "[00-01] log-controller", description = "로그인/아웃 관련 API")
 @Slf4j
 @RestController
 @RequiredArgsConstructor

@@ -18,7 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "exists-controller", description = "중복 확인 관련 API")
+@Tag(name = "[00-02] exists-controller", description = "중복 확인 관련 API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/users/exists")

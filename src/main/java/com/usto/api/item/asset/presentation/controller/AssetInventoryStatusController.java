@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.math.BigDecimal;
 import java.util.UUID;
 
-@Tag(name = "item-asset-inventory-status-controller", description = "물품 보유 현황 조회 API")
+@Tag(name = "[07-01] item-asset-inventory-status-controller", description = "물품 보유 현황 조회 API")
 @RestController
 @RequestMapping("/api/item/asset-inventory-status")
 @RequiredArgsConstructor

@@ -31,7 +31,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-@Tag(name = "item-asset-controller", description = "물품 대장 관리 API")
+@Tag(name = "[04-01, 02] item-asset-controller", description = "물품 운용 대장 관리 API")
 @RestController
 @RequestMapping("/api/item/assets")
 @RequiredArgsConstructor
@@ -40,7 +40,7 @@ public class AssetController {
     private final AssetApplication assetApplication;
 
     @Operation(
-            summary = "물품대장 조회",
+            summary = "물품운용대장 조회",
             description = "필터 조건(G2B, 취득일자, 정리일자, 부서, 운용상태, 물품번호)에 따라 운용대장을 조회합니다. 논리삭제된 물품은 제외됩니다."
     )
     @GetMapping

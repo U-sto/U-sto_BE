@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @desc G2B 팝업 검색 API 컨트롤러
  */
 
-@Tag(name = "g2b-controller", description = "G2B API")
+@Tag(name = "[03-02] g2b-controller", description = "G2B API")
 @RestController
 @RequestMapping("/api/g2b")
 @RequiredArgsConstructor

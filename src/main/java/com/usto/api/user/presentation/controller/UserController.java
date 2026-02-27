@@ -17,7 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "user-controller", description = "회원 정보 관련 API")
+@Tag(name = "[00-02, 09-0x] user-controller", description = "회원 정보 관련 API")
 @Slf4j
 @RestController
 @RequiredArgsConstructor
