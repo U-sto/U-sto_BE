@@ -3,6 +3,7 @@ package com.usto.api.common.code.application;
 import com.usto.api.common.code.domain.CodeGroup;
 import com.usto.api.common.code.presentation.dto.CodeGroupResponse;
 import com.usto.api.common.code.presentation.dto.CodeResponse;
+import com.usto.api.common.exception.BusinessException;
 import com.usto.api.item.acquisition.domain.model.AcqArrangementType;
 import com.usto.api.item.common.model.ApprStatus;
 import com.usto.api.item.common.model.ItemStatus;
@@ -33,7 +34,7 @@ public class CodeApplication {
             case "RETURNING_REASON" -> createCodeGroup("반납사유", ReturningReason.values());
             case "DISUSE_REASON" -> createCodeGroup("불용사유", DisuseReason.values());
             case "DISPOSAL_TYPE" -> createCodeGroup("처분정리구분", DisposalArrangementType.values());
-            default -> throw new IllegalArgumentException("존재하지 않는 코드 그룹입니다: " + groupName);
+            default -> throw new BusinessException("존재하지 않는 코드 그룹입니다: " + groupName);
         };
     }
 
