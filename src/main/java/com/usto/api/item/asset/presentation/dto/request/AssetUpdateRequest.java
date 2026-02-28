@@ -18,7 +18,7 @@ public class AssetUpdateRequest {
     @DecimalMin(value = "0", message = "취득단가는 0원 이상이어야 합니다.")
     private BigDecimal acqUpr;
 
-    @Schema(description = "내용연수", example = "5년")
+    @Schema(description = "내용연수", example = "5")
     @NotNull(message = "내용연수는 필수입니다.")
     private String drbYr;
 
