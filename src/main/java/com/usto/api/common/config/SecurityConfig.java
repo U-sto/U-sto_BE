@@ -101,6 +101,7 @@ public class SecurityConfig {
                     // 기본 허용 경로 (언제든 접근 가능) - 아무 역할이 아니더라도
                     auth.requestMatchers(
                             "/api/users/sign-up", //회원가입
+                            "/api/organization/organizations", // 회원가입 시 소속 선택용
                             "/api/users/exists/**", //중복조회 when 회원가입
                             "/api/auth/find/**", //아이디/비밀번호 찾기
                             "/api/auth/verification/**", //이메일/전화번호 인증 when 회원가입,아이디/비번찾기
@@ -140,6 +141,7 @@ public class SecurityConfig {
         return http.build();
     }
 
+    // CORS 설정
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
