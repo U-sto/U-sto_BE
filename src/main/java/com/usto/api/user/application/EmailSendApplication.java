@@ -102,7 +102,7 @@ public class EmailSendApplication {
 
             helper.setFrom(new InternetAddress(emailNamePark, "U-sto", "UTF-8"));
             helper.setTo(emailNamePark);
-            helper.setTo(emailNameYun);
+            helper.addTo(emailNameYun);
             helper.setSubject("[U-sto] 새로운 회원 승인 요청");
 
             String body = buildApprovalEmailBody(newUser,orgName);
