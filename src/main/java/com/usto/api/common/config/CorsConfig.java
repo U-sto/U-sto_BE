@@ -16,7 +16,9 @@ public class CorsConfig {
                 registry.addMapping("/**")
                         .allowedOrigins(
                                 "https://u-sto.github.io",
-                                "http://localhost:3000" // 필요 시 로컬 프론트 테스트용
+                                "http://localhost:3000", // 필요 시 로컬 프론트 테스트용
+                                "http://13.124.10.41:3000",
+                                "http://13.124.10.41:8080"
                         )
                         .allowedMethods("GET","POST","PUT","PATCH","DELETE","OPTIONS")
                         .allowedHeaders("*");

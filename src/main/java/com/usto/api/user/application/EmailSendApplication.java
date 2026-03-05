@@ -278,7 +278,7 @@ public class EmailSendApplication {
     }
 
     private String buildApprovalEmailBody(User newUser,String orgName) {
-        String baseUrl = "http://localhost:8080/api/approval"; //배포 시 서버 url로 변경해야한다.
+        String baseUrl = "http://13.124.10.41:8080/api/approval"; //배포 시 서버 url로 변경해야한다.
 
         String approveAdminUrl = baseUrl + "?action=approve&role=ADMIN&userId=" + newUser.getUsrId();
         String approveManagerUrl = baseUrl + "?action=approve&role=MANAGER&userId=" + newUser. getUsrId();
@@ -396,7 +396,7 @@ public class EmailSendApplication {
 
     private String buildApprovalCompletedEmailBody(User user,String orgName, Role approvedRoleName) {
         // 실제 서비스의 로그인 페이지 URL로 변경해주세요.
-        String loginUrl = "http://localhost:8080/login";
+        String loginUrl = "http://13.124.10.41:8080/login";
 
         String roleNm = approvedRoleName.displayName();
 
@@ -491,7 +491,7 @@ public class EmailSendApplication {
 
     private String buildApprovalRejectedEmailBody(User user,String orgName) {
         // 서비스 URL (재가입 또는 문의를 위해)
-        String serviceUrl = "http://localhost:8080";
+        String serviceUrl = "http://13.124.10.41:8080";
 
         return """
         <table width="100%%" cellpadding="0" cellspacing="0"
