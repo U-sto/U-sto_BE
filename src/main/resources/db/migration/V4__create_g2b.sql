@@ -1,4 +1,3 @@
-use usto;
 
 -- TB_G2B_RAW
 CREATE TABLE TB_G2B_RAW (
