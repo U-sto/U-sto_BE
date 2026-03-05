@@ -1,4 +1,3 @@
-use usto;
 
 -- TB_USER001M
 CREATE TABLE `TB_USER001M` (

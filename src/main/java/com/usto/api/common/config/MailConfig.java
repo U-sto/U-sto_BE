@@ -11,7 +11,6 @@ import java.util.Properties;
 
 //원래 자동으로 돼야하는데 오류나서 javaMailSender연결을 수동으로 만들었습니다
 @Configuration
-@Profile("dev") // application-dev.properties와 세트로 dev에서만 활성화 - 추후 릴리즈하면 릴리즈용 추가하면 됌
 public class MailConfig {
 
     @Value("${spring.mail.host}")

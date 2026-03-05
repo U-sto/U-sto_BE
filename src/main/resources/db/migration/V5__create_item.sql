@@ -1,4 +1,3 @@
-use usto;
 
 -- TB_ITEM001M 물품취득기본 (취득 당시 스냅샷)
 CREATE TABLE `TB_ITEM001M` (
