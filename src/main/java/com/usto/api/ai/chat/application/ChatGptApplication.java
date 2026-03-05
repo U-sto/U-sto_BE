@@ -7,10 +7,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-public class ChatGptTestApplication {
+public class ChatGptApplication {
 
     private final ChatClient chatClient;
-    public ChatGptTestApplication(ChatClient.Builder chatClientBuilder) {
+
+    public ChatGptApplication(ChatClient.Builder chatClientBuilder) {
         this.chatClient = chatClientBuilder.build();
     }
 
@@ -29,5 +30,18 @@ public class ChatGptTestApplication {
         return AiChatResponse.builder()
                 .reply(aiReply)
                 .build();
+    }
+
+    @Transactional
+    public String call(String message) {
+
+        if(message == null){
+            throw new BusinessException("메시지 누락");
+        }
+
+        return chatClient.prompt()
+                .user(message)
+                .call()
+                .content();
     }
 }

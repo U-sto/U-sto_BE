@@ -30,7 +30,9 @@ import java.time.LocalDateTime;
 public class EmailSendApplication {
 
     @Value("${spring.mail.username}")
-    private String emailName; //badbergjr@hanyang.ac.kr
+    private String emailNamePark;
+    @Value("${yun.mail.username}")
+    private String emailNameYun;
 
     private final JavaMailSender emailSender;// 실제 메일 전송기 (spring-boot-starter-mail이 제공)
     private final VerificationRepository verificationRepository; // 인증 이력 저장/조회용 JPA 리포지토리
@@ -98,8 +100,9 @@ public class EmailSendApplication {
             MimeMessage message = emailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
-            helper.setFrom(new InternetAddress(emailName, "U-sto", "UTF-8"));
-            helper.setTo(emailName);
+            helper.setFrom(new InternetAddress(emailNamePark, "U-sto", "UTF-8"));
+            helper.setTo(emailNamePark);
+            helper.addTo(emailNameYun);
             helper.setSubject("[U-sto] 새로운 회원 승인 요청");
 
             String body = buildApprovalEmailBody(newUser,orgName);
@@ -108,10 +111,13 @@ public class EmailSendApplication {
             emailSender.send(message);
 
             log.info("[APPROVAL-REQUEST] 승인 요청 메일 발송 완료 - to: {}, newUser: {}",
-                    emailName, newUser.getUsrId());
+                    emailNamePark, newUser.getUsrId());
+            log.info("[APPROVAL-REQUEST] 승인 요청 메일 발송 완료 - to: {}, newUser: {}",
+                    emailNameYun, newUser.getUsrId());
 
         } catch (MessagingException | UnsupportedEncodingException e) {
-            log.error("[APPROVAL-REQUEST] 메일 발송 실패 - to: {}", emailName, e);
+            log.error("[APPROVAL-REQUEST] 메일 발송 실패 - to: {}", emailNamePark, e);
+            log.error("[APPROVAL-REQUEST] 메일 발송 실패 - to: {}", emailNameYun, e);
             throw new RuntimeException("승인 요청 메일 발송 실패", e);
         }
     }
@@ -122,8 +128,8 @@ public class EmailSendApplication {
             MimeMessage message = emailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
-            helper.setFrom(new InternetAddress(emailName, "U-sto", "UTF-8"));
-            helper.setTo(emailName);
+            helper.setFrom(new InternetAddress(emailNamePark, "U-sto", "UTF-8"));
+            helper.setTo(newUser.getEmail());
             helper.setSubject("[U-sto] 승인 완료");
 
             String body = buildApprovalCompletedEmailBody(newUser,orgName,approvedRoleName);
@@ -132,10 +138,10 @@ public class EmailSendApplication {
             emailSender.send(message);
 
             log.info("[APPROVAL-REQUEST] 승인 완료 메일 발송 완료 - to: {}, newUser: {}",
-                    emailName, newUser.getUsrId());
+                    newUser.getEmail(), newUser.getUsrId());
 
         } catch (MessagingException | UnsupportedEncodingException e) {
-            log.error("[APPROVAL-REQUEST] 메일 발송 실패 - to: {}", emailName, e);
+            log.error("[APPROVAL-REQUEST] 메일 발송 실패 - to: {}", newUser.getEmail(), e);
             throw new RuntimeException("승인 완료 메일 발송 실패", e);
         }
     }
@@ -146,8 +152,8 @@ public class EmailSendApplication {
             MimeMessage message = emailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
-            helper.setFrom(new InternetAddress(emailName, "U-sto", "UTF-8"));
-            helper.setTo(emailName);
+            helper.setFrom(new InternetAddress(emailNamePark, "U-sto", "UTF-8"));
+            helper.setTo(newUser.getEmail());
             helper.setSubject("[U-sto] 승인 요청 반려");
 
             String body = buildApprovalRejectedEmailBody(newUser,orgName);
@@ -156,10 +162,10 @@ public class EmailSendApplication {
             emailSender.send(message);
 
             log.info("[APPROVAL-REQUEST] 승인 요청 반려 메일 발송 완료 - to: {}, newUser: {}",
-                    emailName, newUser.getUsrId());
+                    newUser.getEmail(), newUser.getUsrId());
 
         } catch (MessagingException | UnsupportedEncodingException e) {
-            log.error("[APPROVAL-REQUEST] 메일 발송 실패 - to: {}", emailName, e);
+            log.error("[APPROVAL-REQUEST] 메일 발송 실패 - to: {}", newUser.getEmail(), e);
             throw new RuntimeException("승인 요청 반려 메일 발송 실패", e);
         }
     }
@@ -171,7 +177,7 @@ public class EmailSendApplication {
         MimeMessage message = emailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
-        helper.setFrom(new InternetAddress(emailName, "U-sto", "UTF-8"));
+        helper.setFrom(new InternetAddress(emailNamePark, "U-sto", "UTF-8"));
         helper.setTo(to);
         helper.setSubject(getEmailSubject(purpose, code));
 
