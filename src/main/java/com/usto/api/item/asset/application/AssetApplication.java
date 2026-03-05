@@ -45,7 +45,7 @@ public class AssetApplication {
     private final QrLabelPdfGenerator qrLabelPdfGenerator;
     private final OrganizationJpaRepository organizationJpaRepository;
 
-    @Value("${app.frontend.base-url:http://13.124.10.41:8080}")
+    @Value("${app.frontend.base-url:http://13.124.10.41:8080}")  // 임시(프론트엔드 연동시 바꿔야함)
     private String frontendBaseUrl;
 
     /**
