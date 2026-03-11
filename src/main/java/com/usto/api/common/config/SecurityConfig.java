@@ -148,9 +148,7 @@ public class SecurityConfig {
                 "http://localhost:5173", //로컬 테스트용
                 "https://avengeful-shaunte-revolvingly.ngrok-free.dev", //로컬 테스트용
                 "http://13.124.10.41:3000",
-                "http://13.124.10.41:8080",
-                "http://13.124.10.41:5173",
-                "http://13.124.10.41:8080/swagger-ui/index.html#/"
+                "http://13.124.10.41:5173"
         ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
