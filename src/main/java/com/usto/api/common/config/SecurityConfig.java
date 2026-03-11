@@ -36,12 +36,8 @@ import java.util.List;
 @RequiredArgsConstructor // 생성자 주입용
 public class SecurityConfig {
 
-    private final Environment env; // 환경 변수 접근용
-
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        // 현재 활성화된 프로필이 dev인지 확인
-        boolean isDev = Arrays.asList(env.getActiveProfiles()).contains("dev");
 
         http
                 .csrf(csrf -> csrf.disable())
@@ -149,9 +145,11 @@ public class SecurityConfig {
                 "http://localhost:3000",
                 "http://localhost:8080",
                 "http://localhost:5500", //로컬 테스트용
+                "http://localhost:5173", //로컬 테스트용
                 "https://avengeful-shaunte-revolvingly.ngrok-free.dev", //로컬 테스트용
                 "http://13.124.10.41:3000",
                 "http://13.124.10.41:8080",
+                "http://13.124.10.41:5173",
                 "http://13.124.10.41:8080/swagger-ui/index.html#/"
         ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
