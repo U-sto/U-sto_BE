@@ -21,8 +21,8 @@ public class CoreApplication {
     @PostConstruct
     void logProfile() {
         System.out.println("CoreApplication 실행 성공");
-        System.out.println("profile 값(의도와 다르면 변경) : " + String.join(",", env.getActiveProfiles()));
-        System.out.println("USERNAME(의도와 다르면 변경) : " + env.getProperty("spring.test.username"));
+        System.out.println("profile 값 : " + String.join(",", env.getActiveProfiles()));
+        System.out.println("USERNAME : " + env.getProperty("spring.test.username"));
     }
 }
 

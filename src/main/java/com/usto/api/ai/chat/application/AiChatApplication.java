@@ -21,9 +21,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -35,19 +39,19 @@ public class AiChatApplication {
     private final ChatMessageRepository chatMessageRepository;
     private final ChatThreadRepository chatThreadRepository;
     private final ChatThreadPolicy chatThreadPolicy;
+    private final ChatGptApplication chatGptTestApplication;
 
 
     @Transactional
-    public AiChatResponse send(String userid,String orgCd, String message, UUID threadId) {
+    public AiChatResponse send(String userId,String orgCd, String message, UUID threadId) {
 
         if(threadId == null){
-            String title = sumMsg(message);
-            ChatThread master = ChatThreadMapper.toDomain(userid,title,orgCd);
+            String title = makeTitle(message);
+            ChatThread master = ChatThreadMapper.toDomain(userId,title,orgCd);
 
             chatThreadRepository.save(master);
 
-            UUID masterId = master.getThreadId();
-            threadId= masterId;
+            threadId = master.getThreadId();
         }
 
         ChatMessage chatMessageByUser = ChatMessageMapper.toDomain(
@@ -71,10 +75,9 @@ public class AiChatApplication {
         log.info("AI Response: {}", aiResponse);
 
         try {
-            String refJson = null;
             if (aiResponse.references() != null) {
                 String replyJson = aiResponse.reply();
-                refJson = objectMapper.writeValueAsString(aiResponse.references());
+                String refJson = objectMapper.writeValueAsString(aiResponse.references());
 
                 ChatMessage chatMessageByBot = ChatMessageMapper.toDomain(
                         threadId,
@@ -92,22 +95,6 @@ public class AiChatApplication {
         }
 
         return aiResponse;
-    }
-
-    private String sumMsg(String message) {
-        if (message == null || message.isBlank()) {
-            return "새로운 대화";
-        }
-
-        // 첫 번째 줄만 추출 (줄바꿈 제거)
-        String firstLine = message.split("\\n")[0].trim();
-
-        // 20자 제한 및 요약 처리
-        if (firstLine.length() <= 20) {
-            return firstLine;
-        }
-
-        return firstLine.substring(0, 20) + "...";
     }
 
     public List<UUID> threads(String username) {
@@ -161,6 +148,37 @@ public class AiChatApplication {
         }
 
         return result;
+    }
+
+    private String makeTitle(String message) {
+
+        if(message == null){
+            throw new BusinessException("메시지 누락");
+        }
+
+        String instruction = """
+        [Task] 메시지를 분석해 핵심 키워드 중심의 제목 후보 5개를 생성하세요.
+        [Policy] 
+        1. 20자 이내, 명사 위주 조합.
+        2. 결과는 반드시 콤마(,)로 구분된 한 줄로 출력할 것.
+        (예: 프로젝트 일정, 스프링 배포, 연동 가이드, 에러 로그, 자바 공부)
+        
+        메시지 내용: """ + message;
+
+        String gptResponse = chatGptTestApplication.call(instruction);
+
+        List<String> candidates = Arrays.stream(gptResponse.split(","))
+                .map(String::trim)
+                .toList();
+
+        for (String candi : candidates) {
+            if (!chatThreadRepository.existsByTitle(candi)) {
+                return candi;
+            }
+        }
+
+        //이래도 안된다? 그러면 최후의 수로 이렇게 한다.
+        return candidates.get(0) + "_" + LocalTime.now().format(DateTimeFormatter.ofPattern("mmss"));
     }
 }
 

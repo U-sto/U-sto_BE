@@ -49,4 +49,9 @@ public class ChatThreadRepositoryAdapter implements ChatThreadRepository {
     public void deleteThread(UUID threadId) {
         jpaRepository.deleteById(threadId);
     }
+
+    @Override
+    public boolean existsByTitle(String title) {
+        return jpaRepository.existsByTitle(title);
+    }
 }

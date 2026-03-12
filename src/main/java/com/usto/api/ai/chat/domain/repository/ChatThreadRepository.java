@@ -13,4 +13,6 @@ public interface ChatThreadRepository {
     ChatThread findById(UUID threadId);
 
     void deleteThread(UUID threadId);
+
+    boolean existsByTitle(String title);
 }

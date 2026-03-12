@@ -1,5 +1,3 @@
-use usto;
-
 -- TB_ORG001M
 CREATE TABLE `TB_ORG001M` (
   `ORG_CD` CHAR(7)  NOT NULL COMMENT '조직코드(의미코드)',
