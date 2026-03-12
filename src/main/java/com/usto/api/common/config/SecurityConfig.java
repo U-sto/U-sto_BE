@@ -147,6 +147,7 @@ public class SecurityConfig {
                 "http://localhost:5500", //로컬 테스트용
                 "http://localhost:5173", //로컬 테스트용
                 "https://avengeful-shaunte-revolvingly.ngrok-free.dev", //로컬 테스트용
+                "https://shavable-shella-thumbless.ngrok-free.dev",
                 "http://13.124.10.41:3000",
                 "http://13.124.10.41:5173"
         ));
