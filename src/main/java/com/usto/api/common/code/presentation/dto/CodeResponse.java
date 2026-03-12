@@ -13,5 +13,5 @@ public class CodeResponse {
     private String code;
 
     @Schema(description = "코드 설명", example = "작성중")
-    private String label;
+    private String description;
 }
