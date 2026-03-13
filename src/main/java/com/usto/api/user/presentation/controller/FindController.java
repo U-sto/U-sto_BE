@@ -7,6 +7,7 @@ import com.usto.api.user.presentation.dto.response.UserIdFindResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -47,7 +48,7 @@ public class FindController {
     @PostMapping("/password")
     @Operation(summary = "비밀번호 재설정")
     public ApiResponse<?> FindPassword(
-            @RequestBody PasswordResetRequest request,
+            @Valid @RequestBody PasswordResetRequest request,
             HttpSession session
     )
     {
