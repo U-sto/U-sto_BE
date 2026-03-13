@@ -1,6 +1,6 @@
 package com.usto.api.item.returning.domain.model;
 
-import com.fasterxml.jackson.annotation.JsonValue;
+import com.usto.api.common.code.domain.CodeGroup;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -9,12 +9,16 @@ import lombok.Getter;
  */
 @Getter
 @AllArgsConstructor
-public enum ReturningReason {
+public enum ReturningReason implements CodeGroup {
     PROJECT_ENDED("사업종료"),
     SURPLUS("잉여물품"),
     COMMON_CONVERSION("공용전환"),
     BROKEN("파손");
 
-    @JsonValue
     private final String description;
+
+    @Override
+    public String getCode() {
+        return this.name();
+    }
 }

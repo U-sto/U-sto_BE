@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 
-@Tag(name = "verification-controller", description = "인증 관련 API")
+@Tag(name = "[00-02] verification-controller", description = "인증 관련 API")
 @RestController
 @RequestMapping("/api/auth/verification")
 @RequiredArgsConstructor

@@ -6,6 +6,7 @@ import com.usto.api.ai.forecast.presentation.dto.response.AiForecastResponse;
 import com.usto.api.common.utils.ApiResponse;
 import com.usto.api.user.domain.model.UserPrincipal;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -16,6 +17,7 @@ import java.util.List;
 import java.util.UUID;
 
 
+@Tag(name = "[08-01] forecast-controller", description = "사용주기 AI예측 API")
 @RestController
 @RequestMapping("/api/ai/forecast")
 @RequiredArgsConstructor

@@ -32,7 +32,7 @@ public class AcqRegisterRequest {
     @NotNull(message = "정리구분은 필수입니다.")
     private AcqArrangementType arrgTy;
 
-    @Schema(description = "운용부서코드", example = "ADM_FAC")
+    @Schema(description = "운용부서코드", example = "A350")
     @NotBlank(message = "운용부서코드는 필수입니다.")
     private String deptCd;
 

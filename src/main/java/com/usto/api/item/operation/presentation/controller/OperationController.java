@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
-@Tag(name = "item-operation-controller", description = "물품 운용 관리 API")
+@Tag(name = "[04-??, 02-02] item-operation-controller", description = "물품 운용 전환 관리 API")
 @RestController
 @RequestMapping("/api/item/operations")
 @RequiredArgsConstructor

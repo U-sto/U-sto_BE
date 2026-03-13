@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Tag(name = "find-controller", description = "찾기 관련 API")
+@Tag(name = "[00-03, 04] find-controller", description = "찾기 관련 API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/auth/find")
