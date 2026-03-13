@@ -1,5 +1,3 @@
-USE usto;
-
 -- 부속기관 - https://www.hanyang.ac.kr/web/www/org_2
 
 INSERT INTO `TB_ORG002M`

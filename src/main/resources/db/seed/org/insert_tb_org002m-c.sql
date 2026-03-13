@@ -1,5 +1,3 @@
-USE usto;
-
 -- 대학(원) - https://www.hanyang.ac.kr/web/www/org_4
 
 INSERT INTO `TB_ORG002M`

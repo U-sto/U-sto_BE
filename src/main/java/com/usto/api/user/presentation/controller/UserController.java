@@ -32,7 +32,7 @@ public class UserController {
     @PostMapping("sign-up")
     @Operation(summary = "회원 가입")
     public ApiResponse<?> signup(
-            @RequestBody SignupRequest request,
+            @Valid @RequestBody SignupRequest request,
             HttpSession session
     ){
 
