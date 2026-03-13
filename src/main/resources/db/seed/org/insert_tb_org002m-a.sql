@@ -1,5 +1,3 @@
-USE usto;
-
 -- 총장 직속 및 본부기관 - https://www.hanyang.ac.kr/web/www/org
 INSERT INTO `TB_ORG002M`
 (DEPT_CD, ORG_CD, DEPT_NM, UP_DEPT_NM, CRE_BY, CRE_AT)

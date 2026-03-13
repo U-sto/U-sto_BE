@@ -1,4 +1,4 @@
-USE usto;
+USE dev_db;
 
 INSERT INTO TB_ORG001M (
                         ORG_CD,
