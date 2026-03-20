@@ -4,6 +4,7 @@ import com.usto.api.common.utils.ApiResponse;
 import com.usto.api.common.utils.PrdctUsefulLifeOpenApiClient;
 import com.usto.api.common.utils.PrdctUsefulLifeOpenApiClient.PageResult;
 import com.usto.api.g2b.application.G2bTestApplication;
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -18,6 +19,7 @@ public class G2bTestController {
 
     private final G2bTestApplication g2bTestApplication;
 
+    @Hidden
     @Operation(
             summary = "공공데이터 포털 연동 테스트 - Sync"
     )
@@ -49,6 +51,7 @@ public class G2bTestController {
         return ApiResponse.ok("테스트 완료",result);
     }
 
+    @Hidden
     @Operation(
             summary = "공공데이터 포털 연동 테스트 - 내용연수"
     )
