@@ -5,8 +5,8 @@ import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
-import java.util.Optional;
-import org.springframework.boot.info.GitProperties;
+import java.io.InputStream;
+import java.util.Properties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -14,17 +14,15 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class SwaggerConfig {
     @Bean
-    public OpenAPI openAPI(Optional<GitProperties> gitProperties) {
+    public OpenAPI openAPI() {
         String cookieAuthName = "JSESSIONID";
 
-        String commitCount = gitProperties
-                .map(g -> g.get("git.total.commit.count"))
-                .map(Object::toString)
-                .orElse("0");
-
-        String version = "1.0." + commitCount;
+        String commitCount = readGitTotalCommitCount();
+        String version = toSemverLike(commitCount);     // "2.3.4"
 
         System.out.println("VERSION=" + version);
+        var url = SwaggerConfig.class.getClassLoader().getResource("git.properties");
+        System.out.println("git.properties resource = " + url);
 
         SecurityRequirement securityRequirement = new SecurityRequirement()
                 .addList(cookieAuthName);
@@ -43,6 +41,36 @@ public class SwaggerConfig {
                 .addSecurityItem(securityRequirement)
                 .components(new Components()
                         .addSecuritySchemes(cookieAuthName, securityScheme));
+    }
+
+    private String readGitTotalCommitCount() {
+        try (InputStream is = SwaggerConfig.class.getClassLoader().getResourceAsStream("git.properties")) {
+            if (is == null) return "0";
+
+            Properties props = new Properties();
+            props.load(is);
+
+            String value = props.getProperty("git.total.commit.count");
+            return (value == null || value.isBlank()) ? "0" : value.trim();
+        } catch (Exception e) {
+            // 여기서 예외 나면 무조건 0으로
+            return "0";
+        }
+    }
+
+    private String toSemverLike(String commitCountString) {
+        int n;
+        try {
+            n = Integer.parseInt(commitCountString.trim());
+        } catch (Exception e) {
+            return "0.0.0";
+        }
+
+        int major = n / 100;
+        int minor = (n / 10) % 10;
+        int patch = n % 10;
+
+        return major + "." + minor + "." + patch;
     }
 }
 
