@@ -5,17 +5,22 @@ import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
-import io.swagger.v3.oas.models.servers.Server;
+import java.util.Optional;
+import org.springframework.boot.info.GitProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.List;
 
 @Configuration
 public class SwaggerConfig {
     @Bean
-    public OpenAPI openAPI() {
+    public OpenAPI openAPI(Optional<GitProperties> gitProperties) {
         String cookieAuthName = "JSESSIONID";
+
+        String version = gitProperties
+                .map(GitProperties::getShortCommitId)     // 예: a1b2c3d
+                .map(id -> "1.0.0+" + id)                 // 예: 1.0.0+a1b2c3d
+                .orElse("1.0.0-dev");
 
         SecurityRequirement securityRequirement = new SecurityRequirement()
                 .addList(cookieAuthName);
@@ -30,7 +35,7 @@ public class SwaggerConfig {
                 .info(new Info()
                         .title("U-sto API")
                         .description("U-sto 백엔드 API 문서")
-                        .version("1.0.0"))
+                        .version(version))
                 .addSecurityItem(securityRequirement)
                 .components(new Components()
                         .addSecuritySchemes(cookieAuthName, securityScheme));
