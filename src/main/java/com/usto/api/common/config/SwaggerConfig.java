@@ -24,6 +24,9 @@ public class SwaggerConfig {
 
         String version = "1.0." + commitCount;
 
+
+        System.out.println("VERSION=" + version);
+
         SecurityRequirement securityRequirement = new SecurityRequirement()
                 .addList(cookieAuthName);
 
@@ -35,21 +38,12 @@ public class SwaggerConfig {
 
         return new OpenAPI()
                 .info(new Info()
-                        .title("U-sto API")
-                        .description("U-sto 백엔드 API 문서")
+                        .title("U-sto BackEnd API")
+                        .description("U-sto 백엔드 API 문서입니다.")
                         .version(version))
                 .addSecurityItem(securityRequirement)
                 .components(new Components()
                         .addSecuritySchemes(cookieAuthName, securityScheme));
-    }
-
-    private io.swagger.v3.oas.models.info.Info apiInfo() {
-        return new io.swagger.v3.oas.models.info.Info()
-                .title("U-sto API")
-                .description("대학물품관리시스템")
-                .version("1.0.0");
-
-
     }
 }
 
