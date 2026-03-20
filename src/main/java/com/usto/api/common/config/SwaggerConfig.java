@@ -65,6 +65,7 @@ public class SwaggerConfig {
         } catch (Exception e) {
             return "0.0.0";
         }
+        n += 100; // 버전은 1이상
 
         int major = n / 100;
         int minor = (n / 10) % 10;
