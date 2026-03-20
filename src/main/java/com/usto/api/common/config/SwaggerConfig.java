@@ -24,7 +24,6 @@ public class SwaggerConfig {
 
         String version = "1.0." + commitCount;
 
-
         SecurityRequirement securityRequirement = new SecurityRequirement()
                 .addList(cookieAuthName);
 
