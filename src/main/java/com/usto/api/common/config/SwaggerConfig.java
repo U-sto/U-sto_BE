@@ -17,10 +17,12 @@ public class SwaggerConfig {
     public OpenAPI openAPI(Optional<GitProperties> gitProperties) {
         String cookieAuthName = "JSESSIONID";
 
-        String version = gitProperties
-                .map(GitProperties::getShortCommitId)     // 예: a1b2c3d
-                .map(id -> "1.0.0+" + id)                 // 예: 1.0.0+a1b2c3d
-                .orElse("1.0.0-dev");
+        String commitCount = gitProperties
+                .map(g -> g.get("git.total.commit.count"))
+                .map(Object::toString)
+                .orElse("0");
+
+        String version = "1.0." + commitCount;
 
         SecurityRequirement securityRequirement = new SecurityRequirement()
                 .addList(cookieAuthName);
