@@ -24,7 +24,6 @@ public class SwaggerConfig {
 
         String version = "1.0." + commitCount;
 
-
         System.out.println("VERSION=" + version);
 
         SecurityRequirement securityRequirement = new SecurityRequirement()
