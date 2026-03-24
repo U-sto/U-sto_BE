@@ -13,7 +13,9 @@ public enum DisuseReason implements CodeGroup {
     LIFE_EXPIRED("내용연수경과"),
     OBSOLETE("구형화"),
     NO_DEPT("활용부서부재"),
-    HIGH_REPAIR("수리비용과다");
+    HIGH_REPAIR("수리비용과다"),
+    DAMAGED("고장/파손"),
+    DETERIORATED("노후화(성능저하)");
 
     private final String description;
 
