@@ -5,12 +5,16 @@ import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
+
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
+
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-
+@Slf4j
 @Configuration
 public class SwaggerConfig {
     @Bean
@@ -19,10 +23,6 @@ public class SwaggerConfig {
 
         String commitCount = readGitTotalCommitCount();
         String version = toSemverLike(commitCount);     // "2.3.4"
-
-        System.out.println("VERSION=" + version);
-        var url = SwaggerConfig.class.getClassLoader().getResource("git.properties");
-        System.out.println("git.properties resource = " + url);
 
         SecurityRequirement securityRequirement = new SecurityRequirement()
                 .addList(cookieAuthName);
@@ -52,8 +52,8 @@ public class SwaggerConfig {
 
             String value = props.getProperty("git.total.commit.count");
             return (value == null || value.isBlank()) ? "0" : value.trim();
-        } catch (Exception e) {
-            // 여기서 예외 나면 무조건 0으로
+        } catch (IOException e) {
+            log.warn("git.properties 파일을 읽는 중 오류가 발생하여 기본값 '0'을 사용합니다.", e);
             return "0";
         }
     }
@@ -62,7 +62,8 @@ public class SwaggerConfig {
         int n;
         try {
             n = Integer.parseInt(commitCountString.trim());
-        } catch (Exception e) {
+        } catch (NumberFormatException e) {
+            log.warn("commit count 문자열 '{}'를 파싱할 수 없어 기본 버전 '0.0.0'을 사용합니다.", commitCountString, e);
             return "0.0.0";
         }
         n += 100; // 버전은 1이상
