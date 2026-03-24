@@ -2,11 +2,22 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '3.5.9'
     id 'io.spring.dependency-management' version '1.1.7'
+    id "com.gorylenko.gradle-git-properties" version "2.4.2"
 }
 
 group = 'com.usto'
 version = '0.0.1-SNAPSHOT'
 description = 'core'
+
+gitProperties {
+    // 생성되는 git.properties에 어떤 값들을 넣을지
+    keys = [
+            'git.commit.id.abbrev',
+            'git.commit.id.describe',
+            'git.commit.time',
+            'git.total.commit.count'
+    ]
+}
 
 java {
     toolchain {

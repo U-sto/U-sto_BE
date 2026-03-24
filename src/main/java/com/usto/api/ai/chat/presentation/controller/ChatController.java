@@ -7,6 +7,7 @@ import com.usto.api.ai.chat.presentation.dto.response.AiChatResponse;
 import com.usto.api.ai.chat.presentation.dto.response.ChatMessageResponse;
 import com.usto.api.common.utils.ApiResponse;
 import com.usto.api.user.domain.model.UserPrincipal;
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.Valid;
@@ -108,6 +109,7 @@ public class ChatController {
         return ApiResponse.ok("조회 성공",response);
     }
 
+    @Hidden
     @Operation(
             summary = "Chat GPT와 대화하기 테스트(AI팀 연동 X)",
             description = "별도의 연동 없이 일반 지피티랑 대화합니다."

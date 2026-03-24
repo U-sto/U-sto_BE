@@ -4,6 +4,7 @@ import com.usto.api.common.utils.ApiResponse;
 import com.usto.api.g2b.application.G2bSyncApplication;
 import com.usto.api.g2b.application.G2bSyncHistoryApplication;
 import com.usto.api.g2b.domain.model.SyncResult;
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,7 @@ public class G2bSyncController {
     private final G2bSyncApplication g2bSyncApplication;
     private final G2bSyncHistoryApplication g2bSyncHistoryApplication;
 
+    @Hidden
     @Operation(
             summary = "G2B 목록정보 최신화(자동)"
     )
@@ -54,6 +56,7 @@ public class G2bSyncController {
         return ApiResponse.ok(msg);
     }
 
+    @Hidden
     @Operation(
             summary = "내용연수 최신화(자동)"
     )
