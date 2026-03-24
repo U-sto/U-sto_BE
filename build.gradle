@@ -96,7 +96,7 @@ tasks.named('test') {
 }
 
 springBoot {
-    mainClass = 'com.usto.CoreApplication'
+    mainClass = 'com.usto.api.CoreApplication'
 }
 
 // QueryDSL QClass 생성 위치 설정
