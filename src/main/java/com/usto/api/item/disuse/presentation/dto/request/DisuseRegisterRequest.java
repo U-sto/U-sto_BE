@@ -28,7 +28,7 @@ public class DisuseRegisterRequest {
     @NotNull(message = "물품상태는 필수입니다.")
     private ItemStatus itemSts;
 
-    @Schema(description = "불용사유 (LIFE_EXPIRED:내용연수경과, OBSOLETE:구형화, NO_DEPT:활용부서부재, HIGH_REPAIR:수리비용과다)", example = "LIFE_EXPIRED")
+    @Schema(description = "불용사유 (LIFE_EXPIRED:내용연수경과, OBSOLETE:구형화, NO_DEPT:활용부서부재, HIGH_REPAIR:수리비용과다, DAMAGED:고장/파손, DETERIORATED:노후화(성능저하))", example = "LIFE_EXPIRED")
     @NotNull(message = "불용사유는 필수입니다.")
     private DisuseReason dsuRsn;
 
