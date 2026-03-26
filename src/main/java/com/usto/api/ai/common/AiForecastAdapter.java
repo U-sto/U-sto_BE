@@ -107,7 +107,6 @@ public class AiForecastAdapter {
 
             // 2. "data" 키에 해당하는 자식 노드만 추출
             JsonNode dataNode = rootNode.get("data");
-        //=====================성공===============================
             if (dataNode != null && !dataNode.isNull()) {
                 AiForecastResponse res = objectMapper.treeToValue(dataNode, AiForecastResponse.class);
                 boolean allEmpty = (res.summary() == null)
@@ -118,6 +117,8 @@ public class AiForecastAdapter {
                     // AI는 성공적으로 응답했지만, 유의미한 분석 결과가 없는 경우를 방지하기 위해 추가 검증
                     throw new BusinessException("AI가 유의미한 분석을 반환하지 않았습니다. 입력 조건을 확인하거나 잠시 후 다시 시도해주세요.");
                 }
+
+                //=====================성공===============================
                 return res; //<- 성공한 결과
             }
         } catch (Exception e) {
