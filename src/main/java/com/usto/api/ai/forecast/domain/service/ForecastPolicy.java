@@ -34,8 +34,8 @@ public class ForecastPolicy {
         if (c.semester() == null) {
             throw new BusinessException("conditions.semester는 필수입니다.");
         }
-        if (c.semester() != 1 && c.semester() != 2) {
-            throw new BusinessException("conditions.semester는 1 또는 2만 허용됩니다.");
+        if (c.semester() < 1 || c.semester() > 4) {
+            throw new BusinessException("conditions.semester는 1,2,3,4만 허용됩니다.");
         }
 
         // campus/org
