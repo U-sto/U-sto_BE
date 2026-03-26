@@ -147,15 +147,12 @@ public class ForecastApplication {
         return new AiForecastRequestToAi(
                 request.prompt(),
                 new AiForecastRequestToAi.Conditions(
-                        c.year(),
-                        // a) ToAi.semester 타입이 Integer인 현재 파일 기준
-                        //aiSemester,
-                        c.semester(),
-                        c.campus(),          // org_cd
-                        c.department(),      // dept_cd
+                        c.year(), //2026
+                        aiSemester, //SPRING, SUMMER, FALL, WINTER
+                        c.campus(),          //7008277
+                        deptName,             //소프트웨어융합대학행정실
                         c.category(),
-                        c.risk_level(),      // enum은 문자열로 직렬화되어 전송됨
-                        deptName             // dept_name
+                        c.risk_level()      //LOW, MID, HIGH (UI에서 선택된 값이 그대로 넘어옴)
                 )
         );
     }

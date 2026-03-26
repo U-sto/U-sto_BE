@@ -20,25 +20,20 @@ public record AiForecastRequestToAi(
             @NotNull Integer year, //년도 (예: 2026)
 
             @Schema(example = "1")
-            @NotNull Integer semester, //1=1학기,2=여름학기,3=2학기,4=겨울학기
+            @NotNull String semester, //1=1학기,2=여름학기,3=2학기,4=겨울학기
 
-            @JsonProperty("org_cd")
-            @JsonAlias({"campus"})
             @Schema(example = "7008277")
             @NotBlank String campus, //org_cd
 
-            @JsonProperty("dept_cd")
+            @JsonProperty("dept_name")
             @JsonAlias({"department"})
             @Schema(example = "A012")
-            @NotBlank String department, //dept_cd
+            String dept_name, //dept_cd
 
             @Schema(example = "")
             String category,          // 물품분류명 (입력 안 하면 null 또는 빈 값)
 
             @Schema(example = "LOW")
-            @NotNull RiskLevel risk_level, //리스크 성향 (UI의 Low/Mid/High 선택값)
-
-            @JsonProperty("dept_name")
-            String dept_name
+            @NotNull RiskLevel risk_level //리스크 성향 (UI의 Low/Mid/High 선택값)
     ) {}
 }
