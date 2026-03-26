@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.usto.api.ai.common.AiForecastAdapter;
 import com.usto.api.ai.forecast.domain.model.Forecast;
+import com.usto.api.ai.forecast.domain.model.RiskLevel;
 import com.usto.api.ai.forecast.domain.repository.ForecastRepository;
 import com.usto.api.ai.forecast.domain.service.ForecastPolicy;
 import com.usto.api.ai.forecast.infrastructure.mapper.ForecastMapper;
@@ -16,6 +17,7 @@ import com.usto.api.common.exception.BusinessException;
 import com.usto.api.organization.infrastructure.entity.DepartmentJpaEntity;
 import com.usto.api.organization.infrastructure.repository.DepartmentJpaRepository;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -141,8 +143,8 @@ public class ForecastApplication {
         AiForecastRequest.Conditions c = request.conditions();
 
         String aiSemester = toAiSemester(c.semester());
-
         String deptName = resolveDeptName(c.campus(),c.department());
+        RiskLevel riskLevel = toAiRiskLevel(c.risk_level());
 
         return new AiForecastRequestToAi(
                 request.prompt(),
@@ -152,9 +154,18 @@ public class ForecastApplication {
                         c.campus(),          //7008277
                         deptName,             //소프트웨어융합대학행정실
                         c.category(),
-                        c.risk_level()      //Low, Midium, High
+                        riskLevel      //Low, Medium, High
                 )
         );
+    }
+
+    private RiskLevel toAiRiskLevel(RiskLevel riskLevel) {
+        // AI 팀 스펙 확정에 맞춰 문자열 enum으로 변환
+        return switch (riskLevel) {
+            case LOW -> RiskLevel.LOW;
+            case MEDIUM -> RiskLevel.MEDIUM;
+            case HIGH -> RiskLevel.HIGH;
+        };
     }
 
     private String toAiSemester(Integer sem) {
