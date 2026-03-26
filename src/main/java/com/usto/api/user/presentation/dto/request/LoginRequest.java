@@ -12,6 +12,6 @@ public class LoginRequest {
     private String usrId;
 
     @NotBlank(message = "비밀번호를 입력해주세요")
-    @Schema(example = "1234qwe!")
+    @Schema(example = "Qwer1234!")
     private String pwd;
 }

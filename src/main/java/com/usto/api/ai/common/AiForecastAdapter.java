@@ -2,7 +2,7 @@ package com.usto.api.ai.common;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.usto.api.ai.forecast.presentation.dto.request.AiForecastRequest;
+import com.usto.api.ai.forecast.presentation.dto.request.AiForecastRequestToAi;
 import com.usto.api.ai.forecast.presentation.dto.response.AiForecastResponse;
 import com.usto.api.common.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +22,7 @@ public class AiForecastAdapter {
     private final AiProperties properties;
     private final ObjectMapper objectMapper; // JSON 파싱을 위한 매퍼 추가
 
-    public AiForecastResponse fetchForecastResponse(AiForecastRequest request) {
+    public AiForecastResponse fetchForecastResponse(AiForecastRequestToAi request) {
         // 1. 먼저 String으로 응답을 받아서 로그를 확인
         String rawResponse =
                 aiWebClient.post()
@@ -30,7 +30,8 @@ public class AiForecastAdapter {
                 .bodyValue(request)
                 .retrieve()
                         // 1. 서버 에러(5xx) 처리 - ngrok 장애 등 외부 API 불능 상태 대응
-                        .onStatus(HttpStatusCode::is5xxServerError, clientResponse ->
+                        .onStatus(HttpStatusCode::is5xxServerError,
+                                clientResponse ->
                                 clientResponse.bodyToMono(String.class)
                                         .defaultIfEmpty("")
                                         .flatMap(errorBody -> {
@@ -105,9 +106,19 @@ public class AiForecastAdapter {
 
             // 2. "data" 키에 해당하는 자식 노드만 추출
             JsonNode dataNode = rootNode.get("data");
-
             if (dataNode != null && !dataNode.isNull()) {
-                return objectMapper.treeToValue(dataNode, AiForecastResponse.class);
+                AiForecastResponse res = objectMapper.treeToValue(dataNode, AiForecastResponse.class);
+                boolean allEmpty = (res.summary() == null)
+                        && (res.chartForecast() == null || res.chartForecast().isEmpty())
+                        && (res.chartPortfolio() == null || res.chartPortfolio().isEmpty())
+                        && (res.recommendations() == null || res.recommendations().isEmpty());
+                if (allEmpty) {
+                    // AI는 성공적으로 응답했지만, 유의미한 분석 결과가 없는 경우를 방지하기 위해 추가 검증
+                    throw new BusinessException("AI가 유의미한 분석을 반환하지 않았습니다. 입력 조건을 확인하거나 잠시 후 다시 시도해주세요.");
+                }
+
+                //=====================성공===============================
+                return res; //<- 성공한 결과
             }
         } catch (Exception e) {
             log.error("JSON 매핑 실패: {}", e.getMessage());
