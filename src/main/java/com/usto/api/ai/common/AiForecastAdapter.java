@@ -2,7 +2,6 @@ package com.usto.api.ai.common;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.usto.api.ai.forecast.presentation.dto.request.AiForecastRequest;
 import com.usto.api.ai.forecast.presentation.dto.request.AiForecastRequestToAi;
 import com.usto.api.ai.forecast.presentation.dto.response.AiForecastResponse;
 import com.usto.api.common.exception.BusinessException;

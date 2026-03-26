@@ -148,11 +148,11 @@ public class ForecastApplication {
                 request.prompt(),
                 new AiForecastRequestToAi.Conditions(
                         c.year(), //2026
-                        aiSemester, //SPRING, SUMMER, FALL, WINTER
+                        aiSemester, //1, 여름, 2, 겨울
                         c.campus(),          //7008277
                         deptName,             //소프트웨어융합대학행정실
                         c.category(),
-                        c.risk_level()      //LOW, MID, HIGH (UI에서 선택된 값이 그대로 넘어옴)
+                        c.risk_level()      //Low, Midium, High
                 )
         );
     }
@@ -160,10 +160,10 @@ public class ForecastApplication {
     private String toAiSemester(Integer sem) {
         // AI 팀 스펙 확정에 맞춰 문자열 enum으로 변환
         return switch (sem) {
-            case 1 -> "SPRING";
-            case 2 -> "SUMMER";
-            case 3 -> "FALL";
-            case 4 -> "WINTER";
+            case 1 -> "1";
+            case 2 -> "여름";
+            case 3 -> "2";
+            case 4 -> "겨울";
             default -> throw new IllegalArgumentException("semester은 1-4값이여야합니다.: " + sem);
         };
     }
