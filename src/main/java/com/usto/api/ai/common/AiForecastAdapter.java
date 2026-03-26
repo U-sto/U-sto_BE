@@ -115,6 +115,7 @@ public class AiForecastAdapter {
                         && (res.chartPortfolio() == null || res.chartPortfolio().isEmpty())
                         && (res.recommendations() == null || res.recommendations().isEmpty());
                 if (allEmpty) {
+                    // AI는 성공적으로 응답했지만, 유의미한 분석 결과가 없는 경우를 방지하기 위해 추가 검증
                     throw new BusinessException("AI가 유의미한 분석을 반환하지 않았습니다. 입력 조건을 확인하거나 잠시 후 다시 시도해주세요.");
                 }
                 return res; //<- 성공한 결과
