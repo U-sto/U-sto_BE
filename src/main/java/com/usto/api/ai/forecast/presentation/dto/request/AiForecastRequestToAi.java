@@ -8,7 +8,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
-public record AiForecastRequest(
+public record AiForecastRequestToAi(
 
         @Schema(example = "분석해줘")
         @NotBlank String prompt,
@@ -20,7 +20,7 @@ public record AiForecastRequest(
             @NotNull Integer year, //년도 (예: 2026)
 
             @Schema(example = "1")
-            @NotNull Integer semester, //1=1학기,2=여름학기,3=2학기,4=겨울학기
+            @NotNull String semester, //1=1학기,2=여름학기,3=2학기,4=겨울학기
 
             @JsonProperty("org_cd")
             @JsonAlias({"campus"})
@@ -36,6 +36,9 @@ public record AiForecastRequest(
             String category,          // 물품분류명 (입력 안 하면 null 또는 빈 값)
 
             @Schema(example = "LOW")
-            @NotNull RiskLevel risk_level //리스크 성향 (UI의 Low/Mid/High 선택값)
+            @NotNull RiskLevel risk_level, //리스크 성향 (UI의 Low/Mid/High 선택값)
+
+            @JsonProperty("dept_name")
+            String dept_name
     ) {}
 }
