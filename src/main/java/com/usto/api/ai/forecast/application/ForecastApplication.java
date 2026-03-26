@@ -149,7 +149,8 @@ public class ForecastApplication {
                 new AiForecastRequestToAi.Conditions(
                         c.year(),
                         // a) ToAi.semester 타입이 Integer인 현재 파일 기준
-                        aiSemester,
+                        //aiSemester,
+                        c.semester(),
                         c.campus(),          // org_cd
                         c.department(),      // dept_cd
                         c.category(),

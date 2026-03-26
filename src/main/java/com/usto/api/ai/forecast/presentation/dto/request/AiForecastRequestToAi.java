@@ -20,7 +20,7 @@ public record AiForecastRequestToAi(
             @NotNull Integer year, //년도 (예: 2026)
 
             @Schema(example = "1")
-            @NotNull String semester, //1=1학기,2=여름학기,3=2학기,4=겨울학기
+            @NotNull Integer semester, //1=1학기,2=여름학기,3=2학기,4=겨울학기
 
             @JsonProperty("org_cd")
             @JsonAlias({"campus"})

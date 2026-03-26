@@ -107,9 +107,17 @@ public class AiForecastAdapter {
 
             // 2. "data" 키에 해당하는 자식 노드만 추출
             JsonNode dataNode = rootNode.get("data");
-
+        //=====================성공===============================
             if (dataNode != null && !dataNode.isNull()) {
-                return objectMapper.treeToValue(dataNode, AiForecastResponse.class);
+                AiForecastResponse res = objectMapper.treeToValue(dataNode, AiForecastResponse.class);
+                boolean allEmpty = (res.summary() == null)
+                        && (res.chartForecast() == null || res.chartForecast().isEmpty())
+                        && (res.chartPortfolio() == null || res.chartPortfolio().isEmpty())
+                        && (res.recommendations() == null || res.recommendations().isEmpty());
+                if (allEmpty) {
+                    throw new BusinessException("AI가 유의미한 분석을 반환하지 않았습니다. 입력 조건을 확인하거나 잠시 후 다시 시도해주세요.");
+                }
+                return res; //<- 성공한 결과
             }
         } catch (Exception e) {
             log.error("JSON 매핑 실패: {}", e.getMessage());
