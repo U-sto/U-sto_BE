@@ -10,8 +10,11 @@ import com.usto.api.ai.forecast.domain.repository.ForecastRepository;
 import com.usto.api.ai.forecast.domain.service.ForecastPolicy;
 import com.usto.api.ai.forecast.infrastructure.mapper.ForecastMapper;
 import com.usto.api.ai.forecast.presentation.dto.request.AiForecastRequest;
+import com.usto.api.ai.forecast.presentation.dto.request.AiForecastRequestToAi;
 import com.usto.api.ai.forecast.presentation.dto.response.AiForecastResponse;
 import com.usto.api.common.exception.BusinessException;
+import com.usto.api.organization.infrastructure.entity.DepartmentJpaEntity;
+import com.usto.api.organization.infrastructure.repository.DepartmentJpaRepository;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +33,7 @@ public class ForecastApplication {
     private final ObjectMapper objectMapper;
     private final ForecastPolicy forecastPolicy;
     private final ForecastRepository forecastRepository;
+    private final DepartmentJpaRepository departmentJpaRepository;
 
     @Transactional
     public AiForecastResponse analyze(String usrId, String orgCd, AiForecastRequest request) {
@@ -38,8 +42,10 @@ public class ForecastApplication {
         forecastPolicy.validateRequest(request,orgCd);
         forecastPolicy.validateOrganization(request.conditions().campus(),orgCd);
 
+        AiForecastRequestToAi requestToAi = toAiPayload(request);
+
         // AI 호출
-        AiForecastResponse aiResponse = aiForecastAdapter.fetchForecastResponse(request);
+        AiForecastResponse aiResponse = aiForecastAdapter.fetchForecastResponse(requestToAi);
 
         log.info("AI Response: {}", aiResponse);
         log.info("summary : {}",aiResponse.summary());
@@ -49,7 +55,7 @@ public class ForecastApplication {
                 usrId,
                 request.conditions().year().shortValue(),
                 request.conditions().semester().byteValue(),
-                request.conditions().riskLevel(),
+                request.conditions().risk_level(),
                 request.prompt(),
                 orgCd,
                 toJsonNullable(aiResponse.summary()),
@@ -129,5 +135,48 @@ public class ForecastApplication {
 
         forecastRepository.delete(forecastId);
 
+    }
+
+    private AiForecastRequestToAi toAiPayload(AiForecastRequest request) {
+        AiForecastRequest.Conditions c = request.conditions();
+
+        String aiSemester = toAiSemester(c.semester());
+
+        String deptName = resolveDeptName(c.campus(),c.department());
+
+        return new AiForecastRequestToAi(
+                request.prompt(),
+                new AiForecastRequestToAi.Conditions(
+                        c.year(),
+                        // a) ToAi.semester 타입이 Integer인 현재 파일 기준
+                        aiSemester,
+                        c.campus(),          // org_cd
+                        c.department(),      // dept_cd
+                        c.category(),
+                        c.risk_level(),      // enum은 문자열로 직렬화되어 전송됨
+                        deptName             // dept_name
+                )
+        );
+    }
+
+    private String toAiSemester(Integer sem) {
+        // AI 팀 스펙 확정에 맞춰 문자열 enum으로 변환
+        return switch (sem) {
+            case 1 -> "SPRING";
+            case 2 -> "SUMMER";
+            case 3 -> "FALL";
+            case 4 -> "WINTER";
+            default -> throw new IllegalArgumentException("semester은 1-4값이여야합니다.: " + sem);
+        };
+    }
+
+    private String resolveDeptName(String campus,String department) {
+
+        return departmentJpaRepository.findById_OrgCdAndId_DeptCd(campus, department)
+                .map(DepartmentJpaEntity::getDeptNm)
+                .orElseGet(() -> {
+                    log.warn("학과명 조회 실패: campus={}, dept_cd={}", campus, department);
+                    return department;
+                });
     }
 }

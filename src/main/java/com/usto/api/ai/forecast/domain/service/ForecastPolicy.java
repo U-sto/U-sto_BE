@@ -65,7 +65,7 @@ public class ForecastPolicy {
         }
 
         // risk_level (enum)
-        if (c.riskLevel() == null) {
+        if (c.risk_level() == null) {
             throw new BusinessException("conditions.risk_level은 필수입니다.");
         }
     }

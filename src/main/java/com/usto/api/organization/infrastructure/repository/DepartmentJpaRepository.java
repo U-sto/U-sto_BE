@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface DepartmentJpaRepository extends JpaRepository<DepartmentJpaEntity, DeptId> {
@@ -14,4 +15,6 @@ public interface DepartmentJpaRepository extends JpaRepository<DepartmentJpaEnti
 
     // 운용부서 존재 여부 확인
     boolean existsById_OrgCdAndId_DeptCd(String orgCd, String deptCd);
+
+    Optional<DepartmentJpaEntity> findById_OrgCdAndId_DeptCd(String orgCd, String deptCd);
 }
