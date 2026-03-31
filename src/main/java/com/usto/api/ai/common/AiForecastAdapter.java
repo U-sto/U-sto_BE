@@ -107,9 +107,9 @@ public class AiForecastAdapter {
             log.info("section2 = {}", res.section2Portfolio());
             log.info("section3 = {}", res.section3Recommendations());
 
-            boolean allEmpty = res.section1TimeSeries().isEmpty()
-                    && res.section2Portfolio().isEmpty()
-                    && res.section3Recommendations().isEmpty();
+            boolean allEmpty = (res.section1TimeSeries() == null || res.section1TimeSeries().isEmpty())
+                    && (res.section2Portfolio() == null || res.section2Portfolio().isEmpty())
+                    && (res.section3Recommendations() == null || res.section3Recommendations().isEmpty());
 
             if (allEmpty) {
                 throw new BusinessException("AI가 유의미한 분석을 반환하지 않았습니다.");

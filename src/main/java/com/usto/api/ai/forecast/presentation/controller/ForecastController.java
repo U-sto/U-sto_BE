@@ -41,10 +41,6 @@ public class ForecastController {
                 request
         );
 
-        if(data == null){
-            throw new BusinessException("예측할 데이터가 없습니다. (data is null)");
-        }
-
         return ApiResponse.ok("예측 분석 성공", data);
     }
 
