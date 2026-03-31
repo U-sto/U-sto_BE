@@ -16,8 +16,8 @@ import com.usto.api.ai.forecast.presentation.dto.response.AiForecastResponse;
 import com.usto.api.common.exception.BusinessException;
 import com.usto.api.organization.infrastructure.entity.DepartmentJpaEntity;
 import com.usto.api.organization.infrastructure.repository.DepartmentJpaRepository;
+import com.usto.api.organization.infrastructure.repository.OrganizationJpaRepository;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -36,6 +36,7 @@ public class ForecastApplication {
     private final ForecastPolicy forecastPolicy;
     private final ForecastRepository forecastRepository;
     private final DepartmentJpaRepository departmentJpaRepository;
+    private final OrganizationJpaRepository organizationJpaRepository;
 
     @Transactional
     public AiForecastResponse analyze(String usrId, String orgCd, AiForecastRequest request) {
@@ -50,7 +51,6 @@ public class ForecastApplication {
         AiForecastResponse aiResponse = aiForecastAdapter.fetchForecastResponse(requestToAi);
 
         log.info("AI Response: {}", aiResponse);
-        log.info("summary : {}",aiResponse.summary());
 
         //도메인 객체에 내용 담기
         Forecast forecast = ForecastMapper.toDomain(
@@ -60,10 +60,10 @@ public class ForecastApplication {
                 request.conditions().risk_level(),
                 request.prompt(),
                 orgCd,
-                toJsonNullable(aiResponse.summary()),
-                toJsonNullable(aiResponse.chartForecast()),
-                toJsonNullable(aiResponse.chartPortfolio()),
-                toJsonNullable(aiResponse.recommendations()),
+                toJsonNullable(""),
+                toJsonNullable(aiResponse.section1TimeSeries()),
+                toJsonNullable(aiResponse.section2Portfolio()),
+                toJsonNullable(aiResponse.section3Recommendations()),
                 request.conditions().department()
         );
 
@@ -83,17 +83,21 @@ public class ForecastApplication {
         forecastPolicy.validateOrganization(forecast.getOrgCode(),orgCd);
         forecastPolicy.valdateOwnership(forecast.getUserId(),username);
 
-        JsonNode summaryNode = readTreeOrNull(forecast.getSummaryJson());
         JsonNode tsNode = readTreeOrNull(forecast.getTsJson());
         JsonNode matrixNode = readTreeOrNull(forecast.getMatrixJson());
         JsonNode recoNode = readTreeOrNull(forecast.getRecoJson());
 
         return AiForecastResponse
                 .builder()
-                .summary(objectMapper.convertValue(summaryNode, AiForecastResponse.Summary.class))
-                .chartForecast(objectMapper.convertValue(tsNode, new TypeReference<>() {}))
-                .chartPortfolio(objectMapper.convertValue(matrixNode, new TypeReference<>() {}))
-                .recommendations(objectMapper.convertValue(recoNode, new TypeReference<>() {}))
+                .section1TimeSeries(tsNode == null ? List.of() : objectMapper.convertValue(
+                        tsNode, new TypeReference<List<AiForecastResponse.TimeSeriesPoint>>() {}
+                ))
+                .section2Portfolio(matrixNode == null ? List.of() : objectMapper.convertValue(
+                        matrixNode, new TypeReference<List<AiForecastResponse.PortfolioPoint>>() {}
+                ))
+                .section3Recommendations(recoNode == null ? List.of() : objectMapper.convertValue(
+                        recoNode, new TypeReference<List<AiForecastResponse.RecommendationItem>>() {}
+                ))
                 .build();
     }
 
@@ -144,27 +148,31 @@ public class ForecastApplication {
 
         String aiSemester = toAiSemester(c.semester());
         String deptName = resolveDeptName(c.campus(),c.department());
-        RiskLevel riskLevel = toAiRiskLevel(c.risk_level());
+        String riskLevel = toAiRiskLevel(c.risk_level());
+        String orgName = resolveOrgName(c.campus());
+        log.info("year={}, semester={}, orgName={}, dept_name={}, category() ={} , risk_level ={}"
+                ,c.year(), aiSemester, orgName, deptName,c.category(),riskLevel);
 
         return new AiForecastRequestToAi(
                 request.prompt(),
                 new AiForecastRequestToAi.Conditions(
                         c.year(), //2026
                         aiSemester, //1, 여름, 2, 겨울
-                        c.campus(),          //7008277
+                        orgName,          //한양대학교 ERICA캠퍼스
                         deptName,             //소프트웨어융합대학행정실
-                        c.category(),
+                        c.category(), //전부
                         riskLevel      //Low, Medium, High
                 )
         );
     }
 
-    private RiskLevel toAiRiskLevel(RiskLevel riskLevel) {
+    private String toAiRiskLevel(RiskLevel riskLevel) {
         // AI 팀 스펙 확정에 맞춰 문자열 enum으로 변환
         return switch (riskLevel) {
-            case LOW -> RiskLevel.LOW;
-            case MEDIUM -> RiskLevel.MEDIUM;
-            case HIGH -> RiskLevel.HIGH;
+            case LOW -> RiskLevel.LOW.getDisplayName();
+            case MEDIUM -> RiskLevel.MEDIUM.getDisplayName();
+            case HIGH -> RiskLevel.HIGH.getDisplayName();
+             default -> throw new IllegalArgumentException("risk_level은 LOW, MEDIUM, HIGH값이여야합니다.: " + riskLevel);
         };
     }
 
@@ -186,6 +194,15 @@ public class ForecastApplication {
                 .orElseGet(() -> {
                     log.warn("학과명 조회 실패: campus={}, dept_cd={}", campus, department);
                     return department;
+                });
+    }
+
+    private String resolveOrgName(String campus) {
+        return organizationJpaRepository.findById(campus)
+                .map(entity -> entity.getOrgNm())
+                .orElseGet(() -> {
+                    log.warn("조직명 조회 실패: campus={}", campus);
+                    return campus;
                 });
     }
 }

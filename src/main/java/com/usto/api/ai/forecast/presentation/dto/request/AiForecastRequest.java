@@ -29,7 +29,7 @@ public record AiForecastRequest(
 
             @JsonProperty("dept_cd")
             @JsonAlias({"department"})
-            @Schema(example = "A012")
+            @Schema(example = "A320")
             @NotBlank String department, //dept_cd
 
             @Schema(example = "")

@@ -3,6 +3,7 @@ package com.usto.api.ai.forecast.presentation.controller;
 import com.usto.api.ai.forecast.application.ForecastApplication;
 import com.usto.api.ai.forecast.presentation.dto.request.AiForecastRequest;
 import com.usto.api.ai.forecast.presentation.dto.response.AiForecastResponse;
+import com.usto.api.common.exception.BusinessException;
 import com.usto.api.common.utils.ApiResponse;
 import com.usto.api.user.domain.model.UserPrincipal;
 import io.swagger.v3.oas.annotations.Operation;
@@ -10,7 +11,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -27,7 +27,8 @@ public class ForecastController {
 
     @Operation(
             summary = "통계 예측 분석",
-            description = "조건(년도/학기/캠퍼스/학과/카테고리/리스크) 기반으로 수요 예측 및 조달 권고안을 생성합니다."
+            description = "조건(년도/학기/캠퍼스/학과/카테고리/리스크) 기반으로 수요 예측 및 조달 권고안을 생성합니다.\n" +
+                    "category는 null이거나 정해진 것만 들어가야합니다."
     )
     @PostMapping
     public ApiResponse<AiForecastResponse> analyze(

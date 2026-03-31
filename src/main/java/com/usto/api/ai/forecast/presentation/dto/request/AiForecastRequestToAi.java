@@ -35,6 +35,6 @@ public record AiForecastRequestToAi(
 
             @JsonProperty("risk_level")
             @Schema(example = "Low")
-            @NotNull RiskLevel riskLevel //리스크 성향 (UI의 Low/Medium/High 선택값)
+            @NotNull String riskLevel //리스크 성향 (UI의 Low/Medium/High 선택값)
     ) {}
 }

@@ -1,6 +1,5 @@
 package com.usto.api.ai.common;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.usto.api.ai.forecast.presentation.dto.request.AiForecastRequestToAi;
 import com.usto.api.ai.forecast.presentation.dto.response.AiForecastResponse;
@@ -26,30 +25,30 @@ public class AiForecastAdapter {
         // 1. 먼저 String으로 응답을 받아서 로그를 확인
         String rawResponse =
                 aiWebClient.post()
-                .uri(properties.endpoints().forecast())
-                .bodyValue(request)
-                .retrieve()
+                        .uri(properties.endpoints().forecast())
+                        .bodyValue(request)
+                        .retrieve()
                         // 1. 서버 에러(5xx) 처리 - ngrok 장애 등 외부 API 불능 상태 대응
                         .onStatus(HttpStatusCode::is5xxServerError,
                                 clientResponse ->
-                                clientResponse.bodyToMono(String.class)
-                                        .defaultIfEmpty("")
-                                        .flatMap(errorBody -> {
-                                            int code = clientResponse.statusCode().value();
-                                            log.error("AI API 5xx 응답. status={}, body={}", code, errorBody);
+                                        clientResponse.bodyToMono(String.class)
+                                                .defaultIfEmpty("")
+                                                .flatMap(errorBody -> {
+                                                    int code = clientResponse.statusCode().value();
+                                                    log.error("AI API 5xx 응답. status={}, body={}", code, errorBody);
 
-                                            if (code == 502) {
-                                                return Mono.error(new BusinessException("AI 게이트웨이 오류(502). 프록시/ngrok 또는 업스트림 장애 가능성이 있습니다."));
-                                            }
-                                            if (code == 503) {
-                                                return Mono.error(new BusinessException("AI 서비스 이용 불가(503). 서버가 내려가 있거나 과부하 상태입니다."));
-                                            }
-                                            if (code == 504) {
-                                                return Mono.error(new BusinessException("AI 응답 지연(504). 요청 처리 시간이 초과되었습니다."));
-                                            }
+                                                    if (code == 502) {
+                                                        return Mono.error(new BusinessException("AI 게이트웨이 오류(502). 프록시/ngrok 또는 업스트림 장애 가능성이 있습니다."));
+                                                    }
+                                                    if (code == 503) {
+                                                        return Mono.error(new BusinessException("AI 서비스 이용 불가(503). 서버가 내려가 있거나 과부하 상태입니다."));
+                                                    }
+                                                    if (code == 504) {
+                                                        return Mono.error(new BusinessException("AI 응답 지연(504). 요청 처리 시간이 초과되었습니다."));
+                                                    }
 
-                                            return Mono.error(new BusinessException("AI 서버 오류(5xx). 잠시 후 다시 시도해주세요."));
-                                        })
+                                                    return Mono.error(new BusinessException("AI 서버 오류(5xx). 잠시 후 다시 시도해주세요."));
+                                                })
                         )
                         // 2. 클라이언트 에러(4xx) 처리
                         .onStatus(HttpStatusCode::is4xxClientError, clientResponse ->
@@ -92,8 +91,8 @@ public class AiForecastAdapter {
                                             return Mono.error(new BusinessException("AI 요청 실패(" + status.value() + "). body=" + abbreviate(errorBody)));
                                         })
                         )
-                .bodyToMono(String.class)
-                .block();
+                        .bodyToMono(String.class)
+                        .block();
 
         log.info("AI Server Raw Response: {}", rawResponse);
 
@@ -102,30 +101,28 @@ public class AiForecastAdapter {
         }
 
         try {
-            JsonNode rootNode = objectMapper.readTree(rawResponse);
+            AiForecastResponse res = objectMapper.readValue(rawResponse, AiForecastResponse.class);
 
-            // 2. "data" 키에 해당하는 자식 노드만 추출
-            JsonNode dataNode = rootNode.get("data");
-            if (dataNode != null && !dataNode.isNull()) {
-                AiForecastResponse res = objectMapper.treeToValue(dataNode, AiForecastResponse.class);
-                boolean allEmpty = (res.summary() == null)
-                        && (res.chartForecast() == null || res.chartForecast().isEmpty())
-                        && (res.chartPortfolio() == null || res.chartPortfolio().isEmpty())
-                        && (res.recommendations() == null || res.recommendations().isEmpty());
-                if (allEmpty) {
-                    // AI는 성공적으로 응답했지만, 유의미한 분석 결과가 없는 경우를 방지하기 위해 추가 검증
-                    throw new BusinessException("AI가 유의미한 분석을 반환하지 않았습니다. 입력 조건을 확인하거나 잠시 후 다시 시도해주세요.");
-                }
+            log.info("section1 = {}", res.section1TimeSeries());
+            log.info("section2 = {}", res.section2Portfolio());
+            log.info("section3 = {}", res.section3Recommendations());
 
-                //=====================성공===============================
-                return res; //<- 성공한 결과
+            boolean allEmpty = (res.section1TimeSeries() == null || res.section1TimeSeries().isEmpty())
+                    && (res.section2Portfolio() == null || res.section2Portfolio().isEmpty())
+                    && (res.section3Recommendations() == null || res.section3Recommendations().isEmpty());
+
+            if (allEmpty) {
+                throw new BusinessException("AI가 유의미한 분석을 반환하지 않았습니다.");
             }
+
+            return res;
+
+        } catch (BusinessException e) {
+            throw e;
         } catch (Exception e) {
-            log.error("JSON 매핑 실패: {}", e.getMessage());
-            // 매핑 실패 시 빈 객체나 에러 처리를 진행합니다.
+            log.error("JSON 매핑 실패", e);
             throw new RuntimeException("AI 서버 응답 파싱에 실패했습니다.", e);
         }
-        throw new RuntimeException("AI 서버 응답에서 'data' 필드를 찾을 수 없습니다.");
     }
 
     private static boolean looksLikeNgrokOfflinePage(String body) {
@@ -142,3 +139,4 @@ public class AiForecastAdapter {
         return s.length() <= max ? s : s.substring(0, max) + "...(truncated)";
     }
 }
+
