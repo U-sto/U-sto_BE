@@ -5,7 +5,6 @@ import com.usto.api.ai.forecast.domain.repository.ForecastRepository;
 import com.usto.api.ai.forecast.infrastructure.entity.ForecastJpaEntity;
 import com.usto.api.ai.forecast.infrastructure.mapper.ForecastMapper;
 import com.usto.api.ai.forecast.infrastructure.repository.ForecastJpaRepository;
-import com.usto.api.ai.forecast.presentation.dto.response.AiForecastResponse;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
