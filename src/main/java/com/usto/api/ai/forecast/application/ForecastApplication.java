@@ -46,7 +46,6 @@ public class ForecastApplication {
         forecastPolicy.validateOrganization(request.conditions().campus(),orgCd);
 
         AiForecastRequestToAi requestToAi = toAiPayload(request);
-
         // AI 호출
         AiForecastResponse aiResponse = aiForecastAdapter.fetchForecastResponse(requestToAi);
 
@@ -60,10 +59,10 @@ public class ForecastApplication {
                 request.conditions().risk_level(),
                 request.prompt(),
                 orgCd,
+                toJsonNullable(aiResponse.section4AlgorithmGuide()),//AI분석알고리즘가이드(원래 상단요약이였는데 바뀜 - 어쩔 수 없음)
                 toJsonNullable(aiResponse.section1TimeSeries()),
-                toJsonNullable(aiResponse.section2StrategicGuide()),
+                toJsonNullable(aiResponse.section2StrategicGuide()), //매트릭스=AI전략적 조달 가이드
                 toJsonNullable(aiResponse.section3Recommendations()),
-                toJsonNullable(aiResponse.section4AlgorithmGuide()),
                 request.conditions().department()
         );
 
@@ -90,20 +89,6 @@ public class ForecastApplication {
 
         return AiForecastResponse
                 .builder()
-                .section1TimeSeries(tsNode == null ? List.of() : objectMapper.convertValue(
-                        tsNode, new TypeReference<List<AiForecastResponse.TimeSeriesPoint>>() {}
-                ))
-                .section2StrategicGuide(
-                        algoNode == null
-                                ? null
-                                : objectMapper.convertValue(
-                                algoNode,
-                                AiForecastResponse.StrategicGuidePoint.class
-                        )
-                )
-                .section3Recommendations(recoNode == null ? List.of() : objectMapper.convertValue(
-                        recoNode, new TypeReference<List<AiForecastResponse.RecommendationItem>>() {}
-                ))
                 .section4AlgorithmGuide(
                         algoNode == null
                                 ? null
@@ -112,6 +97,20 @@ public class ForecastApplication {
                                 AiForecastResponse.AlgorithmGuide.class
                         )
                 )
+                .section1TimeSeries(tsNode == null ? null : objectMapper.convertValue(
+                        tsNode, new TypeReference<List<AiForecastResponse.TimeSeriesPoint>>() {}
+                ))
+                .section2StrategicGuide( //매트릭스=AI전략적 조달 가이드
+                        matrixNode == null
+                                ? null
+                                : objectMapper.convertValue(
+                                matrixNode,
+                                AiForecastResponse.StrategicGuidePoint.class
+                        )
+                )
+                .section3Recommendations(recoNode == null ? null : objectMapper.convertValue(
+                        recoNode, new TypeReference<List<AiForecastResponse.RecommendationItem>>() {}
+                ))
                 .build();
     }
 
