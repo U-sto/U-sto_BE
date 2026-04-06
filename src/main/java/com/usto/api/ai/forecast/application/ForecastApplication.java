@@ -60,10 +60,10 @@ public class ForecastApplication {
                 request.conditions().risk_level(),
                 request.prompt(),
                 orgCd,
-                toJsonNullable(""),
                 toJsonNullable(aiResponse.section1TimeSeries()),
-                toJsonNullable(aiResponse.section2Portfolio()),
+                toJsonNullable(aiResponse.section2StrategicGuide()),
                 toJsonNullable(aiResponse.section3Recommendations()),
+                toJsonNullable(aiResponse.section4AlgorithmGuide()),
                 request.conditions().department()
         );
 
@@ -86,18 +86,32 @@ public class ForecastApplication {
         JsonNode tsNode = readTreeOrNull(forecast.getTsJson());
         JsonNode matrixNode = readTreeOrNull(forecast.getMatrixJson());
         JsonNode recoNode = readTreeOrNull(forecast.getRecoJson());
+        JsonNode algoNode = readTreeOrNull(forecast.getSummaryJson());  //이렇게 안 하면 다 바꿔야함
 
         return AiForecastResponse
                 .builder()
                 .section1TimeSeries(tsNode == null ? List.of() : objectMapper.convertValue(
                         tsNode, new TypeReference<List<AiForecastResponse.TimeSeriesPoint>>() {}
                 ))
-                .section2Portfolio(matrixNode == null ? List.of() : objectMapper.convertValue(
-                        matrixNode, new TypeReference<List<AiForecastResponse.PortfolioPoint>>() {}
-                ))
+                .section2StrategicGuide(
+                        algoNode == null
+                                ? null
+                                : objectMapper.convertValue(
+                                algoNode,
+                                AiForecastResponse.StrategicGuidePoint.class
+                        )
+                )
                 .section3Recommendations(recoNode == null ? List.of() : objectMapper.convertValue(
                         recoNode, new TypeReference<List<AiForecastResponse.RecommendationItem>>() {}
                 ))
+                .section4AlgorithmGuide(
+                        algoNode == null
+                                ? null
+                                : objectMapper.convertValue(
+                                algoNode,
+                                AiForecastResponse.AlgorithmGuide.class
+                        )
+                )
                 .build();
     }
 

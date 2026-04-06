@@ -10,11 +10,14 @@ public record AiForecastResponse(
         @JsonProperty("section_1_time_series")
         List<TimeSeriesPoint> section1TimeSeries,
 
-        @JsonProperty("section_2_portfolio")
-        List<PortfolioPoint> section2Portfolio,
+        @JsonProperty("section_2_strategic_guide")
+        StrategicGuidePoint section2StrategicGuide,
 
         @JsonProperty("section_3_recommendations")
-        List<RecommendationItem> section3Recommendations
+        List<RecommendationItem> section3Recommendations,
+
+        @JsonProperty("section_4_algorithm_guide")
+        AlgorithmGuide section4AlgorithmGuide
 ) {
     public record TimeSeriesPoint(
             @JsonProperty("month")
@@ -26,13 +29,16 @@ public record AiForecastResponse(
     ) {
     }
 
-    public record PortfolioPoint(
-            @JsonProperty("item_name")
-            String itemName,
-            @JsonProperty("x_rul")
-            Number xRul,
-            @JsonProperty("y_importance")
-            Number yImportance
+    public record StrategicGuidePoint(
+            @JsonProperty("ai_summary_comment")
+            String aiSummaryComment,
+            @JsonProperty("smart_forecasting")
+            String smartForecasting,
+            @JsonProperty("time_to_procure")
+            String timeToProcure,
+            @JsonProperty("budget_guide")
+            String budgetGuide
+
     ) {
     }
 
@@ -61,4 +67,13 @@ public record AiForecastResponse(
             String alertLevel
     ) {
     }
+
+            public record AlgorithmGuide(
+            @JsonProperty("formula_1")
+            String formula1,
+            @JsonProperty("formula_2")
+            String formula2,
+            @JsonProperty("formula_3")
+            String formula3
+    ) {}
 }

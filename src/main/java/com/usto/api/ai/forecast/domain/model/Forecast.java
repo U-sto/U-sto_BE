@@ -18,7 +18,7 @@ public class Forecast {
     private final String message;
     private final String deptCd;
     private final String g2bDNm;
-    private final String summaryJson;
+    private final String summaryJson; //algoJson (이렇게 안 하면 다 바꿔야함)
     private final String tsJson;
     private final String matrixJson;
     private final String recoJson;
