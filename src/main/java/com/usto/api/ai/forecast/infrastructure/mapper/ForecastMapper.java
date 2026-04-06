@@ -9,7 +9,7 @@ import java.util.UUID;
 public class ForecastMapper {
     // Overload 1: Data(Inputs) -> Domain (For creating new forecast result)
     public static Forecast toDomain(String userId, Short year, Byte semester, RiskLevel risk, String msg, String org
-                                    , String sumJson,String tsJson, String matrixJson, String recoJson,String deptCd) {
+                                    , String sumJson,String tsJson, String matrixJson, String recoJson,String deptCd,String g2bNm) {
         return Forecast.builder()
                 .forecastId(UUID.randomUUID())
                 .userId(userId)
@@ -23,6 +23,7 @@ public class ForecastMapper {
                 .matrixJson(matrixJson)
                 .recoJson(recoJson)
                 .deptCd(deptCd)
+                .g2bDNm(g2bNm)
                 .build();
     }
 

@@ -63,8 +63,13 @@ public class ForecastApplication {
                 toJsonNullable(aiResponse.section1TimeSeries()),
                 toJsonNullable(aiResponse.section2StrategicGuide()), //매트릭스=AI전략적 조달 가이드
                 toJsonNullable(aiResponse.section3Recommendations()),
-                request.conditions().department()
+                request.conditions().department(),
+                request.conditions().category()
         );
+
+        log.info("getMatrixJson: {}", forecast.getMatrixJson());
+        log.info("getSummaryJson: {}", forecast.getSummaryJson());
+
 
         forecastRepository.save(forecast);
 

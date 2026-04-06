@@ -103,11 +103,6 @@ public class AiForecastAdapter {
         try {
             AiForecastResponse res = objectMapper.readValue(rawResponse, AiForecastResponse.class);
 
-            log.info("section1 = {}", res.section1TimeSeries());
-            log.info("section2 = {}", res.section2StrategicGuide());
-            log.info("section3 = {}", res.section3Recommendations());
-            log.info("section4 = {}", res.section4AlgorithmGuide());
-
             boolean allEmpty = (res.section1TimeSeries() == null || res.section1TimeSeries().isEmpty()) &&
                     (res.section2StrategicGuide() == null) &&
                     (res.section3Recommendations() == null || res.section3Recommendations().isEmpty()) &&
