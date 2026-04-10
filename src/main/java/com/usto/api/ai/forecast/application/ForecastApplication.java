@@ -45,7 +45,7 @@ public class ForecastApplication {
         forecastPolicy.validateRequest(request,orgCd);
         forecastPolicy.validateOrganization(request.conditions().campus(),orgCd);
 
-        // AI에게 보낼 Resquest
+        // AI에게 보낼 Request
         AiForecastRequestToAi requestToAi = toAiPayload(request);
 
         // AI 호출

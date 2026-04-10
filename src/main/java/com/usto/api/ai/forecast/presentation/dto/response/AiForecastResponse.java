@@ -17,7 +17,7 @@ public record AiForecastResponse(
         List<RecommendationItemRaw> section3Recommendations,
 
         @JsonProperty("section_4_algorithm_guide")
-        AlgorithmGuideRaw  section4AlgorithmGuide
+        AlgorithmGuideRaw section4AlgorithmGuide
 ) {
     @JsonIgnoreProperties(ignoreUnknown = true)
     @JsonInclude(JsonInclude.Include.NON_NULL)

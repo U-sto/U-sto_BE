@@ -17,7 +17,7 @@ public record AiForecastRequest(
     public record Conditions(
 
             @Schema(example = "2030")
-            @NotNull Integer year, //년도 (예: 2026)
+            @NotNull Integer year, //년도 (예: 2030)
 
             @Schema(example = "2")
             @NotNull Integer semester, //1=1학기,2=여름학기,3=2학기,4=겨울학기
