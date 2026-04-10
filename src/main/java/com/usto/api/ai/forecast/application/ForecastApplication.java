@@ -12,7 +12,7 @@ import com.usto.api.ai.forecast.domain.service.ForecastPolicy;
 import com.usto.api.ai.forecast.infrastructure.mapper.ForecastMapper;
 import com.usto.api.ai.forecast.presentation.dto.request.AiForecastRequest;
 import com.usto.api.ai.forecast.presentation.dto.request.AiForecastRequestToAi;
-import com.usto.api.ai.forecast.presentation.dto.response.AiForecastResponseFromAi;
+import com.usto.api.ai.forecast.presentation.dto.response.AiForecastResponse;
 import com.usto.api.common.exception.BusinessException;
 import com.usto.api.organization.infrastructure.entity.DepartmentJpaEntity;
 import com.usto.api.organization.infrastructure.repository.DepartmentJpaRepository;
@@ -39,7 +39,7 @@ public class ForecastApplication {
     private final OrganizationJpaRepository organizationJpaRepository;
 
     @Transactional
-    public AiForecastResponseFromAi analyze(String usrId, String orgCd, AiForecastRequest request) {
+    public AiForecastResponse analyze(String usrId, String orgCd, AiForecastRequest request) {
 
         //정책 검사
         forecastPolicy.validateRequest(request,orgCd);
@@ -49,7 +49,7 @@ public class ForecastApplication {
         AiForecastRequestToAi requestToAi = toAiPayload(request);
 
         // AI 호출
-        AiForecastResponseFromAi responseFromAi =
+        AiForecastResponse responseFromAi =
                 aiForecastAdapter.fetchForecastResponse(requestToAi);
 
         //도메인 객체에 내용 담기
@@ -74,7 +74,7 @@ public class ForecastApplication {
     }
 
     @Transactional
-    public AiForecastResponseFromAi check(String username, String orgCd, @Valid UUID forecastId) {
+    public AiForecastResponse check(String username, String orgCd, @Valid UUID forecastId) {
 
         Forecast forecast = forecastRepository.findById(forecastId);
         if(forecast == null){
@@ -90,18 +90,18 @@ public class ForecastApplication {
         JsonNode algoNode = readTreeOrNull(forecast.getSummaryJson());  //이렇게 안 하면 다 바꿔야함
 
         // 저장을 섹션별로 했을 때, 다시 하나의 객체로 합쳐 반환
-        AiForecastResponseFromAi ai = new AiForecastResponseFromAi(
+        AiForecastResponse ai = new AiForecastResponse(
                 tsNode == null ? null : objectMapper.convertValue(
-                        tsNode, new TypeReference<List<AiForecastResponseFromAi.TimeSeriesPointRaw>>() {}
+                        tsNode, new TypeReference<List<AiForecastResponse.TimeSeriesPointRaw>>() {}
                 ),
                 matrixNode == null ? null : objectMapper.convertValue(
-                        matrixNode, AiForecastResponseFromAi.StrategicGuidePointRaw.class
+                        matrixNode, AiForecastResponse.StrategicGuidePointRaw.class
                 ),
                 recoNode == null ? null : objectMapper.convertValue(
-                        recoNode, new TypeReference<List<AiForecastResponseFromAi.RecommendationItemRaw>>() {}
+                        recoNode, new TypeReference<List<AiForecastResponse.RecommendationItemRaw>>() {}
                 ),
                 algoNode == null ? null : objectMapper.convertValue(
-                        algoNode, AiForecastResponseFromAi.AlgorithmGuideRaw.class
+                        algoNode, AiForecastResponse.AlgorithmGuideRaw.class
                 )
         );
 
@@ -213,12 +213,12 @@ public class ForecastApplication {
                 });
     }
 
-    private void validateSection1TimeSeries(List<AiForecastResponseFromAi.TimeSeriesPointRaw> points) {
+    private void validateSection1TimeSeries(List<AiForecastResponse.TimeSeriesPointRaw> points) {
         if (points == null || points.isEmpty()) {
             throw new IllegalArgumentException("section_1_time_series 는 비어 있을 수 없습니다.");
         }
 
-        for (AiForecastResponseFromAi.TimeSeriesPointRaw point : points) {
+        for (AiForecastResponse.TimeSeriesPointRaw point : points) {
             if (point == null) {
                 throw new IllegalArgumentException("section_1_time_series 에 null 포인트가 포함되어 있습니다.");
             }

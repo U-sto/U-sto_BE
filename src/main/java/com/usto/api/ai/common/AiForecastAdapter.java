@@ -2,7 +2,7 @@ package com.usto.api.ai.common;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.usto.api.ai.forecast.presentation.dto.request.AiForecastRequestToAi;
-import com.usto.api.ai.forecast.presentation.dto.response.AiForecastResponseFromAi;
+import com.usto.api.ai.forecast.presentation.dto.response.AiForecastResponse;
 import com.usto.api.common.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +21,7 @@ public class AiForecastAdapter {
     private final AiProperties properties;
     private final ObjectMapper objectMapper; // JSON 파싱을 위한 매퍼 추가
 
-    public AiForecastResponseFromAi fetchForecastResponse(AiForecastRequestToAi request) {
+    public AiForecastResponse fetchForecastResponse(AiForecastRequestToAi request) {
         // 1. 먼저 String으로 응답을 받아서 로그를 확인
         String rawResponse =
                 aiWebClient.post()
@@ -100,7 +100,7 @@ public class AiForecastAdapter {
             throw new BusinessException("AI 서버 응답이 비어있습니다.");
         }
         try {
-            AiForecastResponseFromAi res = objectMapper.readValue(rawResponse, AiForecastResponseFromAi.class);
+            AiForecastResponse res = objectMapper.readValue(rawResponse, AiForecastResponse.class);
 
             boolean allEmpty = (res.section1TimeSeries() == null || res.section1TimeSeries().isEmpty()) &&
                     (res.section2StrategicGuide() == null) &&

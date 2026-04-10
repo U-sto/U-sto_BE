@@ -6,7 +6,7 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public record AiForecastResponseFromAi(
+public record AiForecastResponse(
         @JsonProperty("section_1_time_series")
         List<TimeSeriesPointRaw> section1TimeSeries,
 
