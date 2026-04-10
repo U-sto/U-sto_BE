@@ -99,7 +99,6 @@ public class AiForecastAdapter {
         if (rawResponse == null || rawResponse.isBlank()) {
             throw new BusinessException("AI 서버 응답이 비어있습니다.");
         }
-
         try {
             AiForecastResponse res = objectMapper.readValue(rawResponse, AiForecastResponse.class);
 

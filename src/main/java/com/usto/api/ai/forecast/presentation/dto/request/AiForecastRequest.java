@@ -16,10 +16,10 @@ public record AiForecastRequest(
 ) {
     public record Conditions(
 
-            @Schema(example = "2026")
-            @NotNull Integer year, //년도 (예: 2026)
+            @Schema(example = "2030")
+            @NotNull Integer year, //년도 (예: 2030)
 
-            @Schema(example = "1")
+            @Schema(example = "2")
             @NotNull Integer semester, //1=1학기,2=여름학기,3=2학기,4=겨울학기
 
             @JsonProperty("org_cd")
@@ -32,7 +32,7 @@ public record AiForecastRequest(
             @Schema(example = "A320")
             @NotBlank String department, //dept_cd
 
-            @Schema(example = "")
+            @Schema(example = "전체")
             String category,          // 물품분류명 (입력 안 하면 null 또는 빈 값)
 
             @Schema(example = "LOW")

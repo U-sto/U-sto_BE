@@ -45,11 +45,12 @@ public class ForecastApplication {
         forecastPolicy.validateRequest(request,orgCd);
         forecastPolicy.validateOrganization(request.conditions().campus(),orgCd);
 
+        // AI에게 보낼 Request
         AiForecastRequestToAi requestToAi = toAiPayload(request);
-        // AI 호출
-        AiForecastResponse aiResponse = aiForecastAdapter.fetchForecastResponse(requestToAi);
 
-        log.info("AI Response: {}", aiResponse);
+        // AI 호출
+        AiForecastResponse responseFromAi =
+                aiForecastAdapter.fetchForecastResponse(requestToAi);
 
         //도메인 객체에 내용 담기
         Forecast forecast = ForecastMapper.toDomain(
@@ -59,21 +60,17 @@ public class ForecastApplication {
                 request.conditions().risk_level(),
                 request.prompt(),
                 orgCd,
-                toJsonNullable(aiResponse.section4AlgorithmGuide()),//AI분석알고리즘가이드(원래 상단요약이였는데 바뀜 - 어쩔 수 없음)
-                toJsonNullable(aiResponse.section1TimeSeries()),
-                toJsonNullable(aiResponse.section2StrategicGuide()), //매트릭스=AI전략적 조달 가이드
-                toJsonNullable(aiResponse.section3Recommendations()),
+                toJsonNullable(responseFromAi.section4AlgorithmGuide()),//AI분석알고리즘가이드(원래 상단요약이였는데 바뀜 - 어쩔 수 없음)
+                toJsonNullable(responseFromAi.section1TimeSeries()),
+                toJsonNullable(responseFromAi.section2StrategicGuide()), //매트릭스=AI전략적 조달 가이드
+                toJsonNullable(responseFromAi.section3Recommendations()),
                 request.conditions().department(),
                 request.conditions().category()
         );
 
-        log.info("getMatrixJson: {}", forecast.getMatrixJson());
-        log.info("getSummaryJson: {}", forecast.getSummaryJson());
-
-
         forecastRepository.save(forecast);
 
-        return aiResponse;
+        return responseFromAi;
     }
 
     @Transactional
@@ -92,31 +89,23 @@ public class ForecastApplication {
         JsonNode recoNode = readTreeOrNull(forecast.getRecoJson());
         JsonNode algoNode = readTreeOrNull(forecast.getSummaryJson());  //이렇게 안 하면 다 바꿔야함
 
-        return AiForecastResponse
-                .builder()
-                .section4AlgorithmGuide(
-                        algoNode == null
-                                ? null
-                                : objectMapper.convertValue(
-                                algoNode,
-                                AiForecastResponse.AlgorithmGuide.class
-                        )
+        // 저장을 섹션별로 했을 때, 다시 하나의 객체로 합쳐 반환
+        AiForecastResponse ai = new AiForecastResponse(
+                tsNode == null ? null : objectMapper.convertValue(
+                        tsNode, new TypeReference<List<AiForecastResponse.TimeSeriesPointRaw>>() {}
+                ),
+                matrixNode == null ? null : objectMapper.convertValue(
+                        matrixNode, AiForecastResponse.StrategicGuidePointRaw.class
+                ),
+                recoNode == null ? null : objectMapper.convertValue(
+                        recoNode, new TypeReference<List<AiForecastResponse.RecommendationItemRaw>>() {}
+                ),
+                algoNode == null ? null : objectMapper.convertValue(
+                        algoNode, AiForecastResponse.AlgorithmGuideRaw.class
                 )
-                .section1TimeSeries(tsNode == null ? null : objectMapper.convertValue(
-                        tsNode, new TypeReference<List<AiForecastResponse.TimeSeriesPoint>>() {}
-                ))
-                .section2StrategicGuide( //매트릭스=AI전략적 조달 가이드
-                        matrixNode == null
-                                ? null
-                                : objectMapper.convertValue(
-                                matrixNode,
-                                AiForecastResponse.StrategicGuidePoint.class
-                        )
-                )
-                .section3Recommendations(recoNode == null ? null : objectMapper.convertValue(
-                        recoNode, new TypeReference<List<AiForecastResponse.RecommendationItem>>() {}
-                ))
-                .build();
+        );
+
+        return ai;
     }
 
     private String toJsonNullable(Object value) {
@@ -223,4 +212,6 @@ public class ForecastApplication {
                     return campus;
                 });
     }
+
+
 }

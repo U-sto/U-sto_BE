@@ -3,7 +3,6 @@ package com.usto.api.ai.forecast.presentation.controller;
 import com.usto.api.ai.forecast.application.ForecastApplication;
 import com.usto.api.ai.forecast.presentation.dto.request.AiForecastRequest;
 import com.usto.api.ai.forecast.presentation.dto.response.AiForecastResponse;
-import com.usto.api.common.exception.BusinessException;
 import com.usto.api.common.utils.ApiResponse;
 import com.usto.api.user.domain.model.UserPrincipal;
 import io.swagger.v3.oas.annotations.Operation;
@@ -61,8 +60,8 @@ public class ForecastController {
     }
 
     @Operation(
-            summary = "기록 내용 조회",
-            description = "이전 기록 내용을 조회합니다"
+            summary = "기록 내용 확인",
+            description = "이전 기록 내용을 확인합니다"
     )
     @GetMapping("contents")
     public ApiResponse<AiForecastResponse> check(
