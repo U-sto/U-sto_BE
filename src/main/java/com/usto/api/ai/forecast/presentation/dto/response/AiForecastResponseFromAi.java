@@ -1,5 +1,6 @@
 package com.usto.api.ai.forecast.presentation.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -19,6 +20,7 @@ public record AiForecastResponseFromAi(
         AlgorithmGuideRaw  section4AlgorithmGuide
 ) {
     @JsonIgnoreProperties(ignoreUnknown = true)
+    @JsonInclude(JsonInclude.Include.NON_NULL)  // ← 추가: null 필드 직렬화 제외
     public record TimeSeriesPointRaw(
             @JsonProperty("month")
             Integer month, //월 (1~12)

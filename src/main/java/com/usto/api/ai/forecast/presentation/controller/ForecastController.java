@@ -2,8 +2,7 @@ package com.usto.api.ai.forecast.presentation.controller;
 
 import com.usto.api.ai.forecast.application.ForecastApplication;
 import com.usto.api.ai.forecast.presentation.dto.request.AiForecastRequest;
-import com.usto.api.ai.forecast.presentation.dto.response.AiForecastResponse;
-import com.usto.api.common.exception.BusinessException;
+import com.usto.api.ai.forecast.presentation.dto.response.AiForecastResponseFromAi;
 import com.usto.api.common.utils.ApiResponse;
 import com.usto.api.user.domain.model.UserPrincipal;
 import io.swagger.v3.oas.annotations.Operation;
@@ -31,11 +30,11 @@ public class ForecastController {
                     "category는 null이거나 정해진 것만 들어가야합니다."
     )
     @PostMapping
-    public ApiResponse<AiForecastResponse> analyze(
+    public ApiResponse<AiForecastResponseFromAi> analyze(
             @RequestBody @Valid AiForecastRequest request,
             @Valid @AuthenticationPrincipal UserPrincipal userPrincipal
     ) {
-        AiForecastResponse data = forecastApplication.analyze(
+        AiForecastResponseFromAi data = forecastApplication.analyze(
                 userPrincipal.getUsername(),
                 userPrincipal.getOrgCd(),
                 request
@@ -65,11 +64,11 @@ public class ForecastController {
             description = "이전 기록 내용을 확인합니다"
     )
     @GetMapping("contents")
-    public ApiResponse<AiForecastResponse> check(
+    public ApiResponse<AiForecastResponseFromAi> check(
             @RequestParam @Valid UUID forecastId,
             @Valid @AuthenticationPrincipal UserPrincipal userPrincipal
     ) {
-        AiForecastResponse response = forecastApplication.check(
+        AiForecastResponseFromAi response = forecastApplication.check(
                 userPrincipal.getUsername(),
                 userPrincipal.getOrgCd(),
                 forecastId
