@@ -61,8 +61,8 @@ public class ForecastController {
     }
 
     @Operation(
-            summary = "기록 내용 조회",
-            description = "이전 기록 내용을 조회합니다"
+            summary = "기록 내용 확인",
+            description = "이전 기록 내용을 확인합니다"
     )
     @GetMapping("contents")
     public ApiResponse<AiForecastResponse> check(

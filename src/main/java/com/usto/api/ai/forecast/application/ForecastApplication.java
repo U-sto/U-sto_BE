@@ -13,6 +13,7 @@ import com.usto.api.ai.forecast.infrastructure.mapper.ForecastMapper;
 import com.usto.api.ai.forecast.presentation.dto.request.AiForecastRequest;
 import com.usto.api.ai.forecast.presentation.dto.request.AiForecastRequestToAi;
 import com.usto.api.ai.forecast.presentation.dto.response.AiForecastResponse;
+import com.usto.api.ai.forecast.presentation.dto.response.AiForecastResponseFromAi;
 import com.usto.api.common.exception.BusinessException;
 import com.usto.api.organization.infrastructure.entity.DepartmentJpaEntity;
 import com.usto.api.organization.infrastructure.repository.DepartmentJpaRepository;
@@ -45,11 +46,28 @@ public class ForecastApplication {
         forecastPolicy.validateRequest(request,orgCd);
         forecastPolicy.validateOrganization(request.conditions().campus(),orgCd);
 
+        // AI에게 보낼 Resquest
         AiForecastRequestToAi requestToAi = toAiPayload(request);
-        // AI 호출
-        AiForecastResponse aiResponse = aiForecastAdapter.fetchForecastResponse(requestToAi);
 
-        log.info("AI Response: {}", aiResponse);
+        // AI 호출
+        AiForecastResponseFromAi responseFromAi =
+                aiForecastAdapter.fetchForecastResponse(requestToAi);
+
+        // 정책 검사
+        validateSection1TimeSeries(responseFromAi.section1TimeSeries());
+
+        // 내부 응답 조립
+        AiForecastResponse responseToClient = AiForecastResponse.builder()
+                .section1TimeSeries(
+                        AiForecastResponse.SectionTimeSeries.builder()
+                                .monthlyPoints(buildMonthlyPoints(responseFromAi.section1TimeSeries()))
+                                .ropPoints(buildRopPoints(responseFromAi.section1TimeSeries()))
+                                .build()
+                )
+                .section2StrategicGuide(buildStrategicGuide(responseFromAi.section2StrategicGuide()))
+                .section3Recommendations(buildRecommendations(responseFromAi.section3Recommendations()))
+                .section4AlgorithmGuide(buildAlgorithmGuide(responseFromAi.section4AlgorithmGuide()))
+                .build();
 
         //도메인 객체에 내용 담기
         Forecast forecast = ForecastMapper.toDomain(
@@ -59,10 +77,10 @@ public class ForecastApplication {
                 request.conditions().risk_level(),
                 request.prompt(),
                 orgCd,
-                toJsonNullable(aiResponse.section4AlgorithmGuide()),//AI분석알고리즘가이드(원래 상단요약이였는데 바뀜 - 어쩔 수 없음)
-                toJsonNullable(aiResponse.section1TimeSeries()),
-                toJsonNullable(aiResponse.section2StrategicGuide()), //매트릭스=AI전략적 조달 가이드
-                toJsonNullable(aiResponse.section3Recommendations()),
+                toJsonNullable(responseToClient.section4AlgorithmGuide()),//AI분석알고리즘가이드(원래 상단요약이였는데 바뀜 - 어쩔 수 없음)
+                toJsonNullable(responseToClient.section1TimeSeries()),
+                toJsonNullable(responseToClient.section2StrategicGuide()), //매트릭스=AI전략적 조달 가이드
+                toJsonNullable(responseToClient.section3Recommendations()),
                 request.conditions().department(),
                 request.conditions().category()
         );
@@ -73,7 +91,7 @@ public class ForecastApplication {
 
         forecastRepository.save(forecast);
 
-        return aiResponse;
+        return responseToClient;
     }
 
     @Transactional
@@ -102,15 +120,20 @@ public class ForecastApplication {
                                 AiForecastResponse.AlgorithmGuide.class
                         )
                 )
-                .section1TimeSeries(tsNode == null ? null : objectMapper.convertValue(
-                        tsNode, new TypeReference<List<AiForecastResponse.TimeSeriesPoint>>() {}
-                ))
+                .section1TimeSeries(
+                        tsNode == null
+                                ? null
+                                : objectMapper.convertValue(
+                                tsNode,
+                                AiForecastResponse.SectionTimeSeries.class
+                        )
+                )
                 .section2StrategicGuide( //매트릭스=AI전략적 조달 가이드
                         matrixNode == null
                                 ? null
                                 : objectMapper.convertValue(
                                 matrixNode,
-                                AiForecastResponse.StrategicGuidePoint.class
+                                AiForecastResponse.StrategicGuide.class
                         )
                 )
                 .section3Recommendations(recoNode == null ? null : objectMapper.convertValue(
@@ -222,5 +245,111 @@ public class ForecastApplication {
                     log.warn("조직명 조회 실패: campus={}", campus);
                     return campus;
                 });
+    }
+
+    private void validateSection1TimeSeries(List<AiForecastResponseFromAi.TimeSeriesPointRaw> points) {
+        if (points == null || points.isEmpty()) {
+            throw new IllegalArgumentException("section_1_time_series 는 비어 있을 수 없습니다.");
+        }
+
+        for (AiForecastResponseFromAi.TimeSeriesPointRaw point : points) {
+            if (point == null) {
+                throw new IllegalArgumentException("section_1_time_series 에 null 포인트가 포함되어 있습니다.");
+            }
+
+            if (point.month() == null) {
+                throw new IllegalArgumentException("month 는 필수입니다.");
+            }
+
+            if (point.quantity() == null) {
+                throw new IllegalArgumentException("quantity 는 필수입니다.");
+            }
+
+            boolean isRop = Boolean.TRUE.equals(point.isRop());
+
+            if (isRop) {
+                if (point.ropDate() == null ||
+                        point.baseQty() == null ||
+                        point.safetyStock() == null ||
+                        point.totalOrderQty() == null) {
+                    throw new IllegalArgumentException(
+                            "is_rop=true 인 경우 ropDate, baseQty, safetyStock, totalOrderQty 는 필수입니다."
+                    );
+                }
+            }
+        }
+    }
+
+    private List<AiForecastResponse.MonthlyForecastPoint> buildMonthlyPoints(
+            List<AiForecastResponseFromAi.TimeSeriesPointRaw> points
+    ) {
+        return points.stream()
+                .map(point -> AiForecastResponse.MonthlyForecastPoint.builder()
+                        .month(point.month())
+                        .quantity(point.quantity().intValue())
+                        .build())
+                .toList();
+    }
+
+    private List<AiForecastResponse.RopPoint> buildRopPoints(
+            List<AiForecastResponseFromAi.TimeSeriesPointRaw> points
+    ) {
+        return points.stream()
+                .filter(point -> Boolean.TRUE.equals(point.isRop()))
+                .map(point -> AiForecastResponse.RopPoint.builder()
+                        .month(point.month())
+                        .ropDate(point.ropDate())
+                        .baseQty(point.baseQty().intValue())
+                        .safetyStock(point.safetyStock().intValue())
+                        .totalOrderQty(point.totalOrderQty().intValue())
+                        .build())
+                .toList();
+    }
+
+    private AiForecastResponse.StrategicGuide buildStrategicGuide(
+            AiForecastResponseFromAi.StrategicGuidePointRaw raw
+    ) {
+        if (raw == null) {
+            return null;
+        }
+
+        return AiForecastResponse.StrategicGuide.builder()
+                .aiSummaryComment(raw.aiSummaryComment())
+                .smartForecasting(raw.smartForecasting())
+                .timeToProcure(raw.timeToProcure())
+                .budgetGuide(raw.budgetGuide())
+                .build();
+    }
+
+    private List<AiForecastResponse.RecommendationItem> buildRecommendations(
+            List<AiForecastResponseFromAi.RecommendationItemRaw> items
+    ) {
+        if (items == null) {
+            return List.of();
+        }
+
+        return items.stream()
+                .map(item -> AiForecastResponse.RecommendationItem.builder()
+                        .id(item.id() == null ? null : item.id().longValue())
+                        .itemName(item.itemName())
+                        .quantity(item.quantity() == null ? null : item.quantity().intValue())
+                        .estimatedBudget(item.estimatedBudget() == null ? null : item.estimatedBudget().longValue())
+                        .recommendOrderDate(item.recommendOrderDate())
+                        .build())
+                .toList();
+    }
+
+    private AiForecastResponse.AlgorithmGuide buildAlgorithmGuide(
+            AiForecastResponseFromAi.AlgorithmGuideRaw raw
+    ) {
+        if (raw == null) {
+            return null;
+        }
+
+        return AiForecastResponse.AlgorithmGuide.builder()
+                .formula1(raw.formula1())
+                .formula2(raw.formula2())
+                .formula3(raw.formula3())
+                .build();
     }
 }
