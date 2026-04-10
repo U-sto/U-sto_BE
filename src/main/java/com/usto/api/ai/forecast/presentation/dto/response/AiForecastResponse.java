@@ -20,7 +20,7 @@ public record AiForecastResponse(
         AlgorithmGuideRaw  section4AlgorithmGuide
 ) {
     @JsonIgnoreProperties(ignoreUnknown = true)
-    @JsonInclude(JsonInclude.Include.NON_NULL)  // ← 추가: null 필드 직렬화 제외
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     public record TimeSeriesPointRaw(
             @JsonProperty("month")
             Integer month, //월 (1~12)

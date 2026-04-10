@@ -213,38 +213,5 @@ public class ForecastApplication {
                 });
     }
 
-    private void validateSection1TimeSeries(List<AiForecastResponse.TimeSeriesPointRaw> points) {
-        if (points == null || points.isEmpty()) {
-            throw new IllegalArgumentException("section_1_time_series 는 비어 있을 수 없습니다.");
-        }
-
-        for (AiForecastResponse.TimeSeriesPointRaw point : points) {
-            if (point == null) {
-                throw new IllegalArgumentException("section_1_time_series 에 null 포인트가 포함되어 있습니다.");
-            }
-
-            if (point.month() == null) {
-                throw new IllegalArgumentException("month 는 필수입니다.");
-            }
-
-            if (point.quantity() == null) {
-                throw new IllegalArgumentException("quantity 는 필수입니다.");
-            }
-
-            boolean isRop = Boolean.TRUE.equals(point.isRop());
-
-            if (isRop) {
-                if (point.ropDate() == null ||
-                        point.baseQty() == null ||
-                        point.safetyStock() == null ||
-                        point.totalOrderQty() == null) {
-                    throw new IllegalArgumentException(
-                            "is_rop=true 인 경우 ropDate, baseQty, safetyStock, totalOrderQty 는 필수입니다."
-                    );
-                }
-            }
-        }
-    }
-
 
 }
