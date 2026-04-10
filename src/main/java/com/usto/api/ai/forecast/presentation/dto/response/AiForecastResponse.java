@@ -7,73 +7,57 @@ import java.util.List;
 
 @Builder
 public record AiForecastResponse(
-        @JsonProperty("section_1_time_series")
-        List<TimeSeriesPoint> section1TimeSeries,
-
-        @JsonProperty("section_2_strategic_guide")
-        StrategicGuidePoint section2StrategicGuide,
-
-        @JsonProperty("section_3_recommendations")
+        SectionTimeSeries section1TimeSeries,
+        StrategicGuide section2StrategicGuide,
         List<RecommendationItem> section3Recommendations,
-
-        @JsonProperty("section_4_algorithm_guide")
         AlgorithmGuide section4AlgorithmGuide
 ) {
-    public record TimeSeriesPoint(
-            @JsonProperty("month")
+    @Builder
+    public record SectionTimeSeries(
+            List<MonthlyForecastPoint> monthlyPoints, //is_rop = false
+            List<RopPoint> ropPoints //is_rop = true
+    ) {
+    }
+
+    @Builder
+    public record MonthlyForecastPoint(
             Integer month,
-            @JsonProperty("quantity")
-            Number quantity,
-            @JsonProperty("is_rop")
-            Boolean isRop
+            Integer quantity
     ) {
     }
 
-    public record StrategicGuidePoint(
-            @JsonProperty("ai_summary_comment")
+    @Builder
+    public record RopPoint(
+            Integer month,
+            Integer quantity,
+            String ropDate,
+            Integer baseQty,
+            Integer safetyStock,
+            Integer totalOrderQty
+    ) {
+    }
+    @Builder
+    public record StrategicGuide(
             String aiSummaryComment,
-            @JsonProperty("smart_forecasting")
             String smartForecasting,
-            @JsonProperty("time_to_procure")
             String timeToProcure,
-            @JsonProperty("budget_guide")
             String budgetGuide
-
     ) {
     }
-
+    @Builder
     public record RecommendationItem(
             Long id,
-            @JsonProperty("item_name")
             String itemName,
-            Number quantity,
-            @JsonProperty("estimated_budget")
-            Number estimatedBudget,
-            @JsonProperty("recommend_order_date")
-            String recommendOrderDate,
-            @JsonProperty("ai_insight")
-            AiInsight aiInsight
+            Integer quantity,
+            Long estimatedBudget,
+            String recommendOrderDate
     ) {
     }
-
-    public record AiInsight(
-            @JsonProperty("report_title")
-            String reportTitle,
-            @JsonProperty("analysis_summary")
-            String analysisSummary,
-            @JsonProperty("action_item")
-            String actionItem,
-            @JsonProperty("alert_level")
-            String alertLevel
-    ) {
-    }
-
-            public record AlgorithmGuide(
-            @JsonProperty("formula_1")
+    @Builder
+    public record AlgorithmGuide(
             String formula1,
-            @JsonProperty("formula_2")
             String formula2,
-            @JsonProperty("formula_3")
             String formula3
-    ) {}
+    ) {
+    }
 }
