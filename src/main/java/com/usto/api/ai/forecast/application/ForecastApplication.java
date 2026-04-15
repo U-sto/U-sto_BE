@@ -53,7 +53,7 @@ public class ForecastApplication {
                 aiForecastAdapter.fetchForecastResponse(requestToAi);
 
         //forecastName만들기
-        String forecastName = "";
+        String forecastName = generateForecastName(responseFromAi);
 
         //도메인 객체에 내용 담기
         Forecast forecast = ForecastMapper.toDomain(
@@ -229,5 +229,30 @@ public class ForecastApplication {
                     log.warn("조직명 조회 실패: campus={}", campus);
                     return campus;
                 });
+    }
+
+    // 1. 서비스 클래스 내부에 네이밍 생성 메서드 추가
+    private String generateForecastName(AiForecastResponse response) {
+        // 1-1. Null 및 빈 데이터 방어 로직
+        if (response == null ||
+                response.section3Recommendations() == null ||
+                response.section3Recommendations().isEmpty()) {
+            return "미분류_발주_예측_결과";
+        }
+
+        // 1-2. 핵심 데이터 추출 (첫 번째 추천 항목 기준)
+        var primaryRecommendation = response.section3Recommendations().get(0);
+        String itemName = primaryRecommendation.itemName(); // 예: "노트북컴퓨터"
+        int quantity = primaryRecommendation.quantity().intValue();    // 예: 542
+        String ropDate = primaryRecommendation.recommendOrderDate(); // 예: "2030-10-16"
+
+        // 1-3. 날짜 포맷팅 (YYYY-MM-DD -> YYYY-MM 추출)
+        String yearMonth = "일정미정";
+        if (ropDate != null && ropDate.length() >= 7) {
+            yearMonth = ropDate.substring(0, 7);
+        }
+
+        // 1-4. 최종 문자열 조합
+        return String.format("[%s] %s 발주권고 (%d대)", yearMonth, itemName, quantity);
     }
 }
