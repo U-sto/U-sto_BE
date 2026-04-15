@@ -96,6 +96,25 @@ public class ChatController {
         return ApiResponse.ok("삭제 성공");
     }
 
+    //쓰레드 이름 수정
+    @Operation(
+            summary = "쓰레드 이름 수정",
+            description = "채팅방 이름을 수정합니다."
+    )
+    @PatchMapping("/threads/{threadId}")
+    public ApiResponse<?> updateThread(
+            @PathVariable UUID threadId,
+            @Valid String newTitle,
+            @Valid @AuthenticationPrincipal UserPrincipal userPrincipal
+    ) {
+        aiChatApplication.updateThread(
+                threadId,
+                newTitle,
+                userPrincipal.getUsername()
+        );
+        return ApiResponse.ok("채팅방 이름 수정 성공");
+    }
+
     @Operation(
             summary = "대화 맥락 조회",
             description = "채팅방 입장시 필요한 이전 대화 맥락을 조회합니다."

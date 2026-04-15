@@ -14,8 +14,12 @@ import java.util.UUID;
 public class ChatThread {
     private final UUID threadId;
     private final String userId;
-    private final String title;
+    private String title;
     private final LocalDateTime lastMessageAt;
     private final String orgCode;
     private final List<ChatMessage> messages;
+
+    public void updateTitle(String newTitle) {
+        this.title = newTitle;
+    }
 }

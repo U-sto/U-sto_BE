@@ -22,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -151,6 +152,10 @@ public class AiChatApplication {
 
         List<ChatThread> threads = chatThreadRepository.findByUsrId(username);
 
+        for (ChatThread thread : threads) {
+            chatThreadPolicy.validateOwnership(thread,username);
+        }
+
         if(threads == null){
             throw new BusinessException("대화 기록이 없습니다.");
         }
@@ -168,6 +173,19 @@ public class AiChatApplication {
         }
         chatThreadPolicy.validateOwnership(thread,username);
         chatThreadRepository.deleteThread(threadId);
+    }
+
+    public void updateThread(UUID threadId, String newTitle,String username) {
+
+        ChatThread thread = chatThreadRepository.findById(threadId);
+        if(thread == null){
+            throw new BusinessException("존재하지 않는 채팅방입니다.");
+        }
+        chatThreadPolicy.validateOwnership(thread,username);
+
+        thread.updateTitle(newTitle);
+
+        chatThreadRepository.save(thread);
     }
 
     public List<String> findContent(String content, String username) {
