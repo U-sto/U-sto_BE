@@ -3,6 +3,7 @@ package com.usto.api.ai.chat.presentation.controller;
 import com.usto.api.ai.chat.application.AiChatApplication;
 import com.usto.api.ai.chat.application.ChatGptApplication;
 import com.usto.api.ai.chat.presentation.dto.request.AiChatRequest;
+import com.usto.api.ai.chat.presentation.dto.request.AiFirstChatRequest;
 import com.usto.api.ai.chat.presentation.dto.response.AiChatResponse;
 import com.usto.api.ai.chat.presentation.dto.response.AiFirstChatResponse;
 import com.usto.api.ai.chat.presentation.dto.response.ChatMessageResponse;
@@ -53,7 +54,7 @@ public class ChatController {
     )
     @PostMapping("/threads")
     public ApiResponse<AiFirstChatResponse> chatAtFirst(
-            @Valid @RequestBody AiChatRequest request,
+            @Valid @RequestBody AiFirstChatRequest request,
             @Valid @AuthenticationPrincipal UserPrincipal userPrincipal
     ) {
         AiFirstChatResponse response = aiChatApplication.sendAtFirst(
