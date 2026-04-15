@@ -100,6 +100,10 @@ public class AiChatApplication {
 
         List<ChatThread> threads = chatThreadRepository.findByUsrId(username);
 
+        if(threads == null){
+            throw new BusinessException("대화 기록이 없습니다.");
+        }
+
         return threads.stream()
                 .map(ChatThread::getThreadId)
                 .toList();
