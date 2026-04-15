@@ -7,7 +7,7 @@ import java.util.UUID;
 
 public record AiChatRequest(
 
-        @JsonProperty("session_id")
+        @JsonProperty("threadId")
         UUID threadId,
 
         @NotBlank

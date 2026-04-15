@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 
-//연동 테스트
 @RestController
 @RequestMapping("/api/ai/chat")
 @RequiredArgsConstructor
@@ -28,7 +27,7 @@ public class ChatController {
     private final ChatGptApplication chatGptTestApplication;
 
     @Operation(
-            summary = "AI팀의 챗봇과 대화(AI 연동 후)",
+            summary = "AI팀의 챗봇과 대화(AI팀 연동)",
             description = "AI팀의 챗봇과 대화를 진행합니다."
     )
     @PostMapping
