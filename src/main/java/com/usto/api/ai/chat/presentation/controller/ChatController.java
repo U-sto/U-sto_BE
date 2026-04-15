@@ -3,6 +3,7 @@ package com.usto.api.ai.chat.presentation.controller;
 import com.usto.api.ai.chat.application.AiChatApplication;
 import com.usto.api.ai.chat.application.ChatGptApplication;
 import com.usto.api.ai.chat.presentation.dto.request.AiChatRequest;
+import com.usto.api.ai.chat.presentation.dto.request.AiFirstChatRequest;
 import com.usto.api.ai.chat.presentation.dto.response.AiChatResponse;
 import com.usto.api.ai.chat.presentation.dto.response.ChatMessageResponse;
 import com.usto.api.common.utils.ApiResponse;
@@ -49,9 +50,9 @@ public class ChatController {
             summary = "챗봇과 첫 대화 (새 대화 시작)",
             description = "새로운 채팅방을 파서 새 대화를 시작합니다."
     )
-    @PostMapping("/threads")
+    @PostMapping("/first")
     public ApiResponse<AiChatResponse> threads(
-            @RequestBody AiChatRequest request,
+            @RequestBody AiFirstChatRequest request,
             @Valid @AuthenticationPrincipal UserPrincipal userPrincipal
     ) {
         AiChatResponse response = aiChatApplication.send(
