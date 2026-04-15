@@ -26,6 +26,9 @@ public class ForecastJpaEntity extends BaseTimeEntity {
     @Column(name = "FC_M_ID", columnDefinition = "BINARY(16)")
     private UUID forecastId;
 
+    @Column(name = "FC_NM" , length = 255 , nullable = false)
+    private String forecastName;
+
     @Column(name = "USR_ID", length = 50, nullable = false)
     private String userId;
 

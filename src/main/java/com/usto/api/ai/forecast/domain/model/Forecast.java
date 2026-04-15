@@ -11,6 +11,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class Forecast {
     private final UUID forecastId;
+    private final String forecastName;
     private final String userId;
     private final Short analysisYear;
     private final Byte semester;

@@ -8,10 +8,11 @@ import java.util.UUID;
 
 public class ForecastMapper {
     // Overload 1: Data(Inputs) -> Domain (For creating new forecast result)
-    public static Forecast toDomain(String userId, Short year, Byte semester, RiskLevel risk, String msg, String org
+    public static Forecast toDomain(String userId, String forecastName,Short year, Byte semester, RiskLevel risk, String msg, String org
                                     , String sumJson,String tsJson, String matrixJson, String recoJson,String deptCd,String g2bNm) {
         return Forecast.builder()
                 .forecastId(UUID.randomUUID())
+                .forecastName(forecastName)
                 .userId(userId)
                 .analysisYear(year)
                 .semester(semester)
@@ -31,6 +32,7 @@ public class ForecastMapper {
     public static Forecast toDomain(ForecastJpaEntity entity) {
         return Forecast.builder()
                 .forecastId(entity.getForecastId())
+                .forecastName(entity.getForecastName())
                 .userId(entity.getUserId())
                 .analysisYear(entity.getAnalysisYear())
                 .semester(entity.getSemester())
@@ -50,6 +52,7 @@ public class ForecastMapper {
     public static ForecastJpaEntity toEntity(Forecast domain) {
         return ForecastJpaEntity.builder()
                 .forecastId(domain.getForecastId())
+                .forecastName(domain.getForecastName())
                 .userId(domain.getUserId())
                 .analysisYear(domain.getAnalysisYear())
                 .semester(domain.getSemester())

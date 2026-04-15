@@ -52,9 +52,13 @@ public class ForecastApplication {
         AiForecastResponse responseFromAi =
                 aiForecastAdapter.fetchForecastResponse(requestToAi);
 
+        //forecastName만들기
+        String forecastName = "";
+
         //도메인 객체에 내용 담기
         Forecast forecast = ForecastMapper.toDomain(
                 usrId,
+                forecastName,
                 request.conditions().year().shortValue(),
                 request.conditions().semester().byteValue(),
                 request.conditions().risk_level(),
