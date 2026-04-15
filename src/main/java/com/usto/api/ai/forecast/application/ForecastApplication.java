@@ -94,7 +94,7 @@ public class ForecastApplication {
         JsonNode algoNode = readTreeOrNull(forecast.getSummaryJson());  //이렇게 안 하면 다 바꿔야함
 
         // 저장을 섹션별로 했을 때, 다시 하나의 객체로 합쳐 반환
-        AiForecastResponse ai = new AiForecastResponse(
+        AiForecastResponse aiForecastResponse = new AiForecastResponse(
                 tsNode == null ? null : objectMapper.convertValue(
                         tsNode, new TypeReference<List<AiForecastResponse.TimeSeriesPointRaw>>() {}
                 ),
@@ -109,7 +109,7 @@ public class ForecastApplication {
                 )
         );
 
-        return ai;
+        return aiForecastResponse;
     }
 
     private String toJsonNullable(Object value) {

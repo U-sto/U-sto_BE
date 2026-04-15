@@ -96,7 +96,7 @@ public class ForecastController {
                 forecastId
         );
 
-        return ApiResponse.ok("삭제 성공");
+        return ApiResponse.ok("기록 이름 수정 성공");
     }
 
     @Operation(
