@@ -46,6 +46,9 @@ public class AiChatApplication {
     public AiChatResponse send(String userId,String orgCd, String message, UUID threadId) {
 
         ChatThread thread = chatThreadRepository.findById(threadId);
+        if (thread == null) {
+            throw new BusinessException("존재하지 않는 채팅방입니다.");
+        }
         chatThreadPolicy.validateOwnership(thread,userId);
 
         ChatMessage chatMessageByUser = ChatMessageMapper.toDomain(
@@ -63,13 +66,13 @@ public class AiChatApplication {
 
         if (aiResponse == null) {
             log.error("챗봇에게서 답장을 받지 못함. 저장 스킵 threadId: {}", threadId);
-            return null;
+            throw new BusinessException("AI 응답을 받지 못했습니다.");
         }
 
         log.info("AI Response: {}", aiResponse);
 
         try {
-            if (aiResponse.references() != null) {
+
                 String replyJson = aiResponse.reply();
                 String refJson = objectMapper.writeValueAsString(aiResponse.references());
 
@@ -82,7 +85,7 @@ public class AiChatApplication {
                 );
                 ChatMessageJpaEntity entityByBot = ChatMessageMapper.toEntity(chatMessageByBot);
                 chatMessageRepository.save(entityByBot);
-            }
+
         }catch (JsonProcessingException e) {
             log.error("참고문헌 데이터 변환 실패", e);
             throw new RuntimeException("AI 응답 데이터 처리 중 오류가 발생했습니다.", e);
@@ -123,7 +126,6 @@ public class AiChatApplication {
         log.info("AI Response: {}", aiResponse);
 
         try {
-            if (aiResponse.references() != null) {
                 String replyJson = aiResponse.reply();
                 String refJson = objectMapper.writeValueAsString(aiResponse.references());
 
@@ -136,7 +138,7 @@ public class AiChatApplication {
                 );
                 ChatMessageJpaEntity entityByBot = ChatMessageMapper.toEntity(chatMessageByBot);
                 chatMessageRepository.save(entityByBot);
-            }
+
         }catch (JsonProcessingException e) {
             log.error("참고문헌 데이터 변환 실패", e);
             throw new RuntimeException("AI 응답 데이터 처리 중 오류가 발생했습니다.", e);
@@ -156,7 +158,7 @@ public class AiChatApplication {
             chatThreadPolicy.validateOwnership(thread,username);
         }
 
-        if(threads == null){
+        if(threads.isEmpty()){
             throw new BusinessException("대화 기록이 없습니다.");
         }
 

@@ -2,8 +2,7 @@ package com.usto.api.ai.chat.presentation.controller;
 
 import com.usto.api.ai.chat.application.AiChatApplication;
 import com.usto.api.ai.chat.application.ChatGptApplication;
-import com.usto.api.ai.chat.presentation.dto.request.AiChatToAiRequest;
-import com.usto.api.ai.chat.presentation.dto.request.AiChatToServetRequest;
+import com.usto.api.ai.chat.presentation.dto.request.AiChatToServerRequest;
 import com.usto.api.ai.chat.presentation.dto.response.AiChatResponse;
 import com.usto.api.ai.chat.presentation.dto.response.AiFirstChatResponse;
 import com.usto.api.ai.chat.presentation.dto.response.ChatMessageResponse;
@@ -35,7 +34,7 @@ public class ChatController {
     @PostMapping("/threads/{threadId}/messages")
     public ApiResponse<AiChatResponse> chat(
             @PathVariable UUID threadId,
-            @Valid @RequestBody AiChatToServetRequest request,
+            @Valid @RequestBody AiChatToServerRequest request,
             @Valid @AuthenticationPrincipal UserPrincipal userPrincipal
     ) {
         AiChatResponse response = aiChatApplication.send(
@@ -54,7 +53,7 @@ public class ChatController {
     )
     @PostMapping("/threads")
     public ApiResponse<AiFirstChatResponse> chatAtFirst(
-            @Valid @RequestBody AiChatToServetRequest request,
+            @Valid @RequestBody AiChatToServerRequest request,
             @Valid @AuthenticationPrincipal UserPrincipal userPrincipal
     ) {
         AiFirstChatResponse response = aiChatApplication.sendAtFirst(

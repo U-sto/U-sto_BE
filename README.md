@@ -304,7 +304,7 @@ AI팀(U-sto_AI)의 RAG 기반 챗봇 서버와 연동하여 물품 관련 질의
 | POST | `/api/ai/chat` | 챗봇과 대화 (threadId로 대화 맥락 유지)    |
 | GET | `/api/ai/chat/threads` | 채팅 쓰레드 목록 조회                   |
 | DELETE | `/api/ai/chat/threads` | 채팅 쓰레드 삭제                      |
-| GET | `/api/ai/chat/messages/{threadId}/serch` | 특정 쓰레드의 이전 대화 맥락 조회 (채팅방 입장 시) |
+| GET | `/api/ai/chat/threads/{threadId}/messages` | 특정 쓰레드의 이전 대화 맥락 조회 (채팅방 입장 시) |
 | GET | `/api/ai/chat/messages/search` | 전체 대화 내용 키워드 검색                |
 
 ---
