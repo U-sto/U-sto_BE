@@ -3,7 +3,7 @@ package com.usto.api.item.acquisition.presentation.controller;
 import com.usto.api.common.utils.ApiResponse;
 import com.usto.api.item.acquisition.application.AcquisitionApplication;
 import com.usto.api.item.acquisition.presentation.dto.request.AcqApprovalBulkRequest;
-import com.usto.api.item.acquisition.presentation.dto.request.AcqRegisterRequest;
+import com.usto.api.item.acquisition.presentation.dto.request.      AcqRegisterRequest;
 import com.usto.api.item.acquisition.presentation.dto.request.AcqRejectBulkRequest;
 import com.usto.api.item.acquisition.presentation.dto.request.AcqSearchRequest;
 import com.usto.api.item.acquisition.presentation.dto.response.AcqListResponse;
