@@ -5,7 +5,11 @@ import jakarta.validation.constraints.NotBlank;
 
 import java.util.UUID;
 
-public record AiFirstChatRequest(
+public record AiChatToAiRequest(
+
+        @JsonProperty("threadId")
+        UUID threadId,
+
         @NotBlank
         @JsonProperty("query")
         String message

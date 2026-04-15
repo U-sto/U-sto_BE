@@ -11,7 +11,7 @@ import com.usto.api.ai.chat.domain.service.ChatThreadPolicy;
 import com.usto.api.ai.chat.infrastructure.entity.ChatMessageJpaEntity;
 import com.usto.api.ai.chat.infrastructure.mapper.ChatMessageMapper;
 import com.usto.api.ai.chat.infrastructure.mapper.ChatThreadMapper;
-import com.usto.api.ai.chat.presentation.dto.request.AiChatRequest;
+import com.usto.api.ai.chat.presentation.dto.request.AiChatToAiRequest;
 import com.usto.api.ai.chat.presentation.dto.response.AiChatResponse;
 import com.usto.api.ai.chat.presentation.dto.response.AiFirstChatResponse;
 import com.usto.api.ai.chat.presentation.dto.response.ChatMessageResponse;
@@ -57,7 +57,7 @@ public class AiChatApplication {
         ChatMessageJpaEntity entityByUser = ChatMessageMapper.toEntity(chatMessageByUser);
         chatMessageRepository.save(entityByUser);
 
-        AiChatRequest request = new AiChatRequest(threadId, message);
+        AiChatToAiRequest request = new AiChatToAiRequest(threadId, message);
         AiChatResponse aiResponse = aiClientAdapter.fetchChatResponse(request);
 
         if (aiResponse == null) {
@@ -111,7 +111,7 @@ public class AiChatApplication {
         ChatMessageJpaEntity entityByUser = ChatMessageMapper.toEntity(chatMessageByUser);
         chatMessageRepository.save(entityByUser);
 
-        AiChatRequest request = new AiChatRequest(threadId, message);
+        AiChatToAiRequest request = new AiChatToAiRequest(threadId, message);
         AiFirstChatResponse.AiChatResponse aiResponse = aiClientAdapter.fetchChatResponseAtFirst(request);
 
         if (aiResponse == null) {

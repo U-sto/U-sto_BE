@@ -2,7 +2,7 @@ package com.usto.api.ai.common;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.usto.api.ai.chat.presentation.dto.request.AiChatRequest;
+import com.usto.api.ai.chat.presentation.dto.request.AiChatToAiRequest;
 import com.usto.api.ai.chat.presentation.dto.response.AiChatResponse;
 import com.usto.api.ai.chat.presentation.dto.response.AiFirstChatResponse;
 import com.usto.api.common.exception.BusinessException;
@@ -23,7 +23,7 @@ public class AiChatAdapter {
     private final AiProperties properties;
     private final ObjectMapper objectMapper; // JSON 파싱을 위한 매퍼 추가
 
-    public AiChatResponse fetchChatResponse(AiChatRequest request) {
+    public AiChatResponse fetchChatResponse(AiChatToAiRequest request) {
         // 1. 먼저 String으로 응답을 받아서 로그를 확인
         String rawResponse =
                 aiWebClient.post()
@@ -118,7 +118,7 @@ public class AiChatAdapter {
         throw new RuntimeException("AI 서버 응답에서 'data' 필드를 찾을 수 없습니다.");
     }
 
-    public AiFirstChatResponse.AiChatResponse fetchChatResponseAtFirst(AiChatRequest request) {
+    public AiFirstChatResponse.AiChatResponse fetchChatResponseAtFirst(AiChatToAiRequest request) {
         // 1. 먼저 String으로 응답을 받아서 로그를 확인
         String rawResponse =
                 aiWebClient.post()
