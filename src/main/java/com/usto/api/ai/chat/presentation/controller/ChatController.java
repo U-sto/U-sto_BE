@@ -27,7 +27,7 @@ public class ChatController {
     private final ChatGptApplication chatGptTestApplication;
 
     @Operation(
-            summary = "AI팀의 챗봇과 대화(AI팀 연동)",
+            summary = "챗봇과 대화(AI팀 연동)",
             description = "AI팀의 챗봇과 대화를 진행합니다."
     )
     @PostMapping
@@ -46,6 +46,25 @@ public class ChatController {
     }
 
     @Operation(
+            summary = "챗봇과 첫 대화 (새 대화 시작)",
+            description = "새로운 채팅방을 파서 새 대화를 시작합니다."
+    )
+    @PostMapping("/threads")
+    public ApiResponse<AiChatResponse> threads(
+            @RequestBody AiChatRequest request,
+            @Valid @AuthenticationPrincipal UserPrincipal userPrincipal
+    ) {
+        AiChatResponse response = aiChatApplication.send(
+                userPrincipal.getUsername(),
+                userPrincipal.getOrgCd(),
+                request.message(),
+                null
+        );
+
+        return ApiResponse.ok("채팅 성공",response);
+    }
+
+    @Operation(
             summary = "쓰레드 조회",
             description = "채팅방을 조회합니다."
     )
@@ -53,7 +72,7 @@ public class ChatController {
     public ApiResponse<List<UUID>> threads(
             @Valid @AuthenticationPrincipal UserPrincipal userPrincipal
     ) {
-        List<UUID> response = aiChatApplication.threads(
+        List<UUID> response = aiChatApplication.getThreads(
                 userPrincipal.getUsername()
         );
         return ApiResponse.ok("조회 성공",response);
@@ -64,7 +83,7 @@ public class ChatController {
             description = "채팅방을 삭제합니다."
     )
     @DeleteMapping("/threads")
-    public ApiResponse<?> threads(
+    public ApiResponse<?> deleteThread(
             @RequestParam UUID threadId,
             @Valid @AuthenticationPrincipal UserPrincipal userPrincipal
     ) {

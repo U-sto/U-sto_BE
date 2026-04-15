@@ -96,7 +96,7 @@ public class AiChatApplication {
         return aiResponse;
     }
 
-    public List<UUID> threads(String username) {
+    public List<UUID> getThreads(String username) {
 
         List<ChatThread> threads = chatThreadRepository.findByUsrId(username);
 
