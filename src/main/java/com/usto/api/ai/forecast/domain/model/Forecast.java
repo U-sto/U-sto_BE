@@ -1,5 +1,6 @@
 package com.usto.api.ai.forecast.domain.model;
 
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -11,6 +12,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class Forecast {
     private final UUID forecastId;
+    private String forecastName;
     private final String userId;
     private final Short analysisYear;
     private final Byte semester;
@@ -23,4 +25,8 @@ public class Forecast {
     private final String matrixJson;
     private final String recoJson;
     private final String orgCode;
+
+    public void updateTitle(@Valid String newTitle) {
+        this.forecastName = newTitle;
+    }
 }

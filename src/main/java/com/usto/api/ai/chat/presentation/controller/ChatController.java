@@ -2,8 +2,9 @@ package com.usto.api.ai.chat.presentation.controller;
 
 import com.usto.api.ai.chat.application.AiChatApplication;
 import com.usto.api.ai.chat.application.ChatGptApplication;
-import com.usto.api.ai.chat.presentation.dto.request.AiChatRequest;
+import com.usto.api.ai.chat.presentation.dto.request.AiChatToServerRequest;
 import com.usto.api.ai.chat.presentation.dto.response.AiChatResponse;
+import com.usto.api.ai.chat.presentation.dto.response.AiFirstChatResponse;
 import com.usto.api.ai.chat.presentation.dto.response.ChatMessageResponse;
 import com.usto.api.common.utils.ApiResponse;
 import com.usto.api.user.domain.model.UserPrincipal;
@@ -18,7 +19,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 
-//연동 테스트
 @RestController
 @RequestMapping("/api/ai/chat")
 @RequiredArgsConstructor
@@ -28,22 +28,41 @@ public class ChatController {
     private final ChatGptApplication chatGptTestApplication;
 
     @Operation(
-            summary = "AI팀의 챗봇과 대화(AI 연동 후)",
+            summary = "챗봇과 대화(AI팀 연동)",
             description = "AI팀의 챗봇과 대화를 진행합니다."
     )
-    @PostMapping
+    @PostMapping("/threads/{threadId}/messages")
     public ApiResponse<AiChatResponse> chat(
-            @RequestBody AiChatRequest request,
+            @PathVariable UUID threadId,
+            @Valid @RequestBody AiChatToServerRequest request,
             @Valid @AuthenticationPrincipal UserPrincipal userPrincipal
     ) {
         AiChatResponse response = aiChatApplication.send(
                 userPrincipal.getUsername(),
                 userPrincipal.getOrgCd(),
                 request.message(),
-                request.threadId()
+                threadId
         );
 
         return ApiResponse.ok("채팅 성공",response);
+    }
+
+    @Operation(
+            summary = "쓰레드 생성(첫 대화)",
+            description = "첫 대화를 통해 채팅방을 생성합니다."
+    )
+    @PostMapping("/threads")
+    public ApiResponse<AiFirstChatResponse> chatAtFirst(
+            @Valid @RequestBody AiChatToServerRequest request,
+            @Valid @AuthenticationPrincipal UserPrincipal userPrincipal
+    ) {
+        AiFirstChatResponse response = aiChatApplication.sendAtFirst(
+                userPrincipal.getUsername(),
+                userPrincipal.getOrgCd(),
+                request.message()
+        );
+
+        return ApiResponse.ok("생성 및 첫 대화 성공",response);
     }
 
     @Operation(
@@ -54,7 +73,7 @@ public class ChatController {
     public ApiResponse<List<UUID>> threads(
             @Valid @AuthenticationPrincipal UserPrincipal userPrincipal
     ) {
-        List<UUID> response = aiChatApplication.threads(
+        List<UUID> response = aiChatApplication.getThreads(
                 userPrincipal.getUsername()
         );
         return ApiResponse.ok("조회 성공",response);
@@ -64,9 +83,9 @@ public class ChatController {
             summary = "쓰레드 삭제",
             description = "채팅방을 삭제합니다."
     )
-    @DeleteMapping("/threads")
-    public ApiResponse<?> threads(
-            @RequestParam UUID threadId,
+    @DeleteMapping("/threads/{threadId}")
+    public ApiResponse<?> deleteThread(
+            @PathVariable UUID threadId,
             @Valid @AuthenticationPrincipal UserPrincipal userPrincipal
     ) {
         aiChatApplication.deleteThread(
@@ -76,11 +95,30 @@ public class ChatController {
         return ApiResponse.ok("삭제 성공");
     }
 
+    //쓰레드 이름 수정
+    @Operation(
+            summary = "쓰레드 이름 수정",
+            description = "채팅방 이름을 수정합니다."
+    )
+    @PatchMapping("/threads/{threadId}")
+    public ApiResponse<?> updateThread(
+            @PathVariable UUID threadId,
+            @Valid String newTitle,
+            @Valid @AuthenticationPrincipal UserPrincipal userPrincipal
+    ) {
+        aiChatApplication.updateThread(
+                threadId,
+                newTitle,
+                userPrincipal.getUsername()
+        );
+        return ApiResponse.ok("채팅방 이름 수정 성공");
+    }
+
     @Operation(
             summary = "대화 맥락 조회",
             description = "채팅방 입장시 필요한 이전 대화 맥락을 조회합니다."
     )
-    @GetMapping("/messages/{threadId}/serch")
+    @GetMapping("/threads/{threadId}/messages")
     public ApiResponse<List<ChatMessageResponse>> findForStart(
             @PathVariable UUID threadId,
             @Valid @AuthenticationPrincipal UserPrincipal userPrincipal

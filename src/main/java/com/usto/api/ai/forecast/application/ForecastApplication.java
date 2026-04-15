@@ -52,9 +52,13 @@ public class ForecastApplication {
         AiForecastResponse responseFromAi =
                 aiForecastAdapter.fetchForecastResponse(requestToAi);
 
+        //forecastName만들기
+        String forecastName = generateForecastName(responseFromAi);
+
         //도메인 객체에 내용 담기
         Forecast forecast = ForecastMapper.toDomain(
                 usrId,
+                forecastName,
                 request.conditions().year().shortValue(),
                 request.conditions().semester().byteValue(),
                 request.conditions().risk_level(),
@@ -90,7 +94,7 @@ public class ForecastApplication {
         JsonNode algoNode = readTreeOrNull(forecast.getSummaryJson());  //이렇게 안 하면 다 바꿔야함
 
         // 저장을 섹션별로 했을 때, 다시 하나의 객체로 합쳐 반환
-        AiForecastResponse ai = new AiForecastResponse(
+        AiForecastResponse aiForecastResponse = new AiForecastResponse(
                 tsNode == null ? null : objectMapper.convertValue(
                         tsNode, new TypeReference<List<AiForecastResponse.TimeSeriesPointRaw>>() {}
                 ),
@@ -105,7 +109,7 @@ public class ForecastApplication {
                 )
         );
 
-        return ai;
+        return aiForecastResponse;
     }
 
     private String toJsonNullable(Object value) {
@@ -148,6 +152,20 @@ public class ForecastApplication {
 
         forecastRepository.delete(forecastId);
 
+    }
+
+    public void updateTitle(String username, String orgCd, @Valid String newTitle, @Valid UUID forecastId) {
+        Forecast forecast = forecastRepository.findById(forecastId);
+        if(forecast == null){
+            throw new BusinessException("존재하지 않는 예측입니다.");
+        }
+
+        forecastPolicy.validateOrganization(forecast.getOrgCode(),orgCd);
+        forecastPolicy.valdateOwnership(forecast.getUserId(),username);
+
+        forecast.updateTitle(newTitle);
+
+        forecastRepository.save(forecast);
     }
 
     private AiForecastRequestToAi toAiPayload(AiForecastRequest request) {
@@ -213,5 +231,28 @@ public class ForecastApplication {
                 });
     }
 
+    // 1. 서비스 클래스 내부에 네이밍 생성 메서드 추가
+    private String generateForecastName(AiForecastResponse response) {
+        // 1-1. Null 및 빈 데이터 방어 로직
+        if (response == null ||
+                response.section3Recommendations() == null ||
+                response.section3Recommendations().isEmpty()) {
+            return "미분류_발주_예측_결과";
+        }
 
+        // 1-2. 핵심 데이터 추출 (첫 번째 추천 항목 기준)
+        var primaryRecommendation = response.section3Recommendations().get(0);
+        String itemName = primaryRecommendation.itemName(); // 예: "노트북컴퓨터"
+        int quantity = primaryRecommendation.quantity().intValue();    // 예: 542
+        String ropDate = primaryRecommendation.recommendOrderDate(); // 예: "2030-10-16"
+
+        // 1-3. 날짜 포맷팅 (YYYY-MM-DD -> YYYY-MM 추출)
+        String yearMonth = "일정미정";
+        if (ropDate != null && ropDate.length() >= 7) {
+            yearMonth = ropDate.substring(0, 7);
+        }
+
+        // 1-4. 최종 문자열 조합
+        return String.format("[%s] %s 발주권고 (%d대)", yearMonth, itemName, quantity);
+    }
 }
