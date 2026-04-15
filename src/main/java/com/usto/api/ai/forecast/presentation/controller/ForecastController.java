@@ -63,7 +63,7 @@ public class ForecastController {
             summary = "기록 내용 확인",
             description = "이전 기록 내용을 확인합니다"
     )
-    @GetMapping("contents")
+    @GetMapping("contents/{forecastId}")
     public ApiResponse<AiForecastResponse> check(
             @RequestParam @Valid UUID forecastId,
             @Valid @AuthenticationPrincipal UserPrincipal userPrincipal
@@ -76,6 +76,27 @@ public class ForecastController {
 
 
         return ApiResponse.ok("조회 성공",response);
+    }
+
+    @Operation(
+            summary = "기록 이름 수정",
+            description = "이전 기록 이름을 수정합니다"
+    )
+    @PatchMapping("/{forecastId}")
+    public ApiResponse<?> updateTitle(
+            @Valid @AuthenticationPrincipal UserPrincipal userPrincipal,
+            @Valid String newTitle,
+            @RequestParam @Valid UUID forecastId
+
+    ) {
+        forecastApplication.updateTitle(
+                userPrincipal.getUsername(),
+                userPrincipal.getOrgCd(),
+                newTitle,
+                forecastId
+        );
+
+        return ApiResponse.ok("삭제 성공");
     }
 
     @Operation(

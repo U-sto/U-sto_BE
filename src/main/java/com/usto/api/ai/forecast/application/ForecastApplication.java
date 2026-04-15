@@ -154,6 +154,20 @@ public class ForecastApplication {
 
     }
 
+    public void updateTitle(String username, String orgCd, @Valid String newTitle, @Valid UUID forecastId) {
+        Forecast forecast = forecastRepository.findById(forecastId);
+        if(forecast == null){
+            throw new BusinessException("존재하지 않는 예측입니다.");
+        }
+
+        forecastPolicy.validateOrganization(forecast.getOrgCode(),orgCd);
+        forecastPolicy.valdateOwnership(forecast.getUserId(),username);
+
+        forecast.updateTitle(newTitle);
+
+        forecastRepository.save(forecast);
+    }
+
     private AiForecastRequestToAi toAiPayload(AiForecastRequest request) {
         AiForecastRequest.Conditions c = request.conditions();
 
@@ -216,6 +230,4 @@ public class ForecastApplication {
                     return campus;
                 });
     }
-
-
 }
