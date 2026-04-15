@@ -13,6 +13,7 @@ import com.usto.api.ai.chat.infrastructure.mapper.ChatMessageMapper;
 import com.usto.api.ai.chat.infrastructure.mapper.ChatThreadMapper;
 import com.usto.api.ai.chat.presentation.dto.request.AiChatRequest;
 import com.usto.api.ai.chat.presentation.dto.response.AiChatResponse;
+import com.usto.api.ai.chat.presentation.dto.response.AiFirstChatResponse;
 import com.usto.api.ai.chat.presentation.dto.response.ChatMessageResponse;
 import com.usto.api.ai.common.AiChatAdapter;
 import com.usto.api.common.exception.BusinessException;
@@ -40,18 +41,11 @@ public class AiChatApplication {
     private final ChatThreadPolicy chatThreadPolicy;
     private final ChatGptApplication chatGptTestApplication;
 
-
     @Transactional
     public AiChatResponse send(String userId,String orgCd, String message, UUID threadId) {
 
-        if(threadId == null){
-            String title = makeTitle(message);
-            ChatThread master = ChatThreadMapper.toDomain(userId,title,orgCd);
-
-            chatThreadRepository.save(master);
-
-            threadId = master.getThreadId();
-        }
+        ChatThread thread = chatThreadRepository.findById(threadId);
+        chatThreadPolicy.validateOwnership(thread,userId);
 
         ChatMessage chatMessageByUser = ChatMessageMapper.toDomain(
                 threadId,
@@ -95,6 +89,63 @@ public class AiChatApplication {
 
         return aiResponse;
     }
+
+    @Transactional
+    public AiFirstChatResponse sendAtFirst(String userId,String orgCd, String message) {
+
+        //쓰레드 생성
+        String title = makeTitle(message);
+        ChatThread master = ChatThreadMapper.toDomain(userId,title,orgCd);
+        chatThreadRepository.save(master);
+        UUID threadId = master.getThreadId();
+
+
+        ChatMessage chatMessageByUser = ChatMessageMapper.toDomain(
+                threadId,
+                message,
+                SenderType.USER,
+                null,
+                orgCd
+        );
+
+        ChatMessageJpaEntity entityByUser = ChatMessageMapper.toEntity(chatMessageByUser);
+        chatMessageRepository.save(entityByUser);
+
+        AiChatRequest request = new AiChatRequest(threadId, message);
+        AiFirstChatResponse.AiChatResponse aiResponse = aiClientAdapter.fetchChatResponseAtFirst(request);
+
+        if (aiResponse == null) {
+            log.error("챗봇에게서 답장을 받지 못함. 저장 스킵 threadId: {}", threadId);
+            return null;
+        }
+
+        log.info("AI Response: {}", aiResponse);
+
+        try {
+            if (aiResponse.references() != null) {
+                String replyJson = aiResponse.reply();
+                String refJson = objectMapper.writeValueAsString(aiResponse.references());
+
+                ChatMessage chatMessageByBot = ChatMessageMapper.toDomain(
+                        threadId,
+                        replyJson,
+                        SenderType.AI_BOT,
+                        refJson,
+                        orgCd
+                );
+                ChatMessageJpaEntity entityByBot = ChatMessageMapper.toEntity(chatMessageByBot);
+                chatMessageRepository.save(entityByBot);
+            }
+        }catch (JsonProcessingException e) {
+            log.error("참고문헌 데이터 변환 실패", e);
+            throw new RuntimeException("AI 응답 데이터 처리 중 오류가 발생했습니다.", e);
+        }
+
+        AiFirstChatResponse firstChatResponse = new AiFirstChatResponse(threadId,aiResponse);
+
+        return firstChatResponse;
+    }
+
 
     public List<UUID> getThreads(String username) {
 
