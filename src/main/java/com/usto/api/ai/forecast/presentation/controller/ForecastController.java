@@ -2,6 +2,7 @@ package com.usto.api.ai.forecast.presentation.controller;
 
 import com.usto.api.ai.forecast.application.ForecastApplication;
 import com.usto.api.ai.forecast.presentation.dto.request.AiForecastRequest;
+import com.usto.api.ai.forecast.presentation.dto.response.AiForecastGetResponse;
 import com.usto.api.ai.forecast.presentation.dto.response.AiForecastResponse;
 import com.usto.api.common.utils.ApiResponse;
 import com.usto.api.user.domain.model.UserPrincipal;
@@ -48,10 +49,10 @@ public class ForecastController {
             description = "이전 기록을 조회합니다"
     )
     @GetMapping()
-    public ApiResponse<List<UUID>> find(
+    public ApiResponse<List<AiForecastGetResponse>> find(
             @Valid @AuthenticationPrincipal UserPrincipal userPrincipal
     ) {
-        List<UUID> response = forecastApplication.findAll(
+        List<AiForecastGetResponse> response = forecastApplication.findAll(
                 userPrincipal.getUsername(),
                 userPrincipal.getOrgCd()
         );

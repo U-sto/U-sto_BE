@@ -12,6 +12,7 @@ import com.usto.api.ai.forecast.domain.service.ForecastPolicy;
 import com.usto.api.ai.forecast.infrastructure.mapper.ForecastMapper;
 import com.usto.api.ai.forecast.presentation.dto.request.AiForecastRequest;
 import com.usto.api.ai.forecast.presentation.dto.request.AiForecastRequestToAi;
+import com.usto.api.ai.forecast.presentation.dto.response.AiForecastGetResponse;
 import com.usto.api.ai.forecast.presentation.dto.response.AiForecastResponse;
 import com.usto.api.common.exception.BusinessException;
 import com.usto.api.organization.infrastructure.entity.DepartmentJpaEntity;
@@ -132,12 +133,30 @@ public class ForecastApplication {
         }
     }
 
-    @Transactional
-    public List<UUID> findAll(String username, String orgCd) {
-
+    @Transactional(readOnly = true)
+    public List<AiForecastGetResponse> findAll(String username, String orgCd) {
+        // 1) 사용자 ID로 forecastId 리스트 조회
         List<UUID> ids = forecastRepository.findByUsrId(username);
 
-        return ids;
+        // 2) 각 id로 Forecast 조회 → 정책 검증 → DTO 매핑
+        return ids.stream()
+                .map(forecastRepository::findById) // Forecast 조회
+                .filter(forecast -> {
+                    try {
+                        // 조직, 소유자 검증 (문제 시 해당 항목은 제외)
+                        forecastPolicy.validateOrganization(forecast.getOrgCode(), orgCd);
+                        forecastPolicy.valdateOwnership(forecast.getUserId(), username);
+                        return true;
+                    } catch (BusinessException ex) {
+                        // 정책 위반 항목은 리스트에서 제외
+                        return false;
+                    }
+                })
+                .map(forecast -> new AiForecastGetResponse(
+                        forecast.getForecastId(),
+                        forecast.getForecastName()
+                ))
+                .toList();
     }
 
     @Transactional
