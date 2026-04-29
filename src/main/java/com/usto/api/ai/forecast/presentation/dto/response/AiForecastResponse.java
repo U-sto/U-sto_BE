@@ -60,6 +60,8 @@ public record AiForecastResponse(
             String itemName,
             @JsonProperty("quantity")
             Number quantity, //총 권장 발주 수량 (고장예상수량 + 안전재고)
+            @JsonProperty("unit_price")
+            Number unitPrice, //개장 예상 가격(단가)
             @JsonProperty("estimated_budget")
             Number estimatedBudget, //예상 예산 (총합)
             @JsonProperty("recommend_order_date")
