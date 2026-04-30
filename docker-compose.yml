@@ -6,20 +6,8 @@ services:
     container_name: u-sto-be-app
     env_file:
       - .env
-<<<<<<< HEAD
     environment:
       SPRING_PROFILES_ACTIVE: prod
     ports:
       - "8080:8080"
     restart: always
-=======
-    ports:
-      - "8080:8080"
-    restart: always
-    # If you need a different working directory or timezone, add here
-    # environment:
-    #   TZ: Asia/Seoul
-
-# No database service is defined here because production uses RDS.
-# Ensure your .env supplies the required DB connection variables.
->>>>>>> origin/main
