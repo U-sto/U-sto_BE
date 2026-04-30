@@ -1,0 +1,16 @@
+# Minimize Docker build context to only the JAR and necessary files
+*
+!Dockerfile
+!docker-compose.yml
+!build/
+!build/libs/
+!build/libs/*.jar
+
+# Also ignore common large/unnecessary directories explicitly (redundant due to *)
+.gradle/
+gradle/
+src/
+**/*.iml
+.idea/
+.git/
+**/*.log

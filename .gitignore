@@ -58,3 +58,7 @@ build/
 
 # API test
 /api-test
+
+# Environment files (do not commit real secrets)
+.env
+!.env.example
