@@ -23,6 +23,7 @@ public class CorsConfig {
                                 "http://13.124.10.41:3000",
                                 "http://13.124.10.41:8080",
                                 "http://13.124.10.41:5173",
+                                "http://13.124.10.41:5174",
                                 "https://u-sto-fe.vercel.app" //프론트 배포
                         )
                         .allowedMethods("GET","POST","PUT","PATCH","DELETE","OPTIONS")

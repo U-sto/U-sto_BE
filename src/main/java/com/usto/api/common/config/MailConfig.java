@@ -1,16 +1,19 @@
 package com.usto.api.common.config;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 
 import java.util.Properties;
 
-//원래 자동으로 돼야하는데 오류나서 javaMailSender연결을 수동으로 만들었습니다
+// 원래 자동으로 돼야 하는데 오류가 있어 javaMailSender 연결을 수동으로 만들었습니다.
+// 테스트나 로컬에서 메일 설정이 없을 경우 컨텍스트 로드 실패를 막기 위해
+// spring.mail.host 속성이 있을 때만 이 구성 클래스를 활성화합니다.
 @Configuration
+@ConditionalOnProperty(prefix = "spring.mail", name = "host")
 public class MailConfig {
 
     @Value("${spring.mail.host}")
