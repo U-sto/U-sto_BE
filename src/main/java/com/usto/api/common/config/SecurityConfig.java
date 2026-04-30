@@ -146,10 +146,12 @@ public class SecurityConfig {
                 "http://localhost:8080",
                 "http://localhost:5500", //로컬 테스트용
                 "http://localhost:5173", //로컬 테스트용
+                "http://localhost:5174", //로컬 테스트용
                 "https://avengeful-shaunte-revolvingly.ngrok-free.dev", //로컬 테스트용
                 "https://shavable-shella-thumbless.ngrok-free.dev",
                 "http://13.124.10.41:3000",
                 "http://13.124.10.41:5173",
+                "http://13.124.10.41:5174",
                 "https://u-sto-fe.vercel.app" //프론트 배포용
         ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
