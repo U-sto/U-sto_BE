@@ -150,7 +150,7 @@ public class SecurityConfig {
                 "https://shavable-shella-thumbless.ngrok-free.dev",
                 "http://13.124.10.41:3000",
                 "http://13.124.10.41:5173",
-                "https://u-sto-fe.vercel.app/login" //프론트 배포용
+                "https://u-sto-fe.vercel.app" //프론트 배포용
         ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
