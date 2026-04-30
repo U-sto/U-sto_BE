@@ -1,0 +1,17 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: u-sto-be-app
+    env_file:
+      - .env
+    ports:
+      - "8080:8080"
+    restart: always
+    # If you need a different working directory or timezone, add here
+    # environment:
+    #   TZ: Asia/Seoul
+
+# No database service is defined here because production uses RDS.
+# Ensure your .env supplies the required DB connection variables.
