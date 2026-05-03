@@ -1,13 +1,15 @@
 package com.usto.api.item.acquisition.presentation.dto.request;
 
 import com.usto.api.item.acquisition.domain.model.AcqArrangementType;
-import com.usto.api.item.common.model.OperStatus;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -22,6 +24,11 @@ public class AcqRegisterRequest {
     @Schema(description = "취득일자", example = "2026-01-18")
     @NotNull(message = "취득일자는 필수입니다.")
     private LocalDate acqAt;
+
+    @Schema(description = "취득단가", example = "1500000")
+    @NotNull(message = "취득단가는 필수입니다.")
+    @PositiveOrZero(message = "취득단가는 0 이상이어야 합니다.")
+    private BigDecimal acqUpr;
 
     @Schema(description = "취득수량", example = "10")
     @NotNull(message = "취득수량은 필수입니다.")
