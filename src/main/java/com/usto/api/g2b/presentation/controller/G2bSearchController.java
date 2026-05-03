@@ -5,6 +5,9 @@ import com.usto.api.g2b.domain.repository.G2bItemCategoryRepository;
 import com.usto.api.g2b.domain.repository.G2bSearchRepository;
 import com.usto.api.g2b.presentation.dto.response.G2bCategoryResponse;
 import com.usto.api.g2b.presentation.dto.response.G2bItemResponse;
+import java.util.List;
+import java.util.Map;
+import com.usto.api.g2b.infrastructure.entity.G2bItemJpaEntity;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -68,14 +71,21 @@ public class G2bSearchController {
             @RequestParam(required = false) String itemName,
             @PageableDefault(size = 30) Pageable pageable) {
 
-        Page<G2bItemResponse> items = g2bSearchRepository
-                .findItemList(categoryCode, itemCode, itemName, pageable)
-                .map(e -> new G2bItemResponse(
-                        e.getG2bDCd(),
-                        e.getG2bDNm(),
-                        e.getG2bUpr(),
-                        g2bItemCategoryRepository.findDrbYrByDetailCode(e.getG2bDCd()))
-                );
+        Page<G2bItemJpaEntity> itemPage = g2bSearchRepository
+                .findItemList(categoryCode, itemCode, itemName, pageable);
+
+        List<String> dCds = itemPage.getContent().stream()
+                .map(G2bItemJpaEntity::getG2bDCd)
+                .toList();
+
+        Map<String, String> drbYrMap = g2bItemCategoryRepository.findDrbYrMapByCodes(dCds);
+
+        Page<G2bItemResponse> items = itemPage.map(e -> new G2bItemResponse(
+                e.getG2bDCd(),
+                e.getG2bDNm(),
+                e.getG2bUpr(),
+                drbYrMap.getOrDefault(e.getG2bDCd(), "")
+        ));
 
         if (items.isEmpty()) {
             return ApiResponse.ok("조회 결과가 없습니다.", items);

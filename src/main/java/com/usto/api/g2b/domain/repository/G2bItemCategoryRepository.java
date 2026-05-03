@@ -2,9 +2,9 @@ package com.usto.api.g2b.domain.repository;
 
 
 import com.usto.api.g2b.domain.model.G2bItemCategory;
-import com.usto.api.g2b.infrastructure.entity.G2bItemCategoryJpaEntity;
 
 import java.util.List;
+import java.util.Map;
 
 public interface G2bItemCategoryRepository {
 
@@ -22,4 +22,5 @@ public interface G2bItemCategoryRepository {
     void updateAll(List<G2bItemCategory> categoryDomainList);
 
     String findDrbYrByDetailCode(String g2bDCd);
+    Map<String, String> findDrbYrMapByCodes(List<String> g2bDCds);
 }
