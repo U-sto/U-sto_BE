@@ -139,13 +139,13 @@ public class AcquisitionRepositoryAdapter implements AcquisitionRepository {
     private BooleanExpression acqAtBetween(LocalDate s, LocalDate e) {
         if (s == null && e == null) return null;
         if (s != null && e == null) return itemAcquisitionEntity.acqAt.goe(s);
-        if (s == null && e != null) return itemAcquisitionEntity.acqAt.loe(e);
+        if (s == null) return itemAcquisitionEntity.acqAt.loe(e);
         return itemAcquisitionEntity.acqAt.between(s, e);
     }
     private BooleanExpression apprAtBetween(LocalDate s, LocalDate e) {
         if (s == null && e == null) return null;
         if (s != null && e == null) return itemAcquisitionEntity.apprAt.goe(s);
-        if (s == null && e != null) return itemAcquisitionEntity.apprAt.loe(e);
+        if (s == null) return itemAcquisitionEntity.apprAt.loe(e);
         return itemAcquisitionEntity.apprAt.between(s, e);
     }
 
@@ -156,15 +156,7 @@ public class AcquisitionRepositoryAdapter implements AcquisitionRepository {
                 : null;
     }
     private BooleanExpression apprStsEq(ApprStatus s) {
-        if (s == null) return null;
-
-        // 프론트에서 '대기' 상태(WAIT)로 조회를 요청하면
-        // DB에서는 '작성중(WAIT)'과 '승인대기(REQUEST)'를 모두 찾아서 반환함
-        if (s == ApprStatus.WAIT) {
-            return itemAcquisitionEntity.apprSts.in(ApprStatus.WAIT, ApprStatus.REQUEST);
-        }
-
-        return itemAcquisitionEntity.apprSts.eq(s);
+        return s != null ? itemAcquisitionEntity.apprSts.eq(s) : null;
     }
 
     //여기서 저장됨

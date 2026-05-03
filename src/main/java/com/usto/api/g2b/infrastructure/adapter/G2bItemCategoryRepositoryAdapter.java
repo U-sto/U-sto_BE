@@ -3,8 +3,6 @@ package com.usto.api.g2b.infrastructure.adapter;
 
 import com.usto.api.g2b.domain.model.G2bItemCategory;
 import com.usto.api.g2b.domain.repository.G2bItemCategoryRepository;
-import com.usto.api.g2b.infrastructure.entity.G2bItemCategoryJpaEntity;
-import com.usto.api.g2b.infrastructure.mapper.G2bItemCategoryMapper;
 import com.usto.api.g2b.infrastructure.repository.G2bItemCategoryJpaRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,7 +12,9 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -101,6 +101,36 @@ public class G2bItemCategoryRepositoryAdapter implements G2bItemCategoryReposito
     @Override
     public String findDrbYrByDetailCode(String g2bDCd) {
         return g2bItemCategoryJpaRepository.findDrbYrByDetailCode(g2bDCd);
+    }
+
+    @Override
+    public Map<String, String> findDrbYrMapByCodes(List<String> g2bDCds) {
+        if (g2bDCds == null || g2bDCds.isEmpty()) {
+            return Collections.emptyMap();
+        }
+
+        String placeholders = g2bDCds.stream()
+                .map(c -> "?")
+                .collect(Collectors.joining(", "));
+
+        String sql =
+                "SELECT i.G2B_D_CD, c.DRB_YR " +
+                        "FROM TB_G2B001D i " +
+                        "LEFT JOIN TB_G2B001M c ON i.G2B_M_CD = c.G2B_M_CD " +
+                        "WHERE i.G2B_D_CD IN (" + placeholders + ")";
+
+        return jdbcTemplate.query(
+                sql,
+                g2bDCds.toArray(),
+                (rs, rowNum) -> Map.entry(
+                        rs.getString("G2B_D_CD"),
+                        rs.getString("DRB_YR") != null ? rs.getString("DRB_YR") : ""
+                )
+        ).stream().collect(Collectors.toMap(
+                Map.Entry::getKey,
+                Map.Entry::getValue,
+                (a, b) -> a
+        ));
     }
 }
 

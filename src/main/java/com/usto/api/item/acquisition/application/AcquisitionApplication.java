@@ -51,7 +51,7 @@ public class AcquisitionApplication {
         Acquisition acquisition = AcquisitionMapper.toDomain(
                 request.getG2bDCd(),
                 request.getAcqAt(),
-                g2bItem.getG2bUpr(),
+                request.getAcqUpr(),
                 request.getDeptCd(),
                 drbYrByDetailCode,
                 request.getAcqQty(),
@@ -88,7 +88,7 @@ public class AcquisitionApplication {
         acquisition.updateInfo(
                 request.getG2bDCd(),
                 request.getAcqAt(),
-                g2bItem.getG2bUpr(),
+                request.getAcqUpr(),
                 request.getDeptCd(),
                 drbYrByDetailCode,
                 request.getAcqQty(),
