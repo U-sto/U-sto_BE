@@ -1,6 +1,7 @@
 package com.usto.api.g2b.presentation.controller;
 
 import com.usto.api.common.utils.ApiResponse;
+import com.usto.api.g2b.domain.repository.G2bItemCategoryRepository;
 import com.usto.api.g2b.domain.repository.G2bSearchRepository;
 import com.usto.api.g2b.presentation.dto.response.G2bCategoryResponse;
 import com.usto.api.g2b.presentation.dto.response.G2bItemResponse;
@@ -27,6 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class G2bSearchController {
     private final G2bSearchRepository g2bSearchRepository;
+    private final G2bItemCategoryRepository g2bItemCategoryRepository;
 
     @Operation(
             summary = "G2B 물품 분류 조회",
@@ -68,7 +70,12 @@ public class G2bSearchController {
 
         Page<G2bItemResponse> items = g2bSearchRepository
                 .findItemList(categoryCode, itemCode, itemName, pageable)
-                .map(e -> new G2bItemResponse(e.getG2bDCd(), e.getG2bDNm(), e.getG2bUpr()));
+                .map(e -> new G2bItemResponse(
+                        e.getG2bDCd(),
+                        e.getG2bDNm(),
+                        e.getG2bUpr(),
+                        g2bItemCategoryRepository.findDrbYrByDetailCode(e.getG2bDCd()))
+                );
 
         if (items.isEmpty()) {
             return ApiResponse.ok("조회 결과가 없습니다.", items);

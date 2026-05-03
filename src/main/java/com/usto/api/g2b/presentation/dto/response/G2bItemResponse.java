@@ -7,5 +7,6 @@ import java.math.BigDecimal;
  * @param dCd 물품식별코드
  * @param dNm 물품품목명
  * @param upr 단가
+ * @param drbYr 내용연수
  */
-public record G2bItemResponse(String dCd, String dNm, BigDecimal upr) {}
+public record G2bItemResponse(String dCd, String dNm, BigDecimal upr, String drbYr) {}
