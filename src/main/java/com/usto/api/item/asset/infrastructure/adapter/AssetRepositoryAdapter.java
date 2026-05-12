@@ -242,7 +242,8 @@ public class AssetRepositoryAdapter implements AssetRepository {
                 .leftJoin(apprUser).on(history.apprUsrId.eq(apprUser.usrId))
                 .where(
                         history.itmNo.eq(itmNo),
-                        history.orgCd.eq(orgCd)
+                        history.orgCd.eq(orgCd),
+                        history.delYn.eq("N")
                 )
                 .orderBy(history.apprAt.desc())
                 .fetch();
