@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 @Getter
 @Builder
@@ -72,7 +73,7 @@ public class AssetDetailResponse {
     public static class StatusHistoryDto {
 
         @Schema(description = "상태이력ID")
-        private String itemHisId;
+        private UUID itemHisId;
 
         @Schema(description = "물품고유번호")
         private String itmNo;
@@ -89,12 +90,18 @@ public class AssetDetailResponse {
         @Schema(description = "등록자ID")
         private String reqUsrId;
 
+        @Schema(description = "등록자명")
+        private String reqUsrNm;
+
         @Schema(description = "등록일자")
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
         private LocalDate reqAt;
 
         @Schema(description = "확정자ID")
         private String apprUsrId;
+
+        @Schema(description = "확정자명")
+        private String apprUsrNm;
 
         @Schema(description = "확정일자(변경일자)")
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
