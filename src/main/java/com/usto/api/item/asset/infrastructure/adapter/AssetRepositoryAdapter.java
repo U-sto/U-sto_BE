@@ -23,6 +23,7 @@ import com.usto.api.item.asset.presentation.dto.response.*;
 import com.usto.api.item.common.model.OperStatus;
 import com.usto.api.organization.infrastructure.entity.QDepartmentJpaEntity;
 import com.usto.api.organization.infrastructure.entity.QOrganizationJpaEntity;
+import com.usto.api.user.infrastructure.entity.QUserJpaEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -37,7 +38,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import static com.usto.api.item.acquisition.infrastructure.entity.QItemAcquisitionEntity.itemAcquisitionEntity;
 import static com.usto.api.item.asset.infrastructure.entity.QItemAssetEntity.itemAssetEntity;
@@ -219,22 +219,33 @@ public class AssetRepositoryAdapter implements AssetRepository {
 
     @Override
     public List<AssetDetailResponse.StatusHistoryDto> findStatusHistoriesByItmNo(String itmNo, String orgCd) {
-        List<ItemAssetStatusHistoryEntity> entities =
-                statusHistoryJpaRepository.findByItmNoAndOrgCdOrderByApprAtDesc(itmNo, orgCd);
+        QItemAssetStatusHistoryEntity history = QItemAssetStatusHistoryEntity.itemAssetStatusHistoryEntity;
+        QUserJpaEntity reqUser = new QUserJpaEntity("reqUser");
+        QUserJpaEntity apprUser = new QUserJpaEntity("apprUser");
 
-        return entities.stream()
-                .map(entity -> AssetDetailResponse.StatusHistoryDto.builder()
-                        .itemHisId(entity.getItemHisId().toString())
-                        .itmNo(entity.getItmNo())
-                        .prevSts(entity.getPrevSts() != null ? entity.getPrevSts() : null)
-                        .newSts(entity.getNewSts())
-                        .chgRsn(entity.getChgRsn())
-                        .reqUsrId(entity.getReqUsrId())
-                        .reqAt(entity.getReqAt())
-                        .apprUsrId(entity.getApprUsrId())
-                        .apprAt(entity.getApprAt())
-                        .build())
-                .collect(Collectors.toList());
+        return queryFactory
+                .select(Projections.fields(AssetDetailResponse.StatusHistoryDto.class,
+                        history.itemHisId,
+                        history.itmNo,
+                        history.prevSts,
+                        history.newSts,
+                        history.chgRsn,
+                        history.reqUsrId,
+                        reqUser.usrNm.as("reqUsrNm"),
+                        history.reqAt,
+                        history.apprUsrId,
+                        apprUser.usrNm.as("apprUsrNm"),
+                        history.apprAt
+                ))
+                .from(history)
+                .leftJoin(reqUser).on(history.reqUsrId.eq(reqUser.usrId))
+                .leftJoin(apprUser).on(history.apprUsrId.eq(apprUser.usrId))
+                .where(
+                        history.itmNo.eq(itmNo),
+                        history.orgCd.eq(orgCd)
+                )
+                .orderBy(history.apprAt.desc())
+                .fetch();
     }
 
     /**

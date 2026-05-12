@@ -31,11 +31,9 @@ public class ItemAssetStatusHistoryEntity extends BaseTimeEntity {
     @Column(name = "ITM_NO", nullable = false, length = 10, columnDefinition = "char(10)")
     private String itmNo;
 
-    @Enumerated(EnumType.STRING)
     @Column(name = "PREV_STS", length = 30)
     private OperStatus prevSts;
 
-    @Enumerated(EnumType.STRING)
     @Column(name = "NEW_STS", nullable = false, length = 30)
     private OperStatus newSts;
 
