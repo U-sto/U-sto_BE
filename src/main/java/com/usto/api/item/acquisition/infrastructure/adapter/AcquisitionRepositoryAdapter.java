@@ -101,7 +101,16 @@ public class AcquisitionRepositoryAdapter implements AcquisitionRepository {
                         approvedOnlyIfApprDate(cond.getStartApprAt(), cond.getEndApprAt()),
                         apprStsEq(cond.getApprSts())
                 )
-                .orderBy(itemAcquisitionEntity.creAt.desc())
+                .orderBy(
+                        // 1순위 정렬: 대기(WAIT)/승인요청(REQUEST) 상태인 것을 맨 위(0)로, 나머지를 아래(1)로
+                        new com.querydsl.core.types.dsl.CaseBuilder()
+                                .when(itemAcquisitionEntity.apprSts.in(ApprStatus.WAIT, ApprStatus.REQUEST)).then(0)
+                                .otherwise(1).asc(),
+                        // 2순위 정렬: 같은 그룹 내에서는 취득일자(acqAt) 최신순(내림차순)으로
+                        itemAcquisitionEntity.acqAt.desc(),
+                        // 3순위 정렬: 취득일자가 같다면 시스템 생성일시(creAt) 최신순으로
+                        itemAcquisitionEntity.creAt.desc()
+                )
                 .offset(pageable.getOffset())   // 페이지 시작점
                 .limit(pageable.getPageSize())  // 페이지 사이즈
                 .fetch();
