@@ -5,7 +5,6 @@ import com.usto.api.item.common.model.OperStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -21,7 +20,6 @@ import java.util.UUID;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @SQLDelete(sql = "UPDATE TB_ITEM002 SET del_yn = 'Y', del_at = NOW() WHERE itm_no = ? AND org_cd = ?")
-@Where(clause = "DEL_YN = 'N'")
 public class ItemAssetEntity extends BaseTimeEntity {
 
     @EmbeddedId
