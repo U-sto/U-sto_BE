@@ -111,7 +111,16 @@ public class DisposalRepositoryAdapter implements DisposalRepository {
                 .groupBy(itemDisposalMasterEntity.dispMId)
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
-                .orderBy(itemDisposalMasterEntity.creAt.asc()) // 생성일자 정렬
+                .orderBy(
+                        // 1순위: 대기(WAIT), 승인요청(REQUEST) 상태인 결재 건을 화면 맨 위로 (0점 부여)
+                        new com.querydsl.core.types.dsl.CaseBuilder()
+                                .when(itemDisposalMasterEntity.apprSts.in(ApprStatus.WAIT, ApprStatus.REQUEST)).then(0)
+                                .otherwise(1).asc(),
+                        // 2순위: 처분등록일자(aplyAt) 최신순 (내림차순)
+                        itemDisposalMasterEntity.aplyAt.desc(),
+                        // 3순위: 처분일자가 같은 경우, 시스템 생성일시(creAt) 최신순으로 섞임 방지
+                        itemDisposalMasterEntity.creAt.desc()
+                )
                 .fetch();
 
         return new PageImpl<>(content, pageable, totalCount);
