@@ -122,7 +122,8 @@ public class AssetRepositoryAdapter implements AssetRepository {
                         arrgAtBetween(cond.getStartArrgAt(), cond.getEndArrgAt()),
                         deptCdEq(cond.getDeptCd()),
                         operStsEq(cond.getOperSts()),
-                        itmNoEq(cond.getItmNo())
+                        itmNoEq(cond.getItmNo()),
+                        itemAssetEntity.delYn.eq("N")
                 )
                 .fetchOne();
 
@@ -161,7 +162,8 @@ public class AssetRepositoryAdapter implements AssetRepository {
                         arrgAtBetween(cond.getStartArrgAt(), cond.getEndArrgAt()),
                         deptCdEq(cond.getDeptCd()),
                         operStsEq(cond.getOperSts()),
-                        itmNoEq(cond.getItmNo())
+                        itmNoEq(cond.getItmNo()),
+                        itemAssetEntity.delYn.eq("N")
                 )
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -203,7 +205,8 @@ public class AssetRepositoryAdapter implements AssetRepository {
                 )
                 .where(
                         itemAssetEntity.itemId.itmNo.eq(itmNo),
-                        itemAssetEntity.itemId.orgCd.eq(orgCd)
+                        itemAssetEntity.itemId.orgCd.eq(orgCd),
+                        itemAssetEntity.delYn.eq("N")
                 )
                 .fetchOne();
 
@@ -390,7 +393,8 @@ public class AssetRepositoryAdapter implements AssetRepository {
                         deptCdEq(searchRequest.getDeptCd()),
                         operStsEq(searchRequest.getOperSts()),
                         itmNoEq(searchRequest.getItmNo()),
-                        printYnEq(searchRequest.getPrintYn())
+                        printYnEq(searchRequest.getPrintYn()),
+                        itemAssetEntity.delYn.eq("N")
                 )
                 .fetchOne();
 
@@ -431,7 +435,8 @@ public class AssetRepositoryAdapter implements AssetRepository {
                         deptCdEq(searchRequest.getDeptCd()),
                         operStsEq(searchRequest.getOperSts()),
                         itmNoEq(searchRequest.getItmNo()),
-                        printYnEq(searchRequest.getPrintYn())
+                        printYnEq(searchRequest.getPrintYn()),
+                        itemAssetEntity.delYn.eq("N")
                 )
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
