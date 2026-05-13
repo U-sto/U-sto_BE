@@ -91,10 +91,11 @@ public class AssetInventoryStatusRepositoryAdapter implements AssetInventoryStat
                         itemAssetEntity.rmk
                 )
                 .orderBy(
-                        itemAcquisitionEntity.acqAt.desc(),
-                        itemAcquisitionEntity.acqId.asc(),
-                        departmentJpaEntity.deptNm.asc(),
-                        itemAssetEntity.operSts.asc()
+                        itemAcquisitionEntity.acqAt.desc(), // 1순위 정렬: 취득일자
+                        itemAcquisitionEntity.g2bDCd.asc(), // 2순위 정렬: g2b분류
+                        departmentJpaEntity.deptNm.asc(),   // 3순위 정렬: 부서명
+                        itemAssetEntity.operSts.asc(),      // 4순위 정렬: 운용상태
+                        itemAcquisitionEntity.acqId.asc()   // 페이지 안정성
                 )
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -116,6 +117,7 @@ public class AssetInventoryStatusRepositoryAdapter implements AssetInventoryStat
                         itemAcquisitionEntity.orgCd.eq(orgCd),
                         itemAcquisitionEntity.apprSts.eq(ApprStatus.APPROVED),
                         itemAssetEntity.delYn.eq("N"),
+                        itemAssetEntity.operSts.ne(OperStatus.DISP),
                         g2bDCdEq(cond.getG2bDCd()),
                         deptCdEq(cond.getDeptCd()),
                         acqAtBetween(cond.getStartAcqAt(), cond.getEndAcqAt()),
@@ -160,6 +162,7 @@ public class AssetInventoryStatusRepositoryAdapter implements AssetInventoryStat
                         eqOrBothNull(itemAssetEntity.rmk, rmk),
                         itemAssetEntity.delYn.eq("N")
                 )
+                .orderBy(itemAssetEntity.itemId.itmNo.asc()) // 고유번호 기준 정렬
                 .fetch();
 
         // 2. 상세 정보 조회 (대표값 1건)
