@@ -30,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -130,6 +131,8 @@ public class AssetApplication {
         int currentYear = LocalDate.now().getYear();
         int nextSeq = assetRepository.getNextSequenceForYear(currentYear, acq.getOrgCd());
 
+        List<AssetStatusHistory> histories = new ArrayList<>();
+
         // 3. 취득수량만큼 반복문 수행
         for (int i = 0; i < acq.getAcqQty(); i++) {
             // 고유번호 생성 (예: M202600001, M202600002...)
@@ -149,7 +152,7 @@ public class AssetApplication {
             assetRepository.save(asset); // 002D에 저장
 
             // 이력 생성
-            AssetStatusHistory history = AssetStatusHistory.builder()
+            histories.add(AssetStatusHistory.builder()  // 루프 안에서 리스트에 추가
                     .itemHisId(UUID.randomUUID())
                     .itmNo(itmNo)
                     .prevSts(null)            // 신규 등재라 이전 상태 없음
@@ -161,10 +164,9 @@ public class AssetApplication {
                     .orgCd(acq.getOrgCd())
                     .apprAt(LocalDate.now(ZoneId.of("Asia/Seoul")))
                     .delYn("N")
-                    .build();
-
-            historyRepository.saveAll(List.of(history));
+                    .build());
         }
+        historyRepository.saveAll(histories);  // 루프 끝나고 한 번에 저장
     }
 
     /**
