@@ -65,6 +65,5 @@ public class ReturningMaster {
     public void rejectApproval(String userId) {
         this.apprSts = ApprStatus.REJECTED; //반납 반려 처라
         this.apprUsrId = userId;
-        this.rtrnApprAt = LocalDate.now();
     }
 }
