@@ -54,14 +54,13 @@ public class DisposalMaster {
 
     //승인
     public void confirmApproval(String userId) {
-        this.apprSts = ApprStatus.APPROVED; //불용 확정 처라
+        this.apprSts = ApprStatus.APPROVED; //처분 확정 처라
         this.apprUsrId = userId;
         this.dispApprAt = LocalDate.now();
     }
     //반려
     public void rejectApproval(String userId) {
-        this.apprSts = ApprStatus.REJECTED; //불용 반려 처라
+        this.apprSts = ApprStatus.REJECTED; //처분 반려 처라
         this.apprUsrId = userId;
-        this.dispApprAt = LocalDate.now();
     }
 }

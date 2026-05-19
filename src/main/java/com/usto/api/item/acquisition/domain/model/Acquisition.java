@@ -1,6 +1,5 @@
 package com.usto.api.item.acquisition.domain.model;
 
-import com.usto.api.common.exception.BusinessException;
 import com.usto.api.item.common.model.ApprStatus;
 import com.usto.api.item.common.model.OperStatus;
 import lombok.Builder;
@@ -107,6 +106,5 @@ public class Acquisition {
     public void rejectApproval(String userId) {
         this.apprUsrId = userId;
         this.apprSts = ApprStatus.REJECTED;
-        this.apprAt = LocalDate.now(KOREA_ZONE);
     }
 }
