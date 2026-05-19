@@ -2,9 +2,11 @@ package com.usto.api.item.asset.application;
 
 import com.usto.api.item.acquisition.domain.model.Acquisition;
 import com.usto.api.item.asset.domain.model.Asset;
+import com.usto.api.item.asset.domain.model.AssetStatusHistory;
 import com.usto.api.item.asset.domain.model.QrLabelData;
 import com.usto.api.item.asset.domain.repository.AssetInventoryStatusRepository;
 import com.usto.api.item.asset.domain.repository.AssetRepository;
+import com.usto.api.item.asset.domain.repository.AssetStatusHistoryRepository;
 import com.usto.api.item.asset.domain.service.AssetPolicy;
 import com.usto.api.item.asset.infrastructure.mapper.AssetMapper;
 import com.usto.api.item.asset.presentation.dto.request.AssetInventoryStatusSearchRequest;
@@ -27,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.UUID;
 
@@ -44,6 +47,7 @@ public class AssetApplication {
     private final ItemNumberGenerator itemNumberGenerator;
     private final QrLabelPdfGenerator qrLabelPdfGenerator;
     private final OrganizationJpaRepository organizationJpaRepository;
+    private final AssetStatusHistoryRepository historyRepository;
 
     @Value("${app.frontend.base-url:http://13.124.10.41:8080}")  // 임시(프론트엔드 연동시 바꿔야함)
     private String frontendBaseUrl;
@@ -143,6 +147,23 @@ public class AssetApplication {
                     acq.getRmk()
             );
             assetRepository.save(asset); // 002D에 저장
+
+            // 이력 생성
+            AssetStatusHistory history = AssetStatusHistory.builder()
+                    .itemHisId(UUID.randomUUID())
+                    .itmNo(itmNo)
+                    .prevSts(null)            // 신규 등재라 이전 상태 없음
+                    .newSts(OperStatus.OPER)  // 하드코딩
+                    .chgRsn("신규 운용 등재")
+                    .reqUsrId(acq.getAplyUsrId())
+                    .reqAt(acq.getAcqAt())
+                    .apprUsrId(acq.getApprUsrId())
+                    .orgCd(acq.getOrgCd())
+                    .apprAt(LocalDate.now(ZoneId.of("Asia/Seoul")))
+                    .delYn("N")
+                    .build();
+
+            historyRepository.saveAll(List.of(history));
         }
     }
 

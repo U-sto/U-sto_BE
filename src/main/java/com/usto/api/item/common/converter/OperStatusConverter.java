@@ -19,7 +19,7 @@ public class OperStatusConverter implements AttributeConverter<OperStatus, Strin
         try {
             return OperStatus.valueOf(dbData);
         } catch (IllegalArgumentException e) {
-            return null;  // NONE 등 알 수 없는 값 → null 처리
+            return null;  // NONE, ACQ 등 운용상태 ENUM에 없는 알 수 없는 값 → null 처리
         }
     }
 }

@@ -242,7 +242,7 @@ public class ReturningApplication {
                     .itemHisId(UUID.randomUUID())
                     .itmNo(itemNo)
                     .prevSts(prevStatus) //이전 상태
-                    .newSts(asset.getOperSts()) //현재 상태 = 반납
+                    .newSts(OperStatus.RTN) //변경 상태 = 반납
                     .chgRsn(master.getRtrnRsn().getDescription())
                     .reqUsrId(master.getAplyUsrId())
                     .reqAt(master.getAplyAt())

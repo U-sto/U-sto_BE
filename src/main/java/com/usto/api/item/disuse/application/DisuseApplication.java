@@ -241,7 +241,7 @@ public class DisuseApplication {
                     .itemHisId(UUID.randomUUID())
                     .itmNo(itemNo)
                     .prevSts(prevStatus) //이전 상태
-                    .newSts(asset.getOperSts()) //현재 상태 = 반납
+                    .newSts(OperStatus.DSU) //변경 상태 = 불용
                     .chgRsn(master.getDsuRsn().getDescription())
                     .reqUsrId(master.getAplyUsrId())
                     .reqAt(master.getAplyAt())

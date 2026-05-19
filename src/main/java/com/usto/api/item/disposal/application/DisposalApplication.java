@@ -266,7 +266,7 @@ public class DisposalApplication {
                             .itemHisId(UUID.randomUUID())
                             .itmNo(itemNo)
                             .prevSts(prevStatus) //이전 상태
-                            .newSts(asset.getOperSts()) //현재 상태 = 반납
+                            .newSts(OperStatus.DISP) //변경 상태 = 처분
                             .chgRsn("처분 승인") //별도로 enum 관리를 하고싶다면 변동 가능성 있음.
                             .reqUsrId(master.getAplyUsrId())
                             .reqAt(master.getAplyAt())
