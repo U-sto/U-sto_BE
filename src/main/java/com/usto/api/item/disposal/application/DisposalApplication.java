@@ -237,6 +237,7 @@ public class DisposalApplication {
      * - 승인 시 물품 소프트삭제
      * - 상태 이력 테이블에 기록
      */
+    @Transactional
     public void approvalDisposal(UUID dispMId, String userId, String orgCd) {
         DisposalMaster master = disposalRepository.findMasterById(dispMId, orgCd)
                 .orElseThrow(() -> new BusinessException("존재하지 않는 불용 신청입니다."));
@@ -292,6 +293,7 @@ public class DisposalApplication {
     /**
      * 처분 반려 (ADMIN 권한)
      */
+    @Transactional
     public void rejectDisposal(UUID dispMId, String userId, String orgCd) {
         DisposalMaster master = disposalRepository.findMasterById(dispMId, orgCd)
                 .orElseThrow(() -> new BusinessException("존재하지 않는 불용 신청입니다."));
