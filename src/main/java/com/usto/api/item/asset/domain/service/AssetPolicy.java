@@ -72,8 +72,9 @@ public class AssetPolicy {
             throw new BusinessException("삭제된 물품은 불용 처리할 수 없습니다.");
         }
 
-        if (asset.getOperSts() != OperStatus.RTN) {
-            throw new BusinessException("반납 신청이 완료된 물품에 한해서만 불용 신청할 수 있습니다");
+        // 반납(RTN) 또는 운용(OPER) 상태일 때 불용 등록 가능
+        if (asset.getOperSts() != OperStatus.RTN && asset.getOperSts() != OperStatus.OPER) {
+            throw new BusinessException("운용 또는 반납 상태일 때만 불용 등록이 가능합니다.");
         }
     }
 
