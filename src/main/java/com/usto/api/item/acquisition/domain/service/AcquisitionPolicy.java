@@ -33,7 +33,7 @@ public class AcquisitionPolicy {
             throw new BusinessException("승인 요청 중인 데이터는 수정/삭제할 수 없습니다.");
         }
         if (acquisition.getApprSts() == ApprStatus.APPROVED) {
-            throw new BusinessException("승인 확정된 데이터는 수정/삭제할 수 없습니다.");
+            throw new BusinessException("승인된 데이터는 수정/삭제할 수 없습니다.");
         }
     }
 
