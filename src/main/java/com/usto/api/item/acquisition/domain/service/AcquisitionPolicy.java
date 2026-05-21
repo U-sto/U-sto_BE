@@ -35,16 +35,14 @@ public class AcquisitionPolicy {
         if (acquisition.getApprSts() == ApprStatus.APPROVED) {
             throw new BusinessException("승인 확정된 데이터는 수정/삭제할 수 없습니다.");
         }
-        if (acquisition.getApprSts() == ApprStatus.REJECTED) {
-            throw new BusinessException("반려된 데이터는 수정/삭제할 수 없습니다.");
-        }
     }
 
     /**
      * 승인 요청 가능 여부 검증
      */
     public void validateRequestable(Acquisition acquisition) {
-        if (acquisition.getApprSts() != ApprStatus.WAIT) {
+        if (acquisition.getApprSts() != ApprStatus.WAIT
+                && acquisition.getApprSts() != ApprStatus.REJECTED) {
             throw new BusinessException("승인 요청이 가능한 상태가 아닙니다.");
         }
     }
