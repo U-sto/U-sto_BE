@@ -136,7 +136,7 @@ public class AcquisitionApplication {
     }
 
     /**
-     * 5. 승인 요청 취소 (소프트 삭제)
+     * 5. 승인 요청 취소 (WAIT 상태로 돌아감)
      */
     @Transactional
     public void cancelRequest(UUID acqId, String orgCd) {
@@ -147,7 +147,8 @@ public class AcquisitionApplication {
         acquisitionPolicy.validateOwnership(acquisition, orgCd);
         acquisitionPolicy.validateCancellable(acquisition);
 
-        acquisitionRepository.delete(acqId);
+        acquisition.cancelApprovalRequest();
+        acquisitionRepository.save(acquisition);
     }
 
 

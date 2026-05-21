@@ -2,7 +2,6 @@ package com.usto.api.item.disuse.domain.service;
 
 import com.usto.api.common.exception.BusinessException;
 import com.usto.api.item.common.model.ApprStatus;
-import com.usto.api.item.common.model.OperStatus;
 import com.usto.api.item.disuse.domain.model.DisuseMaster;
 import org.springframework.stereotype.Component;
 
@@ -30,8 +29,9 @@ public class DisusePolicy {
      * 수정/삭제 가능 여부 검증
      */
     public void validateModifiable(DisuseMaster master) {
-        if (master.getApprSts() != ApprStatus.WAIT) {
-            throw new BusinessException("승인 요청 중이거나 확정된 데이터는 수정/삭제할 수 없습니다.");
+        if (master.getApprSts() != ApprStatus.WAIT
+                && master.getApprSts() != ApprStatus.REJECTED) {
+            throw new BusinessException("승인 요청 중이거나 승인된 데이터는 수정/삭제할 수 없습니다.");
         }
     }
 
@@ -39,7 +39,8 @@ public class DisusePolicy {
      * 승인 요청 가능 여부 검증
      */
     public void validateRequestable(DisuseMaster master) {
-        if (master.getApprSts() != ApprStatus.WAIT) {
+        if (master.getApprSts() != ApprStatus.WAIT
+                && master.getApprSts() != ApprStatus.REJECTED) {
             throw new BusinessException("승인요청이 가능한 상태가 아닙니다.");
         }
     }

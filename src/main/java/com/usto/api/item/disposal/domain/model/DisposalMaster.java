@@ -46,6 +46,13 @@ public class DisposalMaster {
     }
 
     /**
+     * 승인 요청 취소
+     */
+    public void cancelApprovalRequest() {
+        this.apprSts = ApprStatus.WAIT;
+    }
+
+    /**
      * 삭제 여부 확인
      */
     public boolean isDeleted() {

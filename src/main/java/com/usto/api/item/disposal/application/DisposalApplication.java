@@ -155,8 +155,10 @@ public class DisposalApplication {
         disposalPolicy.validateOwnership(master, orgCd);
         disposalPolicy.validateCancellable(master);
 
-        disposalRepository.deleteAllDetailsByMasterId(dispMId);
-        disposalRepository.deleteMaster(dispMId);
+        // 상태만 WAIT 복귀
+        master.cancelApprovalRequest();
+
+        disposalRepository.saveMaster(master);
     }
 
     /**

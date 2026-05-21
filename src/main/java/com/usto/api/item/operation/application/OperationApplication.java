@@ -154,8 +154,10 @@ public class OperationApplication {
         operationPolicy.validateOwnership(master, orgCd);
         operationPolicy.validateCancellable(master);
 
-        operationRepository.deleteAllDetailsByMasterId(operMId);
-        operationRepository.deleteMaster(operMId);
+        // 상태만 WAIT 복귀
+        master.cancelApprovalRequest();
+
+        operationRepository.saveMaster(master);
     }
 
     /**

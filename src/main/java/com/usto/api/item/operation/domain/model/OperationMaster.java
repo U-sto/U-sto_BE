@@ -64,6 +64,13 @@ public class OperationMaster {
     }
 
     /**
+     * 승인 요청 취소
+     */
+    public void cancelApprovalRequest() {
+        this.apprSts = ApprStatus.WAIT;
+    }
+
+    /**
      * 반려
      */
     public void rejectApproval(String userId) {

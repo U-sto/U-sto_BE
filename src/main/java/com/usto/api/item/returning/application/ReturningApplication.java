@@ -200,8 +200,10 @@ public class ReturningApplication {
         returningPolicy.validateOwnership(master, orgCd);
         returningPolicy.validateCancellable(master);
 
-        returningRepository.deleteAllDetailsByMasterId(rtrnMId);
-        returningRepository.deleteMaster(rtrnMId);
+        // 상태만 WAIT 복귀
+        master.cancelApprovalRequest();
+
+        returningRepository.saveMaster(master);
     }
 
     /**
