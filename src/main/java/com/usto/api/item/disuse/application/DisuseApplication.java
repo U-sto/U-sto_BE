@@ -154,8 +154,10 @@ public class DisuseApplication {
         disusePolicy.validateOwnership(master, orgCd);
         disusePolicy.validateCancellable(master);
 
-        disuseRepository.deleteAllDetailsByMasterId(dsuMId);
-        disuseRepository.deleteMaster(dsuMId);
+        // 상태만 WAIT 복귀
+        master.cancelApprovalRequest();
+
+        disuseRepository.saveMaster(master);
     }
 
     /**
