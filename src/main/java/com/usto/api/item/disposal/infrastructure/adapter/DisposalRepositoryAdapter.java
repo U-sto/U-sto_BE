@@ -92,6 +92,7 @@ public class DisposalRepositoryAdapter implements DisposalRepository {
                         itemDisposalMasterEntity.dispMId.as("dispMId"),
                         itemDisposalMasterEntity.dispType.as("dispType"),
                         itemDisposalMasterEntity.aplyAt,
+                        itemDisposalMasterEntity.dispApprAt,
                         itemDisposalMasterEntity.aplyUsrId,
                         user.usrNm.as("aplyUsrNm"),
                         itemDisposalMasterEntity.apprSts.as("apprSts"),

@@ -26,6 +26,10 @@ public class DisposalListResponse {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate aplyAt;
 
+    @Schema(description = "처분확정일자")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    private LocalDate dispApprAt;
+
     @Schema(description = "처분정리구분")
     private DisposalArrangementType dispType;
 

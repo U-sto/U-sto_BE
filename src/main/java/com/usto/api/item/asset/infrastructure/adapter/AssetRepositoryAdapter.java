@@ -248,7 +248,10 @@ public class AssetRepositoryAdapter implements AssetRepository {
                         history.orgCd.eq(orgCd),
                         history.delYn.eq("N")
                 )
-                .orderBy(history.apprAt.desc())
+                .orderBy(
+                        history.apprAt.asc(),
+                        history.creAt.asc()
+                )
                 .fetch();
     }
 
