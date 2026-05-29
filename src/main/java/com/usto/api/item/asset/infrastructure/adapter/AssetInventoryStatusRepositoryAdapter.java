@@ -228,11 +228,9 @@ public class AssetInventoryStatusRepositoryAdapter implements AssetInventoryStat
 
     // NULL 안전 비교 헬퍼 메서드
     private BooleanExpression eqOrBothNull(StringPath field, String value) {
-        if (value == null) {
-            // value가 null이면 → "field IS NULL" 조건 생성
-            return field.isNull();
+        if (value == null || value.isEmpty()) {
+            return field.isNull().or(field.eq(""));
         }
-        // value가 null이 아니면 → "field = value" 조건 생성
         return field.eq(value);
     }
 
