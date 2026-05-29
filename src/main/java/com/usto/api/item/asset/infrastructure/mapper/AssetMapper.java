@@ -73,7 +73,7 @@ public final class AssetMapper {
                 .operSts(domain.getOperSts())
                 .acqUpr(domain.getAcqUpr())
                 .drbYr(domain.getDrbYr())
-                .rmk(domain.getRmk())
+                .rmk(domain.getRmk() == null || domain.getRmk().isEmpty() ? null : domain.getRmk())
                 .printYn(domain.getPrintYn())
                 .delYn(domain.getDelYn())
                 .delAt(domain.getDelAt())
