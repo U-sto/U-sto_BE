@@ -26,6 +26,9 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import org.springframework.beans.factory.annotation.Value;
+
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -35,6 +38,10 @@ import java.util.List;
 @EnableMethodSecurity
 @RequiredArgsConstructor // 생성자 주입용
 public class SecurityConfig {
+
+    /** 쉼표 구분 ngrok 등 로컬 테스트 오리진 (운영 환경에서는 빈 값) */
+    @Value("${cors.extra-origins:}")
+    private String corsExtraOrigins;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -114,6 +121,8 @@ public class SecurityConfig {
                             "/swagger-ui/**",
                             "/swagger-ui.html",
                             "/swagger-resources/**",
+                            "/actuator/health",      // 헬스체크 (LB, k8s probe)
+                            "/actuator/prometheus",  // Prometheus scraper
                             "/error"
                     ).permitAll();
                     //역할별 접근 제한
@@ -140,20 +149,28 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.setAllowedOrigins(List.of(
+        List<String> allowedOrigins = new ArrayList<>(List.of(
                 "https://u-sto.github.io",
                 "http://localhost:3000",
                 "http://localhost:8080",
                 "http://localhost:5500", //로컬 테스트용
                 "http://localhost:5173", //로컬 테스트용
                 "http://localhost:5174", //로컬 테스트용
-                "https://avengeful-shaunte-revolvingly.ngrok-free.dev", //로컬 테스트용
-                "https://shavable-shella-thumbless.ngrok-free.dev",
                 "http://13.124.10.41:3000",
                 "http://13.124.10.41:5173",
                 "http://13.124.10.41:5174",
                 "https://u-sto-fe.vercel.app" //프론트 배포용
         ));
+
+        // 환경변수 CORS_EXTRA_ORIGINS 로 주입된 ngrok 등 추가 오리진 병합
+        if (corsExtraOrigins != null && !corsExtraOrigins.isBlank()) {
+            Arrays.stream(corsExtraOrigins.split(","))
+                    .map(String::trim)
+                    .filter(s -> !s.isEmpty())
+                    .forEach(allowedOrigins::add);
+        }
+
+        configuration.setAllowedOrigins(allowedOrigins);
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true); // 세션 기반이면 true 유지
