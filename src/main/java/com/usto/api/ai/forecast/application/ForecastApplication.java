@@ -94,6 +94,24 @@ public class ForecastApplication {
         JsonNode recoNode = readTreeOrNull(forecast.getRecoJson());
         JsonNode algoNode = readTreeOrNull(forecast.getSummaryJson());  //이렇게 안 하면 다 바꿔야함
 
+        // 조회 화면 상단 영역용 메타 복원 (저장된 조건 컬럼 + org/dept 코드를 표시값으로 변환)
+        Integer year = forecast.getAnalysisYear() == null ? null : forecast.getAnalysisYear().intValue();
+        String semesterLabel = toUiSemester(forecast.getSemester());
+        String campusName = resolveOrgName(forecast.getOrgCode());
+        String deptName = resolveDeptName(forecast.getOrgCode(), forecast.getDeptCd());
+        String riskDisplay = toUiRisk(forecast.getRiskLevel());
+        String category = forecast.getG2bDNm();
+        String period = (year == null ? "" : year + "년 ") + semesterLabel;
+
+        AiForecastResponse.ConditionsRaw conditions = new AiForecastResponse.ConditionsRaw(
+                year,
+                semesterLabel,
+                campusName,
+                deptName,
+                category,
+                forecast.getRiskLevel() == null ? null : forecast.getRiskLevel().name()
+        );
+
         // 저장을 섹션별로 했을 때, 다시 하나의 객체로 합쳐 반환
         AiForecastResponse aiForecastResponse = new AiForecastResponse(
                 tsNode == null ? null : objectMapper.convertValue(
@@ -107,7 +125,13 @@ public class ForecastApplication {
                 ),
                 algoNode == null ? null : objectMapper.convertValue(
                         algoNode, AiForecastResponse.AlgorithmGuideRaw.class
-                )
+                ),
+                forecast.getMessage(), //prompt
+                deptName,               //target = 운용부서명
+                riskDisplay,            //risk
+                period,                 //period
+                campusName,             //campus
+                conditions
         );
 
         return aiForecastResponse;
@@ -217,6 +241,28 @@ public class ForecastApplication {
             case MEDIUM -> RiskLevel.MEDIUM.getDisplayName();
             case HIGH -> RiskLevel.HIGH.getDisplayName();
              default -> throw new IllegalArgumentException("risk_level은 LOW, MEDIUM, HIGH값이여야합니다.: " + riskLevel);
+        };
+    }
+
+    // 조회 화면 표시용: 저장된 학기 코드(1~4) -> UI 라벨
+    private String toUiSemester(Byte sem) {
+        if (sem == null) return "";
+        return switch (sem.intValue()) {
+            case 1 -> "1학기";
+            case 2 -> "여름학기";
+            case 3 -> "2학기";
+            case 4 -> "겨울학기";
+            default -> String.valueOf(sem);
+        };
+    }
+
+    // 조회 화면 표시용: 리스크 레벨 -> UI 표시값
+    private String toUiRisk(RiskLevel riskLevel) {
+        if (riskLevel == null) return "";
+        return switch (riskLevel) {
+            case HIGH -> "리스크 선호";
+            case MEDIUM -> "리스크 중립";
+            case LOW -> "리스크 회피";
         };
     }
 
