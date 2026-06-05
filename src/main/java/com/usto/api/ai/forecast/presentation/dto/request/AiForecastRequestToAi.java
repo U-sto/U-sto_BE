@@ -22,9 +22,9 @@ public record AiForecastRequestToAi(
             @Schema(example = "1")
             @NotNull String semester, //1=1학기,2=여름학기,3=2학기,4=겨울학기
 
-            @JsonProperty("org_cd")
-            @Schema(example = "7008277")
-            @NotBlank String campus, //org_cd
+            @JsonProperty("campus")
+            @Schema(example = "한양대학교 ERICA캠퍼스")
+            @NotBlank String campus, //AI 서버는 conditions.campus(조직명)로 ERICA 캠퍼스 필터링
 
             @JsonProperty("dept_name")
             @JsonAlias({"department"})

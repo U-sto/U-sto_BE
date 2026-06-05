@@ -53,6 +53,7 @@ public record AiForecastResponse(
     ) {}
 
     @JsonIgnoreProperties(ignoreUnknown = true)
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     public record RecommendationItemRaw(
             @JsonProperty("id")
             Long id,
@@ -65,7 +66,19 @@ public record AiForecastResponse(
             @JsonProperty("estimated_budget")
             Number estimatedBudget, //예상 예산 (총합)
             @JsonProperty("recommend_order_date")
-            String recommendOrderDate //권장 발주 마감 기한
+            String recommendOrderDate, //권장 발주 마감 기한
+            @JsonProperty("base_qty")
+            Number baseQty, //고장 예상 수량 (안전재고 제외)
+            @JsonProperty("safety_stock")
+            Number safetyStock, //안전 재고
+            @JsonProperty("rop")
+            Number rop, //재발주점(ROP)
+            @JsonProperty("lead_time_days")
+            Number leadTimeDays, //조달 리드타임(일)
+            @JsonProperty("monthly_avg_demand")
+            Number monthlyAvgDemand, //월 평균 수요
+            @JsonProperty("ai_analysis_comment")
+            String aiAnalysisComment //AI분석코멘트
     ) {}
 
     @JsonIgnoreProperties(ignoreUnknown = true)
