@@ -6,6 +6,7 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public record AiForecastResponse(
         @JsonProperty("section_1_time_series")
         List<TimeSeriesPointRaw> section1TimeSeries,
@@ -17,7 +18,21 @@ public record AiForecastResponse(
         List<RecommendationItemRaw> section3Recommendations,
 
         @JsonProperty("section_4_algorithm_guide")
-        AlgorithmGuideRaw section4AlgorithmGuide
+        AlgorithmGuideRaw section4AlgorithmGuide,
+
+        // --- 이전 분석 조회(contents) 화면 상단 영역용 메타. analyze 응답에서는 null이라 직렬화에서 제외됨 ---
+        @JsonProperty("prompt")
+        String prompt, //사용자 질문
+        @JsonProperty("target")
+        String target, //분석 대상(운용부서명 = dept_name)
+        @JsonProperty("risk")
+        String risk, //리스크 표시값(리스크 선호/중립/회피)
+        @JsonProperty("period")
+        String period, //분석 기간 표시값(예: 2030년 2학기)
+        @JsonProperty("campus")
+        String campus, //캠퍼스 조직명
+        @JsonProperty("conditions")
+        ConditionsRaw conditions //분석 조건 원본
 ) {
     @JsonIgnoreProperties(ignoreUnknown = true)
     @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -53,6 +68,7 @@ public record AiForecastResponse(
     ) {}
 
     @JsonIgnoreProperties(ignoreUnknown = true)
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     public record RecommendationItemRaw(
             @JsonProperty("id")
             Long id,
@@ -65,7 +81,19 @@ public record AiForecastResponse(
             @JsonProperty("estimated_budget")
             Number estimatedBudget, //예상 예산 (총합)
             @JsonProperty("recommend_order_date")
-            String recommendOrderDate //권장 발주 마감 기한
+            String recommendOrderDate, //권장 발주 마감 기한
+            @JsonProperty("base_qty")
+            Number baseQty, //고장 예상 수량 (안전재고 제외)
+            @JsonProperty("safety_stock")
+            Number safetyStock, //안전 재고
+            @JsonProperty("rop")
+            Number rop, //재발주점(ROP)
+            @JsonProperty("lead_time_days")
+            Number leadTimeDays, //조달 리드타임(일)
+            @JsonProperty("monthly_avg_demand")
+            Number monthlyAvgDemand, //월 평균 수요
+            @JsonProperty("ai_analysis_comment")
+            String aiAnalysisComment //AI분석코멘트
     ) {}
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -76,5 +104,22 @@ public record AiForecastResponse(
             String formula2, //발주 시점(ROP) 도출 공식 설명
             @JsonProperty("formula_3")
             String formula3 //잔여 수명(RUL) 정의 설명
+    ) {}
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public record ConditionsRaw(
+            @JsonProperty("year")
+            Integer year, //분석 년도
+            @JsonProperty("semester")
+            String semester, //학기 표시값(1학기/여름학기/2학기/겨울학기)
+            @JsonProperty("campus")
+            String campus, //캠퍼스 조직명
+            @JsonProperty("dept_name")
+            String deptName, //운용부서명
+            @JsonProperty("category")
+            String category, //물품분류명
+            @JsonProperty("risk_level")
+            String riskLevel //리스크 레벨(LOW/MEDIUM/HIGH)
     ) {}
 }
